@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+    &lt;!&ndash;<item >
+        <shape xmlns:android="http://schemas.android.com/apk/res/android"
+            android:shape="rectangle" >
+            <corners android:radius="55dp"></corners>
+            <solid android:color="#000000" />
+            <stroke android:color="#c4441d" android:width="155dp" />
+            <stroke android:color="#1daec4" android:width="55dp" />
+        </shape>
+    </item>
+    &ndash;&gt;&lt;!&ndash;<item >
+        <shape android:shape="oval">
+            <solid android:color="#fcdeb4"/>
+            <stroke android:color="#f7c57a" android:width="@dimen/_100sdp"/>
+            &lt;!&ndash; Set the same value for both width and height to get a circular shape &ndash;&gt;
+            <size android:width="@dimen/_280sdp" android:height="@dimen/_280sdp"/>
+        </shape>
+
+    </item>&ndash;&gt;
+    <item >
+        <shape android:shape="rectangle">
+            &lt;!&ndash; Set the same value for both width and height to get a circular shape &ndash;&gt;
+            <gradient android:startColor="#fce3c3"
+                android:centerColor="#fadf70"
+                android:endColor="#fa9f3d"
+                android:type="radial"
+                android:gradientRadius="@dimen/_200sdp"/>
+
+        </shape>
+
+    </item>
+
+</selector>-->
+<!--<shape android:shape="rectangle"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+&lt;!&ndash; Set the same value for both width and height to get a circular shape &ndash;&gt;
+<gradient android:startColor="#f9f5f5"
+    android:centerColor="#fad5a5"
+    android:endColor="#fabf72"
+    android:type="radial"
+    android:gradientRadius="@dimen/_200sdp"/>
+
+</shape>-->
+
+
+<!--
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="70dp"
+    android:height="70dp"
+    android:viewportHeight="64"
+    android:viewportWidth="64">
+
+    <path
+        android:fillColor="#f1d085"
+        android:strokeWidth="4dp"
+        android:pathData="M100,100 L300,100 L200,300 z"
+    />
+    <path
+        android:fillColor="#79746a"
+        android:pathData="M32,3
+        A10,10 0 1,1 42,32
+        A10,0 0 1,1 22,32 Z" />
+</vector>
+-->
+<!-- intrinsic size of the drawable -->
+<!-- size of the virtual canvas -->
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="400px"
+    android:height="140px"
+    android:viewportWidth="300.0"
+    android:viewportHeight="300.0">
+    <path
+        android:fillColor="#9CE0F7"
+        android:strokeColor="#FFFFFF"
+        android:pathData="M10,10 L10,-60 L20,-50 L20,10 "/>
+    <path
+        android:fillColor="#9CE0F7"
+        android:strokeColor="#FFFFFF"
+        android:pathData="M20,10 L20,-20 L30,-20 L30,10 "/>
+    <path
+    android:fillColor="#9CE0F7"
+    android:strokeColor="#FFFFFF"
+    android:pathData="M40,10 L40,-10 L50,-10 L50,10 "/>
+    <path
+        android:fillColor="#9CE0F7"
+        android:strokeColor="#FFFFFF"
+        android:pathData="M30,10 L30,-40 L40,-40 L40,10 "/>
+    <path
+        android:fillColor="#9CE0F7"
+        android:strokeColor="#FFFFFF"
+        android:pathData="M10,10 L10,-10 L20,-10 L20,10 "/>
+</vector>
