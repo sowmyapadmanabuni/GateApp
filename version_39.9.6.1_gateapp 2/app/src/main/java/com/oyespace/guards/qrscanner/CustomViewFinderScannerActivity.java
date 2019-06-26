@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.zxing.Result;
+import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity;
 import com.oyespace.guards.utils.Prefs;
@@ -214,5 +215,15 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
         Configuration conf = res.getConfiguration();
         conf.locale = myLocale;
         res.updateConfiguration(conf, dm);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent i=new Intent(CustomViewFinderScannerActivity.this, Dashboard.class);
+        startActivity(i);
+        finish();
+
+
     }
 }

@@ -47,6 +47,7 @@
     <string name="log">लॉग</string>
     <string name="in">में</string>
     <string name="out">बाहर</string>
+    <string name="textcancel">रद्द करना</string>
 
 
 
@@ -116,5 +117,5 @@
     <string name="textmissedcallby">
         द्वारा मिस्ड कॉल प्राप्त करें: </string>
     <string name="textnodata">कोई आकड़ा उपलब्ध नहीं है</string>
-
+    <string name="textnobalance">कोई राशि उपलब्ध नहीं है</string>
 </resources>

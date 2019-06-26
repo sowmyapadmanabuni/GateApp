@@ -110,6 +110,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         }
         try {
              number = orderData.vlMobile.substring(3)
+          //  number = orderData.vlMobile
         }
         catch (e:StringIndexOutOfBoundsException ) {
         }

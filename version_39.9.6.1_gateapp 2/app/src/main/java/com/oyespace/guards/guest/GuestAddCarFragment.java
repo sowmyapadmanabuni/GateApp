@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.NameEntryScreen;
 import com.oyespace.guards.camtest.AddCarFragment;
@@ -209,8 +210,8 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
                 .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
-        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
 
         if (getIntent().getStringExtra(FLOW_TYPE).equals(GUEST_REGISTRATION)) {
@@ -307,8 +308,8 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
 //                } else {
 
                     Intent d = new Intent(GuestAddCarFragment.this, GuestEntryRegistration.class);
-                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
                     d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                     d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                     d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
@@ -335,20 +336,13 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
         super.onDestroy();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        Intent d = new Intent(GuestAddCarFragment.this, GuestNameEntryScreen.class);
-//        d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
-//        d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
-//        d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
-//        d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
-//        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-//        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-//        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-//        startActivity(d);
-//        finish();
-//    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent d = new Intent(GuestAddCarFragment.this, Dashboard.class);
+        startActivity(d);
+        finish();
+    }
 
     @Override
     public void onClick(View v) {

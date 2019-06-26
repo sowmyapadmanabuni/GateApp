@@ -51,11 +51,11 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
 
 
         }
-if(arrayList[position].image_url>0) {
-    Picasso.with(mcontext)
-        .load(arrayList[position].image_url)
-        .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.img_logo)
-}
+        if(arrayList[position].image_url>0) {
+            Picasso.with(mcontext)
+                .load(arrayList[position].image_url)
+                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.img_logo)
+        }
 
     }
 

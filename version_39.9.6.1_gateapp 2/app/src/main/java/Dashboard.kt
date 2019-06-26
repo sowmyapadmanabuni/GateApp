@@ -988,8 +988,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         loginReq.uNUniName = unitName
         loginReq.vLVisCnt = 1
 
-        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
-            getCurrentTimeLocal(),"")
+
 //getCurrentTimeLocal()
         Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
         //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
@@ -1037,6 +1036,22 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //
 //        }
 
+//        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
+//            getCurrentTimeLocal(),"")
+
+
+        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
+            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
+
+
+        if(id<=0)
+        {
+            Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+        } else
+        {
+            Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
+
+        }
 
 
         val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
@@ -1478,35 +1493,39 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         when (v.id) {
 
             R.id.re_vehicle -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+                re_vehicle!!.setEnabled(false)
+                re_vehicle!!.setClickable(false)
 
                 val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
                 startActivity(i_vehicle)
+                finish()
 
             }
 
             R.id.re_delivery -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+                re_delivery!!.setEnabled(false)
+                re_delivery!!.setClickable(false)
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
+                finish()
 
             }
 
             R.id.re_guest -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+                re_guest!!.setEnabled(false)
+                re_guest!!.setClickable(false)
                 val i_guest = Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
+                finish()
 
             }
 
             R.id.re_staff -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+                re_staff!!.setEnabled(false)
+                re_staff!!.setClickable(false)
                 val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
                 startActivity(i_staff)
+                finish()
 
             }
 

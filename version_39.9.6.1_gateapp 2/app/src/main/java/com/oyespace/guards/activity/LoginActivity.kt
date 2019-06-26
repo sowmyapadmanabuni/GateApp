@@ -328,6 +328,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
         dialogs!!.setContentView(R.layout.layout_otp_dialog)
         val ed_otp = dialogs!!.findViewById(R.id.ed_otp) as EditText
         otpnumber = ed_otp.text.toString()
+        val btn_cancel= dialogs!!.findViewById(R.id.btn_cancel) as Button
         val btn_verifyotp = dialogs!!.findViewById(R.id.btn_verifyotp) as Button
         btn_verifyotp.setOnClickListener {
 
@@ -353,6 +354,9 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
             } else {
              //   Toast.makeText(this, ed_otp.text.toString(), Toast.LENGTH_SHORT).show()
                 verifyOTP(ed_otp.text.toString())
+            }
+            btn_cancel.setOnClickListener {
+                dialogs!!.dismiss()
             }
 
         }

@@ -54,7 +54,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name:TextView
-    internal var dbh: DataBaseHelper?=null
+    var dbh: DataBaseHelper?=null
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -63,20 +63,20 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 button_done.setEnabled(false)
                 button_done.setClickable(false)
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+STAFF_REGISTRATION+" "+FLOW_TYPE.equals( STAFF_REGISTRATION,true))
-                button_done.setEnabled(false)
-                button_done.setClickable(false)
-                if(intent.getStringExtra(FLOW_TYPE).equals( STAFF_REGISTRATION,true)){
-
-                  //  tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
-                   // txt_header.text= LocalDb.getAssociation()!!.asAsnName
-                    //tv_from.text=intent.getStringExtra(FLOW_TYPE)
-
-                    staffRegistration();
-                }else{
+//                button_done.setEnabled(false)
+//                button_done.setClickable(false)
+//                if(intent.getStringExtra(FLOW_TYPE).equals( STAFF_REGISTRATION,true)){
+//
+//                  //  tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
+//                   // txt_header.text= LocalDb.getAssociation()!!.asAsnName
+//                    //tv_from.text=intent.getStringExtra(FLOW_TYPE)
+//
+//                   // staffRegistration();
+//                }else{
                     visitorLog();
                    // txt_header.text= LocalDb.getAssociation()!!.asAsnName
                    // tv_from.text=intent.getStringExtra(COMPANY_NAME)+" "+intent.getStringExtra(FLOW_TYPE)
-                }
+              //  }
 
             }
 
@@ -157,11 +157,11 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             tv_from.text=intent.getStringExtra(COMPANY_NAME)+" "+intent.getStringExtra(FLOW_TYPE)
         }
 
-        Log.d("intentdata StaffEntry",""+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-                +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
-                +intent.getStringExtra(PERSONNAME)+" "
-                +" "+intent.getStringExtra(FLOW_TYPE)+" "
-                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME));
+//        Log.d("intentdata StaffEntry",""+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
+//                +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
+//                +intent.getStringExtra(PERSONNAME)+" "
+//                +" "+intent.getStringExtra(FLOW_TYPE)+" "
+//                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME));
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
@@ -186,10 +186,11 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
 
         val input =intent.getStringExtra(MOBILENUMBER)
-        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
-
+      //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.setText("+"+91+" "+number)
+        tv_mobilenumber.setText(getIntent().getStringExtra(COUNTRYCODE)+" "+number)
+
+
         tv_for.setText(resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME))
        // tv_totalperson.setText(resources.getString(R.string.textperson))
         //tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
@@ -286,7 +287,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        }
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
             toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-            "",0,"","+"+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER),
+            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName)
@@ -300,8 +301,23 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1,
-                            getCurrentTimeLocal(),"")
+                       // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
+
+
+                       var id: Long  = dbh!!.insertVisitorData(intent.getStringExtra(UNITNAME),Prefs.getInt(ASSOCIATION_ID,0).toString(),intent.getStringExtra(PERSONNAME),memID,globalApiObject.data.visitorLog.vlVisLgID, toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(VISITOR_TYPE),1,"","" )
+
+
+
+
+                        if(id<=0)
+            {
+              // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+            } else
+            {
+               // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
+
+            }
+
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
                         val d  =  Intent(this@StaffEntryRegistration,BackgroundSyncReceiver::class.java)
@@ -350,7 +366,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     private fun singUp(name :String, isdCode: String, mobNum : String) {
 
         val req = SignUpReq("", "", "", "", "",
-            name ,"+"+isdCode, "","","","",
+            name ,isdCode, "","","","",
             "",mobNum,"","", "","")
         Log.d("singUp","StaffEntry "+req.toString())
 
@@ -463,6 +479,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //             val d = Intent(this@StaffEntryRegistration,Dashboard::class.java)
 //                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
 //                startActivity(d)
+                val i_delivery = Intent(this@StaffEntryRegistration, Dashboard::class.java)
+                startActivity(i_delivery)
                 finish()
 
             }
@@ -629,8 +647,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        ,intent.getStringExtra(VISITOR_TYPE)
 
         val req = StaffRegistrationReq(Prefs.getInt(ASSOCIATION_ID,0), 0, "", 0,0,0,0,
-            intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(PERSONNAME),"","+"+intent.getStringExtra(COUNTRYCODE),
-            "", ""+intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),toInteger(intent.getStringExtra(UNITID)),
+            intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(PERSONNAME),"","",
+            "", intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),toInteger(intent.getStringExtra(UNITID)),
             intent.getStringExtra(UNITNAME),imgName)
         Log.d("staffRegistration ","StaffEntry "+req.toString())
 
@@ -649,6 +667,9 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         //var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +globalApiObject.data.worker.wkWorkID  + ".jpg"
                         uploadImage(imgName,mBitmap)
 
+                        val i_delivery = Intent(this@StaffEntryRegistration, Dashboard::class.java)
+                        startActivity(i_delivery)
+                        finish()
                        finish();
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)

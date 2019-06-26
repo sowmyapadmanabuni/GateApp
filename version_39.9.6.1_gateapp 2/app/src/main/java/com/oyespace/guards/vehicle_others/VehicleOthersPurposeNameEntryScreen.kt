@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -38,13 +39,13 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@VehicleOthersPurposeNameEntryScreen, VehicleOthersMobileNumberScreen::class.java)
 
-                    Log.d(
-                        "intentdata NameEntr",
-                        "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                                + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(
-                            COUNTRYCODE
-                        ) + " " + Ed_Name_purp.text
-                    )
+//                    Log.d(
+//                        "intentdata NameEntr",
+//                        "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                                + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(
+//                            COUNTRYCODE
+//                        ) + " " + Ed_Name_purp.text
+//                    )
 //                    d.putExtra(UNITID, intent.getStringExtra(UNITID))
 //                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
 //                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -108,10 +109,10 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
             Speak()
         }
 
-        Log.d(
-            "intentdata NameEntr", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE)
-        )
+//        Log.d(
+//            "intentdata NameEntr", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE)
+//        )
 
     }
 
@@ -173,5 +174,12 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent= Intent(this@VehicleOthersPurposeNameEntryScreen, Dashboard::class.java)
+        startActivity(intent)
+        finish()
     }
 }

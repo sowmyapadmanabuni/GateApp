@@ -15,7 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.oyespace.guards.DashBoard
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -326,6 +326,13 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val d = Intent(this@GuestUnitScreen, Dashboard::class.java)
+        startActivity(d)
+        finish()
     }
 
 }

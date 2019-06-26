@@ -153,7 +153,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.setText("+"+"91"+" "+number)
+        tv_mobilenumber.setText(getIntent().getStringExtra(COUNTRYCODE)+" "+number)
        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": +"+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
        // tv_for.setText(resources.getString(R.string.textto)+intent.getStringExtra(UNITNAME))
         tv_for.setText(resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME))
@@ -229,7 +229,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         }
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
             toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-            "",0,"","+"+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER),
+            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName)
@@ -414,6 +414,11 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
 //                        finish();
+
+                        val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
+                        startActivity(d)
+                        finish()
+
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
@@ -450,6 +455,13 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
+        startActivity(d)
+        finish()
     }
 
 

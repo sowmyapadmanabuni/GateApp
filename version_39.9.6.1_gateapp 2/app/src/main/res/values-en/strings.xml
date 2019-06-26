@@ -113,5 +113,6 @@
     <string name="textvisiting">Visiting</string>
     <string name="textmissedcallby">Get Missed Call by: </string>
     <string name="textnodata">No Data</string>
-
+    <string name="textnobalance">No Balance</string>
+    <string name="textcancel">Cancel</string>
 </resources>

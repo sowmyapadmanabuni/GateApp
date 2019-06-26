@@ -18,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
@@ -643,5 +644,12 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val i_delivery = Intent(this@UnitListActivity, Dashboard::class.java)
+        startActivity(i_delivery)
+        finish()
     }
 }

@@ -68,6 +68,11 @@
         </activity>
 
         <activity
+                android:name=".activity.MobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"/>
+
+        <activity
                 android:name=".activity.MobileNumberforEntryScreen"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
@@ -314,6 +319,10 @@
                 android:theme="@style/noActionBar">
         </activity>
         <activity
+                android:name=".vehicle_others.Vehicle_Others_MobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"/>
+        <activity
                 android:name=".guest.GuestEntryRegistration"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
@@ -326,6 +335,10 @@
         <activity android:name=".pertroling.TimeSetter">
         </activity>
         <activity
+                android:name=".vehicle_guest.Vehicle_Guest_MobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"/>
+        <activity
                 android:name=".activity.StaffDetails"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
@@ -336,6 +349,18 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
+
+
+        <activity
+                android:name=".activity.MobileNumberEntryScreenwithOTP"
+                android:exported="true"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
+        </activity>
+        <activity
+                android:name=".guest.GuestMobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"/>
         <!--<activity android:name=".activity.BiometricNewAdvance">-->
         <!--</activity>-->
 

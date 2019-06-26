@@ -1061,6 +1061,7 @@ data class VisitorEntryLog(
     val vlComName: String,
     val vlEntryT: String,
     val vlEntyWID: Int,
+    val vlEntryImg:String,
     var vlExitT: String,
     val vlExitWID: Int,
     val vlGtName: String,
@@ -1353,6 +1354,22 @@ val spPrdImg9: String,
 val spPrdImg10: String
 )
 
+//send staff image request
+
+data class SendStaffImageReq(
+
+    val WKEntryImg: String,
+    val WKEntryGPS: String,
+    val WKWorkID: Int
+)
+
+//send staff image response
+
+data class StaffImageRes(
+    val apiVersion: String,
+    val data: String,
+    val success: Boolean
+)
 
 
 

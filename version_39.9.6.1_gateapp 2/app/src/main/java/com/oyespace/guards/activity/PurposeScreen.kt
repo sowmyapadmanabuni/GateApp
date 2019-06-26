@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.Dashboard
 import kotlinx.android.synthetic.main.activity_purpose.*
 import java.util.*
 import com.oyespace.guards.R
@@ -164,5 +165,12 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val i_delivery = Intent(this@PurposeScreen, Dashboard::class.java)
+        startActivity(i_delivery)
+        finish()
     }
 }

@@ -117,4 +117,8 @@ interface WebApi {
     @GET("oyesafe/api/v1/VisitorLog/GetVisitorLogListByWorkerID/{workerid}/{id}")
     fun getVisitorByWorkerId(@Header("X-OYE247-APIKey")token: String,@Path("workerid")workerId:Int,@Path("id")assid:Int):Single<getVisitorDataByWorker>
 
+//
+//    @POST("oye247/api/v1/Worker/WorkerEntryImgGPSUpdate")
+//    fun sendStaffImage(@Header(OYE247KEY) token: String, @Body sendStaffImageReq: SendStaffImageReq)
+//            : Single<SendStaffImageRes>
 }

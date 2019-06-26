@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -36,8 +37,8 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@NameEntryScreen, AddCarFragment::class.java)
 
-                    Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-                            +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" "+Ed_Name.text);
+//                    Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
+//                            +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" "+Ed_Name.text);
                     d.putExtra(UNITID,intent.getStringExtra(UNITID) )
                     d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                     d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
@@ -91,8 +92,8 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
 //        supportActionBar!!.setTitle("Enter your Name")
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        Log.d("intentdata NameEntr",""+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-        +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE));
+//        Log.d("intentdata NameEntr",""+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
+//        +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE));
 
     }
 
@@ -179,4 +180,10 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         res.updateConfiguration(conf, dm)
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val i_delivery = Intent(this@NameEntryScreen, Dashboard::class.java)
+        startActivity(i_delivery)
+        finish()
+    }
 }

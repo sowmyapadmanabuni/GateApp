@@ -145,19 +145,19 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
 
         }
 
-        Log.d("intentdata StaffEntry",""+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-                +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
-                +intent.getStringExtra(PERSONNAME)+" "
-                +" "+intent.getStringExtra(FLOW_TYPE)+" "
-                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME));
+//        Log.d("intentdata StaffEntry",""+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
+//                +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
+//                +intent.getStringExtra(PERSONNAME)+" "
+//                +" "+intent.getStringExtra(FLOW_TYPE)+" "
+//                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME));
         txt_header.text= LocalDb.getAssociation()!!.asAsnName
 
         tv_name.setText(intent.getStringExtra(PERSONNAME))
         val input =intent.getStringExtra(MOBILENUMBER)
-        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
+       // val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.setText("+"+"91"+" "+number)
+        tv_mobilenumber.setText(getIntent().getStringExtra(COUNTRYCODE)+" "+number)
        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + " +intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
         tv_for.setText(resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME))
         tv_totalperson.setText(resources.getString(R.string.textperson))
@@ -234,7 +234,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
         }
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
             toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-            "",0,"","+"+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER),
+            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName)
@@ -294,7 +294,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
     private fun singUp(name :String, isdCode: String, mobNum : String) {
 
         val req = SignUpReq("", "", "", "", "",
-            name ,"+"+isdCode, "","","","",
+            name ,isdCode, "","","","",
             "",mobNum,"","", "","")
         Log.d("singUp","StaffEntry "+req.toString())
 
@@ -536,6 +536,9 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
                 override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
+
+                        val intent= Intent(this@VehicleGuestEntryRegistration,Dashboard::class.java)
+                        startActivity(intent)
                         finish();
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -575,5 +578,11 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
         res.updateConfiguration(conf, dm)
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent= Intent(this@VehicleGuestEntryRegistration,Dashboard::class.java)
+        startActivity(intent)
+        finish()
+    }
 
 }

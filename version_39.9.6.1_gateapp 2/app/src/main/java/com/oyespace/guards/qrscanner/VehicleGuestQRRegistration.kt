@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.ImageBigView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -178,8 +179,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                         sendBroadcast(d);
 
-//                        val intentdata = Intent(this@VehicleGuestQRRegistration,DashBoard::class.java)
-//                        startActivity(intentdata)
+
 
                         Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
                     } else {
@@ -298,6 +298,8 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
 
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
+                        val d = Intent(this@VehicleGuestQRRegistration, Dashboard::class.java)
+                        startActivity(d)
                         finish();
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -337,6 +339,11 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
     }
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val d = Intent(this@VehicleGuestQRRegistration, Dashboard::class.java)
+        startActivity(d)
+        finish()
+    }
 
 }

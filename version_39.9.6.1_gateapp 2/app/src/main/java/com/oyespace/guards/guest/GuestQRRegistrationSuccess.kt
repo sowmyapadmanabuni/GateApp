@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DashBoard
 import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -105,17 +104,23 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         if (intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHQRCODE, true)) {
             profile_image.visibility = View.GONE
         }
-        Log.d(
-            "intentdata StaffEntry", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE) + " "
-                    + intent.getStringExtra(PERSONNAME) + " "
-                    + " " + intent.getStringExtra(FLOW_TYPE) + " "
-                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
-        )
+//        Log.d(
+//            "intentdata StaffEntry", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE) + " "
+//                    + intent.getStringExtra(PERSONNAME) + " "
+//                    + " " + intent.getStringExtra(FLOW_TYPE) + " "
+//                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
+//        )
 
-        tv_name.setText(resources.getString(R.string.textname)+": " + intent.getStringExtra(PERSONNAME))
-        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
-                + "" + intent.getStringExtra(MOBILENUMBER))
+        tv_name.setText(intent.getStringExtra(PERSONNAME))
+
+        val input =intent.getStringExtra(MOBILENUMBER)
+        //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
+
+        val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
+        tv_mobilenumber.setText(number)
+//        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
+//                + "" + intent.getStringExtra(MOBILENUMBER))
         tv_for.setText(resources.getString(R.string.textto)+ intent.getStringExtra(UNITNAME))
         tv_totalperson.setText(resources.getString(R.string.textperson))
         tv_from.setText(resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME))
@@ -158,7 +163,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         }
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
             intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), "", 0, "",
-            intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
+            intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",""
         )
@@ -221,7 +226,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 
         val req = SignUpReq(
             "", "", "", "", "",
-            name, "+" + isdCode, "", "", "", "",
+            name, isdCode, "", "", "", "",
             "", mobNum, "", "", "", ""
         )
         Log.d("singUp", "StaffEntry " + req.toString())
@@ -426,6 +431,11 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
     }
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val d = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
+        startActivity(d)
+        finish()
+    }
 
 }

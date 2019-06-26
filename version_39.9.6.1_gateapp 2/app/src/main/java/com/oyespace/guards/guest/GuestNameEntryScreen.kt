@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.MobileNumberScreen
@@ -36,13 +37,13 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@GuestNameEntryScreen, GuestAddCarFragment::class.java)
 
-                    Log.d(
-                        "intentdata NameEntr",
-                        "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(
-                            COUNTRYCODE
-                        ) + " " + Ed_Name.text
-                    );
+//                    Log.d(
+//                        "intentdata NameEntr",
+//                        "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(
+//                            COUNTRYCODE
+//                        ) + " " + Ed_Name.text
+//                    );
                     d.putExtra(UNITID, intent.getStringExtra(UNITID))
                     d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                     d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -98,10 +99,10 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
 //        supportActionBar!!.setTitle("Enter your Name")
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        Log.d(
-            "intentdata NameEntr", "" + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                    + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE)
-        )
+//        Log.d(
+//            "intentdata NameEntr", "" + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                    + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE)
+//        )
 
     }
 
@@ -181,5 +182,11 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
+    }
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val d = Intent(this@GuestNameEntryScreen, Dashboard::class.java)
+        startActivity(d)
+        finish()
     }
 }

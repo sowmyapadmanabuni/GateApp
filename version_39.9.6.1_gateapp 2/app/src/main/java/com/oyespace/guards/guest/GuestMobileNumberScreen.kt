@@ -20,6 +20,7 @@ import android.text.InputFilter
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.hbb20.CountryCodePicker
@@ -29,6 +30,7 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.camtest.AddCarFragment
@@ -57,11 +59,14 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
     private var countryName: String? = null
     lateinit var pDialog: ProgressDialog
     var phonenumber: String? = null
+    lateinit var btn_nobalance: Button
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView
     lateinit var timer:TextView
     private val REQUEST_CODE_SPEECH_INPUT = 100;
+    var ccd:String?=null
+    var mobileNumber:String?=null
 
     override fun onClick(v: View?) {
 
@@ -72,13 +77,25 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                     .show()
             }
 
+            R.id.btn_nobalance->{
+
+                val d = Intent(this@GuestMobileNumberScreen, GuestMobileNumberScreenwithOTP::class.java)
+                d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                startActivity(d);
+                finish();
+
+            }
             R.id.buttonSkip -> {
                 val d = Intent(this@GuestMobileNumberScreen, GuestNameEntryScreen::class.java)
-                Log.d(
-                    "intentdata MobileNumber",
-                    "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                            + " " + textview.text + " " + countryCode
-                );
+//                Log.d(
+//                    "intentdata MobileNumber",
+//                    "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                            + " " + textview.text + " " + countryCode
+//                );
                 d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
@@ -95,22 +112,23 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             R.id.buttonNext -> {
                 buttonNext.setEnabled(false)
                 buttonNext.setClickable(false)
-                if (textview.text.length == 10) {
-                    val d = Intent(this@GuestMobileNumberScreen, GuestNameEntryScreen::class.java)
-                    Log.d(
-                        "intentdata MobileNumber",
-                        "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                                + " " + textview.text + " " + countryCode
-                    )
-                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                    d.putExtra(UNITID, intent.getStringExtra(UNITID))
-                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-                    d.putExtra(MOBILENUMBER, textview.getText().toString())
-                    d.putExtra(COUNTRYCODE, countryCode)
+                if (textview.text.length == 13) {
+//                    val d = Intent(this@GuestMobileNumberScreen, GuestNameEntryScreen::class.java)
+////                    Log.d(
+////                        "intentdata MobileNumber",
+////                        "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+////                                + " " + textview.text + " " + countryCode
+////                    )
+//                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+//                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+//                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+//                    d.putExtra(UNITID, intent.getStringExtra(UNITID))
+//                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+//                    d.putExtra(MOBILENUMBER, mobileNumber)
+//                    d.putExtra(COUNTRYCODE, ccd)
 
-                    if (entryExists(countryCode.toString(), textview.getText().toString())) {
+                    if (entryExists(ccd, mobileNumber)) {
+
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)
                         builder.setTitle("Guest Entry already done")
@@ -121,7 +139,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                         builder.setCancelable(false)
                         builder.show()
                     } else {
-                        getAccountDetails(countryCode.toString(), textview.getText().toString())
+                        getAccountDetails(ccd.toString(), mobileNumber.toString())
 
                     }
 
@@ -173,7 +191,17 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (textview != null && number != null) {
-                                textview.text = number.replace("+91", "")
+                              //  textview.text = number.replace("+91", "")
+                                textview.text = number
+
+                               ccd= number.substring(0,3)
+
+                               mobileNumber=number.substring(3,13)
+
+
+
+
+
                             }
                         }
                     }
@@ -183,6 +211,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 //
             }
         };
+        btn_nobalance=findViewById(R.id.btn_nobalance)
         txt_assn_name=findViewById(R.id.txt_assn_name)
         timer=findViewById(R.id.timer)
 
@@ -466,7 +495,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
     fun getAccountDetails(isdCode: String, MobNumber: String) {
 
-        val req = GetAccountDetailsByMobReq("+" + isdCode, MobNumber)
+        val req = GetAccountDetailsByMobReq(isdCode, MobNumber)
         Log.d("getAccountDetails", req.toString())
         compositeDisposable.add(
             RetrofitClinet.instance.GetAccountDetailsByMobCall(CHAMPTOKEN, req)
@@ -479,10 +508,10 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                             Log.d("getAccountDetails", globalApiObject.data.accountByMobile.toString())
                             val d = Intent(this@GuestMobileNumberScreen, GuestAddCarFragment::class.java)
 
-                            Log.d("intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME)
-                                    + " " + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " "
-                                        + globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-                            );
+//                            Log.d("intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME)
+//                                    + " " + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " "
+//                                        + globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
+//                            );
                             d.putExtra(UNITID, intent.getStringExtra(UNITID))
                             d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -522,18 +551,18 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
     fun deliveryFlow_launchNameEntryScreen() {
         val d = Intent(this@GuestMobileNumberScreen, GuestNameEntryScreen::class.java)
-        Log.d(
-            "intentdata MobileNumber",
-            "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                    + " " + textview.text + " " + countryCode
-        );
+//        Log.d(
+//            "intentdata MobileNumber",
+//            "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                    + " " + textview.text + " " + countryCode
+//        );
         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
         d.putExtra(UNITID, intent.getStringExtra(UNITID))
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-        d.putExtra(MOBILENUMBER, textview.getText().toString())
-        d.putExtra(COUNTRYCODE, countryCode)
+        d.putExtra(MOBILENUMBER, mobileNumber)
+        d.putExtra(COUNTRYCODE, ccd)
 
         startActivity(d);
         finish();
@@ -544,7 +573,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         countryCode.toString()
         Ed_phoneNum.toString()
 
-        val req = GetOTPReq(countryCode.toString(), Ed_phoneNum.toString())
+        val req = GetOTPReq("", Ed_phoneNum.toString())
         compositeDisposable.add(
             RetrofitClinet.instance.getOTPCall(CHAMPTOKEN, req)
                 .subscribeOn(Schedulers.io())
@@ -671,6 +700,13 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         super.onResume()
         val action = "android.intent.action.PHONE_STATE"
         registerReceiver(receiver, IntentFilter(action))
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
+        startActivity(d)
+        finish()
     }
 
 }

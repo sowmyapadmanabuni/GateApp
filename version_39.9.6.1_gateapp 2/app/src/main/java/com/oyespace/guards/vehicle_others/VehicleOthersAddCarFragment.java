@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.NameEntryScreen;
 import com.oyespace.guards.camtest.AddCarFragment;
@@ -186,8 +187,8 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
-        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
 
         if(getIntent().getStringExtra(FLOW_TYPE).equals(VEHICLE_OTHERS)){
@@ -283,8 +284,8 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 else {
 
                     Intent d = new Intent(VehicleOthersAddCarFragment.this, VehicleOthersEntryRegistration.class);
-                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
                     d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                     d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                     d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
@@ -539,5 +540,12 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
         res.updateConfiguration(conf, dm);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent=new Intent(VehicleOthersAddCarFragment.this, Dashboard.class);
+        startActivity(intent);
+        finish();
+    }
 }
 

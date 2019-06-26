@@ -116,6 +116,7 @@
                   android:layout_height="54dp"
                   android:layout_gravity="center"
                   android:hint="@string/textenterpurpose"
+                  android:maxLength="50"
                   android:inputType="textCapWords"
                   android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .'"
                   android:layout_marginLeft="4dp"

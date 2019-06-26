@@ -3,10 +3,13 @@ package com.oyespace.guards.activity
 import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
@@ -54,7 +57,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     override fun onFailure(e: java.lang.Exception?, urlId: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
+    var receiver:BroadcastReceiver?=null
     val workType: ArrayList<String> = ArrayList();
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
@@ -66,6 +69,12 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     lateinit var txt_device_name: TextView
     val laststate:Int?=null
     var buttonSkip:Button?=null
+    var ccd:String?=null
+    var mobileNumber:String?=null
+    lateinit var btn_nobalance:Button
+    lateinit var timer:TextView
+
+
 
     // private var Ed_phoneNum:String?=null
 
@@ -75,12 +84,28 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
         when (v?.id) {
 
+            R.id.btn_nobalance->{
+
+                val d = Intent(this@MobileNumberforEntryScreen, MobileNumberEntryScreenwithOTP::class.java)
+                d.putExtra("UNITID", intent.getIntExtra("UNITID",0))
+                d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                d.putExtra("WORKTYPE",  intent.getStringExtra("WORKTYPE"))
+                d.putExtra("WORKERID",  intent.getIntExtra("WORKERID",0))
+                d.putExtra("UNITNAME",  intent.getStringExtra("UNITNAME"))
+                startActivity(d);
+                finish();
+
+            }
+
 
             R.id.buttonNext -> {
                 if (textview.text.length > 0) {
 
                     Log.v("NUMBER MATCH",intent.getStringExtra(MOBILENUMBER)+".."+textview.text)
-                    if (intent.getStringExtra(MOBILENUMBER).equals("+91"+textview.text)) {
+                    if (intent.getStringExtra(MOBILENUMBER).equals(textview.text)) {
 
 
 
@@ -160,6 +185,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 //                    }
                 }
 
+
             }
         }
     }
@@ -177,6 +203,40 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
 
         setContentView(R.layout.activity_mobilenumberforentry)
+        btn_nobalance=findViewById(R.id.btn_nobalance)
+        timer=findViewById(R.id.timer)
+
+
+        receiver =  object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+
+                val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                telephony.listen(object : PhoneStateListener() {
+
+                    override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+                        super.onCallStateChanged(state, phoneNumber)
+                        if (state == TelephonyManager.CALL_STATE_RINGING) {
+
+                            val bundle = intent?.getExtras();
+                            val number = bundle?.getString("incoming_number");
+
+                            //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
+                            if (textview != null && number != null) {
+                                // textview.text = number.replace("+91", "")
+                                textview.text = number
+
+                                ccd= number.substring(0,3)
+
+                                mobileNumber=number.substring(3,13)
+                            }
+                        }
+                    }
+
+                }, PhoneStateListener.LISTEN_CALL_STATE);
+
+                //
+            }
+        };
 
         buttonSkip=findViewById(R.id.buttonSkip)
         buttonSkip?.visibility=View.INVISIBLE
@@ -201,7 +261,18 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             txt_device_name.text = " "
 
         }
+        val timer = object: CountDownTimer(60000,1000){
+            override fun onTick(millisUntilFinished: Long) {
 
+                val remainedSecs: Long  = millisUntilFinished / 1000;
+                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+            }
+
+            override fun onFinish() {
+                finish()
+            }
+        }
+        timer.start()
 
 
 
@@ -581,66 +652,76 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         res.updateConfiguration(conf, dm)
     }
 
+
+    override fun onPause() {
+
+        unregisterReceiver(receiver)
+
+        super.onPause()
+    }
     override fun onResume() {
         super.onResume()
 
-        val telephony = this@MobileNumberforEntryScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        telephony.listen(object : PhoneStateListener() {
-            override fun onCallStateChanged(state: Int, incomingNumber: String) {
-                super.onCallStateChanged(state, incomingNumber)
-                when (state) {
+        val action = "android.intent.action.PHONE_STATE"
+        registerReceiver(receiver, IntentFilter(action))
 
-                    // not getting incoming number in latest version of android
-                    TelephonyManager.CALL_STATE_RINGING -> {
-                        Log.e("Shalini Pareek", "incomingNumber: $incomingNumber")
-                        phonenumber = "$incomingNumber"
-                        if (phonenumber?.length == 13) {
-                            Log.d("Shalini length", "length: " + phonenumber?.substring(3, 13))
-                           // Toast.makeText(this@MobileNumberScreen,phonenumber?.substring(3, 13),Toast.LENGTH_LONG).show()
-                            textview.text = phonenumber?.substring(3, 13)
-
-//                            ccp.setCountryForPhoneCode()
-
-                            //TODO romove the data
-
-                        } else if (phonenumber?.length == 10) {
-                            textview.text = phonenumber
-
-//                        }else if(phonenumber.contains("+91")){
-//                            textview.text=phonenumber?.replace("+91","")
-                        } else {
-                           // textview.text = phonenumber)
-                            if(textview.text.toString().length==0){
-                                val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
-                                startActivity(i)
-
-                            }
-                        }
-
-                    }
-TelephonyManager.CALL_STATE_IDLE->{
-    if (laststate==TelephonyManager.CALL_STATE_RINGING){
-        if(textview.text.toString().equals(null)){
-            val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
-            startActivity(i)
-
-        }
-    }
-
-}
-
-                }
-
-
-
-            }
-        }, PhoneStateListener.LISTEN_CALL_STATE)
-
-//        if(textview.text.toString().length==0){
-//            val i=Intent(this@MobileNumberScreen,DashBoard::class.java)
+//        val telephony = this@MobileNumberforEntryScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+//        telephony.listen(object : PhoneStateListener() {
+//            override fun onCallStateChanged(state: Int, incomingNumber: String) {
+//                super.onCallStateChanged(state, incomingNumber)
+//                when (state) {
+//
+//                    // not getting incoming number in latest version of android
+//                    TelephonyManager.CALL_STATE_RINGING -> {
+//                        Log.e("Shalini Pareek", "incomingNumber: $incomingNumber")
+//                        phonenumber = "$incomingNumber"
+//                        if (phonenumber?.length == 13) {
+//                            Log.d("Shalini length", "length: " + phonenumber?.substring(3, 13))
+//                           // Toast.makeText(this@MobileNumberScreen,phonenumber?.substring(3, 13),Toast.LENGTH_LONG).show()
+//                            textview.text = phonenumber?.substring(3, 13)
+//
+////                            ccp.setCountryForPhoneCode()
+//
+//                            //TODO romove the data
+//
+//                        } else if (phonenumber?.length == 10) {
+//                            textview.text = phonenumber
+//
+////                        }else if(phonenumber.contains("+91")){
+////                            textview.text=phonenumber?.replace("+91","")
+//                        } else {
+//                           // textview.text = phonenumber)
+//                            if(textview.text.toString().length==0){
+//                                val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
+//                                startActivity(i)
+//
+//                            }
+//                        }
+//
+//                    }
+//TelephonyManager.CALL_STATE_IDLE->{
+//    if (laststate==TelephonyManager.CALL_STATE_RINGING){
+//        if(textview.text.toString().equals(null)){
+//            val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
 //            startActivity(i)
 //
 //        }
+//    }
+//
+//}
+//
+//                }
+//
+//
+//
+//            }
+//        }, PhoneStateListener.LISTEN_CALL_STATE)
+//
+////        if(textview.text.toString().length==0){
+////            val i=Intent(this@MobileNumberScreen,DashBoard::class.java)
+////            startActivity(i)
+////
+////        }
     }
 
     private fun visitorLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
@@ -767,6 +848,13 @@ TelephonyManager.CALL_STATE_IDLE->{
 //                    dismissProgress()
                 }
             }))
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val i_delivery = Intent(this@MobileNumberforEntryScreen, Dashboard::class.java)
+        startActivity(i_delivery)
+        finish()
     }
 
 }

@@ -846,10 +846,33 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             previous!!.visibility = View.INVISIBLE
             next!!.visibility = View.INVISIBLE
             save!!.visibility = View.VISIBLE
-            result = sgfplib!!.GetImage(mRegisterImage)
-            // var result = sgfplib!!.GetImage(mRegisterImage)
-            //  Toast.makeText(this@Biometric,result.toString(),Toast.LENGTH_LONG).show()
-            Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)
+
+
+//            if(sgfplib!!.GetImage(mRegisterImage).equals(true)){
+//
+//                val builder = android.support.v7.app.AlertDialog.Builder(this@Biometric)
+//                // builder.setTitle("Guest Entry already done")
+//                builder.setMessage("Check")
+//                builder.setPositiveButton("Ok") { dialog, which ->
+//                    dialog.cancel()
+//                }
+//                builder.setCancelable(false)
+//                builder.show()
+//
+//            }else{
+
+                result = sgfplib!!.GetImage(mRegisterImage)
+
+          //  }
+
+
+
+
+
+
+
+            Toast.makeText(this@Biometric,result.toString(),Toast.LENGTH_LONG).show()
+
 
             var fpInfo: SGFingerInfo? = SGFingerInfo()
 
@@ -1529,5 +1552,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         private val TAG = "SecuGen USB"
         private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     }
+
+
 
 }

@@ -17,6 +17,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.oyespace.guards.Dashboard
 import kotlinx.android.synthetic.main.activity_unit_list.*
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -353,5 +354,12 @@ class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        val intent= Intent(this@VehicleOthersUnitScreen, Dashboard::class.java)
+        startActivity(intent)
+        finish()
     }
 }

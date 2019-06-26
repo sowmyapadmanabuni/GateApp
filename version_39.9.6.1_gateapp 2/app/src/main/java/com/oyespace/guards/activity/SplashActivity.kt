@@ -1,14 +1,12 @@
 package com.oyespace.guards.activity
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.oyespace.guards.DashBoard
 import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
@@ -17,17 +15,10 @@ import com.oyespace.guards.listeners.LocationCallback
 import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.pojo.SearchResult
 import timber.log.Timber
-import android.content.Context.TELEPHONY_SERVICE
-import android.support.v4.content.ContextCompat.getSystemService
 import android.telephony.TelephonyManager
 import android.content.Context
-import android.content.pm.PackageManager
-import android.support.v4.app.ActivityCompat
-import android.content.DialogInterface
-import android.app.AlertDialog
 import android.view.Gravity
 import com.oyespace.guards.Myapp
-import com.oyespace.guards.camtest.MyApplication
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.Device
@@ -117,6 +108,7 @@ class SplashActivity : BaseLocationActivity() {
 
 
             if(Prefs.getString(PrefKeys.MOBILE_NUMBER,null)==null) {
+
 
                 val mainIntent = Intent(this@SplashActivity, LoginActivity::class.java)
                 startActivity(mainIntent)
@@ -281,16 +273,26 @@ class SplashActivity : BaseLocationActivity() {
                         Log.d("onErrorResponse","StaffEntry "+e.toString())
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
 
-                        if(getSimNumber?.length==0){
+                        Toast.makeText(this@SplashActivity,e.toString(),Toast.LENGTH_LONG).show()
 
-                            val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,null)
+                        if(getSimNumber?.length==0) {
+
+                            val input = Prefs.getString(PrefKeys.MOBILE_NUMBER, null)
                             LovelyStandardDialog(this@SplashActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                 .setTopColorRes(R.color.google_red)
                                 // .setIcon(R.drawable.ic_info_black_24dp)
                                 //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
                                 .setTitle("Device is not registered as Gate device")
                                 .setTitleGravity(Gravity.CENTER)
-                                .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
+                                .setMessage(
+                                    Mobile_IMEI_NO + " and +" + Prefs.getString(
+                                        PrefKeys.COUNTRY_CODE,
+                                        null
+                                    ) + Prefs.getString(
+                                        PrefKeys.MOBILE_NUMBER,
+                                        null
+                                    ) + " is Not Registered as Gate Device"
+                                )
                                 //.setMessage(Mobile_IMEI_NO + " and +91" + intent.getStringExtra("MOBIELNUMBER") + " is not registered as Gate Device")
 
                                 .setMessageGravity(Gravity.CENTER)
@@ -300,16 +302,17 @@ class SplashActivity : BaseLocationActivity() {
 
                                 .show()
                             dismissProgress()
+                       // }
                         }else {
 
 
                             LovelyStandardDialog(this@SplashActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                 .setTopColorRes(R.color.google_red)
-                                // .setIcon(R.drawable.ic_info_black_24dp)
+                               //  .setIcon(R.drawable.google_red)
                                 //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
                                 .setTitle("Device is not registered as Gate device")
                                 .setTitleGravity(Gravity.CENTER)
-                                // .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
+                                 .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
                                 .setMessage(Mobile_IMEI_NO + " and +" + getSimNumber + " is not registered as Gate Device")
 
                                 .setMessageGravity(Gravity.CENTER)
@@ -323,8 +326,22 @@ class SplashActivity : BaseLocationActivity() {
                     }
 
                     override fun noNetowork() {
-                        Utils.showToast(applicationContext, getString(R.string.no_internet))
-                    }
+                        LovelyStandardDialog(this@SplashActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                            .setTopColorRes(R.color.white)
+                            .setIcon(R.drawable.oyespace_toolbar)
+                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+                            .setTitle("Please check Internet connection")
+                            .setTitleGravity(Gravity.CENTER)
+                            // .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
+                            // .setMessage(Mobile_IMEI_NO + " and +" + getSimNumber + " is not registered as Gate Device")
+
+                            .setMessageGravity(Gravity.CENTER)
+                            .setPositiveButton(android.R.string.ok) {
+                                finish()
+                            }
+
+                            .show()
+                        dismissProgress()                    }
 
                     override fun onShowProgress() {
                         showProgress()
