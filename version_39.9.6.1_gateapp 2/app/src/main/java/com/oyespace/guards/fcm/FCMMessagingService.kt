@@ -3,6 +3,7 @@ package com.oyespace.guards.fcm
 import android.app.*
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -18,6 +19,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.SplashActivity
 import com.oyespace.guards.activity.TicketingDetailsActivity
 import com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON
 import com.oyespace.guards.network.CommonDisposable
@@ -55,8 +57,32 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     lateinit var dbh:DataBaseHelper;
 
+    override fun onNewToken(p0: String?) {
+        super.onNewToken(p0)
+        Log.e("TOKEN",""+p0);
+    }
+
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
-        Log.d("JSON s", "From:  " + remoteMessage!!.from)
+        //Log.e("JSON s", "From:  " + remoteMessage!!.data)
+        /**
+         * The following implementation is for testing.
+         * Now notification will be displayed if app is in background / foreground
+         * Please replace the screen name (SplashActivity) based on logic.
+         */
+
+        var intent = Intent(this,SplashActivity::class.java)
+        var pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
+        var notificationBuilder = NotificationCompat.Builder(this,"Notification")
+            .setSmallIcon(R.drawable.oyespace_launcher)
+            .setContentTitle(remoteMessage!!.data["ntTitle"])
+            .setContentText(remoteMessage!!.data["ntDesc"])
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        var notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0,notificationBuilder.build())
+
+
 
         try
         {

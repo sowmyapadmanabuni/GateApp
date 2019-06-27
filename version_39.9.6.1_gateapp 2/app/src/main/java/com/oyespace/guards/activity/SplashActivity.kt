@@ -112,7 +112,6 @@ class SplashActivity : BaseLocationActivity() {
          getSimNumber = tm.getLine1Number()
         val modelno=android.os.Build.MODEL
         Prefs.putString(PrefKeys.MODEL_NUMBER,modelno)
-
         if(getSimNumber?.length==0){
 
 

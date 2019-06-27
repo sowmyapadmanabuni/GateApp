@@ -33,6 +33,7 @@
             android:icon="@drawable/oyespace_launcher"
             android:label="@string/app_name"
             android:networkSecurityConfig="@xml/network"
+
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"

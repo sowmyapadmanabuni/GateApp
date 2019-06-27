@@ -637,7 +637,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
 
     private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int) {
-
+        Log.e("sendCloudNotification"," "+associationID+" "+associationName+" "+ntDesc+" "+ntTitle+" "+ntType+" "+sbSubID+" "+userID);
         val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID )
 
 

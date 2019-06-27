@@ -19,6 +19,7 @@ class CloudFunctionRetrofitClinet {
     companion object {
         val TAG: String = CloudFunctionRetrofitClinet::javaClass.name
         val FCM_BASE_URL = "https://us-central1-oyespace-dc544.cloudfunctions.net/"
+        //val FCM_BASE_URL = "https://us-central1-oyespace-b7e2d.cloudfunctions.net/"
 //        val BASE_URL="http://apidev.oyespace.com/"
 
         val instance: CloudFunctionApi by lazy {

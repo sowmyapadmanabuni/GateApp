@@ -1370,7 +1370,7 @@ public class DashBoard extends BaseActivity implements AdapterView.OnItemSelecte
                 swipeContainer.setRefreshing(false);
             }
         });
-
+        Log.e("AllGuards","Subscribed as AllGuards"+LocalDb.getAssociation().getAsAssnID());
         FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" +LocalDb.getAssociation().getAsAssnID());
         //FirebaseMessaging.getInstance().subscribeToTopic("Guard" + prefManager.getGuardID());
 

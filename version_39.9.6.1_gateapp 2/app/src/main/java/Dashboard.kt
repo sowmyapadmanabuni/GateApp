@@ -1768,7 +1768,16 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
             swipeContainer!!.isRefreshing = false
         }
 
+        Log.e("SUBSCRIBING","AllGuards" + LocalDb.getAssociation()!!.asAssnID);
         FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + LocalDb.getAssociation()!!.asAssnID)
+            .addOnCompleteListener { task ->
+                var msg = "SUCCESS"
+                if (!task.isSuccessful) {
+                    msg = "FAILED"
+                }
+                Log.e("SUBSCRIPTION", msg)
+
+            }
         //FirebaseMessaging.getInstance().subscribeToTopic("Guard" + prefManager.getGuardID());
 
        // spinner?.onItemSelectedListener = this
