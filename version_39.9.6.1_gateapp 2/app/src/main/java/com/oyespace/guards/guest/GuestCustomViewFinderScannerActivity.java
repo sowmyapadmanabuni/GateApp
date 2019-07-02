@@ -217,8 +217,8 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent d = new Intent(GuestCustomViewFinderScannerActivity.this, Dashboard.class);
-        startActivity(d);
+//        Intent d = new Intent(GuestCustomViewFinderScannerActivity.this, Dashboard.class);
+//        startActivity(d);
         finish();
     }
 }

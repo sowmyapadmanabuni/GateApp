@@ -648,8 +648,8 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val i_delivery = Intent(this@UnitListActivity, Dashboard::class.java)
-        startActivity(i_delivery)
+//        val i_delivery = Intent(this@UnitListActivity, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
     }
 }

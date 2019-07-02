@@ -75,6 +75,7 @@ import static com.oyespace.guards.utils.Utils.showToast;
 public class AddCarFragment extends Activity implements ResponseHandler, View.OnClickListener {
 
     /*sumeeth fragment*/
+    File destination;
     ChampApiInterface champApiInterface;
 
     private final int REQUEST_CODE_SPEECH_INPUT = 100;
@@ -314,6 +315,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             public void onClick(View v) {
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
+
 //                val imgName = "Association"+ "0" + ".jpg"
 
 //                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
@@ -399,7 +401,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
         loginReq.WKLName="";
 
-        loginReq.WKMobile=""+ getIntent().getStringExtra(MOBILENUMBER);
+        loginReq.WKMobile=getIntent().getStringExtra(COUNTRYCODE)+ getIntent().getStringExtra(MOBILENUMBER);
         loginReq.WKWrkType= getIntent().getStringExtra(VISITOR_TYPE);
         loginReq.UNUnitID=toInteger( getIntent().getStringExtra(UNITID));
         loginReq.UNUniName= getIntent().getStringExtra(UNITNAME);
@@ -459,7 +461,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         startActivity(d);
                     }
-                    else {
+                    else if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
                         Intent intent = new Intent(AddCarFragment.this, StaffDetails.class);
                         intent.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
                         intent.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
@@ -472,6 +474,19 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         intent.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         startActivity(intent);
                         finish();
+                    }
+                    else{
+                        Intent d = new Intent(AddCarFragment.this, Biometric.class);
+                        d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
+                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                        d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
+                        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
+                        d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
+                        d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
+                        d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
+                        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
+                        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                        startActivity(d);
                     }
                  //   uploadImage(imgName,personPhoto);
 
@@ -533,9 +548,9 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
-          Intent i=new Intent(AddCarFragment.this, Dashboard.class);
-          startActivity(i);
+//
+//          Intent i=new Intent(AddCarFragment.this, Dashboard.class);
+//          startActivity(i);
           finish();
 
     }
@@ -594,7 +609,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
         String imgName=System.currentTimeMillis() + ".jpg";
 
-        File destination = new File(Environment.getExternalStorageDirectory().getPath(), imgName);
+        destination= new File(Environment.getExternalStorageDirectory().getPath(), imgName);
 
         // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
         setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
@@ -615,7 +630,10 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             fo.close();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
+
+
 
 
     }

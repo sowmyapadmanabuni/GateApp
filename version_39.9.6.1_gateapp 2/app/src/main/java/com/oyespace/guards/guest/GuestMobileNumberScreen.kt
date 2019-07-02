@@ -135,6 +135,9 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                         builder.setMessage("No Duplicates allowed")
                         builder.setPositiveButton("Ok") { dialog, which ->
                             dialog.cancel()
+                            val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
+                            startActivity(d)
+                            finish()
                         }
                         builder.setCancelable(false)
                         builder.show()
@@ -244,6 +247,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             }
 
             override fun onFinish() {
+//                val i_delivery = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
+//                startActivity(i_delivery)
                 finish()
             }
         }
@@ -264,7 +269,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             buttonSkip.setVisibility(View.INVISIBLE)
             Ed_phoneNum.setVisibility(View.GONE)
             textview.visibility = View.VISIBLE
-            img_logo.visibility=View.INVISIBLE
+            img_logo.visibility=View.VISIBLE
         } else {
             buttonSkip.setVisibility(View.INVISIBLE)
         }
@@ -704,8 +709,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
-        startActivity(d)
+//        val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
+//        startActivity(d)
         finish()
     }
 

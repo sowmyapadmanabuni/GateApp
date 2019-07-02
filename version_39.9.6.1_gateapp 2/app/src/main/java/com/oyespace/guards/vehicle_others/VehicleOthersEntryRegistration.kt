@@ -255,9 +255,9 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
         else if(BASE_URL.contains("uat",true)){
             memID=64;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME),
             toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-            "",0,"",intent.getStringExtra(MOBILENUMBER),
+            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),intent.getStringExtra(VEHICLE_NUMBER),"","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName)
@@ -603,8 +603,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
-        startActivity(intent)
+//        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
+//        startActivity(intent)
         finish()
     }
 

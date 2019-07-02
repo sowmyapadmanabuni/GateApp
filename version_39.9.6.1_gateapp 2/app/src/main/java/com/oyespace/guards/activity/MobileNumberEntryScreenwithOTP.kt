@@ -988,7 +988,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         var SPPrdImg8=""
         var SPPrdImg9=""
         var SPPrdImg10=""
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, staffID,
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
             unitName,unitId ,desgn,
             personName,"",0,"+",mobileNumb,
             "","","","",
@@ -1091,8 +1091,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val i_delivery = Intent(this@MobileNumberEntryScreenwithOTP, Dashboard::class.java)
-        startActivity(i_delivery)
+//        val i_delivery = Intent(this@MobileNumberEntryScreenwithOTP, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
     }
 }

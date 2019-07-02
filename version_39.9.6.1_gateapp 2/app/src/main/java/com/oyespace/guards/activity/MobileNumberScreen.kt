@@ -270,6 +270,8 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
             }
 
             override fun onFinish() {
+//                val i_delivery = Intent(this@MobileNumberScreen, Dashboard::class.java)
+//                startActivity(i_delivery)
                 finish()
             }
         }
@@ -287,16 +289,17 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
            // buttonSkip.setVisibility(View.VISIBLE)
-            if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
+           // if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
             if(workType.contains(intent.getStringExtra(COMPANY_NAME))){
                 buttonSkip.visibility=View.INVISIBLE
             }
             else{
                 buttonSkip.visibility=View.VISIBLE
             }
-            }else{
-                buttonSkip.visibility=View.INVISIBLE
-            }
+           // }
+//        else{
+//                buttonSkip.visibility=View.INVISIBLE
+//            }
             img_logo.visibility=View.VISIBLE
 //            Ed_phoneNum.setVisibility(View.VISIBLE)
 //            textview.visibility = View.GONE
@@ -846,8 +849,8 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val i_delivery = Intent(this@MobileNumberScreen, Dashboard::class.java)
-        startActivity(i_delivery)
+//        val i_delivery = Intent(this@MobileNumberScreen, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
     }
 

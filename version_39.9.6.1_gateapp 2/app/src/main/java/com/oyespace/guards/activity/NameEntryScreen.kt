@@ -182,8 +182,8 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val i_delivery = Intent(this@NameEntryScreen, Dashboard::class.java)
-        startActivity(i_delivery)
+//        val i_delivery = Intent(this@NameEntryScreen, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
     }
 }

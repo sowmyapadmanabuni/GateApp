@@ -118,6 +118,9 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                         builder.setMessage("No Duplicates allowed")
                         builder.setPositiveButton("Ok") { dialog, which ->
                             dialog.cancel()
+                            val d = Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
+                            startActivity(d)
+                            finish()
                         }
                         builder.setCancelable(false)
                         builder.show()
@@ -224,6 +227,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
             }
 
             override fun onFinish() {
+//                val i_delivery = Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
+//                startActivity(i_delivery)
                 finish()
             }
         }
@@ -665,8 +670,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent= Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
-        startActivity(intent)
+//        val intent= Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
+//        startActivity(intent)
         finish()
     }
 }

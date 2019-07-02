@@ -951,8 +951,8 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val i_delivery = Intent(this@MobileNumberScreenwithOTP, Dashboard::class.java)
-        startActivity(i_delivery)
+//        val i_delivery = Intent(this@MobileNumberScreenwithOTP, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
     }
 

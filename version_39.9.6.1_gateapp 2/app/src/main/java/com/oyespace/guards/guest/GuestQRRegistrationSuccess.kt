@@ -161,7 +161,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         if(!BASE_URL.contains("dev",true)){
             memID=410;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
             intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), "", 0, "",
             intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
@@ -433,8 +433,8 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
     }
     override fun onBackPressed() {
         super.onBackPressed()
-        val d = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
-        startActivity(d)
+//        val d = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
+//        startActivity(d)
         finish()
     }
 

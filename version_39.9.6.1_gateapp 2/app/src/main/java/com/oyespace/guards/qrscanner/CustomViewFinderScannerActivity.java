@@ -220,8 +220,8 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent i=new Intent(CustomViewFinderScannerActivity.this, Dashboard.class);
-        startActivity(i);
+//        Intent i=new Intent(CustomViewFinderScannerActivity.this, Dashboard.class);
+//        startActivity(i);
         finish();
 
 

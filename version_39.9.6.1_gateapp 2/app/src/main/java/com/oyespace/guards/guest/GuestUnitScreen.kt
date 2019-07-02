@@ -330,8 +330,8 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val d = Intent(this@GuestUnitScreen, Dashboard::class.java)
-        startActivity(d)
+//        val d = Intent(this@GuestUnitScreen, Dashboard::class.java)
+//        startActivity(d)
         finish()
     }
 

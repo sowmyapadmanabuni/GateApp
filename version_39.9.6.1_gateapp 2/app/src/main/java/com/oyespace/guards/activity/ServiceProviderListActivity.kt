@@ -248,8 +248,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val i_delivery = Intent(this@ServiceProviderListActivity, Dashboard::class.java)
-        startActivity(i_delivery)
+//        val i_delivery = Intent(this@ServiceProviderListActivity, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
 
     }

@@ -78,7 +78,8 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
-
+//    var handler: Handler? = null
+//    var r: Runnable? = null
     private val mInterval = 96000 // 5 seconds by default, can be changed later
     private var mHandlerr: Handler? = null
     var counter:Int?=0
@@ -534,6 +535,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     override fun onResume() {
 
+
+
         try {
 
           //  Dashboard..notifyDatasetChanged()
@@ -734,6 +737,31 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         } catch (ex: Exception) {
             Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT).show()
         }
+
+
+//        handler =  Handler();
+//
+//
+//        r = Runnable() {
+//            run() {
+//                Toast.makeText(
+//                    this@Dashboard, "user Is Idle from last 5 minutes",
+//                    Toast.LENGTH_SHORT
+//                ).show();
+//            }
+//        }
+
+//        r =  Runnable() {
+//
+//            @Override
+//           fun run() {
+//                // TODO Auto-generated method stub
+//                Toast.makeText(this@Dashboard, "user Is Idle from last 5 minutes",
+//                    Toast.LENGTH_SHORT).show();
+//            }
+//        };
+//        startHandler();
+
 
     }
 
@@ -1046,10 +1074,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         if(id<=0)
         {
-            Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+          //  Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
         } else
         {
-            Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
+           // Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
 
         }
 
@@ -1493,39 +1521,39 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         when (v.id) {
 
             R.id.re_vehicle -> {
-                re_vehicle!!.setEnabled(false)
-                re_vehicle!!.setClickable(false)
+//                re_vehicle!!.setEnabled(false)
+//                re_vehicle!!.setClickable(false)
 
                 val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
                 startActivity(i_vehicle)
-                finish()
+                //finish()
 
             }
 
             R.id.re_delivery -> {
-                re_delivery!!.setEnabled(false)
-                re_delivery!!.setClickable(false)
+//                re_delivery!!.setEnabled(false)
+//                re_delivery!!.setClickable(false)
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
-                finish()
+               // finish()
 
             }
 
             R.id.re_guest -> {
-                re_guest!!.setEnabled(false)
-                re_guest!!.setClickable(false)
+//                re_guest!!.setEnabled(false)
+//                re_guest!!.setClickable(false)
                 val i_guest = Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
-                finish()
+              //  finish()
 
             }
 
             R.id.re_staff -> {
-                re_staff!!.setEnabled(false)
-                re_staff!!.setClickable(false)
+//                re_staff!!.setEnabled(false)
+//                re_staff!!.setClickable(false)
                 val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
                 startActivity(i_staff)
-                finish()
+               // finish()
 
             }
 
@@ -2668,4 +2696,17 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 }
             })
     }
+
+//    override fun onUserInteraction() {
+//        super.onUserInteraction()
+//        stopHandler();//stop first and then start
+//        startHandler();
+//    }
+//   fun stopHandler() {
+//    handler!!.removeCallbacks(r);
+//}
+//    fun startHandler() {
+//    handler!!.postDelayed(r, 1*60*1000);
+//}
+
     }

@@ -183,8 +183,8 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent= Intent(this@VehicleOthersNameEntryScreen, Dashboard::class.java)
-        startActivity(intent)
+//        val intent= Intent(this@VehicleOthersNameEntryScreen, Dashboard::class.java)
+//        startActivity(intent)
         finish()
     }
 }

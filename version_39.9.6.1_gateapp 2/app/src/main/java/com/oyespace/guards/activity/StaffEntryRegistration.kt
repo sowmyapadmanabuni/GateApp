@@ -10,6 +10,7 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -260,7 +261,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         }
 
         val mLayoutManager = GridLayoutManager(applicationContext, 2)
-        rv_image.layoutManager = mLayoutManager
+        rv_image.layoutManager = mLayoutManager as RecyclerView.LayoutManager?
         imageAdapter = ImageAdapter(list, this@StaffEntryRegistration)
         rv_image.adapter = imageAdapter
 
@@ -285,7 +286,16 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        }else{
 //            memID=410;
 //        }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
+//        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
+//            toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
+//            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
+//            intToString(minteger),"","","",
+//            minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+//            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName)
+
+
+
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME),
             toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
             "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",

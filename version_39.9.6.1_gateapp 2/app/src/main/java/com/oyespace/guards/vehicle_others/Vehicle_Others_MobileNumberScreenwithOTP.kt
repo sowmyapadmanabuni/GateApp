@@ -944,8 +944,8 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 
     override fun onBackPressed() {
         super.onBackPressed()
-        val intent= Intent(this@Vehicle_Others_MobileNumberScreenwithOTP,Dashboard::class.java)
-        startActivity(intent)
+//        val intent= Intent(this@Vehicle_Others_MobileNumberScreenwithOTP,Dashboard::class.java)
+//        startActivity(intent)
         finish()
     }
 

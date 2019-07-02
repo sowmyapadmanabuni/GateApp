@@ -281,7 +281,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
         var SPPrdImg8=""
         var SPPrdImg9=""
         var SPPrdImg10=""
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, staffID,
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
             unitName,unitId ,desgn,
             personName,"",0,"+",mobileNumb,
             "","","","",

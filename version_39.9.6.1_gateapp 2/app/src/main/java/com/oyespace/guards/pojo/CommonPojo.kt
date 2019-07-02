@@ -518,7 +518,7 @@ data class Courier(
 //visitor log req
 data class CreateVisitorLogReq(
     val ASAssnID: Int,
-    val MEMemID: Int,
+  //  val MEMemID: Int,
     val RERgVisID: Int,
     val UNUniName: String,
     val UNUnitID: Int,

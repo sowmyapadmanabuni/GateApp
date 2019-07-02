@@ -176,10 +176,10 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 DisableControls()
             }
 
-            Toast.makeText(
-                applicationContext,
-                "Inside " + action!!, Toast.LENGTH_SHORT
-            ).show()
+//            Toast.makeText(
+//                applicationContext,
+//                "Inside " + action!!, Toast.LENGTH_SHORT
+//            ).show()
         }
 
 
@@ -711,6 +711,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     fun CaptureFingerPrint() {
         //        this.mCheckBoxMatched.setChecked(false);
         var buffer: ByteArray? = ByteArray(mImageWidth * mImageHeight)
+        Toast.makeText(this@Biometric,"HIh",Toast.LENGTH_LONG).show()
         //long result = sgfplib.GetImage(buffer);
         //commented val result = sgfplib!!.GetImage(buffer)
         //        if (this.mToggleButtonNFIQ.isChecked()) {
@@ -848,22 +849,10 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             save!!.visibility = View.VISIBLE
 
 
-//            if(sgfplib!!.GetImage(mRegisterImage).equals(true)){
-//
-//                val builder = android.support.v7.app.AlertDialog.Builder(this@Biometric)
-//                // builder.setTitle("Guest Entry already done")
-//                builder.setMessage("Check")
-//                builder.setPositiveButton("Ok") { dialog, which ->
-//                    dialog.cancel()
-//                }
-//                builder.setCancelable(false)
-//                builder.show()
-//
-//            }else{
+
 
                 result = sgfplib!!.GetImage(mRegisterImage)
 
-          //  }
 
 
 
@@ -1103,10 +1092,13 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 mButtonRegister2!!.visibility = View.VISIBLE
                 mButtonRegister3!!.visibility = View.VISIBLE
 
+
+
             }
         }
 
         if (v.id == R.id.buttonDone) {
+
 
             val d = Intent(this@Biometric, StaffDetails::class.java)
             d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
@@ -1446,6 +1438,9 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     finger_type = key_left_small
                     if (bl_left_little) {
                         selectedFinger()
+
+                        Toast.makeText(this@Biometric,"Coming1",Toast.LENGTH_LONG).show()
+
                     }
                 }
                 R.id.btn_left_ring -> {

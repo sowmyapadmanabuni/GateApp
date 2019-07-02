@@ -210,6 +210,8 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
                 .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
+        Log.v("Oyespace",IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
+
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
@@ -339,8 +341,8 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent d = new Intent(GuestAddCarFragment.this, Dashboard.class);
-        startActivity(d);
+//        Intent d = new Intent(GuestAddCarFragment.this, Dashboard.class);
+//        startActivity(d);
         finish();
     }
 

@@ -45,6 +45,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
     private val REQUEST_CODE_SPEECH_INPUT = 100;
     var otpnumber: String? = null
     var mobilenumber:String?=null
+    var phone:String?=null
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -54,7 +55,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
             }
             R.id.Btn_SendOtp -> {
 
-                mobilenumber= Ed_phoneNum.text.toString()
+                mobilenumber= phone.toString()
 
                 if (TextUtils.isEmpty(Ed_phoneNum.text.toString())) {
 
@@ -200,6 +201,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                     Ed_phoneNum.setText(result[0].trim() + "")
+                    phone = Ed_phoneNum.text.toString().replace(" ","");
                 }
             }
         }
@@ -209,10 +211,10 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
     fun sendotp() {
 
         countryCode.toString()
-        Ed_phoneNum.toString()
+        phone.toString()
         Log.d("sdssds", countryCode.toString() + " " + Ed_phoneNum.text.toString())
 
-        val req = GetOTPReq(countryCode.toString(), Ed_phoneNum.text.toString())
+        val req = GetOTPReq(countryCode.toString(), phone.toString())
         compositeDisposable.add(
             RetrofitClinet.instance.getOTPCall(ConstantUtils.CHAMPTOKEN, req)
                 .subscribeOn(Schedulers.io())
@@ -251,11 +253,11 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
     fun verifyOTP(number: String) {
 
         countryCode.toString()
-        Ed_phoneNum.toString()
+        phone.toString()
 
-        Log.d("sdssds", "Verify otp " + countryCode.toString() + " " + Ed_phoneNum.text.toString() + " " + number)
-        val req = GetVerifyOTPRequest(countryCode.toString(), Ed_phoneNum.text.toString(), number)
-        Log.d("sdssds", "Verify otp " + req.toString() + " " + Ed_phoneNum.text.toString() + " " + number)
+        Log.d("sdssds", "Verify otp " + countryCode.toString() + " " + phone + " " + number)
+        val req = GetVerifyOTPRequest(countryCode.toString(), phone.toString(), number)
+        Log.d("sdssds", "Verify otp " + req.toString() + " " + phone.toString() + " " + number)
 
         compositeDisposable.add(
             RetrofitClinet.instance.getVerifyOTP(ConstantUtils.CHAMPTOKEN, req)
@@ -265,10 +267,10 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
                     override fun onSuccessResponse(globalApiObject: GetVerifyOTPResponse) {
                         if (globalApiObject.success == true) {
 
-                            Prefs.putString(PrefKeys.MOBILE_NUMBER,countryCode.toString()+mobilenumber)
+                            Prefs.putString(PrefKeys.MOBILE_NUMBER,countryCode.toString()+phone)
 
                             val mainIntent = Intent(this@LoginActivity, MyRoleScreen::class.java)
-                            mainIntent.putExtra("MOBIELNUMBER",Ed_phoneNum.text.toString())
+                            mainIntent.putExtra("MOBIELNUMBER",phone.toString())
                             startActivity(mainIntent)
                             finish()
                             println("Verify otp " + globalApiObject.success)
@@ -355,12 +357,12 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
              //   Toast.makeText(this, ed_otp.text.toString(), Toast.LENGTH_SHORT).show()
                 verifyOTP(ed_otp.text.toString())
             }
-            btn_cancel.setOnClickListener {
-                dialogs!!.dismiss()
-            }
+
 
         }
-
+        btn_cancel.setOnClickListener {
+            dialogs!!.dismiss()
+        }
         dialogs.show()
 
     }

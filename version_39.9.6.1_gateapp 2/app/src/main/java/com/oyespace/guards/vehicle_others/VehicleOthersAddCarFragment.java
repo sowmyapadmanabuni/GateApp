@@ -543,8 +543,8 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        Intent intent=new Intent(VehicleOthersAddCarFragment.this, Dashboard.class);
-        startActivity(intent);
+//        Intent intent=new Intent(VehicleOthersAddCarFragment.this, Dashboard.class);
+//        startActivity(intent);
         finish();
     }
 }
