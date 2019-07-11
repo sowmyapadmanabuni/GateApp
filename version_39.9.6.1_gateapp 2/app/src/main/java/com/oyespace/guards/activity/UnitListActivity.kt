@@ -9,6 +9,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.AppCompatCheckBox
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -293,6 +295,11 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
             holder.cb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
                 // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
                 listVistor!!.get(position).isSelected=isChecked
+                if(isChecked) {
+                    holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
+                }else{
+                    holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+                }
 
             }
             //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
@@ -587,7 +594,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
         inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
-            val cb_unit: CheckBox
+            val cb_unit: AppCompatCheckBox
             val apartmentNamee: TextView
             val lv_itemrecyclerview: RelativeLayout
 

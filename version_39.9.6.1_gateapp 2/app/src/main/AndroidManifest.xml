@@ -3,6 +3,8 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.oyespace.guards">
 
+    <uses-feature android:name="android.hardware.usb.host"/>
+
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/> <!-- Dangerous Permissions -->
@@ -24,8 +26,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
     <permission android:name="android.permission.CLEAR_APP_CACHE"/>
-    <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
+
+    <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
 
     <application
             android:name=".Myapp"
@@ -33,15 +37,20 @@
             android:icon="@drawable/oyespace_launcher"
             android:label="@string/app_name"
             android:networkSecurityConfig="@xml/network"
-
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.MapActivity"
-                  android:enabled="true"
-                  android:exported="true">
+        <activity android:name=".activity.BlockSelectionActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+        </activity>
+        <activity
+                android:name=".activity.MapActivity"
+                android:enabled="true"
+                android:exported="true">
         </activity>
 
         <service
@@ -67,13 +76,11 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-
         <activity
                 android:name=".activity.MobileNumberforEntryScreen"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-
         <activity
                 android:name=".guest.GuestCustomViewFinderScannerActivity"
                 android:screenOrientation="portrait"
@@ -117,8 +124,10 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-        <activity android:name=".vehicle_others.VehicleOthersViewFullImageActivity"  android:screenOrientation="portrait"
-                  android:theme="@style/noActionBar">
+        <activity
+                android:name=".vehicle_others.VehicleOthersViewFullImageActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
         </activity>
         <activity
                 android:name=".activity.LocationSearchActivity"
@@ -131,6 +140,11 @@
         </activity>
         <activity
                 android:name=".activity.UnitListActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
+        </activity>
+        <activity
+                android:name=".activity.UnitSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
@@ -205,17 +219,11 @@
                 android:value="@integer/google_play_services_version"/>
         <meta-data
                 android:name="com.google.android.ocr.API_KEY"
-                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w"/>
-
-
-
-
-        <!--<activity-->
-                <!--android:name=".activity.PatrollingActivity"-->
-                <!--android:screenOrientation="portrait"-->
-                <!--android:theme="@style/noActionBar">-->
-        <!--</activity>-->
-
+                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w"/> <!-- <activity -->
+        <!-- android:name=".activity.PatrollingActivity" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@style/noActionBar"> -->
+        <!-- </activity> -->
         <service
                 android:name=".SGPatrollingService"
                 android:enabled="true"
@@ -336,10 +344,8 @@
                 android:exported="true"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
-        </activity>
-        <!--<activity android:name=".activity.BiometricNewAdvance">-->
-        <!--</activity>-->
-
+        </activity> <!-- <activity android:name=".activity.BiometricNewAdvance"> -->
+        <!-- </activity> -->
         <receiver
                 android:name=".BackgroundSyncReceiver"
                 android:enabled="true"

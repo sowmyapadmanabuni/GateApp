@@ -49,4 +49,12 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item><!-- Customize your theme here. -->
     </style>
+
+    <style name="checkBoxStyle">
+        <item name="colorAccent">@color/orange</item>
+        <item name="android:textColorSecondary">@color/orange</item>
+        <item name="android:colorControlNormal">@color/orange</item>
+        <item name="android:colorControlActivated">@color/orange</item>
+    </style>
+
 </resources>

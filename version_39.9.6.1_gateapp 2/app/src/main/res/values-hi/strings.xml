@@ -117,4 +117,8 @@
         द्वारा मिस्ड कॉल प्राप्त करें: </string>
     <string name="textnodata">कोई आकड़ा उपलब्ध नहीं है</string>
 
+    <string name="units_list_title">Units List</string>
+    <string name="units_selection_title">Select Units</string>
+    <string name="blocks_selection_title">Select Blocks</string>
+
 </resources>

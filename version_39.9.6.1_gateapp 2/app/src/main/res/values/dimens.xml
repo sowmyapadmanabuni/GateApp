@@ -1040,4 +1040,7 @@
     <dimen name="_599sdp">599.00dp</dimen>
     <dimen name="_600sdp">600.00dp</dimen>
 
+    <dimen name="header_btn_height">24dp</dimen>
+    <dimen name="header_btn_radius">12dp</dimen>
+
 </resources>

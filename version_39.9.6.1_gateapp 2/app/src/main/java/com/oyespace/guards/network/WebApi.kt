@@ -1,6 +1,7 @@
 package com.oyespace.guards.network
 
 
+import com.oyespace.guards.com.oyespace.guards.pojo.*
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
@@ -27,6 +28,19 @@ interface WebApi {
     @GET("oyeliving/api/v1/Unit/GetUnitListByAssocID/{id}")
     fun unitList(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
             : Single<UnitList<ArrayList<UnitPojo>>>
+
+    @GET("oyeliving/api/v1/Unit/GetUnitListByBlockID/{id}")
+    fun getUnitsFromBlock(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
+            : Single<UnitsList<ArrayList<UnitPojo>>>
+
+    @POST("oyeliving/api/v1/Unit/UnitNameSearchByAssociationID")
+    fun searchUnits(@Body unitSearch: SearchUnitRequest,@Header("X-Champ-APIKey") token: String)
+            : Single<UnitListSearch<UnitPojo>>
+
+    @GET("oyeliving/api/v1/Block/GetBlockListByAssocID/{id}")
+    fun blocksList(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
+            : Single<BlocksList<ArrayList<BlocksData>>>
+
 
     @POST("oye247/api/v1/Worker/Create")
     fun creatStaff(@Body staffReq: StaffRegistrationReq, @Header("X-OYE247-APIKey") token: String)

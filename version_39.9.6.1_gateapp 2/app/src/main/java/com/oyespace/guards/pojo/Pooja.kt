@@ -2,6 +2,8 @@ package com.oyespace.guards.pojo
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
+import com.google.gson.annotations.SerializedName
+import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
 import kotlinx.android.parcel.Parcelize
 
 @SuppressLint("ParcelCreator")
@@ -52,6 +54,18 @@ data class Visitorlogbydate(
 )
 
 
+
+data class UnitListSearch<T>(
+    val apiVersion: String,
+    val `data`: UnitDataSingle,
+    val success: Boolean
+)
+
+data class UnitDataSingle(
+    val unit: UnitPojo
+)
+
+
 data class UnitList<T>(
     val apiVersion: String,
     val `data`: UnitData,
@@ -61,6 +75,7 @@ data class UnitList<T>(
 data class UnitData(
     val unit: ArrayList<UnitPojo>
 )
+
 data class UnitPojo(
     val acAccntID: Int,
     val asAssnID: Int,

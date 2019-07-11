@@ -1577,7 +1577,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     /// End Added by Rajesh
 
     internal fun init() {
-        showProgressrefresh()
+        //showProgressrefresh()
         mHandlerr = Handler()
         //startRepeatingTask()
         database =  DBHelper(this);

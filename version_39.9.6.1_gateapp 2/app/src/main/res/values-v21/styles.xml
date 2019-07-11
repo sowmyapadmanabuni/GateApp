@@ -1,0 +1,61 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/orange</item>
+        <!--<item name="android:windowActionBar">false</item>-->
+
+    </style>
+
+    <style name="TransparentToolbar" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <item name="android:windowActionBarOverlay">true</item>
+
+        <!-- Support Library compability -->
+
+        <item name="windowActionBarOverlay">true</item>
+
+    </style>
+    <style name="appbar_theme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="colorControlNormal">@color/white</item>
+        <item name="android:windowActionBar">false</item>
+
+    </style>
+
+    <style name="toolbar_theme" parent="ThemeOverlay.AppCompat.Light">
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+    </style>
+
+    <style name="EditTextCustomHolo" parent="@android:style/Widget.EditText">
+        <item name="android:background">@drawable/apptheme_edit_text_holo_light</item>
+    </style>
+
+
+    <style name="TextAppearance.App.TextInputLayout" parent="@android:style/TextAppearance">
+        <item name="android:textColorPrimary">@color/orange</item>
+        <item name="android:textSize">@dimen/font_size_nano</item>
+        <item name="android:textColor">@color/GBL3</item>
+    </style>
+    <style name="splashScreen" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item><!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/transparent</item>
+    </style>
+    <style name="noActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item><!-- Customize your theme here. -->
+    </style>
+
+    <style name="checkBoxStyle">
+        <item name="colorAccent">@color/orange</item>
+        <item name="android:textColorSecondary">@color/orange</item>
+        <item name="android:colorControlNormal">@color/orange</item>
+        <item name="android:colorControlActivated">@color/orange</item>
+    </style>
+
+</resources>

@@ -5,9 +5,9 @@
                                     android:layout_height="wrap_content"
 
                                     app:cardBackgroundColor="@android:color/white"
-                                    app:cardCornerRadius="4dp"
-                                    app:cardElevation="5dp"
-                                    android:layout_margin="5dp"
+                                    app:cardCornerRadius="3dp"
+                                    app:cardElevation="2dp"
+                                    android:layout_margin="3dp"
                                     app:contentPadding="0dp">
     <LinearLayout
             android:layout_width="match_parent"
@@ -22,17 +22,19 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:background="@drawable/tab_left_divider"
+
                 android:gravity="center"
                 android:padding="@dimen/dp_5"
                 android:text="-"
                 android:textColor="@color/orange" >
-            <CheckBox
+            <android.support.v7.widget.AppCompatCheckBox
                     android:id="@+id/cb_unit"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:paddingTop="5dp"
+                    android:buttonTint="@color/orange"
+                    android:background="@drawable/checkbox_state_style"
+                    style="@style/checkBoxStyle"
                     android:textColor="@android:color/black"
                     android:textSize="15sp"/>
         </RelativeLayout>
@@ -44,8 +46,8 @@
                 android:layout_height="match_parent"
                 android:id="@+id/lv_itemrecyclerview"
                 android:layout_weight="2"
-                android:background="@drawable/tab_middle_divider"
-                android:gravity="center"
+
+                android:gravity="left|center"
                 android:padding="@dimen/dp_5"
                 android:text="1"
                 android:textColor="@color/orange" >
@@ -63,17 +65,17 @@
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@drawable/tab_right_divider"
+
                 android:gravity="center"
                 android:padding="@dimen/dp_5"
                 android:text="+"
                 android:textColor="@color/orange" >
             <ImageView
                     android:id="@+id/iv_unit"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
                     android:layout_alignParentRight="true"
-                    android:src="@drawable/call"
+                    android:src="@drawable/call_left"
                     android:gravity="right"
                     android:padding="5dp"
             />

@@ -81,4 +81,8 @@ public class ConstantUtils {
     public static final String WALKIETALKIE = "WalkieTalkie";
     public static final String BIOMETRICPERSONNAME = "BiometricPersonName";
 
+    public static final String SELECTED_UNITS = "selected_units";
+    public static final String SELECTED_BLOCK = "selected_block";
+    public static final String SELECTED_BLOCK_NAME = "selected_block_name";
+
 }

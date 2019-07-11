@@ -846,7 +846,11 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             previous!!.visibility = View.INVISIBLE
             next!!.visibility = View.INVISIBLE
             save!!.visibility = View.VISIBLE
+            Log.e("BUTTON_CLICK",""+sgfplib)
+
             result = sgfplib!!.GetImage(mRegisterImage)
+
+
             // var result = sgfplib!!.GetImage(mRegisterImage)
             //  Toast.makeText(this@Biometric,result.toString(),Toast.LENGTH_LONG).show()
             Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)

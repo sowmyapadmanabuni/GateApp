@@ -111,6 +111,10 @@
     <string name="in">In</string>
     <string name="out">Out</string>
     <string name="textvisiting">Visiting</string>
-    <string name="textmissedcallby">Get Missed Call by: </string>
+    <string name="textmissedcallby">Get Missed Call by:</string>
     <string name="textnodata">No Data</string>
+
+    <string name="units_list_title">Units List</string>
+    <string name="units_selection_title">Select Units</string>
+    <string name="blocks_selection_title">Select Blocks</string>
 </resources>

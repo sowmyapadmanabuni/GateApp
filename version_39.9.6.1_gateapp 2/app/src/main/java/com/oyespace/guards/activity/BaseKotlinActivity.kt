@@ -1,7 +1,10 @@
 package com.oyespace.guards.activity
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import android.speech.RecognizerIntent
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -21,6 +24,7 @@ import java.util.*
 open class BaseKotlinActivity : AppCompatActivity(){
 
     private var progressDialog: ProgressDialog? = null
+    val REQUEST_CODE_SPEECH = 101;
 
     val LOCATION_REQ = 7446
 
@@ -89,6 +93,12 @@ open class BaseKotlinActivity : AppCompatActivity(){
         progressDialog?.show()
     }
 
+    fun setDarkStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.window.statusBarColor = this.getResources().getColor(R.color.orangedark);
+        }
+    }
+
     fun dismissProgressrefresh() {
         progressDialog?.isShowing.let {
             progressDialog?.dismiss()
@@ -108,6 +118,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
             progressDialog?.dismiss()
         }
     }
+
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -191,6 +202,21 @@ open class BaseKotlinActivity : AppCompatActivity(){
         return list
     }
 
+    fun openMic() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
+
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH)
+
+        } catch (e: Exception) {
+
+            //    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
 
