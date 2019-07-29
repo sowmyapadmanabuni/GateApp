@@ -19,8 +19,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW"/>
-    <uses-permission
-            android:name="android.permission.WRITE_SECURE_SETTINGS"/> <!-- <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/> -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/> <!-- <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/> -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -31,7 +30,7 @@
             android:name=".Myapp"
             android:allowBackup="true"
             android:icon="@drawable/oyespace_launcher"
-            android:label="@string/app_name"
+
             android:networkSecurityConfig="@xml/network"
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
@@ -114,6 +113,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+       <!-- <activity android:name=".activity.SSampleActivity" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>-->
         <activity android:name=".testgridsectionedrecyclerview.SectionedRecyclerView">
         </activity>
         <activity
@@ -215,9 +221,9 @@
 
 
         <!--<activity-->
-                <!--android:name=".activity.PatrollingActivity"-->
-                <!--android:screenOrientation="portrait"-->
-                <!--android:theme="@style/noActionBar">-->
+        <!--android:name=".activity.PatrollingActivity"-->
+        <!--android:screenOrientation="portrait"-->
+        <!--android:theme="@style/noActionBar">-->
         <!--</activity>-->
 
         <service
@@ -361,6 +367,13 @@
                 android:name=".guest.GuestMobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"/>
+        <activity android:name=".com.oyespace.guards.activity.SSampleActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
         <!--<activity android:name=".activity.BiometricNewAdvance">-->
         <!--</activity>-->
 

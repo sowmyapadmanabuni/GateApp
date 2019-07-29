@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.zxing.Result;
 import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
+import com.oyespace.guards.com.oyespace.guards.activity.SSampleActivity;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
 import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration;
@@ -56,7 +57,10 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             @Override
             public void onClick(View v) {
 //                Toast.makeText(GuestCustomViewFinderScannerActivity.this,"NO QR Code ",Toast.LENGTH_LONG).show();
-                Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, GuestUnitScreen.class);
+             /*   Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, GuestUnitScreen.class);
+                startActivity(in);
+                finish();*/
+                Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, SSampleActivity.class);
                 startActivity(in);
                 finish();
 
