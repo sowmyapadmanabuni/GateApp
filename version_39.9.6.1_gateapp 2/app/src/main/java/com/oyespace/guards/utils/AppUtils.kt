@@ -3,7 +3,6 @@ package com.oyespace.guards.utils
 import android.util.Log
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.BaseKotlinActivity
 
 
 /**
@@ -44,7 +43,6 @@ class AppUtils {
             Log.d("xgdssd Dgddfdf", "$lat1 $lng1 $lat2 $lng2 $dist")
             return dist
         }
-
 
     }
 

@@ -25,4 +25,5 @@ public class VehicleOthersViewFullImageActivity extends AppCompatActivity {
        viewPager.setCurrentItem(pos);
 
     }
+
 }

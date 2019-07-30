@@ -6,26 +6,24 @@ import android.support.v4.content.ContextCompat
 import android.telephony.TelephonyManager
 import android.util.Log
 import com.google.firebase.iid.FirebaseInstanceId
+import com.google.firebase.iid.FirebaseInstanceIdService
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.FirebaseMessagingService
 
-class FCMInstantIDService : FirebaseMessagingService() {
+class FCMInstantIDService : FirebaseInstanceIdService() {
 
     private val TAG = "MyAndroidFCMIIDService"
 
-    override fun onNewToken(token: String?) {
-        super.onNewToken(token)
-        val refreshedToken = FirebaseInstanceId.getInstance().getToken()
+    override fun onTokenRefresh() {
+        //Get hold of the registration token
+        val refreshedToken = FirebaseInstanceId.getInstance().token
         //Log the token
         Log.d(TAG, "Refreshed token: " + refreshedToken!!)
 
         FirebaseMessaging.getInstance().subscribeToTopic("Gate")
+
     }
 
-//    override fun onTokenRefresh() {
-//        //Get hold of the registration token
-//
-//
-//    }
+
+
 
 }

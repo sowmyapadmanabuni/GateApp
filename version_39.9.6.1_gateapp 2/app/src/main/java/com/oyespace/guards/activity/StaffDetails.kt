@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.View
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.utils.*
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -148,5 +149,10 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
             conf.locale = myLocale
             res.updateConfiguration(conf, dm)
         }
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val i_delivery = Intent(this@StaffDetails, Dashboard::class.java)
+//        startActivity(i_delivery)
+        finish()
+    }
     }

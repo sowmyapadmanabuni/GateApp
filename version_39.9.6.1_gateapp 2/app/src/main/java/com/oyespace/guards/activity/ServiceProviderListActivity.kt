@@ -1,11 +1,13 @@
 package com.oyespace.guards.activity
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.SeviceProviderListResponse
@@ -51,14 +53,14 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         R.mipmap.amazon,
         R.mipmap.bb,
         R.mipmap.grofers,
-    R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar,
-        R.drawable.oyespace_toolbar
+        R.drawable.godrej,
+        R.drawable.carpenter,
+        R.drawable.plumber,
+        R.drawable.electrician,
+        R.drawable.ola,
+        R.drawable.uber,
+        R.drawable.meru,
+        R.drawable.others
 
 
     )
@@ -77,7 +79,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         "Godrej",
         "Carpenter",
         "Plumber",
-        "electrician",
+        "Electrician",
         "OLA",
         "Uber",
         "Meru",
@@ -112,7 +114,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
 
-      //  getServiceProviderList()
+        //  getServiceProviderList()
         val rv_serviceProvider = findViewById(R.id.rv_serviceProvider) as RecyclerView
         rv_serviceProvider!!.setHasFixedSize(true)
         val gridLayoutManager = GridLayoutManager(this@ServiceProviderListActivity, 3)
@@ -242,5 +244,13 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
             vendordata.add(vendorPojo)
         }
         return vendordata
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val i_delivery = Intent(this@ServiceProviderListActivity, Dashboard::class.java)
+//        startActivity(i_delivery)
+        finish()
+
     }
 }

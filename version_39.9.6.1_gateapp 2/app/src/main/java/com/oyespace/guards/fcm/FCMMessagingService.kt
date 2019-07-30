@@ -3,34 +3,35 @@ package com.oyespace.guards.fcm
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.RingtoneManager
+import android.media.*
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Handler
+import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import android.widget.Toast
+import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.SplashActivity
 import com.oyespace.guards.activity.TicketingDetailsActivity
+import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.pojo.CloudFunctionNotificationReq
 import com.oyespace.guards.pojo.GetTicketingResponsesRes
+import com.oyespace.guards.pojo.SendGateAppNotificationRequest
 import com.oyespace.guards.pojo.TicketingResponseData
 import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.ConstantUtils.Emergency
-import com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -50,39 +51,53 @@ class FCMMessagingService : FirebaseMessagingService(){
     lateinit var mp:  MediaPlayer
     internal var handler = Handler()
     internal lateinit var mediaPlayer: MediaPlayer
+    var  myFormat="3gp"
 
 //    private val firebaseDatabase = FirebaseDatabase.getInstance()
 //    private val mRootReference = firebaseDatabase.getReference()
 //    private var mChildReference:DatabaseReference? = null
 
+    //   private val TAG = "MyFirebaseToken"//FirebaseInstanceId.getInstance().token
+    private val TAG = FirebaseInstanceId.getInstance().token
+    private lateinit var notificationManager: NotificationManager
+    private val ADMIN_CHANNEL_ID = "GateApp"
+
+    override fun onNewToken(token: String?) {
+        super.onNewToken(token)
+        Log.i(TAG, token)
+    }
     lateinit var dbh:DataBaseHelper;
 
-    override fun onNewToken(p0: String?) {
-        super.onNewToken(p0)
-        Log.e("TOKEN",""+p0);
-    }
-
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
-        //Log.e("JSON s", "From:  " + remoteMessage!!.data)
-        /**
-         * The following implementation is for testing.
-         * Now notification will be displayed if app is in background / foreground
-         * Please replace the screen name (SplashActivity) based on logic.
-         */
+        remoteMessage?.let { message ->
+            //  Log.i(TAG, message.getData().get("message"))
 
-        var intent = Intent(this,SplashActivity::class.java)
-        var pendingIntent = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_ONE_SHOT);
-        var notificationBuilder = NotificationCompat.Builder(this,"Notification")
-            .setSmallIcon(R.drawable.oyespace_launcher)
-            .setContentTitle(remoteMessage!!.data["ntTitle"])
-            .setContentText(remoteMessage!!.data["ntDesc"])
-            .setAutoCancel(true)
-            .setContentIntent(pendingIntent)
+//            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//            //Setting up Notification channels for android O and above
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                setupNotificationChannels()
+//            }
+//            val notificationId = Random().nextInt(60000)
+//
+//            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+//            val notificationBuilder = NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
+//                .setSmallIcon(R.drawable.oyespace_launcher)  //a resource for your custom small icon
+//                .setContentTitle(message.data["title"]) //the "title" value you sent in your notification
+//                .setContentText(message.data["message"]) //ditto
+//                .setAutoCancel(true)  //dismisses the notification on click
+//                .setSound(defaultSoundUri)
+//
+//            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//            notificationManager.notify(notificationId /* ID of notification */, notificationBuilder.build())
 
-        var notificationManager: NotificationManager = this.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(0,notificationBuilder.build())
+        }
 
 
+        Log.d("JSON s", "From:  " + remoteMessage!!.from)
+//        getNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,"Oyespace","Gate App",
+//            "gate_app","Gate",Prefs.getInt(DEVICE_ID,0))
 
         try
         {
@@ -493,8 +508,8 @@ class FCMMessagingService : FirebaseMessagingService(){
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 //        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
         val i = Intent(applicationContext, TicketingDetailsActivity::class.java)
-                    i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    startActivity(i)
+        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(i)
 
 //                //to play sound external sound files
 //                // final MediaPlayer mediaPlayer;
@@ -739,7 +754,6 @@ class FCMMessagingService : FirebaseMessagingService(){
 //Define sound URI
 
 
-
         mp = MediaPlayer.create(applicationContext, R.raw.walkietalkiestart);
 
         try {
@@ -755,20 +769,44 @@ class FCMMessagingService : FirebaseMessagingService(){
             e.printStackTrace()
         }
 
-       val mediaPlayer:MediaPlayer
 
-        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+      val mediaPlayer:MediaPlayer
+//
+       val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-        mediaPlayer =  MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setDataSource("http://mediaupload.oyespace.com/"+filename);
-        Log.v("uploadAudio 714",filename)
-        mediaPlayer.prepare();
+       mediaPlayer =  MediaPlayer();
 
-        // Start playing audio from http url
-        mediaPlayer.start();
 
-        Log.v("uploadAudio 720","PLAYYY")
+        var spb =  SoundPool.Builder();
+   spb.setMaxStreams(10);
+   var attrBuilder =  AudioAttributes.Builder();
+   attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC);
+   spb.setAudioAttributes(attrBuilder.build());
+    spb.build();
+
+//        mediaPlayer.setAudioAttributes( AudioAttributes.Builder()
+//.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+//.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//.build());
+//
+////        var myTrack =  AudioTrack(
+////         AudioAttributes.Builder()
+////            .setUsage(AudioAttributes.USAGE_MEDIA)
+////            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+////            .build(),
+////        myFormat, myBuffSize, AudioTrack.MODE_STREAM, mySession);
+//
+//       // mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+//       // mediaPlayer.setAudioAttributes()
+       mediaPlayer.setDataSource(IMAGE_BASE_URL+filename);
+//        Log.v("uploadAudio 714",filename)
+       mediaPlayer.prepare();
+//        Toast.makeText(applicationContext,"888",Toast.LENGTH_LONG).show()
+//        // Start playing audio from http url
+       mediaPlayer.start();
+//
+//        Log.v("uploadAudio 720","PLAYYY")
 
 //mediaPlayer.setOnErrorListener( MediaPlayer.OnErrorListener() {
 //     boolean onError(mp:MediaPlayer , int what, int extra) {
@@ -806,13 +844,66 @@ class FCMMessagingService : FirebaseMessagingService(){
 //                }
 //            })
 
-        }
-
-
-
-
-
     }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private fun setupNotificationChannels() {
+        val adminChannelName = "Oyespace"
+        val adminChannelDescription = "Security"
+
+        val adminChannel: NotificationChannel
+        adminChannel = NotificationChannel(ADMIN_CHANNEL_ID, adminChannelName, NotificationManager.IMPORTANCE_LOW)
+        adminChannel.description = adminChannelDescription
+        adminChannel.enableLights(true)
+        adminChannel.lightColor = Color.RED
+        adminChannel.enableVibration(true)
+        notificationManager.createNotificationChannel(adminChannel)
+    }
+    private fun getNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int) {
+
+        val dataReq = SendGateAppNotificationRequest(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID )
+
+
+        CloudFunctionRetrofitClinet.instance
+            .getNotification(dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<Any>() {
+
+                override fun onSuccessResponse(any: Any) {
+
+//                    if (workerListResponse.data.checkPointListByAssocID !=null) {
+//                        Log.d("WorkerList success",workerListResponse.data.toString())
+//                        var arrayList: ArrayList<CheckPointByAssocID>? = null
+//                        arrayList=ArrayList()
+//                        arrayList = workerListResponse.data.checkPointListByAssocID
+//
+//                        Collections.sort(arrayList, object : Comparator<CheckPointByAssocID>{
+//                            override  fun compare(lhs: CheckPointByAssocID, rhs: CheckPointByAssocID): Int {
+//                                return lhs.cpCkPName.compareTo(rhs.cpCkPName)
+//                            }
+//                        })
+//
+//                        LocalDb.saveCheckPointList(arrayList);
+//
+//                    } else {
+//
+//                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList",e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
+
+
+}
 
 
 

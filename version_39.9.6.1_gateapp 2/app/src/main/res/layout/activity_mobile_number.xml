@@ -240,6 +240,7 @@
                                 app:ccp_hintExampleNumber="true"
                                 android:clickable="false"
                                 android:focusable="true"
+                                android:visibility="gone"
                                 android:background="@color/white"
                                 android:layout_width="wrap_content"
                                 android:layout_height="match_parent">
@@ -274,6 +275,9 @@
                             android:layout_height="wrap_content"
                             android:gravity="center_vertical"
                             android:hint=""
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="1dp"
+                            android:layout_marginTop="5dp"
                             android:layout_gravity="center_vertical"
                             style="@style/EditTextCustomHolo"
                             android:paddingLeft="5dp"
@@ -282,7 +286,7 @@
                             android:textColor="@color/GBL1"
                             android:textColorHint="@color/GBL1"
                             android:textCursorDrawable="@null"
-                            android:textSize="16dp"
+                            android:textSize="18dp"
                     />
                     <Button
                             android:layout_width="@dimen/_10sdp"
@@ -346,6 +350,22 @@
             android:textStyle="bold"
             android:text=""
             android:layout_toRightOf="@+id/timertext"
+    />
+
+    <Button
+            android:id="@+id/btn_nobalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/timer"
+            android:layout_marginTop="10dp"
+            android:textSize="15sp"
+            android:padding="15dp"
+            android:visibility="gone"
+            android:background="@drawable/square"
+            android:onClick="onClick"
+            android:layout_centerInParent="true"
+            android:text="@string/textnobalance"
+            android:textColor="@color/white"
     />
 
 </RelativeLayout>

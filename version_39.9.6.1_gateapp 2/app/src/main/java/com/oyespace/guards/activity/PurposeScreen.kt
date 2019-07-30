@@ -8,11 +8,13 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.Dashboard
 import kotlinx.android.synthetic.main.activity_purpose.*
 import java.util.*
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.vehicle_others.VehicleOthersAddCarFragment
@@ -53,6 +55,7 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                     d.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
                     d.putExtra(ConstantUtils.MOBILENUMBER, intent.getStringExtra(ConstantUtils.MOBILENUMBER))
                     d.putExtra(ConstantUtils.COUNTRYCODE, intent.getStringExtra(ConstantUtils.COUNTRYCODE))
+                    d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(UNIT_ACCOUNT_ID))
 
                     startActivity(d)
                     finish()
@@ -164,5 +167,12 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
         val conf = res.configuration
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val i_delivery = Intent(this@PurposeScreen, Dashboard::class.java)
+//        startActivity(i_delivery)
+        finish()
     }
 }

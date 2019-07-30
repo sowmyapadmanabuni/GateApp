@@ -82,7 +82,7 @@
     <string name="textother">OTHER</string>
     <string name="textguest">Guest</string>
     <string name="textlookingforqr">Looking for Guest QR Code</string>
-    <string name="textnoqrcode">No qr code</string>
+    <string name="textnoqrcode">Without qr code</string>
     <string name="textpatrollingscreen">Patrolling Screen</string>
     <string name="textstart">Start</string>
     <string name="textend">End</string>
@@ -113,7 +113,21 @@
     <string name="textvisiting">Visiting</string>
     <string name="textmissedcallby">Get Missed Call by:</string>
     <string name="textnodata">No Data</string>
-
+    <string name="textnobalance">No Balance</string>
+    <string name="textcancel">Cancel</string>
+    <string name="textselectdob">Select DOB</string>
+    <string name="textupdate">Update</string>
+    <string name="textstaffdetails">Staff Details</string>
+    <string name="btn1">
+        Cancel
+    </string>
+    <string name="btn2">
+        Update
+    </string>
+    <string name="textstaffedit">
+        Staff Edit
+    </string>
+    <string name="capture">Capture</string><string name="init">Initialize</string>
     <string name="units_list_title">Units List</string>
     <string name="units_selection_title">Select Units</string>
     <string name="blocks_selection_title">Select Blocks</string>

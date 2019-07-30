@@ -268,28 +268,38 @@ class MyRoleScreen : BaseKotlinActivity() {
 
                         LocalDb.saveStaffList(arrayList);
                         val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+                        mainIntent.putExtra("STAFF","Available")
                         startActivity(mainIntent)
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
                         finish()
-                    } else {
-                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
-
-                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.google_red)
-                            .setIcon(R.drawable.ic_info_black_24dp)
-                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-                            .setTitle("No Staff Data")
-                            .setTitleGravity(Gravity.CENTER)
-                            .setMessage("No Staff Data")
-                            .setMessageGravity(Gravity.CENTER)
-                            .setPositiveButton("Add") {
-                                val mainIntent = Intent(this@MyRoleScreen, StaffListActivity::class.java)
-                                startActivity(mainIntent)
-                                finish()
-                            }
-
-                            .show()
                     }
+                    else{
+                        //LocalDb.saveStaffList(arrayList);
+                        val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+                        mainIntent.putExtra("STAFF","Not Available")
+                        startActivity(mainIntent)
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
+                        finish()
+                    }
+//                    else {
+//                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//
+//                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
+//                            .setTopColorRes(R.color.google_red)
+//                            .setIcon(R.drawable.ic_info_black_24dp)
+//                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+//                            .setTitle("No Staff Data")
+//                            .setTitleGravity(Gravity.CENTER)
+//                            .setMessage("No Staff Data")
+//                            .setMessageGravity(Gravity.CENTER)
+//                            .setPositiveButton("Add") {
+//                                val mainIntent = Intent(this@MyRoleScreen, StaffListActivity::class.java)
+//                                startActivity(mainIntent)
+//                                finish()
+//                            }
+//
+//                            .show()
+//                    }
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -342,8 +352,12 @@ fun getDeviceList(AssnID: Int){
 //                    finish()
                 } else {
 
-                    //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//                    val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+//                    startActivity(mainIntent)
+//                    finish()
 
+                    //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//
 //                    LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
 //                        .setTopColorRes(R.color.google_red)
 //                        .setIcon(R.drawable.ic_info_black_24dp)

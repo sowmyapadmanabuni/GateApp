@@ -22,6 +22,7 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -49,16 +50,27 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         mcontext=context
         if(intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)){
 
-            if(intent.getStringExtra("unitname").contains(",")){
+            if(intent.getStringExtra(UNITID).contains(",")){
                 var unitname_dataList: Array<String>
+                var unitid_dataList: Array<String>
+                var unitAccountId_dataList: Array<String>
                 unitname_dataList = intent.getStringExtra("unitname").split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 if(unitname_dataList.size>0) {
                     for (i in 0 until unitname_dataList.size) {
                         sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
                             intent.getStringExtra("name"), intent.getStringExtra("nr_id"),
                             unitname_dataList.get(i).replace(" ",""), intent.getStringExtra("memType"));
+
+                        getNotificationCreate(unitAccountId_dataList.get(i).replace(" ",""),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",intent.getStringExtra("msg"),unitid_dataList.get(i).replace(" ",""),intent.getIntExtra("VLVisLgID",0).toString(),unitid_dataList.get(i).replace(" ","")+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
+                            DateTimeUtils.getCurrentTimeLocal(),
+                            DateTimeUtils.getCurrentTimeLocal(),
+                            intent.getIntExtra("VLVisLgID",0).toString()
+                        )
+
                         sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,intent.getStringExtra("msg"),intent.getStringExtra(COMPANY_NAME),"gate_app",
-                            Prefs.getInt(DEVICE_ID,0).toString()+"gate_app",Prefs.getInt(DEVICE_ID,0))
+                            unitid_dataList.get(i).replace(" ","")+"admin",Prefs.getInt(DEVICE_ID,0),unitid_dataList.get(i).replace(" ",""))
                     }
                 }
             }else{
@@ -66,8 +78,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
                     intent.getStringExtra("unitname").replace(" ",""),intent.getStringExtra("memType"));
 
+
+                getNotificationCreate(intent.getStringExtra(UNIT_ACCOUNT_ID),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",intent.getStringExtra("msg"),intent.getStringExtra(UNITID),intent.getIntExtra("VLVisLgID",0).toString(),intent.getStringExtra(UNITID)+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
+                    DateTimeUtils.getCurrentTimeLocal(),
+                    DateTimeUtils.getCurrentTimeLocal(),
+                    intent.getIntExtra("VLVisLgID",0).toString()
+                )
+
                 sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,intent.getStringExtra("msg"),intent.getStringExtra(COMPANY_NAME),"gate_app",
-                    Prefs.getInt(DEVICE_ID,0).toString()+"gate_app",Prefs.getInt(DEVICE_ID,0))
+                    intent.getStringExtra(UNITID)+"admin",Prefs.getInt(DEVICE_ID,0),intent.getStringExtra(UNITID))
             }
             sendFCM_toSyncNonreg()
             Log.d("SYCNCHECK","in 65")
@@ -116,6 +135,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             }
         }
         else if(intent.getStringExtra(BSR_Action).equals(SENDAUDIO)){
+            Toast.makeText(context,"coming",Toast.LENGTH_LONG).show()
             sendFCM_forAudioMessage(intent.getStringExtra("FILENAME"))
         }
 
@@ -636,9 +656,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int) {
-        Log.e("sendCloudNotification"," "+associationID+" "+associationName+" "+ntDesc+" "+ntTitle+" "+ntType+" "+sbSubID+" "+userID);
-        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID )
+    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
+
+        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
 
 
         CloudFunctionRetrofitClinet.instance
@@ -678,5 +698,52 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
+
+
+
+//    {
+//        "ACAccntID"  : 1,
+//        "ASAssnID"   : 2,
+//        "NTType"     : "Join",
+//        "NTDesc"     : "Joining as Owner",
+//        "SBUnitID" : 23,
+//        "SBMemID"  : 3,
+//        "SBSubID"  : 2,
+//        "SBRoleID" : 2,
+//        "ASAsnName" : "AssociationName",
+//        "MRRolName" : "Owner",
+//        "NTDUpdated" : "2019-09-12 12:00:00",
+//        "NTDCreated" : "2019-01-29 11:11:11"
+//
+//
+//    }
+
+
+    private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {
+
+
+        val dataReq = NotificationCreateReq(ACAccntID,ASAssnID,NTType,NTDesc,SBUnitID,SBMemID,SBSubID,SBRoleID ,ASAsnName,MRRolName,NTDUpdated,NTDCreated,VLVisLgID,"")
+
+
+        RetrofitClinet.instance
+            .getNotificationCreate(OYE247TOKEN, dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<NotificationCreateResponse>() {
+
+                override fun onSuccessResponse(notificationCreateResponse: NotificationCreateResponse) {
+
+                }
+
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList",e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
 
 }

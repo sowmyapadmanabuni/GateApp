@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#da650a</color>
+    <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#D81B60</color>
     <color name="app_theme_color">#00a7ce</color>
 
@@ -26,9 +26,9 @@
     <color name="google_red">#fc424b</color>
     <color name="google_light">#f9a5a9</color>
     <color name="red">#ffeb5454</color>
-    <color name="orange">#FF8C00</color>
+    <color name="orange">#fa9f3d</color>
     <color name="orange_light">#efb588</color>
-    <color name="orangedark">#FF8C00</color>
+    <color name="orangedark">#da650a</color>
 
 
     <color name="sub_txt">#ff8c9b9b</color>
@@ -84,6 +84,5 @@
     <color name="background">#65828e</color>
     <color name="main_color">#ff9a00</color>
     <color name="secondary_color">#BDBDBD</color>
-
     <color name="dark_grey">#696969</color>
 </resources>

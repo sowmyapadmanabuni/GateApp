@@ -20,6 +20,7 @@ public enum URLData {
     URL_SAVE_CHECK_POINT(BASE_URL+"oye247/api/v1/Tracking/Create",false,true,"",11),
     URL_STAFF_REGISTRATION(BASE_URL+"oye247/api/v1/Worker/Create",false,true,"",12),
     URL_CREATE_TICKETING_RESPONSE(BASE_URL+"oye247/api/v1/TicketingResponse/Create",false,true,"",13);
+   // URL_SEND_STAFF_IMAGE(BASE_URL+"oye247/api/v1/Worker/WorkerEntryImgGPSUpdate",false,true,"",14);
 
 
 //    URL_HOTELS_MENU_LIST_DETAILS("https://goohungrry.com/stack/v1/menuItems", false, true, "", 4),

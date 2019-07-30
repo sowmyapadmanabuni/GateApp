@@ -9,8 +9,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v4.content.ContextCompat
-import android.support.v7.widget.AppCompatCheckBox
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.Editable
@@ -20,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
@@ -46,7 +45,8 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
     var arrayList = ArrayList<UnitPojo>()
     private val REQUEST_CODE_SPEECH_INPUT = 100
     internal var unitNames = ""
-    internal var unitId = 0
+    internal var unitId = ""
+    internal var acAccntID=""
     internal var unitNumber1=""
     internal var unitNumber2=""
     internal var unitNumber3=""
@@ -107,6 +107,8 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                         if (arrayList.get(j).isSelected) {
                             if((unitNames.length!=0)||(unitNumber1.length!=0)){
                                 unitNames +=  ", "
+                                unitId+= ", "
+                                acAccntID+=", "
                                 unitNumber1+=", "
                                 unitNumber2+=", "
                                 unitNumber3+=", "
@@ -114,7 +116,10 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                                 unitNumber5+=", "
                             }
                             unitNames += arrayList.get(j).unUniName
-                            unitId = arrayList.get(j).unUnitID
+                            unitId += arrayList.get(j).unUnitID
+                            acAccntID+=arrayList.get(j).acAccntID
+
+
                             if(arrayList.get(j).tenant.size!=0){
                                 try {
                                     unitNumber1 += arrayList.get(j).tenant[0].utMobile
@@ -149,15 +154,17 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                     if ( unitNames.length > 0) {
 
+
                         if(intent.getStringExtra(COMPANY_NAME).equals("Others")){
                             val d = Intent(this@UnitListActivity, PurposeScreen::class.java)
 //                            Log.d( "intentdata MobileNumber", "buttonNext " + intent.getStringExtra(UNITNAME) +
 // " " + intent.getStringExtra(UNITID) + " " + Ed_phoneNum.text + " " + countryCode );
-                            d.putExtra(UNITID, intToString(unitId))
+                            d.putExtra(UNITID, unitId)
                             d.putExtra(UNITNAME, unitNames)
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
                             d.putExtra("RESIDENT_NUMBER",unitNumber1+", "+unitNumber2+", "+unitNumber3+", "+unitNumber4+", "+unitNumber5)
 
                             startActivity(d);
@@ -168,12 +175,13 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                             Log.d("intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " "
                                     + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " "
                                     + getIntent().getStringExtra(COUNTRYCODE) + " ");
-                            d.putExtra(UNITID, intToString(unitId))
+                            d.putExtra(UNITID, unitId)
                             d.putExtra(UNITNAME, unitNames)
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                             //d.putExtra("RESIDENT_NUMBER",unitNumber1)
+                            d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
                             d.putExtra("RESIDENT_NUMBER",unitNumber1+", "+unitNumber2+", "+unitNumber3+", "+unitNumber4+", "+unitNumber5)
                             startActivity(d);
                             finish();
@@ -295,11 +303,6 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
             holder.cb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
                 // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
                 listVistor!!.get(position).isSelected=isChecked
-                if(isChecked) {
-                    holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-                }else{
-                    holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
-                }
 
             }
             //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
@@ -594,7 +597,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
         inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
-            val cb_unit: AppCompatCheckBox
+            val cb_unit: CheckBox
             val apartmentNamee: TextView
             val lv_itemrecyclerview: RelativeLayout
 
@@ -651,4 +654,13 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
             }
         }
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val i_delivery = Intent(this@UnitListActivity, Dashboard::class.java)
+//        startActivity(i_delivery)
+        finish()
+    }
+
+
 }

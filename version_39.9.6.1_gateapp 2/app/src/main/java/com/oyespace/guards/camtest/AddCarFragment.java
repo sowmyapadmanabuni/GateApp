@@ -48,14 +48,17 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.oyespace.guards.BackgroundSyncReceiver;
+import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 
 import com.oyespace.guards.activity.*;
 import com.oyespace.guards.constants.PrefKeys;
 import com.oyespace.guards.network.*;
+import com.oyespace.guards.request.SendStaffImageReq;
 import com.oyespace.guards.request.StaffRegistrationReqJv;
+import com.oyespace.guards.responce.StaffImageRes;
 import com.oyespace.guards.responce.StaffRegistrationRespJv;
-import com.oyespace.guards.responce.TicketListingTesponse;
+import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
@@ -73,6 +76,7 @@ import static com.oyespace.guards.utils.Utils.showToast;
 public class AddCarFragment extends Activity implements ResponseHandler, View.OnClickListener {
 
     /*sumeeth fragment*/
+    File destination;
     ChampApiInterface champApiInterface;
 
     private final int REQUEST_CODE_SPEECH_INPUT = 100;
@@ -88,7 +92,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
     TextView txt_assn_name,txt_device_name,txt_gate_name ;
     private View view;
     private EditText notes, Regno, kms, exp_date, exp_price ,car_id;
-    private Button  image_Gallery, submit_button,buttonCapture;
+    public static Button  image_Gallery, submit_button,buttonCapture;
     ImageView dialog_imageview;
     static ArrayList<String> list = new ArrayList<>();
     private TextView upload_rc_book,
@@ -189,7 +193,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
                 Picasso.with(AddCarFragment.this)
-                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
 
                 builder.setView(dialogView);
@@ -241,8 +245,8 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         //iamgeLyt.removeAllViews();
         list.clear();
 
-        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
         if(getIntent().getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)){
             image_Gallery.setVisibility(View.INVISIBLE);
@@ -250,13 +254,13 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
         }else{
             if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
-                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
+                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
 
                 Log.v("CALLER IMAGEVIEW",IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
 
                 imageView1.setImageBitmap(personPhoto);
                 Picasso.with(this)
-                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
@@ -266,6 +270,9 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         buttonCapture.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+
+
+
                 Intent intent =new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 
@@ -312,6 +319,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             public void onClick(View v) {
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
+
 //                val imgName = "Association"+ "0" + ".jpg"
 
 //                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
@@ -334,6 +342,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         submit_button.setClickable(false);
                         staffRegistration();
                     }else{
+
                         byte[] byteArray=null;
                         try {
                             Log.d("Dgddfdf picas","5 2");
@@ -349,8 +358,8 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         }
 
                         Intent d = new Intent(AddCarFragment.this, StaffEntryRegistration.class);
-                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
                         d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                         d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                         d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
@@ -362,7 +371,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(PERSON_PHOTO, byteArray);
                         d.putExtra(ITEMS_PHOTO_LIST, list);
                         d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
-
+                        d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                         startActivity(d);
                         finish();
 
@@ -392,10 +401,12 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         loginReq.WKDesgn= getIntent().getStringExtra(COMPANY_NAME);
         loginReq.WKFName= getIntent().getStringExtra(PERSONNAME);
         loginReq.WKIDCrdNo="";
-        loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
+        loginReq.WKDOB=getIntent().getStringExtra("DOB");
+        loginReq.WKISDCode = "";
+        //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
         loginReq.WKLName="";
 
-        loginReq.WKMobile=""+ getIntent().getStringExtra(MOBILENUMBER);
+        loginReq.WKMobile=getIntent().getStringExtra(COUNTRYCODE)+ getIntent().getStringExtra(MOBILENUMBER);
         loginReq.WKWrkType= getIntent().getStringExtra(VISITOR_TYPE);
         loginReq.UNUnitID=toInteger( getIntent().getStringExtra(UNITID));
         loginReq.UNUniName= getIntent().getStringExtra(UNITNAME);
@@ -423,6 +434,9 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             if (workerResponce != null) {
                 Log.d("str3", "str3: " + urlId+" id "+position+" "+" "+" "+workerResponce.success.toString());
                 if(workerResponce.success.equalsIgnoreCase("true")) {
+                    imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +workerResponce.data.worker.wkWorkID  + ".jpg";
+
+                    sendStaffImage(imgName,"",String.valueOf(workerResponce.data.worker.wkWorkID));
 
                     byte[] byteArray=null;
                     try {
@@ -452,7 +466,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         startActivity(d);
                     }
-                    else {
+                    else if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
                         Intent intent = new Intent(AddCarFragment.this, StaffDetails.class);
                         intent.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
                         intent.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
@@ -466,7 +480,19 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         startActivity(intent);
                         finish();
                     }
-                     imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +workerResponce.data.worker.wkWorkID  + ".jpg";
+                    else{
+                        Intent d = new Intent(AddCarFragment.this, Biometric.class);
+                        d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
+                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                        d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
+                        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
+                        d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
+                        d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
+                        d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
+                        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
+                        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                        startActivity(d);
+                    }
                  //   uploadImage(imgName,personPhoto);
 
                     Intent ddc =new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
@@ -524,20 +550,15 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         super.onDestroy();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        Intent d =new  Intent(AddCarFragment.this, NameEntryScreen.class);
-//        d.putExtra(FLOW_TYPE,getIntent().getStringExtra(FLOW_TYPE));
-//        d.putExtra(VISITOR_TYPE,getIntent().getStringExtra(VISITOR_TYPE));
-//        d.putExtra(COMPANY_NAME,getIntent().getStringExtra(COMPANY_NAME));
-//        d.putExtra(UNITID,getIntent().getStringExtra(UNITID) );
-//        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-//        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-//        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-//        startActivity(d);
-//        finish();
-//    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+//
+//          Intent i=new Intent(AddCarFragment.this, Dashboard.class);
+//          startActivity(i);
+          finish();
+
+    }
 
     @Override
     public void onClick(View v) {
@@ -593,7 +614,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
         String imgName=System.currentTimeMillis() + ".jpg";
 
-        File destination = new File(Environment.getExternalStorageDirectory().getPath(), imgName);
+        destination= new File(Environment.getExternalStorageDirectory().getPath(), imgName);
 
         // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
         setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
@@ -614,11 +635,18 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             fo.close();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
+
+
+
+
     }
+
 
     private void setviewPager(final String selectedImagePath, final Context context) {
         try {
+
 
             if (list.size() == 19) {
                 image_Gallery.setVisibility(View.GONE);
@@ -629,7 +657,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             list.add(selectedImagePath);
             ImageHelper.loadImage(context, selectedImagePath, imageView);
 
-            imageAdapter = new ImageAdapter(list,AddCarFragment.this);
+            imageAdapter = new ImageAdapter(list,AddCarFragment.this,"On");
             rv_image.setAdapter(imageAdapter);
             // iamgeLyt.addView(imageView);
 
@@ -649,11 +677,11 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                             list.remove(selectedImagePath);
                             //iamgeLyt.removeView(imageView);
                             imageAdapter.notifyDataSetChanged();
-                            if (list.size() == 18) {
-                                image_Gallery.setVisibility(View.VISIBLE);
-                            } else {
-                                image_Gallery.setVisibility(View.GONE);
-                            }
+//                            if (list.size() == 18) {
+//                                image_Gallery.setVisibility(View.VISIBLE);
+//                            } else {
+//                                image_Gallery.setVisibility(View.GONE);
+//                            }
                         }
                     });
 
@@ -665,7 +693,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                }
+              }
             });
 
 
@@ -741,6 +769,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                 case REQUEST_CAMERA:
                     if(resultCode == Activity.RESULT_OK){
                     onCaptureImageResult(data, this);
+
                     showViewPager();
                 }
                 break;
@@ -749,6 +778,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                     Bitmap photo = (Bitmap) data.getExtras().get("data");
                     imageView1.setImageBitmap(photo);
                     personPhoto=photo;
+
                 }
                 break;
 
@@ -837,6 +867,114 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //
 //    }
 //
+
+
+//    private void staffImageUpload(String wkEntryImg, String wkEntryGPS, String wkWorkID ) {
+//
+//        RestClient restClient = RestClient.getInstance();
+//
+//        SendStaffImageReq sendStaffImageReq = new SendStaffImageReq();
+//
+//
+//
+//        sendStaffImageReq.WKEntryImg=imgName;
+//        sendStaffImageReq.WKEntryGPS=wkEntryGPS;
+//        sendStaffImageReq.WKWorkID=wkWorkID;
+//
+//
+//
+//        Log.d("saveCheckPoints","StaffEntry "+sendStaffImageReq.WKWorkID+" "+sendStaffImageReq.WKEntryImg+" "
+//                +sendStaffImageReq.WKEntryGPS);
+//
+//        restClient.addHeader(OYE247KEY, OYE247TOKEN);
+//        restClient.post(this, sendStaffImageReq, StaffImageRes.class, this, URLData.URL_SEND_STAFF_IMAGE);
+//
+//    }
+
+
+    void sendStaffImage(String WKEntryImg, String WKEntryGPS, String WKWorkID ) {
+
+
+
+
+        SendStaffImageReq sendStaffImageReq = new SendStaffImageReq();
+
+        sendStaffImageReq.WKEntryImg=WKEntryImg;
+        sendStaffImageReq.WKEntryGPS=WKEntryGPS;
+        sendStaffImageReq.WKWorkID=WKWorkID;
+
+        Log.v("IMAGE NAME....",WKEntryImg);
+        Toast.makeText(AddCarFragment.this,WKEntryImg,Toast.LENGTH_LONG).show();
+
+
+        Call<StaffImageRes> call = champApiInterface.sendStaffImage(sendStaffImageReq);
+        call.enqueue(new Callback<StaffImageRes>() {
+            @Override
+            public void onResponse(Call<StaffImageRes> call, Response<StaffImageRes> response) {
+
+               // Toast.makeText(AddCarFragment.this,"Shalinii",Toast.LENGTH_LONG).show();
+
+
+
+//                if (response.body().getSuccess() == true) {
+//                    DateFormat dateFormat_DMY = new SimpleDateFormat("dd-MM-yyyy");
+//                    String CurrentString = response.body().data.getSubscription().sueDate;
+//                    String[] separated = CurrentString.split("T");
+//                    subscriptionDate = separated[0];
+//
+//                    tv_subscriptiondate.setText("Valid till: " + subscriptionDate);
+//                    //  if(PrefManager.getValidityDate().length()>0) {
+//                    try {
+//                        java.util.Date dt_dwnld_date = dateFormat_DMY.parse(response.body().data.getSubscription().sueDate);
+//                        Calendar c1 = Calendar.getInstance();
+//                        c1.setTime(dt_dwnld_date);
+//
+//                        long days = (c1.getTimeInMillis() - System.currentTimeMillis()) / (24 * 60 * 60 * 1000) + 1;
+//
+//                        if (0 < days && days <= 7) {
+//                            android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(DashBoard.this);
+//                            alertDialog.setTitle("Your Association Subscription Expires in " + days + " days");
+//                            alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.cancel();
+//                                }
+//                            });
+//                            // Showing Alert Message
+//                            if (!DashBoard.this.isFinishing()) {
+//                                alertDialog.show();
+//                            }
+//                        }
+//
+//                    } catch (Exception ex) {
+//
+//                    }
+//
+//                } else {
+//                }
+            }
+
+            @Override
+            public void onFailure(Call<StaffImageRes> call, Throwable t) {
+                Toast.makeText(AddCarFragment.this,t.toString(),Toast.LENGTH_LONG).show();
+                call.cancel();
+            }
+        });
+
+    }
+
+    public String getRealPathFromURI (Uri contentUri) {
+        String path = null;
+        String[] proj = { MediaStore.MediaColumns.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            path = cursor.getString(column_index);
+        }
+        cursor.close();
+        return path;
+    }
+
+
 
 }
 

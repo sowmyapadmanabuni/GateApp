@@ -14,7 +14,6 @@ import android.view.*
 import android.widget.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
-import com.oyespace.guards.adapter.LinearLayoutManager
 import com.oyespace.guards.com.oyespace.guards.adapter.PaginationAdapter
 import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
 import com.oyespace.guards.com.oyespace.guards.pojo.UnitsData
@@ -71,7 +70,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
         /**
          * Setting status bar color (Only for Lollipop & above)
          */
-        setDarkStatusBar()
+        //setDarkStatusBar()
 
         try{
             blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK,-1);
@@ -284,7 +283,11 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
             /**
              * Sublist end index is exclusive. So an additional one is added to the end index
              */
-            arrayList = ArrayList(arrayFullList.subList(start,end+1))
+            try {
+                arrayList = ArrayList(arrayFullList.subList(start, end + 1))
+            }catch (e:Exception){
+
+            }
             rv_unit.showProgress()
                 orderListAdapter =
                     UnitSelectionActivity.UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@UnitSelectionActivity, checkListener = {

@@ -10,17 +10,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import com.oyespace.guards.R;
+import com.oyespace.guards.vehicle_others.VehicleOthersAddCarFragment;
 
 import java.util.List;
+
+import static android.content.Context.LAYOUT_INFLATER_SERVICE;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
 
 private List<String> imageList;
 Context context;
+String visibility;
 
 public class MyViewHolder extends RecyclerView.ViewHolder {
 ImageView imageview,iv_delete;
@@ -35,9 +37,10 @@ CardView lyt_card;
 }
 
 
-    public ImageAdapter(List<String> imageList, Context context) {
+    public ImageAdapter(List<String> imageList, Context context,String visibility) {
         this.imageList = imageList;
         this.context=context;
+        this.visibility=visibility;
     }
 
     @Override
@@ -48,6 +51,14 @@ CardView lyt_card;
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
+
+
+    if(visibility.equals("On")){
+        holder.iv_delete.setVisibility(View.VISIBLE);
+    }
+    else if(visibility.equals("Off")){
+        holder.iv_delete.setVisibility(View.GONE);
+    }
 
 
         ImageHelper.loadImage(context, imageList.get(position), holder.imageview);
@@ -75,6 +86,12 @@ CardView lyt_card;
                         imageList.remove(position);
                         //iamgeLyt.removeView(imageView);
                         notifyDataSetChanged();
+
+                        if (imageList.size() == 19) {
+                            AddCarFragment.image_Gallery.setVisibility(View.VISIBLE);
+                        }
+
+
                     }
                 });
 
@@ -88,6 +105,7 @@ CardView lyt_card;
                 dialog.show();
             }
         });
+
     }
 
     @Override

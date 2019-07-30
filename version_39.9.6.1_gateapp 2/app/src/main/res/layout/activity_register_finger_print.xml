@@ -466,8 +466,8 @@
                 <ImageView
                     android:id="@+id/imageFingerprint1"
                     android:contentDescription="@string/fingerprint_capture_image"
-                    android:layout_width="@dimen/_150sdp"
-                    android:layout_height="@dimen/_150sdp"
+                    android:layout_width="@dimen/_130sdp"
+                    android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
                     android:src="@android:drawable/picture_frame" />
                 <RelativeLayout android:id="@+id/layout_fp1_done"
@@ -509,8 +509,8 @@
                 <ImageView
                     android:id="@+id/imageFingerprint2"
                     android:contentDescription="@string/fingerprint_capture_image"
-                    android:layout_width="@dimen/_150sdp"
-                    android:layout_height="@dimen/_150sdp"
+                    android:layout_width="@dimen/_130sdp"
+                    android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
                     android:src="@android:drawable/picture_frame" />
 
@@ -554,8 +554,8 @@
                 <ImageView
                     android:id="@+id/imageFingerprint3"
                     android:contentDescription="@string/fingerprint_capture_image"
-                    android:layout_width="@dimen/_150sdp"
-                    android:layout_height="@dimen/_150sdp"
+                    android:layout_width="@dimen/_130sdp"
+                    android:layout_height="@dimen/_130sdp"
                     android:layout_centerHorizontal="true"
                     android:src="@android:drawable/picture_frame" />
 

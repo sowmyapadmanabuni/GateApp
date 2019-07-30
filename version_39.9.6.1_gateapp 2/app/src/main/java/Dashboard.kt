@@ -18,6 +18,7 @@ import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
@@ -38,6 +39,7 @@ import com.malinskiy.superrecyclerview.SuperRecyclerView
 import com.oyespace.guards.activity.*
 import com.oyespace.guards.adapter.VistorEntryListAdapter
 import com.oyespace.guards.adapter.VistorListAdapter
+import com.oyespace.guards.com.oyespace.guards.utils.ConnectionDetector
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.network.*
@@ -74,49 +76,52 @@ import kotlinx.android.synthetic.main.activity_walkie_talkie.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.lang.NullPointerException
 import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
 
+    lateinit var cd: ConnectionDetector
+    var timer:Timer?=null
     private val mInterval = 96000 // 5 seconds by default, can be changed later
     private var mHandlerr: Handler? = null
     var counter:Int?=0
     internal var database: DBHelper?=null
 
     var audioclip: String? = null
-      lateinit var mp:  MediaPlayer
+    lateinit var mp:  MediaPlayer
 
     internal var newAl: ArrayList<VisitorEntryLog>? = ArrayList()
-     var mHandler: Handler?=null
+    var mHandler: Handler?=null
     lateinit var btn_in:Button
     lateinit var btn_out:Button
 
     private var audiofile: File? = null
-      var vistorEntryListAdapter: VistorEntryListAdapter?=null
+    var vistorEntryListAdapter: VistorEntryListAdapter?=null
     // var spinner: Spinner?=null
     private var mFileName = ""
     private var myAudioRecorder: MediaRecorder? = null
     // var record: ImageView?=null
-     var iv_settings: ImageView?=null
-     lateinit var tv_nodata: TextView
+    var iv_settings: ImageView?=null
+    lateinit var tv_nodata: TextView
     // LinearLayout lyt_settings;
-     var clickable = 0
-     var clickable1 = 0
-     var re_vehicle: RelativeLayout?=null
-     var re_staff: RelativeLayout?=null
-     var re_guest: RelativeLayout?=null
-     var re_delivery: RelativeLayout?=null
-     var lyt_settings: RelativeLayout?=null
-     var champApiInterface: ChampApiInterface?=null
-     var rv_dashboard: RecyclerView?=null
-     var tv_subscriptiondate: TextView?=null
-     var tv_version: TextView?=null
-     var tv_languagesettings: TextView?=null
-     var txt_assn_name: TextView?=null
-     var txt_device_name: TextView?=null
-     var txt_gate_name: TextView?=null
-     var subscriptionDate: String?=null
+    var clickable = 0
+    var clickable1 = 0
+    var re_vehicle: RelativeLayout?=null
+    var re_staff: RelativeLayout?=null
+    var re_guest: RelativeLayout?=null
+    var re_delivery: RelativeLayout?=null
+    var lyt_settings: RelativeLayout?=null
+    var champApiInterface: ChampApiInterface?=null
+    var rv_dashboard: RecyclerView?=null
+    var tv_subscriptiondate: TextView?=null
+    var tv_version: TextView?=null
+    var tv_languagesettings: TextView?=null
+    var txt_assn_name: TextView?=null
+    var txt_device_name: TextView?=null
+    var txt_gate_name: TextView?=null
+    var subscriptionDate: String?=null
     internal var stringNumber: String? = null
     internal var stringCode: String? = null
     internal var dbh: DataBaseHelper?=null
@@ -283,14 +288,17 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     //    }, 30 * 1000 );
     //}
 
-    private val m_Runnable = object : Runnable {
-        override fun run() {
-            //Toast.makeText(DashBoard.this,"in runnable",Toast.LENGTH_SHORT).show();
-            //   vistorEntryListAdapter.notifyDataSetChanged();
-            this@Dashboard.mHandler?.postDelayed(this, 20000)
-        }
-
-    }
+//    private val m_Runnable = object : Runnable {
+//        override fun run() {
+//            var i:Intent  = getBaseContext().getPackageManager()
+//                         .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(i);
+//            this@Dashboard.mHandler?.postDelayed(this, 20000)
+//        }
+//
+//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -298,7 +306,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         setContentView(R.layout.activity_dash_board)
 
 
-
+        cd = ConnectionDetector()
+        cd.isConnectingToInternet(this@Dashboard)
         init()
 
 //        wvvalue=Prefs.getString(WALKIETALKIE,null)
@@ -408,7 +417,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
             if (status != TextToSpeech.ERROR)
-               // t1?.language = Locale.getDefault()
+            // t1?.language = Locale.getDefault()
                 t1?.language=Locale.getDefault()
         })
 
@@ -498,8 +507,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             txt_device_name?.text = " "
 
         }
+//        if(intent.getStringExtra("STAFF")!=null) {
+//            if (intent.getStringExtra("STAFF").equals("Available")) {
+//                downloadBiometricData_Loop()
+//            } else {
+//                Log.e("Value", "Not Available")
+//            }
+//        }
 
-        downloadBiometricData_Loop()
+
     }
 
     private fun sendFCM_welcomeMsg(welcomeMessage: String) {
@@ -534,9 +550,29 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     override fun onResume() {
 
+
+
+        timer = Timer()
+        Log.i("Main", "Invoking logout timer")
+        val logoutTimeTask = LogOutTimerTask()
+        timer!!.schedule(logoutTimeTask, 300000)
+
+        if (timer != null) {
+            timer!!.cancel();
+            Log.i("Main", "cancel timer");
+            timer = null;
+        }
+
         try {
 
-          //  Dashboard..notifyDatasetChanged()
+            downloadBiometricData_Loop()
+        }catch (e:NullPointerException){
+
+        }
+
+        try {
+
+            //  Dashboard..notifyDatasetChanged()
         } catch (e: Throwable) {
             //error occured. Probably null
         }
@@ -545,11 +581,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         val updateHandler = Handler()
 
         val runnable = Runnable {
-          // openAlert() // some action(s)
+            // openAlert() // some action(s)
         }
 
         updateHandler.postDelayed(runnable, 1000)
-      //  stopRepeatingTask()
+        //  stopRepeatingTask()
 
         LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("SYNC"))//constant
         super.onResume()
@@ -735,11 +771,36 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT).show()
         }
 
+
+//        handler =  Handler();
+//
+//
+//        r = Runnable() {
+//            run() {
+//                Toast.makeText(
+//                    this@Dashboard, "user Is Idle from last 5 minutes",
+//                    Toast.LENGTH_SHORT
+//                ).show();
+//            }
+//        }
+
+//        r =  Runnable() {
+//
+//            @Override
+//           fun run() {
+//                // TODO Auto-generated method stub
+//                Toast.makeText(this@Dashboard, "user Is Idle from last 5 minutes",
+//                    Toast.LENGTH_SHORT).show();
+//            }
+//        };
+//        startHandler();
+
+
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-      //  dbh?.residentsLogVehicles
+        //  dbh?.residentsLogVehicles
         //            prefManager.setOnForeground(false);
         //            startService(new Intent(DashBoard.this, ByteDownloaderService.class));
         //            Intent intentAction1 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
@@ -786,9 +847,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     Log.d(
                         "str3",
                         "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
-                   )
+                    )
                     if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
-                                         //   showToast(this, " Saved");
+                        //   showToast(this, " Saved");
                         visitorEntryLog(loginDetailsResponce.data.visitorLog.vlVisLgID)
 
 
@@ -809,7 +870,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
                     )
                     if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
-                       // showToast(this, " Welcome")
+                        // showToast(this, " Welcome")
 
                         val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
                         intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
@@ -934,7 +995,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         //  showToast(this, urlId+" id "+position+" "+memId+" "+MemberType+" ");
 
-              //  finish();
+        //  finish();
     }
 
     private fun visitorEntryLog(vlVisLgID: Int) {
@@ -957,7 +1018,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     private fun visitorLog(
         unitId: Int, personName: String, mobileNumb: String, desgn: String,
-        workerType: String, staffID: Int, unitName: String
+        workerType: String, staffID: Int, unitName: String,wkEntryImg:String
     ) {
 
         val restClient = RestClient.getInstance()
@@ -987,16 +1048,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         loginReq.vLVisType = workerType
         loginReq.uNUniName = unitName
         loginReq.vLVisCnt = 1
+        loginReq.VLEntryImg=wkEntryImg
 
-        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
-            getCurrentTimeLocal(),"")
+
 //getCurrentTimeLocal()
         Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
         //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
 
         restClient.addHeader(OYE247KEY, OYE247TOKEN)
         restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_LOG)
-      //  t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
+          t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
         Prefs.putString(BIOMETRICPERSONNAME,personName)
         if(database!!.insertContact(personName)){
 //            Toast.makeText(getApplicationContext(), "done",
@@ -1037,6 +1098,35 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //
 //        }
 
+//        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
+//            getCurrentTimeLocal(),"")
+
+
+        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
+            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
+
+
+        if(id<=0)
+        {
+            //  Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+        } else
+        {
+            // Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
+
+        }
+
+
+
+//        d.putExtra(BSR_Action, VisitorEntryFCM)
+//        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
+//        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+//        d.putExtra("name", intent.getStringExtra(PERSONNAME))
+//        d.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
+//        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
+//        d.putExtra("memType", "Owner")
+//        d.putExtra(UNITID,intent.getStringExtra(UNITID))
+//        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+
 
 
         val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
@@ -1047,9 +1137,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         d.putExtra("nr_id", "0")
         d.putExtra("unitname",unitName)
         d.putExtra("memType", "Owner")
+        d.putExtra(UNITID,unitId.toString())
         d.putExtra(COMPANY_NAME,"Staff")
-
+        d.putExtra(UNIT_ACCOUNT_ID,"0")
+        d.putExtra("VLVisLgID",0)
         sendBroadcast(d);
+
+
 
 
 //        val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
@@ -1079,7 +1173,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         restClient.addHeader(OYE247KEY, OYE247TOKEN)
         restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_MAKE_EXIT)
-       // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
+        // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
 
 
 
@@ -1088,10 +1182,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     public override fun onPause() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
         super.onPause()
+
+
     }
 
     public override fun onDestroy() {
-       // clearApplicationData()
+        // clearApplicationData()
 
 
         if (bSecuGenDeviceOpened) {
@@ -1255,11 +1351,19 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         if (filterdNames.size > 0) {
 
 
-                            val (_, _, unUnitID, unUniName, _, wkDesgn, _, _, wkMobile, wkWorkID, wkWrkType, _, _, wkfName, _, _, wklName) = filterdNames[0]
+                            val (_, _, unUnitID, unUniName, _, wkDesgn, wkEntryImg, _, wkMobile, wkWorkID, wkWrkType, _, _, wkfName, _, _, wklName) = filterdNames[0]
 
-                        getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),wkWorkID,unUnitID,"$wkfName $wklName",wkMobile, wkDesgn, wkWrkType,wkWorkID, unUniName)
-                           // t1?.speak("Welcome $wkfName$wklName", TextToSpeech.QUEUE_FLUSH, null)
-                          // showToast(this@Dashboard,"came")
+                          //  if (cd.isConnectingToInternet(this@Dashboard)) {
+                                getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),wkWorkID,unUnitID.toInt(),"$wkfName",wkMobile, wkDesgn, wkWrkType,wkWorkID, unUniName,wkEntryImg)
+
+//                            } else {
+//                                Toast.makeText(applicationContext,
+//                                    "Please check your Internet Connection", Toast.LENGTH_LONG).show()
+//                            }
+
+
+                            // t1?.speak("Welcome $wkfName$wklName", TextToSpeech.QUEUE_FLUSH, null)
+                            // showToast(this@Dashboard,"came")
 //                            visitorLog(
 //                                unUnitID, "$wkfName $wklName",
 //                                wkMobile, wkDesgn, wkWrkType,
@@ -1268,7 +1372,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //
 //                         //   showToast(this@Dashboard,wkWorkID.toString())
 //                            Log.d("check 78 ", "bio")
-//                            t1?.speak("Welcome $wkfName$wklName", TextToSpeech.QUEUE_FLUSH, null)
+                          // t1?.speak("Welcome $wkfName", TextToSpeech.QUEUE_FLUSH, null)
                         } else {
                             Toast.makeText(applicationContext, "No Data", Toast.LENGTH_SHORT).show()
 
@@ -1288,11 +1392,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
                 Log.d("Biometric 1035", " $ex")
-               // Toast.makeText(applicationContext, "Biometric not attached correctly ", Toast.LENGTH_LONG).show()
+                // Toast.makeText(applicationContext, "Biometric not attached correctly ", Toast.LENGTH_LONG).show()
             }
 
         } else {
-           // Toast.makeText(applicationContext, "Biometric Device Not Attached", Toast.LENGTH_LONG).show()
+            // Toast.makeText(applicationContext, "Biometric Device Not Attached", Toast.LENGTH_LONG).show()
         }
 
         var buffer: ByteArray? = ByteArray(mImageWidth * mImageHeight)
@@ -1481,32 +1585,37 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //                re_vehicle!!.setEnabled(false)
 //                re_vehicle!!.setClickable(false)
 
-                val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
-                startActivity(i_vehicle)
+
+               val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
+               startActivity(i_vehicle)
+                //finish()
 
             }
 
             R.id.re_delivery -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+//                re_delivery!!.setEnabled(false)
+//                re_delivery!!.setClickable(false)
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
+                // finish()
 
             }
 
             R.id.re_guest -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+//                re_guest!!.setEnabled(false)
+//                re_guest!!.setClickable(false)
                 val i_guest = Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
+                //  finish()
 
             }
 
             R.id.re_staff -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
+//                re_staff!!.setEnabled(false)
+//                re_staff!!.setClickable(false)
                 val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
                 startActivity(i_staff)
+                // finish()
 
             }
 
@@ -1577,7 +1686,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     /// End Added by Rajesh
 
     internal fun init() {
-        //showProgressrefresh()
+        showProgressrefresh()
         mHandlerr = Handler()
         //startRepeatingTask()
         database =  DBHelper(this);
@@ -1585,10 +1694,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         btn_in=findViewById(R.id.btn_in)
         btn_out=findViewById(R.id.btn_out)
-btn_in.setBackgroundColor(resources.getColor(R.color.orange))
+        btn_in.setBackgroundColor(resources.getColor(R.color.orange))
         btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
-       walk1=findViewById(R.id.walky)
+        walk1=findViewById(R.id.walky)
         walk2=findViewById(R.id.walky1)
         val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         try {
@@ -1723,14 +1832,14 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
 //            }
 //            false
 //        })
-       // this.mHandler = Handler()
-       // m_Runnable.run()
+         this.mHandler = Handler()
+      //   m_Runnable.run()
 
 
         tv_nodata = findViewById(R.id.tv_nodata)
-       // record = findViewById(R.id.record)
-       // record?.setOnClickListener(this)
-       // spinner = findViewById<View>(R.id.spinner) as Spinner
+        // record = findViewById(R.id.record)
+        // record?.setOnClickListener(this)
+        // spinner = findViewById<View>(R.id.spinner) as Spinner
         // tv_filter=findViewById(R.id.tv_filter);
         swipeContainer = findViewById<View>(R.id.swipeContainer) as SwipeRefreshLayout
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface::class.java)
@@ -1768,19 +1877,10 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
             swipeContainer!!.isRefreshing = false
         }
 
-        Log.e("SUBSCRIBING","AllGuards" + LocalDb.getAssociation()!!.asAssnID);
         FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + LocalDb.getAssociation()!!.asAssnID)
-            .addOnCompleteListener { task ->
-                var msg = "SUCCESS"
-                if (!task.isSuccessful) {
-                    msg = "FAILED"
-                }
-                Log.e("SUBSCRIPTION", msg)
-
-            }
         //FirebaseMessaging.getInstance().subscribeToTopic("Guard" + prefManager.getGuardID());
 
-       // spinner?.onItemSelectedListener = this
+        // spinner?.onItemSelectedListener = this
 
 //        val filter_option = ArrayList<String>()
 //        filter_option.add(resources.getString(R.string.`in`))
@@ -1793,7 +1893,7 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
 //        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         // attaching data adapter to spinner
-       // spinner?.adapter = dataAdapter
+        // spinner?.adapter = dataAdapter
 
         btn_in.setOnClickListener{
             btn_in.setBackgroundColor(resources.getColor(R.color.orange))
@@ -2064,40 +2164,43 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
         call?.enqueue(object : Callback<SubscriptionResponse> {
             override fun onResponse(call: Call<SubscriptionResponse>, response: Response<SubscriptionResponse>) {
 
+try {
+    if (response.body()!!.getSuccess() == true) {
+        val dateFormat_DMY = SimpleDateFormat("dd-MM-yyyy")
+        val CurrentString = response.body()!!.data.getSubscription().sueDate
+        val separated = CurrentString.split("T".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+        subscriptionDate = separated[0]
 
-                if (response.body()!!.getSuccess() == true) {
-                    val dateFormat_DMY = SimpleDateFormat("dd-MM-yyyy")
-                    val CurrentString = response.body()!!.data.getSubscription().sueDate
-                    val separated = CurrentString.split("T".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    subscriptionDate = separated[0]
+        tv_subscriptiondate?.text = "Valid till: $subscriptionDate"
+        //  if(PrefManager.getValidityDate().length()>0) {
+        try {
+            val dt_dwnld_date = dateFormat_DMY.parse(response.body()!!.data.getSubscription().sueDate)
+            val c1 = Calendar.getInstance()
+            c1.time = dt_dwnld_date
 
-                    tv_subscriptiondate?.text = "Valid till: $subscriptionDate"
-                    //  if(PrefManager.getValidityDate().length()>0) {
-                    try {
-                        val dt_dwnld_date = dateFormat_DMY.parse(response.body()!!.data.getSubscription().sueDate)
-                        val c1 = Calendar.getInstance()
-                        c1.time = dt_dwnld_date
+            val days = (c1.timeInMillis - System.currentTimeMillis()) / (24 * 60 * 60 * 1000) + 1
 
-                        val days = (c1.timeInMillis - System.currentTimeMillis()) / (24 * 60 * 60 * 1000) + 1
-
-                        if (0 < days && days <= 7) {
-                            val alertDialog = android.app.AlertDialog.Builder(this@Dashboard)
-                            alertDialog.setTitle("Your Association Subscription Expires in $days days")
-                            alertDialog.setPositiveButton(
-                                "Ok"
-                            ) { dialog, which -> dialog.cancel() }
-                            // Showing Alert Message
-                            if (!this@Dashboard.isFinishing) {
-                                alertDialog.show()
-                            }
-                        }
-
-                    } catch (ex: Exception) {
-
-                    }
-
-                } else {
+            if (0 < days && days <= 7) {
+                val alertDialog = android.app.AlertDialog.Builder(this@Dashboard)
+                alertDialog.setTitle("Your Association Subscription Expires in $days days")
+                alertDialog.setPositiveButton(
+                    "Ok"
+                ) { dialog, which -> dialog.cancel() }
+                // Showing Alert Message
+                if (!this@Dashboard.isFinishing) {
+                    alertDialog.show()
                 }
+            }
+
+        } catch (ex: Exception) {
+
+        }
+
+    } else {
+    }
+}catch (e:KotlinNullPointerException){
+
+}
             }
 
             override fun onFailure(call: Call<SubscriptionResponse>, t: Throwable) {
@@ -2401,7 +2504,6 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
         val Audio = audiofile
         audioclip = Audio.toString()
 
-
         val file = File(audiofile.toString())
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
         val body = MultipartBody.Part.createFormData("Test", audioclip, requestFile)
@@ -2411,7 +2513,6 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 try {
-
                     val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
                     intentAction1.putExtra(BSR_Action, ConstantUtils.SENDAUDIO)
                     intentAction1.putExtra("FILENAME", response.body().toString())
@@ -2422,7 +2523,6 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
 
                 } catch (ex: Exception) {
                     Log.d("uploadAudio 113", "errr:" + ex.toString())
-
                 }
 
             }
@@ -2461,13 +2561,13 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
 //        }
 
 
-    myAudioRecorder = MediaRecorder()
-    myAudioRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
-    myAudioRecorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-    myAudioRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-    myAudioRecorder?.setOutputFile(mFileName)
-       // recorder.setOnErrorListener(errorListener)
-       // recorder.setOnInfoListener(infoListener)
+        myAudioRecorder = MediaRecorder()
+        myAudioRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
+        myAudioRecorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+        myAudioRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+        myAudioRecorder?.setOutputFile(mFileName)
+        // recorder.setOnErrorListener(errorListener)
+        // recorder.setOnInfoListener(infoListener)
 
         try {
             myAudioRecorder?.prepare()
@@ -2483,30 +2583,30 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
 
 
 
-      //  Handler().postDelayed({
-                                if (myAudioRecorder != null) {
-                        myAudioRecorder!!.reset()
-                                    myAudioRecorder?.setMaxDuration(50*1000)
-                        myAudioRecorder!!.release()
-                       // Toast.makeText(applicationContext, "Recording Stopped", Toast.LENGTH_LONG).show()
-                        uploadAudio()
-                        myAudioRecorder = null
-                    }
+        //  Handler().postDelayed({
+        if (myAudioRecorder != null) {
+            myAudioRecorder!!.reset()
+            myAudioRecorder?.setMaxDuration(50*1000)
+            myAudioRecorder!!.release()
+            // Toast.makeText(applicationContext, "Recording Stopped", Toast.LENGTH_LONG).show()
+            uploadAudio()
+            myAudioRecorder = null
+        }
 
-                    //record.isEnabled = true
-               // }, 5000)
-                try {
-                    if (mp.isPlaying()) {
-                        mp.stop()
-                        mp.release()
-                        mp = MediaPlayer.create(this@Dashboard, R.raw.walkietalkiestop)
-                    }
-                    mp.start()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                walk2?.visibility=View.GONE
-                walk1?.visibility=View.VISIBLE
+        //record.isEnabled = true
+        // }, 5000)
+        try {
+            if (mp.isPlaying()) {
+                mp.stop()
+                mp.release()
+                mp = MediaPlayer.create(this@Dashboard, R.raw.walkietalkiestop)
+            }
+            mp.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        walk2?.visibility=View.GONE
+        walk1?.visibility=View.VISIBLE
 //        if (myAudioRecorder != null) {
 //            //myAudioRecorder?.stop();
 //            myAudioRecorder?.reset();
@@ -2527,13 +2627,13 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
             val children = appDir.list()
             for (s in children!!) {
                 if (s != "lib") {
-                if (s == "cache") {
-                    deleteDir(File(appDir, s))
-                    Log.i(
-                        "EEEEEERRRRRROOOOOOORRRR",
-                        "**************** File /data/data/APP_PACKAGE/$s DELETED *******************"
-                    )
-                }
+                    if (s == "cache") {
+                        deleteDir(File(appDir, s))
+                        Log.i(
+                            "EEEEEERRRRRROOOOOOORRRR",
+                            "**************** File /data/data/APP_PACKAGE/$s DELETED *******************"
+                        )
+                    }
                 }
             }
         }
@@ -2555,44 +2655,44 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
         assert(dir != null)
         return dir!!.delete()
     }
- fun openAlert() {
-     AlertDialog.Builder(this@Dashboard)
+    fun openAlert() {
+        AlertDialog.Builder(this@Dashboard)
             .setTitle("SignOut")
             .setMessage("TYPE YOUR MESSAGE HERE")
             .setPositiveButton(android.R.string.yes,
-                     DialogInterface.OnClickListener() { dialogInterface: DialogInterface, i: Int ->
-                         fun onClick(dialog:DialogInterface , which:Int) {
-                            // do want you want to do here
-                             Toast.makeText(this@Dashboard,"Coming",Toast.LENGTH_LONG).show()
-                             onDestroy()
+                DialogInterface.OnClickListener() { dialogInterface: DialogInterface, i: Int ->
+                    fun onClick(dialog:DialogInterface , which:Int) {
+                        // do want you want to do here
+                        Toast.makeText(this@Dashboard,"Coming",Toast.LENGTH_LONG).show()
+                        onDestroy()
 
-                        }
-                    })
+                    }
+                })
             .setNegativeButton(android.R.string.no,
-                     DialogInterface.OnClickListener() { dialogInterface: DialogInterface, i: Int ->
-                         fun onClick(dialog:DialogInterface ,
-                                 which:Int) {
-                        }
-                    }).show();
+                DialogInterface.OnClickListener() { dialogInterface: DialogInterface, i: Int ->
+                    fun onClick(dialog:DialogInterface ,
+                                which:Int) {
+                    }
+                }).show();
 
-}
+    }
 
-//    var mStatusChecker: Runnable = object : Runnable {
-//        override fun run() {
-//            try {
-//               // openAlert()
-//              // clearApplicationData(this@Dashboard)
-//                //trimCache(this@Dashboard)
-////                finish();
-////                startActivity(getIntent());
-//              //  updateStatus() //this function can change value of mInterval.
-//            } finally {
-//                // 100% guarantee that this always happens, even if
-//                // your update method throws an exception
-//                mHandlerr!!.postDelayed(this, mInterval.toLong())
-//            }
-//        }
-//    }
+    var mStatusChecker: Runnable = object : Runnable {
+        override fun run() {
+            try {
+               // openAlert()
+              // clearApplicationData(this@Dashboard)
+                //trimCache(this@Dashboard)
+//                finish();
+//                startActivity(getIntent());
+              //  updateStatus() //this function can change value of mInterval.
+            } finally {
+                // 100% guarantee that this always happens, even if
+                // your update method throws an exception
+                mHandlerr!!.postDelayed(this, mInterval.toLong())
+            }
+        }
+    }
 //
 //    fun startRepeatingTask() {
 //        mStatusChecker.run()
@@ -2613,13 +2713,13 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
 //
 //    }
 
-//    private fun content() {
+    //    private fun content() {
 //        refresh(1000)
 //    }
     fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: Int, personName: String, mobileNumb: String, desgn: String,
-                             workerType: String, staffID: Int, unitName: String){
+                             workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
 
-       // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
+        // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
         RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -2628,25 +2728,25 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
 
                     if (getdata.success == true) {
-                       // showToast(this@Dashboard,"already entered")
-                      //  showToast(this@Dashboard,workerID.toString())
+                        // showToast(this@Dashboard,"already entered")
+                        //  showToast(this@Dashboard,workerID.toString())
 
                     }
                 }
 
                 override fun onErrorResponse(e: Throwable) {
 
-                   // showToast(this@Dashboard,"false")
+                    // showToast(this@Dashboard,"false")
                     //showToast(this@Dashboard,workerID.toString()+"-"+unitId+"-"+personName+"-"+mobileNumb+"-"+desgn+"-"+workerType+"-"+staffID+"-"+unitName)
 
                     visitorLog(
                         unitId, personName,
                         mobileNumb, desgn, workerType,
-                        staffID, unitName
+                        staffID, unitName,wkEntryImg
                     )
 
-                   // Log.d("check 78 ", "bio")
-                   t1?.speak("Welcome"+personName, TextToSpeech.QUEUE_FLUSH, null)
+                    // Log.d("check 78 ", "bio")
+                  //  t1?.speak("Welcome"+personName, TextToSpeech.QUEUE_FLUSH, null)
 //                    showToast(this@Dashboard,personName)
                     //Log.d("Error WorkerList",e.toString())
 
@@ -2658,4 +2758,67 @@ btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 }
             })
     }
+
+
+
+//    override fun onUserInteraction() {
+//        super.onUserInteraction()
+//        stopHandler();//stop first and then start
+//        startHandler();
+//    }
+//   fun stopHandler() {
+//    handler!!.removeCallbacks(r);
+//}
+//    fun startHandler() {
+//    handler!!.postDelayed(r, 1*60*1000);
+//}
+//
+//
+//    val myHandler =  Handler();
+//   val myRunnable =  Runnable() {
+//
+//       Toast.makeText(this@Dashboard,"Hii",Toast.LENGTH_LONG).show()
+//       var i:Intent  = getBaseContext().getPackageManager()
+//                         .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(i);
+//       finish()
+//
+//
+//    };
+//
+//    override fun onUserInteraction() {
+//        super.onUserInteraction()
+//        myHandler.removeCallbacks(myRunnable);
+//        myHandler.postDelayed(myRunnable,2000);
+//    }
+//
+//    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
+//        Toast.makeText(this@Dashboard,"gjgj",Toast.LENGTH_LONG).show()
+//  //  val timestamp = System.getCurrentTimeMilis();
+//    val timestamp = 2000;
+//    return super.dispatchTouchEvent(ev)
+//    }
+
+
+    class LogOutTimerTask : TimerTask() {
+        val context:Context?=null
+
+        override fun run() {
+
+Toast.makeText(context,"Hii",Toast.LENGTH_LONG).show()
+            var i:Intent  = context!!.getPackageManager()
+                .getLaunchIntentForPackage( context.getPackageName() );
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context!!.startActivity(i);
+
+
+       }
     }
+
+
+
+
+}

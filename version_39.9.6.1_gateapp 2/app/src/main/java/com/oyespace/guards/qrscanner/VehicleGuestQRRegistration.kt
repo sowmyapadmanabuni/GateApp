@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.ImageBigView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -41,6 +42,8 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
+    var accountId:String?=null
+    var unitName:String?=null
     lateinit var mBitmap: Bitmap
     var SPPrdImg1=""
     var SPPrdImg2=""
@@ -85,6 +88,9 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
+
+        getUnitLog(intent.getStringExtra(UNITID).toInt())
+
         if (intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHQRCODE, true)) {
             profile_image.visibility = View.GONE
         }
@@ -104,7 +110,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
 
         //  tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER))
-        tv_for.setText(resources.getString(R.string.textto) + intent.getStringExtra(UNITNAME))
+
         tv_totalperson.setText(resources.getString(R.string.textperson) )
         tv_from.setText(resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME))
 
@@ -151,11 +157,11 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         else if(BASE_URL.contains("uat",true)){
             memID=64;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
-            toInteger(intent.getStringExtra(UNITID)), intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), "", 0,
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, unitName!!,
+            toInteger(intent.getStringExtra(UNITID)), intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), LocalDb.getAssociation()!!.asAsnName, 0,
             "",  intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER), intToString(minteger), "",
             "", "", minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName,Prefs.getString(ConstantUtils.GATE_NO, "")
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
@@ -165,21 +171,39 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-                        val d  =  Intent(this@VehicleGuestQRRegistration, BackgroundSyncReceiver::class.java)
+//                        val d  =  Intent(this@VehicleGuestQRRegistration, BackgroundSyncReceiver::class.java)
+//                        d.putExtra(BSR_Action, VisitorEntryFCM)
+//                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
+//                        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+//                        d.putExtra("name", intent.getStringExtra(PERSONNAME))
+//                        d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+//                        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
+//                        d.putExtra(UNITID,intent.getStringExtra(UNITID))
+//                        d.putExtra("memType", "Owner")
+////                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+////                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+//                        sendBroadcast(d);
+
+
+                        val d  =  Intent(this@VehicleGuestQRRegistration,BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
                         d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
                         d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                         d.putExtra("name", intent.getStringExtra(PERSONNAME))
                         d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
+                        d.putExtra("unitname", unitName)
                         d.putExtra("memType", "Owner")
+                        d.putExtra(UNITID,intent.getStringExtra(UNITID))
+                        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(UNIT_ACCOUNT_ID,accountId)
+                        d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                         sendBroadcast(d);
 
-//                        val intentdata = Intent(this@VehicleGuestQRRegistration,DashBoard::class.java)
-//                        startActivity(intentdata)
+
 
                         Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
                     } else {
@@ -214,7 +238,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         val req = SignUpReq(
             "", "", "", "", "",
             name, "+" + isdCode, "", "", "", "",
-            "", mobNum, "", "", "", ""
+            "", mobNum, "", "", "", "",""
         )
         Log.d("singUp", "StaffEntry " + req.toString())
 
@@ -286,7 +310,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-        val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
+        val req = VisitorEntryReq(getCurrentTimeLocal(),0, visitorLogID)
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
@@ -298,6 +322,8 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
 
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
+                        val d = Intent(this@VehicleGuestQRRegistration, Dashboard::class.java)
+                        startActivity(d)
                         finish();
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -337,6 +363,60 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
     }
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val d = Intent(this@VehicleGuestQRRegistration, Dashboard::class.java)
+//        startActivity(d)
+        finish()
+    }
+
+    private fun getUnitLog(unitId:Int) {
+
+        RetrofitClinet.instance
+            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
+
+                override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
+
+                    if (UnitList.success == true) {
+
+                        tv_for.setText(resources.getString(R.string.textto) + UnitList.data.unit.unUniName)
+                        accountId=UnitList.data.unit.acAccntID.toString()
+                        unitName=UnitList.data.unit.unUniName
+//
+//                        val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
+//                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+//                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+//                        ddc.putExtra("mobNum", mobileNumb)
+//                        ddc.putExtra("name", personName)
+//                        ddc.putExtra("nr_id", vlVisLgID.toString())
+//                        ddc.putExtra("unitname", unitName)
+//                        ddc.putExtra("memType", "Owner")
+//                        ddc.putExtra(UNITID,unitId.toString())
+//                        ddc.putExtra(COMPANY_NAME,"Staff")
+//                        ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+//                        ddc.putExtra("VLVisLgID",vlVisLgID)
+////                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+////                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+//                        mcontext.sendBroadcast(ddc);
 
 
+                    } else {
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("cdvd", e.message);
+
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
 }

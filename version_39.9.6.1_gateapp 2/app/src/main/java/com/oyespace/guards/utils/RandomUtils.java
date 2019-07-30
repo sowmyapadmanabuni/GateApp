@@ -138,12 +138,18 @@ public class RandomUtils {
           //  Log.d("button_done ", "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals("0001-01-01T00:00:00", true) + " ");
             Log.d("button_done ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlExitT().equalsIgnoreCase("0001-01-01T00:00:00") + " ");
 
-            if (s.getVlMobile().equalsIgnoreCase("+" + isdCode + mobNum)) {
+            String phoneNumber = s.getVlMobile().replace("+91", "");
+            Log.d("Shalini ", "Shalini " + phoneNumber +"...."+isdCode + mobNum);
+
+
+
+            // if (s.getVlMobile().equalsIgnoreCase("+" + isdCode + mobNum)) {
+            if (phoneNumber.equalsIgnoreCase( mobNum)) {
                 Log.d("vlExitT ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlfName() + " ");
                 return true;
                 //adding the element to filtered list
             } else {
-                Log.d("vlExitT else", "visitorlogbydate " + s.getVlMobile() + " " + isdCode + mobNum + " ");
+                Log.d("vlExitT else", "visitorlogbydate " +phoneNumber + " " + isdCode + mobNum + " ");
 
             }
         }
