@@ -40,6 +40,7 @@ import com.oyespace.guards.camtest.CarImages_Adapter;
 import com.oyespace.guards.camtest.ImageAdapter;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.constants.PrefKeys;
+import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
@@ -224,6 +225,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 i.putExtra(COMPANY_NAME,getIntent().getStringExtra(COMPANY_NAME));
                 i.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                 i.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                i.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
                 startActivity(i);
                 finish();
             }
@@ -269,6 +271,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                     d.putExtra(PERSON_PHOTO, byteArray);
                     d.putExtra(ITEMS_PHOTO_LIST, list);
                     d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
+                d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
 
                     startActivity(d);
                     finish();
@@ -384,7 +387,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
             final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.layout.image_list, null);
             list.add(selectedImagePath);
             ImageHelper.loadImage(context, selectedImagePath, imageView);
-            imageAdapter = new ImageAdapter(list, VehicleGuestAddCarFragment.this);
+            imageAdapter = new ImageAdapter(list, VehicleGuestAddCarFragment.this,"On");
             rv_image.setAdapter(imageAdapter);
             // iamgeLyt.addView(imageView);
 

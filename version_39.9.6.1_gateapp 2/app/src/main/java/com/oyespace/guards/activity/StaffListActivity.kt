@@ -1,8 +1,11 @@
 package com.oyespace.guards.activity
 
 import android.app.Activity
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.speech.RecognizerIntent
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -35,6 +38,7 @@ import android.widget.EditText
 import android.widget.TextView
 import com.oyespace.guards.utils.ConstantUtils
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import java.io.File
 import java.util.Locale.filter
 
 
@@ -43,6 +47,7 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name:TextView
+    lateinit var tv_nodata: TextView
     private lateinit var tv: EditText
     private val REQUEST_CODE_SPEECH_INPUT = 100
     override fun onClick(v: View?) {
@@ -72,12 +77,16 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_staff_list)
 
+        getServiceProviderList()
+
+        tv_nodata = findViewById(R.id.tv_nodata)
         tv = findViewById<EditText>(R.id.edt_search_text1)
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
 
-        getServiceProviderList()
+
+
 
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
@@ -123,7 +132,10 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
 
                 override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
                     try{
-                        WorkerAdapter!!.getFilter().filter(charSequence)
+                        if(WorkerAdapter!=null){
+                            WorkerAdapter!!.getFilter().filter(charSequence)
+
+                        }
                     }
                     catch (e:KotlinNullPointerException){
 
@@ -151,6 +163,7 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
                     if (workerListResponse.data.worker != null) {
+                        tv_nodata.visibility=View.INVISIBLE
                         Log.d("WorkerList success", workerListResponse.data.toString())
 
                         arrayList = ArrayList()
@@ -170,24 +183,27 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
 
                         WorkerAdapter = StaffAdapter(arrayList as ArrayList<WorkerDetails>, this@StaffListActivity)
                         rv_staff!!.adapter = WorkerAdapter
-                    } else {
-                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
-                        Toast.makeText(this@StaffListActivity, "No Data", Toast.LENGTH_LONG)
-                            .show()
-                        LovelyStandardDialog(this@StaffListActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.google_red)
-                            .setIcon(R.drawable.ic_info_black_24dp)
-                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-                            .setTitle("No Staff Data")
-                            .setTitleGravity(Gravity.CENTER)
-                            .setMessage("No Staff Data")
-                            .setMessageGravity(Gravity.CENTER)
-                            .setPositiveButton("Add") {
-                                val mainIntent = Intent(this@StaffListActivity, WorkersTypeList::class.java)
-                                startActivity(mainIntent)
-                            }
 
-                            .show()
+                    } else {
+
+                        tv_nodata.visibility=View.VISIBLE
+                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//                        Toast.makeText(this@StaffListActivity, "No Data", Toast.LENGTH_LONG)
+//                            .show()
+//                        LovelyStandardDialog(this@StaffListActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
+//                            .setTopColorRes(R.color.google_red)
+//                            .setIcon(R.drawable.ic_info_black_24dp)
+//                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+//                            .setTitle("No Staff Data")
+//                            .setTitleGravity(Gravity.CENTER)
+//                            .setMessage("No Staff Data")
+//                            .setMessageGravity(Gravity.CENTER)
+//                            .setPositiveButton("Add") {
+//                                val mainIntent = Intent(this@StaffListActivity, WorkersTypeList::class.java)
+//                                startActivity(mainIntent)
+//                            }
+//
+//                            .show()
                     }
                 }
 
@@ -205,6 +221,15 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
                         .show()
                 }
             })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+      //  Handler().postDelayed({
+           // getServiceProviderList()
+      //  }, 1000)
+
     }
 
     fun setLocale(lang: String?) {
@@ -251,4 +276,73 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
             }
         }
     }
+
+
+    override fun onRestart() {
+        super.onRestart()
+
+
+      //  clearApplicationData(this@StaffListActivity)
+      //  deleteAppData()
+        val intent=Intent(this@StaffListActivity, StaffListActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
+
+
+        startActivity(intent)
+        this.finish();
+    }
+
+ fun deleteAppData() {
+     try {
+    // clearing app data
+    val packageName = getApplicationContext().getPackageName();
+    val runtime = Runtime.getRuntime();
+    runtime.exec("pm clear "+packageName);
+
+} catch ( e:Exception) {
+    e.printStackTrace();
+} }
+
+
+    fun clearApplicationData(context: Context) {
+        val cache = context.cacheDir
+        val appDir = File(cache.parent)
+        if (appDir.exists()) {
+            val children = appDir.list()
+            for (s in children!!) {
+                if (s != "lib") {
+                   // if (s == "cache") {
+                        deleteDir(File(appDir, s))
+                        Log.i(
+                            "EEEEEERRRRRROOOOOOORRRR",
+                            "**************** File /data/data/APP_PACKAGE/$s DELETED *******************"
+                        )
+                   // }
+                }
+            }
+        }
+    }
+
+    fun deleteDir(dir: File?): Boolean {
+        if (dir != null && dir.isDirectory) {
+            val children = dir.list()
+            var i = 0
+            while (i < children!!.size) {
+                val success = deleteDir(File(dir, children[i]))
+                if (!success) {
+                    return false
+                }
+                i++
+            }
+        }
+
+        assert(dir != null)
+        return dir!!.delete()
+    }
+
+
+
+
+
+
 }

@@ -14,6 +14,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import android.app.Activity
 import android.widget.ImageView
 import com.oyespace.guards.pojo.VendorPojo
+import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity
 import com.squareup.picasso.Picasso
 
 class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
@@ -34,10 +35,11 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
 
         val mcontextintent = (mcontext as Activity).intent
 
+
         holder.itemLabel.text = arrayList[position].vendor_names
         holder.lv_itemrecyclerview.setOnClickListener {
 
-            val intent = Intent(mcontext, VehicleOthersUnitScreen::class.java)
+            val intent = Intent(mcontext, Vehicle_Others_BlockSelectionActivity::class.java)
             intent.putExtra(FLOW_TYPE, VEHICLE_OTHERS)
             intent.putExtra(VISITOR_TYPE, DELIVERY)
             intent.putExtra(VEHICLE_NUMBER,mcontextintent.getStringExtra(VEHICLE_NUMBER) )

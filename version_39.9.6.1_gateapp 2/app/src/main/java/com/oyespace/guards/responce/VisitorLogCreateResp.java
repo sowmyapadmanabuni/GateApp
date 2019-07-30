@@ -17,6 +17,8 @@ public class VisitorLogCreateResp {
     {
         public int vlVisLgID;
 
+
+
     }
 
   /*  @SerializedName("data")

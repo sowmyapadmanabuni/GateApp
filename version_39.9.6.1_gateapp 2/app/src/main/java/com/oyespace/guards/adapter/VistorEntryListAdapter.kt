@@ -142,15 +142,39 @@ try {
 
 //        ImageHelper.loadImage(mcontext, IMAGE_BASE_URL+"Images/PERSONAssociation"+ASSOCIATIONID+"NONREGULAR"+orderData?.vlVisLgID+".jpg", holder.iv_user)
         if(orderData?.vlVisType.equals("STAFF",true)){
-            Picasso.with(mcontext)
-                .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+ Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+orderData?.reRgVisID+".jpg")
+//            Picasso.with(mcontext)
+//                .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+ Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+orderData?.reRgVisID+".jpg")
+//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
+
+            if(orderData?.vlEntryImg.equals("")){
+                Picasso.with(mcontext)
+               .load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg")
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
+            }
+            else {
+
+
+                Picasso.with(mcontext)
+                    .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
+                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
+            }
 
         }else{
-            Picasso.with(mcontext)
-                .load(IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+number+".jpg")
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
+//            Picasso.with(mcontext)
+//                .load(IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+number+".jpg")
+//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
 
+            if(orderData?.vlEntryImg.equals("")){
+                Picasso.with(mcontext)
+               .load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg")
+                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
+            }
+            else {
+                Picasso.with(mcontext)
+                    .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
+                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
+
+            }
         }
 
         holder.iv_user.setOnClickListener {
@@ -179,15 +203,18 @@ try {
 
                 if (orderData.vlVisType.equals("STAFF", true)) {
 
-                    Picasso.with(mcontext)
-                        .load(
-                            IMAGE_BASE_URL + "Images/PERSONAssociation" + Prefs.getInt(
-                                ASSOCIATION_ID,
-                                0
-                            ) + "STAFF" + orderData?.reRgVisID + ".jpg"
-                        )
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
+                    if(orderData?.vlEntryImg.equals("")){
+                        Picasso.with(mcontext)
+                            .load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg")
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
+                    }
+                    else {
+
+
+                        Picasso.with(mcontext)
+                            .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
+                    }
 
 
 //                val intent1 = Intent(mcontext, ImgView::class.java)
@@ -199,22 +226,17 @@ try {
 
                 } else {
 
+                    if(orderData?.vlEntryImg.equals("")){
+                        Picasso.with(mcontext)
+                            .load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg")
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
+                    }
+                    else {
+                        Picasso.with(mcontext)
+                            .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
 
-//                    Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/PERSONAssociation" + Prefs.getInt(ASSOCIATION_ID, 0) + "NONREGULAR" + number + ".jpg")
-//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-//                        .into(dialog_imageview)
-
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+mobnumber+".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
-
-                    Log.v("IMAGES",IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+mobnumber+".jpg")
-//                val intent2 = Intent(mcontext, ImgView::class.java)
-//                intent2.putExtra(
-//                    "URL_IMAGE",
-//                    IMAGE_BASE_URL + "Images/PERSONAssociation" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + orderData?.vlVisLgID + ".jpg"
-//                )
-//                mcontext.startActivity(intent2)
+                    }
 
 
 
@@ -246,7 +268,7 @@ try {
 
     private fun makeExitCall(visitorLogID: Int) {
 
-        val req = VisitorExitReq(getCurrentTimeLocal(), 0, visitorLogID)
+        val req = VisitorExitReq(getCurrentTimeLocal(), 0, visitorLogID,Prefs.getString(GATE_NO, ""))
         CompositeDisposable().add(
             RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE",req)
                 .subscribeOn(Schedulers.io())

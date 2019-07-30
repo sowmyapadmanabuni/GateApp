@@ -25,6 +25,7 @@ import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.*
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
@@ -72,7 +73,26 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+GUEST_REGISTRATION+" "+FLOW_TYPE.equals( GUEST_REGISTRATION,true))
                 button_done.setEnabled(false)
                 button_done.setClickable(false)
-                visitorLog();
+
+                if(intent.getStringExtra(UNITID).contains(",")){
+                    var unitname_dataList: Array<String>
+                    var unitid_dataList: Array<String>
+                    var unitAccountId_dataList: Array<String>
+                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    if(unitname_dataList.size>0) {
+                        for (i in 0 until unitname_dataList.size) {
+
+                            showProgress()
+                            visitorLog(unitname_dataList.get(i).replace(" ",""),unitid_dataList.get(i).replace(" ","").toInt(),unitAccountId_dataList.get(i).replace(" ",""));
+                        }
+                    }
+                }else{
+                    showProgress()
+                    visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(UNIT_ACCOUNT_ID));                }
+
+               // visitorLog();
 
             }
             R.id.profile_image ->{
@@ -175,14 +195,17 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
             }
         }
-        if (intent.getStringExtra(FLOW_TYPE) == GUEST_REGISTRATION) {
-            tv_from.setText(resources.getString(R.string.textfrom)+intent.getStringExtra(COMPANY_NAME))
-            itemLyt.setVisibility(View.VISIBLE)
-        } else {
+//        if (intent.getStringExtra(FLOW_TYPE) == GUEST_REGISTRATION) {
+//            tv_from.setText(resources.getString(R.string.textfrom)+intent.getStringExtra(COMPANY_NAME))
+//            itemLyt.setVisibility(View.VISIBLE)
+//        } else {
+
+
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
 
+                singUp(intent.getStringExtra(PERSONNAME),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(MOBILENUMBER))
             }
-        }
+      //  }
 
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
         if(wrrw!=null) {
@@ -206,12 +229,12 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val mLayoutManager = GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
-        imageAdapter = ImageAdapter(list, this@GuestEntryRegistration)
+        imageAdapter = ImageAdapter(list, this@GuestEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
 
     }
 
-    private fun visitorLog() {
+    private fun visitorLog(UNUniName: String,UNUnitID: Int,Unit_ACCOUNT_ID:String) {
        // var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +globalApiObject.data.visitorLog.vlVisLgID  + ".jpg"
         var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
 
@@ -227,12 +250,12 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         else if(BASE_URL.contains("uat",true)){
             memID=64;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME),
-            toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, UNUniName,
+            UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
+            LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName)
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName,Prefs.getString(ConstantUtils.GATE_NO, ""))
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
@@ -245,14 +268,17 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)
-                        dd.putExtra("msg", intent.getStringExtra(PERSONNAME)+"is coming to your home" )
+                        dd.putExtra("msg", intent.getStringExtra(PERSONNAME)+" is coming to your home" )
                         //dd.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
                         dd.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                         dd.putExtra("name", intent.getStringExtra(PERSONNAME))
                         dd.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                        dd.putExtra("unitname", intent.getStringExtra(UNITNAME))
+                        dd.putExtra("unitname", UNUniName)
+                        dd.putExtra(UNITID,UNUnitID.toString())
                         dd.putExtra("memType", "Owner")
                         dd.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                        dd.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
+                        dd.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -272,7 +298,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     Utils.showToast(applicationContext, getString(R.string.some_wrng))
                     Log.d("CreateVisitorLogResp","onErrorResponse  "+e.toString())
 
-                    dismissProgress()
+                  //  dismissProgress()
                 }
 
                 override fun noNetowork() {
@@ -280,11 +306,53 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 }
 
                 override fun onShowProgress() {
-                    showProgress()
+                   // showProgress()
                 }
 
                 override fun onDismissProgress() {
-                    dismissProgress()
+                   // dismissProgress()
+                }
+            }))
+    }
+
+
+
+    private fun singUp(name :String, isdCode: String, mobNum : String) {
+
+        val req = SignUpReq("", "", "", "", "",
+            name ,isdCode, "","","","",
+            "",mobNum,"","", "","","")
+        //  Log.d("singUp","StaffEntry "+req.toString(),imgName.toString())
+
+        compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<SignUpResp<Account>>() {
+                override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
+                    if (globalApiObject.success == true) {
+                         var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
+                        uploadAccountImage(imgName.toString(),mBitmap)
+                        Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
+                    } else {
+//                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
+                        Log.d("CreateVisitorLogResp","globalApiObject  "+globalApiObject.data.toString())
+
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+//                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
+                    Log.d("CreateVisitorLogResp","onErrorResponse  "+e.toString())
+                }
+
+                override fun noNetowork() {
+//                    Utils.showToast(applicationContext, getString(R.string.no_internet))
+                }
+
+                override fun onShowProgress() {
+                }
+
+                override fun onDismissProgress() {
                 }
             }))
     }
@@ -402,8 +470,10 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
+        var req:VisitorEntryReq?=null
 
-        val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
+             req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
+
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
@@ -415,8 +485,9 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
 //                        finish();
 
-                        val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
-                        startActivity(d)
+                        //val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
+                       // startActivity(d)
+                        dismissProgress()
                         finish()
 
                     } else {
@@ -434,11 +505,11 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 }
 
                 override fun onShowProgress() {
-//                    showProgress()
+                 // showProgress()
                 }
 
                 override fun onDismissProgress() {
-                    dismissProgress()
+                  //  dismissProgress()
                 }
             }))
     }
@@ -463,6 +534,85 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        startActivity(d)
         finish()
     }
+    fun uploadAccountImage(localImgName: String, incidentPhoto: Bitmap?) {
+        Log.d("uploadImage",localImgName)
+        var byteArrayProfile: ByteArray?
+        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
+        val imageFile = File(mPath)
 
+        try {
+            val outputStream = FileOutputStream(imageFile)
+            val quality = 50
+            if (incidentPhoto != null) {
+                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+            }
+            outputStream.flush()
+            outputStream.close()
+
+            val bosProfile = ByteArrayOutputStream()
+            if (incidentPhoto != null) {
+                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
+            }
+            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
+            byteArrayProfile = bosProfile.toByteArray()
+            val len = bosProfile.toByteArray().size
+            println("AFTER COMPRESSION-===>$len")
+            bosProfile.flush()
+            bosProfile.close()
+            if (incidentPhoto != null) {
+                //    incidentPhoto.recycle()
+            }
+            Timber.e("uploadImage  bf", "sfas")
+        } catch (ex: Exception) {
+            byteArrayProfile = null
+            Log.d("uploadImage ererer bf", ex.toString())
+        }
+
+        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
+
+        val imageFileOS: OutputStream?
+        try {
+            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
+            imageFileOS!!.write(byteArrayProfile!!)
+            imageFileOS.flush()
+            imageFileOS.close()
+
+            Log.d("uploadImage Path bf", uriTarget.toString())
+        } catch (e: FileNotFoundException) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        } catch (e: IOException) {
+            // TODO Auto-generated catch block
+            e.printStackTrace()
+        }
+
+        val file = File(imageFile.toString())
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
+        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
+        val call = apiService.updateImageProfile(body)
+
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
+                try {
+                    Log.d("uploadImage", "response:" + response.body()!!)
+
+                } catch (ex: Exception) {
+                    Log.d("uploadImage", "errr:" + ex.toString())
+
+                }
+
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                // Log error here since request failed
+                Log.d("uploadImage", t.toString())
+
+            }
+        })
+
+
+    }
 
 }

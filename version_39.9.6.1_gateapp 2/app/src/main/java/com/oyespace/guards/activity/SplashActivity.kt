@@ -344,11 +344,11 @@ class SplashActivity : BaseLocationActivity() {
                         dismissProgress()                    }
 
                     override fun onShowProgress() {
-                        showProgress()
+//                        showProgress()
                     }
 
                     override fun onDismissProgress() {
-                        dismissProgress()
+                     //   dismissProgress()
                     }
                 }))
     }

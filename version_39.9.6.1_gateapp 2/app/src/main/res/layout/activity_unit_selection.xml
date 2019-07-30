@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="@android:color/white"
+>
+    <include layout="@layout/header_with_next" />
+
+    <include layout="@layout/title_bar" />
+
+    <include layout="@layout/subtitle_bar" />
+
+
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <com.malinskiy.superrecyclerview.SuperRecyclerView
+                android:id="@+id/rv_unit"
+                android:padding="5dp"
+                android:layout_weight="4"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        <include layout="@layout/pager_view" />
+
+    </LinearLayout>
+
+</LinearLayout>

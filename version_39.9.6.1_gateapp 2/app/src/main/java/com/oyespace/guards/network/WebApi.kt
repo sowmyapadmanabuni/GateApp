@@ -1,6 +1,10 @@
 package com.oyespace.guards.network
 
 
+import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
+import com.oyespace.guards.com.oyespace.guards.pojo.BlocksList
+import com.oyespace.guards.com.oyespace.guards.pojo.SearchUnitRequest
+import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
@@ -27,6 +31,10 @@ interface WebApi {
     @GET("oyeliving/api/v1/Unit/GetUnitListByAssocID/{id}")
     fun unitList(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
             : Single<UnitList<ArrayList<UnitPojo>>>
+
+    @GET("oyeliving/api/v1/Block/GetBlockListByAssocID/{id}")
+    fun blocksList(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
+            : Single<BlocksList<ArrayList<BlocksData>>>
 
     @POST("oye247/api/v1/Worker/Create")
     fun creatStaff(@Body staffReq: StaffRegistrationReq, @Header("X-OYE247-APIKey") token: String)
@@ -117,8 +125,29 @@ interface WebApi {
     @GET("oyesafe/api/v1/VisitorLog/GetVisitorLogListByWorkerID/{workerid}/{id}")
     fun getVisitorByWorkerId(@Header("X-OYE247-APIKey")token: String,@Path("workerid")workerId:Int,@Path("id")assid:Int):Single<getVisitorDataByWorker>
 
-//
-//    @POST("oye247/api/v1/Worker/WorkerEntryImgGPSUpdate")
-//    fun sendStaffImage(@Header(OYE247KEY) token: String, @Body sendStaffImageReq: SendStaffImageReq)
-//            : Single<SendStaffImageRes>
+    @POST("oye247/api/v1/Worker/WorkerDetailsUpdate")
+    fun staffUpdate(@Header(OYE247KEY) token: String, @Body staffEditRequest:StaffEditRequest):Single<StaffEditResponse>
+
+
+    @POST("oye247/api/v1/Worker/WorkerEntryImgGPSUpdate")
+    fun sendStaffImageUpdate(@Header(OYE247KEY) token: String, @Body sendStaffImageReq: SendStaffImageReq)
+            : Single<SendStaffImageRes>
+
+    @POST("oye247/api/v1/GetWorkersListByMobileNumberAndAssocID")
+    fun GetWorkersListByMobileNumberAndAssocID(@Header(OYE247KEY) token: String, @Body getWorkersListByMobileNumberReq:GetWorkersListByMobileNumberReq ):
+            Single<GetWorkersListByMobileNumberResp>
+
+    @POST("oyesafe/api/v1/Notification/Notificationcreate")
+    fun getNotificationCreate(@Header(OYE247KEY) token: String,@Body notificationCreateReq:NotificationCreateReq):Single<NotificationCreateResponse>
+
+    @GET("oyeliving/api/v1/Unit/GetUnitListByUnitID/{id}")
+    fun getUnitListbyUnitId(@Header(CHAMPKEY) token: String, @Path("id") unitId: String):Single<UnitlistbyUnitID>
+
+    @POST("oyeliving/api/v1/Unit/UnitNameSearchByAssociationID")
+    fun searchUnits(@Body unitSearch: SearchUnitRequest, @Header("X-Champ-APIKey") token: String)
+            : Single<UnitListSearch<UnitPojo>>
+
+    @GET("oyeliving/api/v1/Unit/GetUnitListByBlockID/{id}")
+    fun getUnitsFromBlock(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
+            : Single<UnitsList<ArrayList<UnitPojo>>>
 }

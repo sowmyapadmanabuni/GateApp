@@ -99,14 +99,14 @@ public class BGService extends Service  {
 
         if(overStayingNames.length()>2){
             if(t1 != null) {
-                t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
+             //   t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
 
                 try {
                     Thread.sleep((long) 3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                t1.speak("Overstaying " + overStayingNames, TextToSpeech.QUEUE_FLUSH, null);
+               // t1.speak("Overstaying " + overStayingNames, TextToSpeech.QUEUE_FLUSH, null);
 
             }
             else {

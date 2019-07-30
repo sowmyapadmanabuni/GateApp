@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Handler
+import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -26,14 +27,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import com.oyespace.guards.DataBaseHelper
-import com.oyespace.guards.activity.Biometric
-import com.oyespace.guards.activity.ImgView
-import com.oyespace.guards.activity.MobileNumberforEntryScreen
+import com.oyespace.guards.activity.*
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import kotlinx.android.synthetic.main.activity_img_view.*
 import kotlinx.android.synthetic.main.activity_mobile_number.*
+
+
 
 
 class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context) : RecyclerView.Adapter<StaffAdapter.StaffViewHolder>() ,Filterable{
@@ -75,7 +76,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
 
-            if (staffdata.WKEntryImg.equals("STAFF", true)) {
+            if (staffdata.wkEntryImg.equals("STAFF", true)) {
 //                val intent1 = Intent(mcontext, ImgView::class.java)
 //                intent1.putExtra(
 //                    "URL_IMAGE",
@@ -85,7 +86,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
 
 
                 Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+ Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+staffdata.wkWorkID+".jpg")
+                    .load(IMAGE_BASE_URL +"Images/"+ staffdata.wkEntryImg)
                     .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(dialog_imageview)
 
             } else {
@@ -97,7 +98,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
 //                mcontext.startActivity(intent2)
 
                 Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+staffdata.wkWorkID+".jpg")
+                    .load(IMAGE_BASE_URL +"Images/"+staffdata.wkEntryImg)
                     .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(dialog_imageview)
 
             }
@@ -136,9 +137,14 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
 
         }
 
+
         Picasso.with(mcontext)
-            .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+staffdata.wkWorkID+".jpg")
-            .placeholder(R.drawable.placeholder_dark_potrait).error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
+            .load(IMAGE_BASE_URL +"Images/"+staffdata.wkEntryImg)
+           .placeholder(R.drawable.placeholder_dark_potrait).error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
+
+//        Picasso.with(mcontext)
+//            .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+staffdata.wkWorkID+".jpg")
+//            .placeholder(R.drawable.placeholder_dark_potrait).error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
         // var imgName="PERSON"+"Association"+ASSOCIATIONID+"STAFF" +globalApiObject.data.worker.wkWorkID  + ".jpg"
 
         holder.btn_makeentry.setOnClickListener {
@@ -162,6 +168,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                         d.putExtra(UNITNAME, staffdata.unUniName)
                         d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
                         d.putExtra(VISITOR_TYPE, "STAFF")
+                        d.putExtra(UNITID,staffdata.unUnitID)
                         d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
                         d.putExtra(COUNTRYCODE,"")
                         d.putExtra(MOBILENUMBER, staffdata.wkMobile)
@@ -189,8 +196,10 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                 d.putExtra(MOBILENUMBER, staffdata.wkMobile)
                 d.putExtra("DESIGNATION",  staffdata.wkDesgn)
                 d.putExtra("WORKTYPE",  staffdata.wkWrkType)
-                d.putExtra("WORKERID",  staffdata.wkWorkID)
+                d.putExtra(ConstantUtils.WORKER_ID,  staffdata.wkWorkID)
                 d.putExtra("UNITNAME",  staffdata.unUniName)
+                d.putExtra("Image",staffdata.wkEntryImg)
+                d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
 
                 mcontext.startActivity(d);
                 (mcontext as Activity).finish()
@@ -220,11 +229,62 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                     Utils.showToast(mcontext, "Duplicate Entry not allowed")
 
                 }else {
-                    visitorLog(
-                        staffdata.unUnitID, staffdata.wkfName + " " + staffdata.wklName, staffdata.wkMobile, staffdata.wkDesgn, staffdata.wkWrkType, staffdata.wkWorkID, staffdata.unUniName
-                    );
+
+
+                    if(staffdata.unUniName.contains(",")){
+                        var unitname_dataList: Array<String>
+                        var unitid_dataList: Array<String>
+                      //  var unitAccountId_dataList: Array<String>
+                        unitname_dataList = staffdata.unUniName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        unitid_dataList=staffdata.unUnitID.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                      //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        if(unitname_dataList.size>0) {
+                            for (i in 0 until unitname_dataList.size) {
+                                try {
+                                    visitorLog(
+                                        unitid_dataList.get(i).replace(" ", "").toInt(),
+                                        staffdata.wkfName + " " + staffdata.wklName,
+                                        staffdata.wkMobile,
+                                        staffdata.wkDesgn,
+                                        staffdata.wkWrkType,
+                                        staffdata.wkWorkID,
+                                        unitname_dataList.get(i).replace(" ", ""),
+                                        staffdata.wkEntryImg
+                                    );
+                                }catch (e:ArrayIndexOutOfBoundsException){
+
+                                }
+                            }
+                        }
+                    }else{
+                        visitorLog(staffdata.unUnitID.toInt(), staffdata.wkfName + " " + staffdata.wklName, staffdata.wkMobile, staffdata.wkDesgn, staffdata.wkWrkType, staffdata.wkWorkID, staffdata.unUniName,staffdata.wkEntryImg);
+                    }
+
+
                 }
             }
+
+        }
+
+        holder.iv_edit.setOnClickListener {
+
+
+            val intent= Intent(mcontext,EditStaffActivity::class.java)
+
+            intent.putExtra("UNITID", staffdata.unUnitID)
+            intent.putExtra("FIRSTNAME", staffdata.wkfName)
+            intent.putExtra("LASTNAME", staffdata.wklName)
+            intent.putExtra(MOBILENUMBER, staffdata.wkMobile)
+            intent.putExtra("DESIGNATION",  staffdata.wkDesgn)
+            intent.putExtra("WORKTYPE",  staffdata.wkWrkType)
+            intent.putExtra(ConstantUtils.WORKER_ID,  staffdata.wkWorkID)
+            intent.putExtra("UNITNAME",  staffdata.unUniName)
+            intent.putExtra("IMAGE",  staffdata.wkEntryImg)
+            intent.putExtra("DOB",staffdata.wkdob)
+
+           // (mcontext as Activity).startActivityForResult(intent, 2)
+            mcontext.startActivity(intent);
+            (mcontext as Activity).finish()
 
         }
 
@@ -235,8 +295,8 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
             mcontext.startActivity(intent)
         }
 
-        if(dbh.fingercount(staffdata.wkWorkID)>3){
-           // holder.btn_biometric.visibility=View.INVISIBLE
+        if(dbh.fingercount(staffdata.wkWorkID)>1){
+            holder.btn_biometric.visibility=View.INVISIBLE
         }else{
             if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 1") {
                 holder.btn_biometric.visibility=View.INVISIBLE
@@ -257,7 +317,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
     }
 
     private fun visitorLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String) {
+                           workerType:String,staffID:Int,unitName:String,vlEntryImage:String) {
 
 
         var memID:Int=410;
@@ -283,10 +343,10 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
         var SPPrdImg10=""
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
             unitName,unitId ,desgn,
-            personName,"",0,"+",mobileNumb,
+            personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
             1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","");
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""));
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(
@@ -299,22 +359,28 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
                             visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
+                         //  if (  (globalApiObject.data.visitorLog.unUniName).contains(","))
 
 
 
-                            val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
-                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                            ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
-                            ddc.putExtra("mobNum", mobileNumb)
-                            ddc.putExtra("name", personName)
-                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            ddc.putExtra("unitname", unitName)
-                            ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME,"Staff")
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                            mcontext.sendBroadcast(ddc);
+                            getUnitLog(unitId, personName,  " " ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
+
+//                            val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
+//                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+//                            ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+//                            ddc.putExtra("mobNum", mobileNumb)
+//                            ddc.putExtra("name", personName)
+//                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
+//                            ddc.putExtra("unitname", unitName)
+//                            ddc.putExtra("memType", "Owner")
+//                            ddc.putExtra(UNITID,unitId.toString())
+//                            ddc.putExtra(COMPANY_NAME,"Staff")
+//                            ddc.putExtra(UNIT_ACCOUNT_ID,"0")
+//                            ddc.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+////                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+////                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+//                            mcontext.sendBroadcast(ddc);
 
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                         } else {
@@ -343,6 +409,55 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
 //                    dismissProgress()
                     }
                 }))
+    }
+
+
+    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int) {
+
+        RetrofitClinet.instance
+            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
+
+                override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
+
+                    if (UnitList.success == true) {
+
+                        val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
+                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+                        ddc.putExtra("mobNum", mobileNumb)
+                        ddc.putExtra("name", personName)
+                        ddc.putExtra("nr_id", vlVisLgID.toString())
+                        ddc.putExtra("unitname", unitName)
+                        ddc.putExtra("memType", "Owner")
+                        ddc.putExtra(UNITID,unitId.toString())
+                        ddc.putExtra(COMPANY_NAME,"Staff")
+                        ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                        ddc.putExtra("VLVisLgID",vlVisLgID)
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                        mcontext.sendBroadcast(ddc);
+
+
+                    } else {
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("cdvd", e.message);
+
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+
     }
 
     private fun visitorEntryLog( visitorLogID: Int) {
@@ -408,6 +523,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
         val btn_biometric: Button
         val btn_makeentry: Button
         val iv_call: ImageView
+        val iv_edit:ImageView
 
         init {
             tv_staff = view.findViewById(R.id.tv_staff)
@@ -417,6 +533,8 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
             btn_biometric = view.findViewById(R.id.btn_biometric)
             btn_makeentry = view.findViewById(R.id.btn_makeentry)
             iv_call = view.findViewById(R.id.iv_call)
+            iv_edit=view.findViewById(R.id.iv_edit)
+
 
         }
 
@@ -451,5 +569,6 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
         }
 
     }
+
 }
 

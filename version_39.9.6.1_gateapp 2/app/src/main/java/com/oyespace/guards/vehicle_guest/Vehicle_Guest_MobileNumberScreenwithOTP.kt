@@ -593,6 +593,7 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
                                 globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
                             )
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
+                            d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
                             startActivity(d);
                             finish();
@@ -634,6 +635,7 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
         d.putExtra(MOBILENUMBER, textview.getText().toString())
         d.putExtra(COUNTRYCODE, countryCode)
+        d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
         startActivity(d);
         finish();

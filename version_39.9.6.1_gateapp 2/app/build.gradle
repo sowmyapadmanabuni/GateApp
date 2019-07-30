@@ -32,17 +32,17 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.oyespace.guards"
-        minSdkVersion 17
+        minSdkVersion 24
         targetSdkVersion 28
-        versionCode 52
-        versionName "39.9.6.10.5V"
+        versionCode 54
+        versionName "10.4D"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
     }
     buildTypes {
         release {
-           // minifyEnabled false
+            // minifyEnabled false
 //            shrinkResources true
 //            debuggable false
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -127,6 +127,8 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
     //implementation 'com.intuit.sdp:sdp-android:1.0.4'
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+
 
 
 }

@@ -26,7 +26,7 @@
     <color name="google_red">#fc424b</color>
     <color name="google_light">#f9a5a9</color>
     <color name="red">#ffeb5454</color>
-    <color name="orange">#ff7912</color>
+    <color name="orange">#fa9f3d</color>
     <color name="orange_light">#efb588</color>
     <color name="orangedark">#da650a</color>
 
@@ -84,4 +84,5 @@
     <color name="background">#65828e</color>
     <color name="main_color">#ff9a00</color>
     <color name="secondary_color">#BDBDBD</color>
+    <color name="dark_grey">#696969</color>
 </resources>

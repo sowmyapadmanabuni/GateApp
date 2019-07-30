@@ -15,11 +15,22 @@ public class RequestDTO {
 	public int vLItmCnt;
 	public String uNUniName;
 	public int rERgVisID;
+
+	public String getVLEntryImg() {
+		return VLEntryImg;
+	}
+
+	public void setVLEntryImg(String VLEntryImg) {
+		this.VLEntryImg = VLEntryImg;
+	}
+
+	public String VLEntryImg;
 	public int mEMemID;
 	public String vLVerStat;
 	public String vLGtName;
 	public int uNUnitID;
 	public int aSAssnID;
+	public String VLENGName;
 
 	public void setVLFName(String vLFName){
 		this.vLFName = vLFName;
@@ -177,7 +188,8 @@ public class RequestDTO {
 			",vLVerStat = '" + vLVerStat + '\'' + 
 			",vLGtName = '" + vLGtName + '\'' + 
 			",uNUnitID = '" + uNUnitID + '\'' + 
-			",aSAssnID = '" + aSAssnID + '\'' + 
-			"}";
+			",aSAssnID = '" + aSAssnID + '\'' +
+					",VLEntryImg = '" + VLEntryImg + '\'' +
+					"}";
 		}
 }

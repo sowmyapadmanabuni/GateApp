@@ -265,7 +265,8 @@ data class VisitorEntryReq(
 data class VisitorExitReq(
     val VLExitT: String,
     val VLExitWID: Int,
-    val VLVisLgID: Int
+    val VLVisLgID: Int,
+    val VLEXGName:String
 )
 //Visitor exit response
 data class VisitorExitResp(
@@ -375,11 +376,11 @@ data class WorkerDetails(
     val asAssnID: Int,
     val blBlockID: Int,
 
-    val unUnitID: Int,
+    val unUnitID: String,
     val unUniName: String,
     val vnVendorID: Int,
     val wkDesgn: String,
-    val WKEntryImg: String,
+    val wkEntryImg: String,
     val wkIsActive: Boolean,
     val wkMobile: String,
     val wkWorkID: Int,
@@ -387,6 +388,7 @@ data class WorkerDetails(
     val wkdCreated: String,
     val wkdUpdated: String,
     val wkfName: String,
+    val wkdob:String,
     val wkidCrdNo: String,
     val wkisdCode: Any,
     val wklName: String
@@ -545,7 +547,8 @@ data class CreateVisitorLogReq(
     val SPPrdImg9: String,
     val SPPrdImg10: String,
 val WKSelfImg:String,
-val VLEntryImg:String
+val VLEntryImg:String,
+    val VLENGName:String
 
 
 )
@@ -568,7 +571,7 @@ data class VisitorLogResp(
     val meMemID: Int,
     val reRgVisID: Int,
     val startDate: String,
-    val unUniName: Any,
+    val unUniName: String,
     val unUnitID: Int,
     val vlCmntImg: Any,
     val vlCmnts: Any,
@@ -854,7 +857,8 @@ data class SignUpReq(
     val ACMobile1: String,
     val ACMobile2: String,
     val ACMobile3: String,
-    val ACMobile4: String
+    val ACMobile4: String,
+    val ACImgName:String
 )
 
 
@@ -1279,8 +1283,12 @@ data class CloudFunctionNotificationReq(
     val ntTitle: String,
     val ntType: String,
     val sbSubID: String,
-    val userID: Int
+    val userID: Int,
+    val unitID: String
+
 )
+
+
 
 //sendGateAppNotification
 data class SendGateAppNotificationRequest(
@@ -1365,28 +1373,200 @@ data class SendStaffImageReq(
 
 //send staff image response
 
-data class StaffImageRes(
+data class SendStaffImageRes(
     val apiVersion: String,
     val data: String,
     val success: Boolean
 )
 
 
+//edit staff request
+
+data class StaffEditRequest(
+    val WKFName: String,
+    val WKMobile: String,
+    val WKImgName: String,
+    val WKWrkType: String,
+    val WKDesgn: String,
+    val WKIDCrdNo: String,
+    val WKDOB: String,
+    val WKIsActive: Boolean,
+    val WKWorkID: Int
+)
 
 
+data class StaffEditResponse(
+    val apiVersion: String,
+    val data: String,
+    val success: Boolean
+)
 
+//GetWorkersListByMobileNumberAndAssocID
+data class GetWorkersListByMobileNumberReq(
 
+    val WKMobile: String,
+    val ASAssnID: Int
+)
 
+data class GetWorkersListByMobileNumberResp(
+    val `data`: WorkersData,
+    val apiVersion: String,
+    val success: Boolean
+)
+data class WorkersData(
+    val workers:WorkerMobileData,
+    val message:String
+)
 
+data class WorkerMobileData(
 
+    val  wkWorkID:Int,
 
+val  wkfName:String,
 
+val  wklName:String,
 
+val  wkMobile:String,
 
+val  wkEntryImg:String,
 
+val  wkWrkType:String,
 
+val  wkDesgn:String,
 
+val  wkidCrdNo:String,
 
+val  vnVendorID:Int,
+
+val  blBlockID:Int,
+
+val  unUnitID:Int,
+
+val  asAssnID:Int,
+
+val wkisdCode:Any,
+
+val  wkdCreated:String,
+
+val  wkdUpdated:String,
+
+val  wkdob:String,
+
+val  wkIsActive:Boolean,
+ val unUniName:String,
+
+val  wkExitImg:String,
+
+val  wkEntryGPS:String,
+
+val  wkExitGPS:String,
+
+val  wkSelfImg:String,
+
+val  fromDate:String,
+
+val  toDate:String
+)
+//NotificatioCreateRequest
+data class NotificationCreateReq(
+    val ACAccntID: String,
+    val ASAssnID: String,
+    val NTType:String,
+    val NTDesc:String,
+    val SBUnitID:String,
+    val SBMemID:String,
+    val SBSubID:String,
+    val SBRoleID:String,
+    val ASAsnName:String,
+    val MRRolName:String,
+    val NTDUpdated:String,
+    val NTDCreated:String,
+    val VLVisLgID:String,
+   val NTStatDesc:String
+
+)
+
+//NotificationCreateResponse
+data class NotificationCreateResponse(
+
+    val `data`: NotificationData,
+    val apiVersion: String,
+    val success: Boolean
+
+)
+
+data class NotificationData(
+    val notifications:Notifications
+
+)
+data class Notifications(
+    val ntid:Int,
+    val acAccntID:Int,
+    val asAssnID:Int,
+    val ntdCreated:String,
+    val ntType:String,
+    val ntIsActive:String,
+    val ntdUpdated:String,
+    val ntDesc:String,
+    val sbUnitID:Int,
+    val sbMemID:Int,
+    val sbSubID:Int,
+    val sbRoleID:Int,
+    val asAsnName:String,
+    val mrRolName:String,
+    val unOcSDate:String,
+    val unSldDate:String,
+    val ntStatDesc:String
+
+)
+
+//getunitlistbyUnitId
+data class UnitlistbyUnitID(
+    val apiVersion: String,
+    val `data`: Unitsdata,
+    val success: Boolean
+)
+
+data class Unitsdata(
+    val unit:Units
+)
+data class Units(
+    val acAccntID: Int,
+    val asAssnID: Int,
+    val blBlockID: Int,
+    val flFloorID: Int,
+    val owner: ArrayList<UnitOwner>,
+    val tenant: ArrayList<Tenant>,
+    val unCalType: String,
+    val unCurrBal: Double,
+    val unDimens: Int,
+    val unIsActive: Boolean,
+    val unOcSDate: String,
+    val unOcStat: String,
+    val unOpenBal: Double,
+    val unOwnStat: String,
+    val unRate: Double,
+    val unSldDate: String,
+    val unUniIden: String,
+    val unUniName: String,
+    val unUniType: String,
+    val unUnitID: Int,
+    val undCreated: String,
+    val undUpdated: String,
+    val unitParkingLot: List<Any>,
+    val unitbankaccount: Any,
+    var isSelected: Boolean=false
+)
+
+data class UnitListSearch<T>(
+    val apiVersion: String,
+    val `data`: UnitDataSingle,
+    val success: Boolean
+)
+
+data class UnitDataSingle(
+    val unit: UnitPojo
+)
 
 
 

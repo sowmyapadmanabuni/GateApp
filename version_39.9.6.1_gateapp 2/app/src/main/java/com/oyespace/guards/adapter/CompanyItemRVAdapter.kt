@@ -15,6 +15,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import android.app.Activity
 import android.util.Log
 import android.widget.ImageView
+import com.oyespace.guards.activity.BlockSelectionActivity
 import com.oyespace.guards.pojo.VendorPojo
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
@@ -35,7 +36,7 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
 
         holder.lv_itemrecyclerview.setOnClickListener {
 
-            val intent = Intent(mcontext, UnitListActivity::class.java)
+            val intent = Intent(mcontext, BlockSelectionActivity::class.java)
             intent.putExtra(FLOW_TYPE, DELIVERY)
             intent.putExtra(VISITOR_TYPE, DELIVERY)
             if(arrayList[position].vendor_names.equals("Others")){

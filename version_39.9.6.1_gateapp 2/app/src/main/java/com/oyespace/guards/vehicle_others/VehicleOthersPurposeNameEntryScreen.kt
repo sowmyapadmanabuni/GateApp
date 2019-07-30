@@ -12,6 +12,7 @@ import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -65,7 +66,7 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
                    // d.putExtra(MOBILENUMBER, Ed_phoneNum.getText().toString())
                    // d.putExtra(COUNTRYCODE, countryCode)
                     d.putExtra(VEHICLE_NUMBER,intent.getStringExtra(VEHICLE_NUMBER))
-
+                    d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     startActivity(d)
                     finish()
                 } else {

@@ -105,12 +105,13 @@
                   android:text="@string/textnameentryscreen"/>
 
         <LinearLayout
+                android:id="@+id/lyt_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_gravity="center"
 
-                    android:layout_centerInParent="true">
+                   android:layout_centerInParent="true">
 
                 <EditText android:id="@+id/Ed_Name"
                           android:layout_width="match_parent"
@@ -136,6 +137,46 @@
                         android:src="@drawable/microphone_640"/>
 
         </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/lyt_dob"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:layout_below="@+id/lyt_phone"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="1dp"
+            android:layout_marginLeft="1dp"
+    >
+
+        <EditText android:id="@+id/ed_dob"
+                  android:layout_width="match_parent"
+                  android:layout_height="54dp"
+                  android:layout_gravity="center"
+                  android:hint="@string/textselectdob"
+                  android:inputType="textCapWords"
+                  android:drawableRight="@drawable/calnder_small"
+                  android:maxLength="40"
+                  android:editable="false"
+                  android:focusable="false"
+                  android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .'"
+                  android:layout_marginLeft="4dp"
+                  android:layout_marginRight="4dp"
+                  android:layout_centerInParent="true"
+                  android:layout_weight="1"
+                  android:gravity="left"/>
+        <!--<ImageView-->
+                <!--android:id="@+id/Btn_dob"-->
+                <!--android:layout_below="@+id/Ed_Name"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="80dp"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:layout_centerHorizontal="true"-->
+                <!--android:background="@color/white"-->
+                <!--android:src="@drawable/microphone_640"/>-->
+
+    </LinearLayout>
 
 
 

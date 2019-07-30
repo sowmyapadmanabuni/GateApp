@@ -45,6 +45,7 @@ import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.RandomUtils.entryExists
@@ -88,6 +89,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                 d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                 d.putExtra(MOBILENUMBER, "")
                     d.putExtra(COUNTRYCODE, "")
+                d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
                     startActivity(d);
                     finish();
@@ -132,10 +134,11 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                       //  builder.setTitle("Vendor Entry already done")
                         builder.setMessage("No Duplicates allowed")
                         builder.setPositiveButton("Ok") { dialog, which ->
-                            dialog.cancel()
-                            val d = Intent(this@VehicleGuestMobileNumberScreen, Dashboard::class.java)
-                            startActivity(d)
+
+//                            val d = Intent(this@VehicleGuestMobileNumberScreen, Dashboard::class.java)
+//                            startActivity(d)
                             finish()
+                            dialog.dismiss()
                         }
                         builder.setCancelable(false);
                         builder.show()
@@ -155,6 +158,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                     d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                     d.putExtra(MOBILENUMBER, Ed_phoneNum.getText().toString())
                     d.putExtra(COUNTRYCODE, ccd)
+                    d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
                     startActivity(d);
                     finish();
@@ -536,7 +540,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                             d.putExtra(COUNTRYCODE, isdCode)
                             d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName+" "+globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
-
+                            d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                             startActivity(d);
                             finish();
 
@@ -571,7 +575,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
         d.putExtra(MOBILENUMBER, mobileNumber)
         d.putExtra(COUNTRYCODE, ccd)
-
+        d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     startActivity(d);
                     finish();
     }

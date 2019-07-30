@@ -26,6 +26,7 @@ import com.oyespace.guards.R;
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity;
 import com.oyespace.guards.utils.Prefs;
 import com.oyespace.guards.vehicle_guest.VehicleGuestUnitScreen;
+import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity;
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -56,7 +57,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
             @Override
             public void onClick(View v) {
                 Toast.makeText(CustomViewFinderScannerActivity.this,"NO QR Code ",Toast.LENGTH_LONG).show();
-                Intent in = new Intent(CustomViewFinderScannerActivity.this, VehicleGuestUnitScreen.class);
+                Intent in = new Intent(CustomViewFinderScannerActivity.this, Vehicle_Guest_BlockSelectionActivity.class);
                 startActivity(in);
                 finish();
 

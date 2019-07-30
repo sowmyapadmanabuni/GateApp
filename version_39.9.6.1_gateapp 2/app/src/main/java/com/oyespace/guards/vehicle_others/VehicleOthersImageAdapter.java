@@ -74,6 +74,12 @@ CardView lyt_card;
                         imageList.remove(position);
                         //iamgeLyt.removeView(imageView);
                         notifyDataSetChanged();
+
+                        if (imageList.size() == 19) {
+                            VehicleOthersAddCarFragment.image_Gallery.setVisibility(View.VISIBLE);
+                        }
+
+
                     }
                 });
 
