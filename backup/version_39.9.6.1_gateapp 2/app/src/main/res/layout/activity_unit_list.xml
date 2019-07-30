@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="@android:color/white"
+>
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="1dp"
+                    android:id="@+id/rl_header"
+                    android:background="@color/white">
+        <ImageView android:layout_width="150dp"
+                   android:layout_height="35dp"
+                   android:id="@+id/rl_header1"
+                   android:layout_centerHorizontal="true"
+                   android:layout_margin="@dimen/_2sdp"
+                   android:src="@drawable/oyespace_toolbar"/>
+
+        <ImageView android:layout_width="35dp"
+                   android:layout_height="35dp"
+                   android:id="@+id/rl_logo"
+                   android:visibility="gone"
+                   android:layout_marginLeft="@dimen/_5sdp"
+                   android:layout_centerVertical="true"
+                   android:src="@drawable/oyespace_launcher"/>
+
+
+        <EditText
+                android:id="@+id/edt_search_text1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/rl_logo"
+                android:layout_toLeftOf="@+id/btn_mic"
+                android:layout_centerVertical="true"
+                android:inputType="text"
+                android:imeOptions="actionSearch"
+                android:hint="@string/textsearchbyname"
+                android:paddingLeft="8dp"
+                android:visibility="gone"
+                android:paddingRight="8dp"
+                android:lines="1"
+                android:textColorHint="@android:color/darker_gray"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                android:background="@android:color/transparent"/>
+
+
+
+
+        <Button
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="@dimen/_35sdp"
+                android:id="@+id/btn_mic"
+                android:layout_toLeftOf="@+id/buttonNext"
+                android:visibility="gone"
+                android:layout_centerVertical="true"
+                android:background="@drawable/microphone_640"
+                android:textColor="@color/white"
+                android:layout_marginLeft="189dp" android:layout_marginStart="@dimen/horizontal_padding_small"
+                android:layout_marginRight="@dimen/horizontal_padding_small"
+                android:layout_marginEnd="@dimen/horizontal_padding_small"/>
+
+
+        <Button
+                android:id="@+id/buttonNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_2sdp"
+                android:layout_alignParentRight="true"
+                android:padding="@dimen/_2sdp"
+                android:onClick="onClick"
+                android:text="@string/next"
+                android:textColor="@android:color/white"
+                android:background="@drawable/square"
+                android:textSize="@dimen/_10sdp" />
+    </RelativeLayout>
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/orange">
+
+    </RelativeLayout>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:weightSum="3"
+                  android:orientation="horizontal">
+
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/txt_device_name"
+                  android:textColor="@color/black"
+                  android:layout_weight="1"
+                  android:textStyle="bold"
+                  android:textSize="10sp"
+                  android:padding="2dp"
+                  android:text="Deeee"/>
+
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/txt_assn_name"
+                  android:textColor="@color/black"
+                  android:layout_weight="1"
+                  android:textStyle="bold"
+                  android:textSize="12sp"
+                  android:padding="2dp"
+                  android:text="Association Name"/>
+
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/txt_gate_name"
+                  android:textColor="@color/black"
+                  android:textStyle="bold"
+                  android:layout_weight="1"
+
+                  android:textSize="12sp"
+                  android:padding="2dp"
+                  android:text="Gate Name"/>
+    </LinearLayout>
+
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/orange">
+
+    </RelativeLayout>
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:textColor="@color/black"
+              android:layout_margin="5dp"
+              android:text="@string/textsearchflat"/>
+    <com.malinskiy.superrecyclerview.SuperRecyclerView
+            android:id="@+id/rv_unit"
+            android:padding="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+</LinearLayout>

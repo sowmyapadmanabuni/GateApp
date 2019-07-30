@@ -14,6 +14,9 @@ import android.util.Log
 import android.widget.Toast
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
+import com.oyespace.guards.models.GetVisitorsResponse
+import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -27,6 +30,7 @@ import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -319,42 +323,54 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
     private fun getStaffList() {
+        try {
+            var realm: Realm = Realm.getDefaultInstance();
+            RetrofitClinet.instance
+                .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
 
-        RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+                    override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
 
-                override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
-                    if (workerListResponse.data.worker !=null) {
-                        Log.d("WorkerList success",workerListResponse.data.toString())
-                        var arrayList: ArrayList<WorkerDetails>? = null
-                        arrayList=ArrayList()
-                        arrayList = workerListResponse.data.worker
+                        if (workerListResponse.data.worker != null) {
+                            Log.d("WorkerList success", workerListResponse.data.toString())
 
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-                                return lhs.wkfName.compareTo(rhs.wkfName)
-                            }
-                        })
+                            val arrayList = workerListResponse.data.worker
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(arrayList);
+                            realm.commitTransaction();
+                            realm.close()
 
-                        LocalDb.saveStaffList(arrayList);
 
-                    } else {
+//                        var arrayList: ArrayList<Worker>? = null
+//
+//                        arrayList = workerListResponse.data.worker
+//
+//                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
+//                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+//                                return lhs.wkfName.compareTo(rhs.wkfName)
+//                            }
+//                        })
+//                        LocalDb.saveStaffList(arrayList);
+
+                        } else {
+
+                        }
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+                        Log.d("Error WorkerList", e.toString())
+                    }
+
+                    override fun noNetowork() {
 
                     }
-                }
+                })
+        }catch (e:java.lang.Exception){
 
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
+        }
     }
 
     private fun getUnitList() {
@@ -430,35 +446,40 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     private fun getVisitorLogEntryList() {
         Log.d("SYCNCHECK","in 408")
+        var realm: Realm = Realm.getDefaultInstance();
         RetrofitClinet.instance
             .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
+            .subscribeWith(object : CommonDisposable<GetVisitorsResponse<ArrayList<VisitorLog>>>() {
 
-                override fun onSuccessResponse(visitorList: VisitorLogEntryResp<ArrayList<VisitorEntryLog>>) {
+                override fun onSuccessResponse(visitorList: GetVisitorsResponse<ArrayList<VisitorLog>>) {
                     Log.d("SYCNCHECK","in 416")
                     Log.d("SYCNCHECK","in 417"+visitorList.toString())
 
-                    if (visitorList.success == true) {
+                    if (visitorList.success == true && visitorList.data.visitorLog != null) {
                         Log.d("SYCNCHECK", "in 421")
-                        Log.d("cdvd", visitorList.toString());
-                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
-                        arrayListVisitors = visitorList.data.visitorLog
-
-                        if(visitorList.data.visitorLog!=null) {
-
-//                                Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
-//                                    override fun compare(lhs: VisitorEntryLog, rhs: VisitorEntryLog): Int {
-//                                        return lhs.vlEntryT.compareTo(rhs.vlEntryT, true)
-//                                    }
-//                                })
-                        }
-                        LocalDb.saveEnteredVisitorLog(arrayListVisitors);
-
-                        val smsIntent = Intent(ConstantUtils.SYNC)
-                        smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
+                        Log.e("cdvd_", ""+visitorList.data.visitorLog);
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(visitorList.data.visitorLog);
+                        realm.commitTransaction();
+                        realm.close()
+//                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
+//                        arrayListVisitors = visitorList.data.visitorLog
+//
+//                        if(visitorList.data.visitorLog!=null) {
+//
+////                                Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
+////                                    override fun compare(lhs: VisitorEntryLog, rhs: VisitorEntryLog): Int {
+////                                        return lhs.vlEntryT.compareTo(rhs.vlEntryT, true)
+////                                    }
+////                                })
+//                        }
+//                        LocalDb.saveEnteredVisitorLog(arrayListVisitors);
+//
+//                        val smsIntent = Intent(ConstantUtils.SYNC)
+//                        smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
+//                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")
@@ -501,7 +522,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
                         Log.d("sendFCM","onErrorResponse  "+e.toString())
-                        Log.d("SYCNCHECK","in 473")
+                        Log.d("SYCNCHECK","in cdvd473")
                     }
 
                     override fun noNetowork() {

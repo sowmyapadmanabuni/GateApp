@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:background="@android:color/white"
+>
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="2dp"
+                    android:background="@color/white"
+    >
+        <ImageView android:layout_width="150dp"
+                   android:layout_height="40dp"
+                   android:layout_centerHorizontal="true"
+android:layout_margin="@dimen/_2sdp"
+                   android:src="@drawable/oyespace_toolbar"/>
+    </RelativeLayout>
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/orange">
+
+    </RelativeLayout>
+
+    <LinearLayout android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:weightSum="3"
+                  android:orientation="horizontal">
+
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/txt_device_name"
+                  android:textColor="@color/black"
+                  android:layout_weight="1"
+                  android:textStyle="bold"
+                  android:textSize="10sp"
+                  android:padding="2dp"
+                  android:text="Deeee"/>
+
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/txt_assn_name"
+                  android:textColor="@color/black"
+                  android:layout_weight="1"
+                  android:textStyle="bold"
+                  android:textSize="12sp"
+                  android:padding="2dp"
+                  android:text="Association Name"/>
+
+        <TextView android:layout_width="0dp"
+                  android:layout_height="wrap_content"
+                  android:id="@+id/txt_gate_name"
+                  android:textColor="@color/black"
+                  android:textStyle="bold"
+                  android:layout_weight="1"
+
+                  android:textSize="12sp"
+                  android:padding="2dp"
+                  android:text="Gate Name"/>
+    </LinearLayout>
+
+
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:background="@color/orange">
+
+    </RelativeLayout>
+    <TextView
+            android:id="@+id/tv_selectdelivery"
+            android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:textColor="@color/black"
+              android:layout_margin="5dp"
+            android:text="@string/textselectdeliveryfrom"
+             />
+
+
+
+
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_serviceProvider"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"/>
+
+
+</LinearLayout>
