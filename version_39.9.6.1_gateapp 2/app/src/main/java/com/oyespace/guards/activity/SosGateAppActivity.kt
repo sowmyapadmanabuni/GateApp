@@ -1,10 +1,7 @@
 package com.oyespace.guards.com.oyespace.guards.activity
 
-import android.content.Intent
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
@@ -14,15 +11,13 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
-import com.google.firebase.FirebaseError
 import com.google.firebase.database.*
+import com.google.firebase.iid.FirebaseInstanceId
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.activity.Hero
-import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
-import kotlinx.android.synthetic.main.activity_recycle_sos_items.*
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
+import java.io.IOException
 
-open class SSampleActivity:AppCompatActivity () {
+open class SosGateAppActivity:AppCompatActivity () {
     lateinit var edittext: EditText
     lateinit var edittext1: EditText
     lateinit var edittext2: EditText
@@ -32,6 +27,14 @@ open class SSampleActivity:AppCompatActivity () {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sos_screen_gate)
+        val intent = intent
+        val message = intent.getStringExtra("message")
+        if(!message.isNullOrEmpty()) {
+            AlertDialog.Builder(this)
+                .setTitle("Notification")
+                .setMessage(message)
+                .setPositiveButton("Ok", { dialog, which -> }).show()
+        }
         // get reference to button
         val btn_click_me = findViewById(R.id.b1_start) as Button
         // set on-click listener
@@ -50,39 +53,10 @@ open class SSampleActivity:AppCompatActivity () {
                 alert.dismiss()
             })
         }
-
-        /* edittext = findViewById(R.id.editText)
-        edittext1 = findViewById(R.id.editText2)
-        edittext2 = findViewById(R.id.editText3)
-        save = findViewById(R.id.button3)
-        save.setOnClickListener()
-        {
-            val ref = FirebaseDatabase.getInstance().getReference("SOS")
-            val h= Hero("17",12.8,77.6,9999088899,"hdgshdg",0,"df",5102)
-        // val h1id=ref.push().key.toString()
-
-               // val value = edittext.text.toString()
-
-            ref.child("17").child("5102").setValue(h)
-            //To retrieve data from firebase
-            /*ref.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-
-
-                Toast.makeText(applicationContext, snapshot.child("h1").getValue(Hero::class.java)!!.id.toString(),Toast.LENGTH_SHORT).show()
-            }
-
-            override fun onCancelled(error: DatabaseError) {}
-        })*/
-
-
-
-
-
-        }*/
-
-
-        val _recyclerView: RecyclerView = findViewById(R.id.recyclerV)
+        lateinit var ref : DatabaseReference
+        ref = FirebaseDatabase.getInstance().getReference("SOS")
+        val h= Units("17",12.8,77.6,9999088899,"hdgshdg",0,"df",5102)
+               val _recyclerView: RecyclerView = findViewById(R.id.recyclerV)
         _recyclerView.layoutManager = GridLayoutManager(this, 3)
 
         val items = ArrayList<MyData>()
@@ -111,9 +85,6 @@ open class SSampleActivity:AppCompatActivity () {
                 "101"
             )
         )
-        //items.add(MyData(BitmapFactory.decodeResource(resources, R.drawable.security_button),"Security Supervisor",BitmapFactory.decodeResource(resources,R.mipmap.call_orange_call),"0141-444-123"))
-        // items.add(MyData(BitmapFactory.decodeResource(resources, R.drawable.police_new),"Facility Incharge",BitmapFactory.decodeResource(resources, R.mipmap.call_orange_call),"9876677554"))
-        // items.add(MyData(BitmapFactory.decodeResource(resources, R.drawable.firetruck_new),"ASSN Secretary",BitmapFactory.decodeResource(resources, R.mipmap.call_orange_call),"7697654446"))
 
 
         //creating our adapter
@@ -123,7 +94,7 @@ open class SSampleActivity:AppCompatActivity () {
         _recyclerView.adapter = adapter
 
         b1_stop.setOnClickListener({ b1_start.setVisibility(View.GONE) })
-      /*  val ph = "9994863024"
+      /*
         img2.setOnClickListener {
             val intent = Intent(Intent.ACTION_DIAL)
             intent.data = Uri.parse(ph)
@@ -131,6 +102,32 @@ open class SSampleActivity:AppCompatActivity () {
         }*/
 
 
+        var ref1=FirebaseDatabase.getInstance().getReference("/SOS/17")
+        ref1.addValueEventListener(object:ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                if(p0.hasChildren())
+                {
+                    var title:String= p0.child("5102").child("name").getValue() as String
+                    Toast.makeText(applicationContext,title, Toast.LENGTH_LONG).show()
+                }
+            }
+
+        })
+        initView()
+}
+    private fun initView() {
+        //This method will use for fetching Token
+        Thread(Runnable {
+            try {
+                Log.i("Service", FirebaseInstanceId.getInstance().getToken("1", "FCM"))
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+        }).start()
     }
 }
 
