@@ -16,7 +16,7 @@
                 android:orientation="horizontal">
             <android.support.v7.widget.AppCompatEditText
                     android:id="@+id/search_text"
-                    android:hint="Select Units"
+                    android:hint="@string/units_selection_title"
                     android:padding="1dp"
                     android:background="@null"
                     android:lines="1"

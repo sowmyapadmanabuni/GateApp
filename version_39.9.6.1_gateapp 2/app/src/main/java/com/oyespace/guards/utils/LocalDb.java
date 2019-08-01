@@ -136,6 +136,15 @@ public class LocalDb {
 
     }
 
+    public static ArrayList<Worker> getStaffs(){
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<Worker> list = new ArrayList<>();
+        list.addAll(realm.where(Worker.class).findAll());
+        realm.close();
+        return list;
+
+    }
+
     public static void saveEnteredVisitorLog_old(ArrayList<VisitorLogExitResp.Data.VisitorLog> menuItems) {
         String tojson;
         if (menuItems == null || menuItems.size() == 0) {

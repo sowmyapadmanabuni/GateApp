@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.zxing.Result;
+import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
 import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
@@ -55,7 +56,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             @Override
             public void onClick(View v) {
 //                Toast.makeText(GuestCustomViewFinderScannerActivity.this,"NO QR Code ",Toast.LENGTH_LONG).show();
-                Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, GuestUnitScreen.class);
+                Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, GuestBlockSelectionActivity.class);
                 startActivity(in);
                 finish();
 
@@ -211,5 +212,13 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
         Configuration conf = res.getConfiguration();
         conf.locale = myLocale;
         res.updateConfiguration(conf, dm);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+//        Intent d = new Intent(GuestCustomViewFinderScannerActivity.this, Dashboard.class);
+//        startActivity(d);
+        finish();
     }
 }

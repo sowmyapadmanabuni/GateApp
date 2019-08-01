@@ -23,7 +23,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
     private static String DB_PATH;
     private final Context context;
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private SQLiteDatabase sqliteDBInstance = null;
     static final String dbName = "ghtest43.db";
 
@@ -89,6 +89,21 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         Log.d("database", "created...!!!!!!");
 
 
+        String  CREATE_VisitorData_TABLE = " create table IF NOT EXISTS VisitorData(VisitorID integer primary key autoincrement, UnitName VARCHAR(50),AssociationID VARCHAR(150), Name VARCHAR(150),MemberId integer, StaffId integer, UnitID integer , MobileNumber VARCHAR(20) , Designation VARCHAR(50), WorkerType VARCHAR(50),VisitorCount integer, VisitorEntryTime DateTime2(7), VisitorExitTime DateTime2(7)) ";
+        db.execSQL(CREATE_VisitorData_TABLE);
+        Log.d("BlockUnit_TABLE", "Created");
+
+//
+//        String CREATE_Worker_TABLE ="create table IF NOT EXISTS Worker(WorkerID integer primary key autoincrement, AssociationID integer)";
+//        //+
+////                ", MemberID integer, SfaffID integer,"+
+////                "UnitID integer, MobileNumber VARCHAR(50), Name VARCHAR(50), Designation VARCHAR(50), WorkerType VARCHAR(50),UnitName VARCHAR(50),VisitorCount integer, VisitorEntryTime VARCHAR(50), VisitorExitTime VARCHAR(50) ) ";
+//        db.execSQL(CREATE_Worker_TABLE);
+
+//        String CREATE_StaffWorker_TABLE = " create table IF NOT EXISTS StaffWorker(StaffWorkeID integer primary key autoincrement,AssociationID integer ," +
+//                " MemberId integer, StaffId integer, UnitID integer , MobileNumber text not null , Name VARCHAR(40), Designation VARCHAR(50), WorkerType VARCHAR(50),UnitName VARCHAR(50),VisitorCount integer, VisitorEntryTime DateTime2(7), VisitorExitTime DateTime2(7)) ";
+//        db.execSQL(CREATE_StaffWorker_TABLE);
+//
 
         String CREATE_StaffWorker_TABLE = " create table IF NOT EXISTS StaffWorker(StaffWorkeID integer primary key autoincrement,AssociationID integer ," +
                 " MemberId integer, StaffId integer, UnitID integer , MobileNumber VARCHAR(20) , Name VARCHAR(40), Designation VARCHAR(50), WorkerType VARCHAR(50),UnitName VARCHAR(50),VisitorCount integer, VisitorEntryTime DateTime2(7), VisitorExitTime DateTime2(7)) ";
@@ -354,8 +369,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
     {
 
-        if(oldVersion < newVersion)
+
+        if(oldVersion < 2)
         {
+
+            db.execSQL("ALTER TABLE userdetails ADD COLUMN AssociationID INTEGER");
+
+
             Log.d("+++++++", "'INSIDE UpGrade...'");
             // 7th upgrade code is masked/*
 //            if(!isFieldExist(NBA_Table,"pre_lat",db)){
@@ -365,6 +385,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             //		db.execSQL("ALTER TABLE "+ NBA_Table_public +" ADD pre_dpvt_reason VARCHAR(50)");
         }
+
+
     }
 
     public boolean isFieldExist(String tableName, String fieldName, SQLiteDatabase DB)
@@ -4469,18 +4491,61 @@ return log_count;
 
     }
 
-    public Cursor getData(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res =  db.rawQuery( "SELECT * FROM StaffWorker where  StaffId="+id+"", null );
-        return res;
+//    public Cursor getData(int id) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor res =  db.rawQuery( "SELECT * FROM StaffWorker where  StaffId="+id+"", null );
+//        return res;
+//    }
+
+
+    public long insertVisitorData( String unitName, String associationID,  String name, int memberId,  int staffId, int unitID, String mobileNumber, String designation,String workerType, int visitorCount, String visitorEntryTime, String visitorExitTime)
+
+
+    {
+
+        System.out.println("DATA DATA"+unitName+".."+associationID+".."+name);
+
+        SQLiteDatabase db=this.getWritableDatabase();
+        ContentValues initialValues = new ContentValues();
+        initialValues.put("UnitName", unitName);
+        initialValues.put("AssociationID",associationID);
+        initialValues.put("Name",name);
+        initialValues.put("MemberId",memberId);
+        initialValues.put("StaffId",staffId);
+        initialValues.put("UnitID",unitID);
+        initialValues.put("MobileNumber",mobileNumber);
+        initialValues.put("Designation",designation);
+        initialValues.put("WorkerType",workerType);
+        initialValues.put("VisitorCount",visitorCount);
+        initialValues.put("VisitorEntryTime",visitorEntryTime);
+        initialValues.put("VisitorExitTime",visitorExitTime);
+
+
+
+
+        Cursor cursor = db.rawQuery("SELECT * FROM VisitorData where Name=trim('"+name +"') ",null);
+
+        if(cursor.getCount() >0)
+        {
+            return -1;
+        }else {
+            cursor.close();
+
+
+            return db.insert("VisitorData", null, initialValues);
+        }
+
     }
 
-    public long insertStaffWorker(int associationID,int memberId, int staffId, int unitID , String mobileNumber,String name, String designation,String workerType,String unitName, int visitorCount, String visitorEntryTime, String visitorExitTime)
-    {
-        SQLiteDatabase db=this.getWritableDatabase();
 
+
+
+//    public long insertStaffWorker(int associationID,int memberId, int staffId, int unitID , String mobileNumber,String name, String designation,String workerType,String unitName, int visitorCount, String visitorEntryTime, String visitorExitTime)
+//    {
+//        SQLiteDatabase db=this.getWritableDatabase();
+//
 //        ContentValues initialValues = new ContentValues();
-//        initialValues.put("AssociationID", associationID);
+//        initialValues.put("AssociationID", 273);
 //        initialValues.put("MemberId",memberId);
 //        initialValues.put("StaffId",staffId);
 //        initialValues.put("UnitID",unitID);
@@ -4492,67 +4557,27 @@ return log_count;
 //        initialValues.put("VisitorCount",visitorCount);
 //        initialValues.put("VisitorEntryTime",visitorEntryTime);
 //        initialValues.put("VisitorExitTime",visitorExitTime);
-
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("AssociationID", 273);
-        initialValues.put("MemberId",410);
-        initialValues.put("StaffId",11887);
-        initialValues.put("UnitID",6885);
-        initialValues.put("MobileNumber",mobileNumber);
-        initialValues.put("Name","Lucky");
-        initialValues.put("Designation","Maid");
-        initialValues.put("WorkerType","Staff");
-        initialValues.put("UnitName","A101");
-        initialValues.put("VisitorCount",1);
-        initialValues.put("VisitorEntryTime",visitorEntryTime);
-        initialValues.put("VisitorExitTime",visitorExitTime);
-
-        Toast.makeText(context,"coming",Toast.LENGTH_LONG).show();
-
-
 //
-//       // SQLiteDatabase db = this.getWritableDatabase();
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put("name", name);
-//        contentValues.put("phone", phone);
-//        contentValues.put("email", email);
-//        contentValues.put("street", street);
-//        contentValues.put("place", place);
-//        db.insert("contacts", null, contentValues);
-//        return true;
+//
+//
+//        Toast.makeText(context,initialValues.toString(),Toast.LENGTH_LONG).show();
+//
+//        Cursor cur = db.rawQuery(sql, null);
+//        Log.d(" value315"," all count "+cur.getCount()+" ");
+//        if(cur.getCount()>0){
+//            cur.moveToFirst();
+//            associationID =cur.getInt(cur.getColumnIndex("AssociationID"));
+//        }
+//        cur.close();
+//
+//
+//            return db.insert("autoincrement", null, initialValues);
+//
+//
+//
+//        }
+//
 //    }
-
-
-      //  Toast.makeText(context,associationID+".."+memberId+".."+staffId+".."+unitID+".."+mobileNumber+".."+name+".."+designation+".."+workerType+".."+unitName+".."+visitorCount+".."+visitorEntryTime+".."+visitorExitTime,Toast.LENGTH_LONG).show();
-
-//        Cursor cursor = db.rawQuery("SELECT * FROM StaffWorker where StaffId=trim('"+staffId
-//                +"') and   Name=trim('"+name+"')  ", null);
-
-//        String sql ="SELECT * FROM StaffWorker";
-//
-//        Cursor cursor = db.rawQuery(sql, null);
-//
-//      //  Log.d("count",cursor.getCount()+"");
-//
-//       // Toast.makeText(context,cursor.getCount()+"",Toast.LENGTH_LONG).show();
-//
-//        if(cursor.getCount() >0)
-//        {
-//
-//           // Toast.makeText(context,"coming1",Toast.LENGTH_LONG).show();
-//
-//            cursor.close();
-//            return -1;
-//        }else{
-//           // Toast.makeText(context,"coming2",Toast.LENGTH_LONG).show();
-//            cursor.close();
-            return db.insert("StaffWorker", null, initialValues);
-
-
-       // }
-
-    }
 
     public long insertUserDetails(String uname, String finger_type, byte[] photo1, byte[] photo2, byte[] photo3, String MemberType, int aid)
     {

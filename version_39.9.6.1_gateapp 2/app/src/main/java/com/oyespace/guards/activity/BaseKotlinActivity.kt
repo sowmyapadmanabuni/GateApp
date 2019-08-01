@@ -25,10 +25,9 @@ import java.util.*
 open class BaseKotlinActivity : AppCompatActivity(){
 
     private var progressDialog: ProgressDialog? = null
-    val REQUEST_CODE_SPEECH = 101;
 
     val LOCATION_REQ = 7446
-
+    val REQUEST_CODE_SPEECH = 101;
     private var callback: PermissionCallback? = null
     private var requestcode: Int = 0
     lateinit var realm: Realm
@@ -105,17 +104,16 @@ open class BaseKotlinActivity : AppCompatActivity(){
         progressDialog?.show()
     }
 
-    fun setDarkStatusBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            this.window.statusBarColor = this.getResources().getColor(R.color.orangedark);
-        }
-    }
-
     fun dismissProgressrefresh() {
         progressDialog?.isShowing.let {
             progressDialog?.dismiss()
         }
     }
+//    fun setDarkStatusBar() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            this.window.statusBarColor = this.getResources().getColor(R.color.orangedark);
+//        }
+//    }
     fun showProgress() {
         progressDialog = ProgressDialog(this)
         progressDialog?.isIndeterminate = true
@@ -130,7 +128,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
             progressDialog?.dismiss()
         }
     }
-
 
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
@@ -214,6 +211,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
         return list
     }
 
+
     fun openMic() {
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
@@ -229,7 +227,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
             //    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
 }

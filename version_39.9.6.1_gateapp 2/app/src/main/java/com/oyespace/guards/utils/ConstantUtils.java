@@ -17,6 +17,7 @@ public class ConstantUtils {
     public static final String VISITOR_TYPE = "visitor_type";
     public static final String PERSONNAME = "person_name";
     public static final String ACCOUNT_ID = "account_id";
+    public static final String UNIT_ACCOUNT_ID = "unit_account_id";
     public static final String VEHICLE_NUMBER = "VEHICLE_NUMBER";
 
     public static final String PERSON_PHOTO = "person_photo";
@@ -66,10 +67,12 @@ public class ConstantUtils {
     public static final String SENDFCM_toSYNC_VISITORENTRY="SENDFCM_toSYNC_VISITORENTRY";
 
     //http://mediaupload.oyespace.com/Images/
-    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
- public static final String BASE_URL="http://apidev.oyespace.com/";
-   //public static final String BASE_URL="https://apiuat.oyespace.com/";
-  //public static final String BASE_URL="https://api.oyespace.com/";
+    //public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+//public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+public static final String BASE_URL="https://apidev.oyespace.com/";
+// public static final String BASE_URL="https://apiuat.oyespace.com/";
+//public static final String BASE_URL="https://api.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT="Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT="Patrolling Start Point";
     public static final String PATROLLING_END_POINT="Patrolling End Point";
@@ -84,5 +87,6 @@ public class ConstantUtils {
     public static final String SELECTED_UNITS = "selected_units";
     public static final String SELECTED_BLOCK = "selected_block";
     public static final String SELECTED_BLOCK_NAME = "selected_block_name";
+    public static final String DOB = "dob";
 
 }

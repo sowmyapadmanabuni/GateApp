@@ -131,7 +131,8 @@
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="vertical"
-                  android:layout_centerInParent="true">
+                  android:layout_centerInParent="true"
+                  android:id="@+id/lytt">
 
         <LinearLayout
                 android:layout_width="match_parent"
@@ -239,6 +240,7 @@
                                 android:id="@+id/country_code_picker"
                                 app:ccp_hintExampleNumber="true"
                                 android:clickable="false"
+                                android:visibility="gone"
                                 android:focusable="true"
                                 android:background="@color/white"
                                 android:layout_width="wrap_content"
@@ -282,7 +284,7 @@
                             android:textColor="@color/GBL1"
                             android:textColorHint="@color/GBL1"
                             android:textCursorDrawable="@null"
-                            android:textSize="16dp"
+                            android:textSize="18dp"
                     />
                     <Button
                             android:layout_width="@dimen/_10sdp"
@@ -315,5 +317,44 @@
 
 
     </LinearLayout>
+    <TextView
+            android:id="@+id/timertext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/textmissedcallby"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:layout_below="@+id/lytt"
+            android:paddingLeft="15dp"
+            android:textStyle="bold"
+            android:textColor="@color/orange"
+    />
 
+    <TextView
+            android:id="@+id/timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lytt"
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text=""
+            android:layout_toRightOf="@+id/timertext"
+    />
+
+    <Button
+            android:id="@+id/btn_nobalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/timer"
+            android:layout_marginTop="10dp"
+            android:textSize="15sp"
+            android:visibility="gone"
+            android:padding="15dp"
+            android:background="@drawable/square"
+            android:onClick="onClick"
+            android:layout_centerInParent="true"
+            android:text="@string/textnobalance"
+            android:textColor="@color/white"
+    />
 </RelativeLayout>

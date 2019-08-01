@@ -1,10 +1,8 @@
 package com.oyespace.guards.ocr;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -32,7 +30,6 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 import com.oyespace.guards.Dashboard;
-import com.oyespace.guards.DashboardActivity;
 import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.ImageHelper;
@@ -58,6 +55,7 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
 import static com.oyespace.guards.utils.Utils.showToast;
 
@@ -339,6 +337,7 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
         RestClient restClient = RestClient.getInstance();
         VehicalReq vehicalReq = new  VehicalReq();
         vehicalReq.VERegNo = val;
+        vehicalReq.ASAssnID=String.valueOf( Prefs.getInt(ASSOCIATION_ID,0));
         restClient.addHeader("X-Champ-APIKey", "1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1");
         restClient.post(this,vehicalReq,CheckUser.class,this, URLData.URL_CHEK_VEHICAL);
 
@@ -492,4 +491,12 @@ final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.l
         res.updateConfiguration(conf, dm);
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        Intent i=new Intent(CaptureImageOcr.this,Dashboard.class);
+        startActivity(i);
+        finish();
+    }
 }

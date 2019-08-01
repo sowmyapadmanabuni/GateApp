@@ -8,17 +8,18 @@ import io.realm.annotations.RealmClass
 @RealmClass
 open class Worker:RealmObject(){
     @PrimaryKey
-    var wkWorkID:Long = 0
+    var wkWorkID:Int = 0
     var wkfName:String = ""
     var wklName:String = ""
     var wkMobile:String = ""
     var wkEntryImg:String = ""
     var wkWrkType:String = ""
     var wkDesgn:String = ""
+    var wkdob:String = ""
     var wkidCrdNo:String =""
     var vnVendorID:Long = 0
     var blBlockID:Long = 0
-    var unUnitID:Long = 0
+    var unUnitID:String = ""
     var asAssnID:Long = 0
     var wkIsActive:Boolean = false
     var unUniName:String = ""

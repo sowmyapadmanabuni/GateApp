@@ -104,17 +104,23 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         if (intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHQRCODE, true)) {
             profile_image.visibility = View.GONE
         }
-        Log.d(
-            "intentdata StaffEntry", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE) + " "
-                    + intent.getStringExtra(PERSONNAME) + " "
-                    + " " + intent.getStringExtra(FLOW_TYPE) + " "
-                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
-        )
+//        Log.d(
+//            "intentdata StaffEntry", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+//                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE) + " "
+//                    + intent.getStringExtra(PERSONNAME) + " "
+//                    + " " + intent.getStringExtra(FLOW_TYPE) + " "
+//                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
+//        )
 
-        tv_name.setText(resources.getString(R.string.textname)+": " + intent.getStringExtra(PERSONNAME))
-        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
-                + "" + intent.getStringExtra(MOBILENUMBER))
+        tv_name.setText(intent.getStringExtra(PERSONNAME))
+
+        val input =intent.getStringExtra(MOBILENUMBER)
+        //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
+
+        val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
+        tv_mobilenumber.setText(number)
+//        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
+//                + "" + intent.getStringExtra(MOBILENUMBER))
         tv_for.setText(resources.getString(R.string.textto)+ intent.getStringExtra(UNITNAME))
         tv_totalperson.setText(resources.getString(R.string.textperson))
         tv_from.setText(resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME))
@@ -155,11 +161,11 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         if(!BASE_URL.contains("dev",true)){
             memID=410;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
-            intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), "", 0, "",
-            intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
+            intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), LocalDb.getAssociation()!!.asAsnName, 0, "",
+            intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",""
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","",Prefs.getString(ConstantUtils.GATE_NO, "")
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
@@ -173,12 +179,15 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 
                         val d  =  Intent(this@GuestQRRegistrationSuccess, BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
-                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
+                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+intent.getStringExtra(UNITNAME)+")")
                         d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                         d.putExtra("name", intent.getStringExtra(PERSONNAME))
                         d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
                         d.putExtra("unitname", intent.getStringExtra(UNITNAME))
+
                         d.putExtra("memType", "Owner")
+                        d.putExtra(UNITID,intent.getStringExtra(UNITID))
+
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -217,11 +226,12 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun singUp(name: String, isdCode: String, mobNum: String) {
+        Toast.makeText(this@GuestQRRegistrationSuccess,"Hiii",Toast.LENGTH_LONG).show()
 
         val req = SignUpReq(
             "", "", "", "", "",
-            name, "+" + isdCode, "", "", "", "",
-            "", mobNum, "", "", "", ""
+            name, isdCode, "", "", "", "",
+            "", mobNum, "", "", "", "",""
         )
         Log.d("singUp", "StaffEntry " + req.toString())
 
@@ -376,7 +386,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-        val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
+        val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
@@ -425,6 +435,11 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         conf.locale = myLocale
         res.updateConfiguration(conf, dm)
     }
-
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val d = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
+//        startActivity(d)
+        finish()
+    }
 
 }

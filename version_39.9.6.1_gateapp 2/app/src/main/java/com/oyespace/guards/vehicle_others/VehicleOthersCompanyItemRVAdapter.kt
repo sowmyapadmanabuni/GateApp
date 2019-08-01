@@ -12,8 +12,12 @@ import android.widget.Toast
 import com.oyespace.guards.R
 import com.oyespace.guards.utils.ConstantUtils.*
 import android.app.Activity
+import android.widget.ImageView
+import com.oyespace.guards.pojo.VendorPojo
+import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity
+import com.squareup.picasso.Picasso
 
-class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<String>) :
+class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
     RecyclerView.Adapter<VehicleOthersCompanyItemRVAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -31,17 +35,18 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
 
         val mcontextintent = (mcontext as Activity).intent
 
-        holder.itemLabel.text = arrayList[position]
+
+        holder.itemLabel.text = arrayList[position].vendor_names
         holder.lv_itemrecyclerview.setOnClickListener {
 
-            val intent = Intent(mcontext, VehicleOthersUnitScreen::class.java)
+            val intent = Intent(mcontext, Vehicle_Others_BlockSelectionActivity::class.java)
             intent.putExtra(FLOW_TYPE, VEHICLE_OTHERS)
             intent.putExtra(VISITOR_TYPE, DELIVERY)
             intent.putExtra(VEHICLE_NUMBER,mcontextintent.getStringExtra(VEHICLE_NUMBER) )
             if(arrayList[position].equals("Others")){
                 intent.putExtra(COMPANY_NAME, OTHERS)
             }else{
-                intent.putExtra(COMPANY_NAME, arrayList[position])
+                intent.putExtra(COMPANY_NAME, arrayList[position].vendor_names)
 
             }
 
@@ -52,6 +57,11 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
             mcontext.finish()
 
         }
+        if(arrayList[position].image_url>0) {
+            Picasso.with(mcontext)
+                .load(arrayList[position].image_url)
+                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.img_logo)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -61,10 +71,12 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
+        val img_logo: ImageView
 
         init {
             itemLabel = itemView.findViewById(R.id.item_label)
             lv_itemrecyclerview = itemView.findViewById(R.id.lv_itemrecyclerview)
+            img_logo=itemView.findViewById(R.id.img_logo)
 
         }
     }

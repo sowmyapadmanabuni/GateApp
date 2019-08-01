@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.BlockSelectionActivity
 import com.oyespace.guards.activity.UnitListActivity
 import com.oyespace.guards.utils.ConstantUtils.*
 
@@ -22,7 +23,7 @@ class WorkersTypeListAdapter (val items : ArrayList<String>, val mcontext: Conte
 
         holder.tv_worktype.text=items[position]
         holder.lv_staff.setOnClickListener {
-            val intent = Intent(mcontext, UnitListActivity::class.java)
+            val intent = Intent(mcontext, BlockSelectionActivity::class.java)
             intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
             intent.putExtra(VISITOR_TYPE, "STAFF")
             intent.putExtra(COMPANY_NAME, items[position])

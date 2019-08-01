@@ -95,7 +95,9 @@ android:layout_margin="@dimen/_2sdp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:maxLines="1"
+                    android:maxLength="15"
 
+                    android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789,_,-"
                     android:gravity="center"
 
                     android:inputType="text"

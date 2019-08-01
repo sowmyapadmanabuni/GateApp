@@ -41,7 +41,7 @@ public class Myapp extends MultiDexApplication {
         super.onCreate();
        // Fabric.with(this, new Crashlytics());
         CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
-                .disabled(BuildConfig.DEBUG)
+                //.disabled(BuildConfig.DEBUG)
                 .build();
         Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
         Timber.plant(new Timber.DebugTree());

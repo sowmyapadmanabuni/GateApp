@@ -3,10 +3,13 @@ package com.oyespace.guards.activity
 import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
@@ -32,6 +35,7 @@ import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.guest.GuestUnitScreen
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RetrofitClinet
@@ -39,10 +43,13 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.RandomUtils.entryExists
+import com.oyespace.guards.utils.Utils.showToast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
+import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
+import kotlinx.android.synthetic.main.activity_unit_list.*
 import java.util.*
 
 
@@ -54,7 +61,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     override fun onFailure(e: java.lang.Exception?, urlId: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
+    var receiver:BroadcastReceiver?=null
     val workType: ArrayList<String> = ArrayList();
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
@@ -66,6 +73,12 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     lateinit var txt_device_name: TextView
     val laststate:Int?=null
     var buttonSkip:Button?=null
+    var ccd:String?=null
+    var mobileNumber:String?=null
+    lateinit var btn_nobalance:Button
+    lateinit var timer:TextView
+
+
 
     // private var Ed_phoneNum:String?=null
 
@@ -75,21 +88,77 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
         when (v?.id) {
 
+            R.id.btn_nobalance->{
+
+                val d = Intent(this@MobileNumberforEntryScreen, MobileNumberEntryScreenwithOTP::class.java)
+                d.putExtra("UNITID", intent.getIntExtra("UNITID",0))
+                d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                d.putExtra("WORKTYPE",  intent.getStringExtra("WORKTYPE"))
+                d.putExtra("WORKERID",  intent.getIntExtra("WORKERID",0))
+                d.putExtra("UNITNAME",  intent.getStringExtra("UNITNAME"))
+                startActivity(d);
+                finish();
+
+            }
+
 
             R.id.buttonNext -> {
                 if (textview.text.length > 0) {
 
                     Log.v("NUMBER MATCH",intent.getStringExtra(MOBILENUMBER)+".."+textview.text)
-                    if (intent.getStringExtra(MOBILENUMBER).equals("+91"+textview.text)) {
+                    if (intent.getStringExtra(MOBILENUMBER).equals(textview.text)) {
 
+                        getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME"),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"),intent.getStringExtra("WORKTYPE"),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("UNITNAME"),intent.getStringExtra("Image"))
 
+//                            if (intent.getStringExtra("UNITID").contains(",")) {
+//                                var unitname_dataList: Array<String>
+//                                var unitid_dataList: Array<String>
+//                                //   var unitAccountId_dataList: Array<String>
+//                                unitname_dataList =
+//                                    intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                        .toTypedArray()
+//                                unitid_dataList =
+//                                    intent.getStringExtra("UNITID").split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                        .toTypedArray()
+//                                //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//                                if (unitname_dataList.size > 0) {
+//                                    for (i in 0 until unitname_dataList.size) {
+//
+//                                        visitorLog(
+//                                            unitid_dataList.get(i).replace(" ", "").toInt(),
+//                                            intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+//                                            intent.getStringExtra(MOBILENUMBER),
+//                                            intent.getStringExtra("DESIGNATION"),
+//                                            intent.getStringExtra("WORKTYPE"),
+//                                            intent.getIntExtra("WORKERID", 0),
+//                                            unitname_dataList.get(i).replace(" ", "")
+//                                        );
+//
+//                                    }
+//                                }
+//                            } else {
+//
+//                                visitorLog(
+//                                    intent.getStringExtra("UNITID").toInt(),
+//                                    intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+//                                    intent.getStringExtra(MOBILENUMBER),
+//                                    intent.getStringExtra("DESIGNATION"),
+//                                    intent.getStringExtra("WORKTYPE"),
+//                                    intent.getIntExtra("WORKERID", 0),
+//                                    intent.getStringExtra("UNITNAME")
+//                                );
+//                            }
+//
+////                        visitorLog(intent.getIntExtra("UNITID",0), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
+////                            intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
+////                        );
+//                            buttonNext.setEnabled(false)
+//                            buttonNext.setClickable(false)
+                        }
 
-                        visitorLog(intent.getIntExtra("UNITID",0), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
-                            intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
-                        );
-                        buttonNext.setEnabled(false)
-                        buttonNext.setClickable(false)
-                    }
                     else {
                         buttonNext.setEnabled(true)
                         buttonNext.setClickable(true)
@@ -160,6 +229,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 //                    }
                 }
 
+
             }
         }
     }
@@ -177,6 +247,41 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
 
         setContentView(R.layout.activity_mobilenumberforentry)
+        btn_nobalance=findViewById(R.id.btn_nobalance)
+        timer=findViewById(R.id.timer)
+
+
+        receiver =  object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+                telephony.listen(object : PhoneStateListener() {
+
+                    override fun onCallStateChanged(state: Int, phoneNumber: String?) {
+                        super.onCallStateChanged(state, phoneNumber)
+                        if (state == TelephonyManager.CALL_STATE_RINGING) {
+
+                            val bundle = intent?.getExtras();
+                            val number = bundle?.getString("incoming_number");
+
+                            //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
+                            if (textview != null && number != null) {
+                                // textview.text = number.replace("+91", "")
+                                textview.text = number
+
+                                ccd= number.substring(0,3)
+
+                                mobileNumber=number.substring(3,13)
+
+                               // GetWorkersListByMobileNumberAndAssocID(ccd.toString()+mobileNumber.toString(),Prefs.getInt(ASSOCIATION_ID, 0))
+                            }
+                        }
+                    }
+
+                }, PhoneStateListener.LISTEN_CALL_STATE);
+
+                //
+            }
+        };
 
         buttonSkip=findViewById(R.id.buttonSkip)
         buttonSkip?.visibility=View.INVISIBLE
@@ -201,7 +306,18 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             txt_device_name.text = " "
 
         }
+        val timer = object: CountDownTimer(60000,1000){
+            override fun onTick(millisUntilFinished: Long) {
 
+                val remainedSecs: Long  = millisUntilFinished / 1000;
+                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+            }
+
+            override fun onFinish() {
+                finish()
+            }
+        }
+        timer.start()
 
 
 
@@ -581,66 +697,76 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         res.updateConfiguration(conf, dm)
     }
 
+
+    override fun onPause() {
+
+        unregisterReceiver(receiver)
+
+        super.onPause()
+    }
     override fun onResume() {
         super.onResume()
 
-        val telephony = this@MobileNumberforEntryScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        telephony.listen(object : PhoneStateListener() {
-            override fun onCallStateChanged(state: Int, incomingNumber: String) {
-                super.onCallStateChanged(state, incomingNumber)
-                when (state) {
+        val action = "android.intent.action.PHONE_STATE"
+        registerReceiver(receiver, IntentFilter(action))
 
-                    // not getting incoming number in latest version of android
-                    TelephonyManager.CALL_STATE_RINGING -> {
-                        Log.e("Shalini Pareek", "incomingNumber: $incomingNumber")
-                        phonenumber = "$incomingNumber"
-                        if (phonenumber?.length == 13) {
-                            Log.d("Shalini length", "length: " + phonenumber?.substring(3, 13))
-                           // Toast.makeText(this@MobileNumberScreen,phonenumber?.substring(3, 13),Toast.LENGTH_LONG).show()
-                            textview.text = phonenumber?.substring(3, 13)
-
-//                            ccp.setCountryForPhoneCode()
-
-                            //TODO romove the data
-
-                        } else if (phonenumber?.length == 10) {
-                            textview.text = phonenumber
-
-//                        }else if(phonenumber.contains("+91")){
-//                            textview.text=phonenumber?.replace("+91","")
-                        } else {
-                           // textview.text = phonenumber)
-                            if(textview.text.toString().length==0){
-                                val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
-                                startActivity(i)
-
-                            }
-                        }
-
-                    }
-TelephonyManager.CALL_STATE_IDLE->{
-    if (laststate==TelephonyManager.CALL_STATE_RINGING){
-        if(textview.text.toString().equals(null)){
-            val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
-            startActivity(i)
-
-        }
-    }
-
-}
-
-                }
-
-
-
-            }
-        }, PhoneStateListener.LISTEN_CALL_STATE)
-
-//        if(textview.text.toString().length==0){
-//            val i=Intent(this@MobileNumberScreen,DashBoard::class.java)
+//        val telephony = this@MobileNumberforEntryScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+//        telephony.listen(object : PhoneStateListener() {
+//            override fun onCallStateChanged(state: Int, incomingNumber: String) {
+//                super.onCallStateChanged(state, incomingNumber)
+//                when (state) {
+//
+//                    // not getting incoming number in latest version of android
+//                    TelephonyManager.CALL_STATE_RINGING -> {
+//                        Log.e("Shalini Pareek", "incomingNumber: $incomingNumber")
+//                        phonenumber = "$incomingNumber"
+//                        if (phonenumber?.length == 13) {
+//                            Log.d("Shalini length", "length: " + phonenumber?.substring(3, 13))
+//                           // Toast.makeText(this@MobileNumberScreen,phonenumber?.substring(3, 13),Toast.LENGTH_LONG).show()
+//                            textview.text = phonenumber?.substring(3, 13)
+//
+////                            ccp.setCountryForPhoneCode()
+//
+//                            //TODO romove the data
+//
+//                        } else if (phonenumber?.length == 10) {
+//                            textview.text = phonenumber
+//
+////                        }else if(phonenumber.contains("+91")){
+////                            textview.text=phonenumber?.replace("+91","")
+//                        } else {
+//                           // textview.text = phonenumber)
+//                            if(textview.text.toString().length==0){
+//                                val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
+//                                startActivity(i)
+//
+//                            }
+//                        }
+//
+//                    }
+//TelephonyManager.CALL_STATE_IDLE->{
+//    if (laststate==TelephonyManager.CALL_STATE_RINGING){
+//        if(textview.text.toString().equals(null)){
+//            val i=Intent(this@MobileNumberforEntryScreen,Dashboard::class.java)
 //            startActivity(i)
 //
 //        }
+//    }
+//
+//}
+//
+//                }
+//
+//
+//
+//            }
+//        }, PhoneStateListener.LISTEN_CALL_STATE)
+//
+////        if(textview.text.toString().length==0){
+////            val i=Intent(this@MobileNumberScreen,DashBoard::class.java)
+////            startActivity(i)
+////
+////        }
     }
 
     private fun visitorLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
@@ -668,12 +794,12 @@ TelephonyManager.CALL_STATE_IDLE->{
         var SPPrdImg8=""
         var SPPrdImg9=""
         var SPPrdImg10=""
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, staffID,
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
             unitName,unitId ,desgn,
-            personName,"",0,"+",mobileNumb,
+            personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
             1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","");
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",intent.getStringExtra("Image"),Prefs.getString(ConstantUtils.GATE_NO, ""));
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(
@@ -686,19 +812,11 @@ TelephonyManager.CALL_STATE_IDLE->{
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
                             visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
-                            val ddc  =  Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
-                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                            ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
-                            ddc.putExtra("mobNum", mobileNumb)
-                            ddc.putExtra("name", personName)
-                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            ddc.putExtra("unitname", unitName)
-                            ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                            this@MobileNumberforEntryScreen.sendBroadcast(ddc);
+
+                            getUnitLog(intent.getStringExtra("UNITID").toInt(), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
+                                intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME"),globalApiObject.data.visitorLog.vlVisLgID)
+
+
 
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                         } else {
@@ -768,5 +886,194 @@ TelephonyManager.CALL_STATE_IDLE->{
                 }
             }))
     }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val i_delivery = Intent(this@MobileNumberforEntryScreen, Dashboard::class.java)
+//        startActivity(i_delivery)
+        finish()
+    }
+
+    private fun GetWorkersListByMobileNumberAndAssocID(WKMobile: String,ASAssnID: Int) {
+
+
+        val req = GetWorkersListByMobileNumberReq(WKMobile, ASAssnID)
+
+        compositeDisposable.add(
+            RetrofitClinet.instance.GetWorkersListByMobileNumberAndAssocID(ConstantUtils.OYE247TOKEN, req)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<GetWorkersListByMobileNumberResp>() {
+                    override fun onSuccessResponse(globalApiObject: GetWorkersListByMobileNumberResp) {
+                        if (globalApiObject.success == true) {
+
+                            if(globalApiObject.data.message.equals("Invalid MobileNumber")){
+
+                               // getAccountDetails(ccd.toString(), mobileNumber.toString());
+
+
+                            } else {
+
+
+                                val builder = AlertDialog.Builder(this@MobileNumberforEntryScreen)
+                                // builder.setTitle("Vendor Entry already done")
+                                builder.setMessage(globalApiObject.data.message+". Please Try again")
+                                builder.setPositiveButton("Ok") { dialog, which ->
+
+
+                                    dialog.cancel()
+                                    textview!!.text=""
+
+//                                    val d = Intent(this@MobileNumberScreen, Dashboard::class.java)
+//                                    startActivity(d)
+//                                    finish()
+                                }
+                                builder.setCancelable(false);
+                                builder.show()
+                                // Toast.makeText(this@EditStaffActivity,globalApiObject.data.message,Toast.LENGTH_LONG).show()
+
+                            }
+                        }
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+//                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
+                        Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
+                    }
+
+                    override fun noNetowork() {
+//                    Utils.showToast(applicationContext, getString(R.string.no_internet))
+                    }
+
+                    override fun onShowProgress() {
+                    }
+
+                    override fun onDismissProgress() {
+                    }
+                })
+        )
+    }
+
+    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int) {
+
+        RetrofitClinet.instance
+            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
+
+                override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
+
+                    if (UnitList.success == true) {
+
+                        val ddc  =  Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
+                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+                        ddc.putExtra("mobNum", mobileNumb)
+                        ddc.putExtra("name", personName)
+                        ddc.putExtra("nr_id", vlVisLgID.toString())
+                        ddc.putExtra("unitname", unitName)
+                        ddc.putExtra("memType", "Owner")
+                        ddc.putExtra(UNITID,unitId.toString())
+                        ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                        ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                        ddc.putExtra("VLVisLgID",vlVisLgID)
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                        this@MobileNumberforEntryScreen.sendBroadcast(ddc);
+
+
+                    } else {
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("cdvd", e.message);
+
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+
+    }
+
+    fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: String, personName: String, mobileNumb: String, desgn: String,
+                             workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
+
+        // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
+        RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
+
+                override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
+
+                    if (getdata.success == true) {
+                         showToast(this@MobileNumberforEntryScreen,"Duplicate Entry not allowed")
+                        //  showToast(this@Dashboard,workerID.toString())
+
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+                    if (intent.getStringExtra("UNITID").contains(",")) {
+                        var unitname_dataList: Array<String>
+                        var unitid_dataList: Array<String>
+                        //   var unitAccountId_dataList: Array<String>
+                        unitname_dataList =
+                            intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                .toTypedArray()
+                        unitid_dataList =
+                            intent.getStringExtra("UNITID").split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                .toTypedArray()
+                        //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        if (unitname_dataList.size > 0) {
+                            for (i in 0 until unitname_dataList.size) {
+
+                                visitorLog(
+                                    unitid_dataList.get(i).replace(" ", "").toInt(),
+                                    intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+                                    intent.getStringExtra(MOBILENUMBER),
+                                    intent.getStringExtra("DESIGNATION"),
+                                    intent.getStringExtra("WORKTYPE"),
+                                    workerID,
+                                    unitname_dataList.get(i).replace(" ", "")
+                                );
+
+                            }
+                        }
+                    } else {
+
+                        visitorLog(
+                            intent.getStringExtra("UNITID").toInt(),
+                            intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+                            intent.getStringExtra(MOBILENUMBER),
+                            intent.getStringExtra("DESIGNATION"),
+                            intent.getStringExtra("WORKTYPE"),
+                            workerID,
+                            intent.getStringExtra("UNITNAME")
+                        );
+                    }
+
+//                        visitorLog(intent.getIntExtra("UNITID",0), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
+//                            intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
+//                        );
+                    buttonNext.setEnabled(false)
+                    buttonNext.setClickable(false)
+                }
+
+                override fun noNetowork() {
+                    Toast.makeText(this@MobileNumberforEntryScreen, "No network call ", Toast.LENGTH_LONG)
+                        .show()
+                }
+            })
+    }
+
 
 }

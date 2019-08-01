@@ -39,7 +39,8 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
     var orderListAdapter:VehicleGuestUnitListAdapter?=null
     private val REQUEST_CODE_SPEECH_INPUT = 100
     internal var unitNames = ""
-    internal var unitId = 0
+    internal var unitId = ""
+    internal var acAccntID=""
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name:TextView
@@ -93,9 +94,12 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
                         if (arrayList.get(j).isSelected) {
                             if(unitNames.length!=0){
                                 unitNames +=  ", "
+                                unitId+= ", "
+                                acAccntID+=", "
                             }
                             unitNames += arrayList.get(j).unUniName
-                            unitId = arrayList.get(j).unUnitID
+                            unitId += arrayList.get(j).unUnitID
+                            acAccntID+=arrayList.get(j).acAccntID
 
                         }
                     }
@@ -105,12 +109,12 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
                         val d = Intent(this@VehicleGuestUnitScreen, VehicleGuestMobileNumberScreen::class.java)
                         Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
                                 +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" ");
-                        d.putExtra(UNITID, intToString(unitId) )
+                        d.putExtra(UNITID, unitId )
                         d.putExtra(UNITNAME,unitNames )
                         d.putExtra(FLOW_TYPE, VEHICLE_GUESTWITHOUTINVITATION)
                         d.putExtra(VISITOR_TYPE,ConstantUtils.GUEST)
                         d.putExtra(COMPANY_NAME,"Guest")
-
+                        d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
                         startActivity(d);
                         finish();
 
@@ -328,6 +332,13 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
                 }
             }
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+//        val intent= Intent(this@VehicleGuestUnitScreen, Dashboard::class.java)
+//        startActivity(intent)
+        finish()
     }
 
 }

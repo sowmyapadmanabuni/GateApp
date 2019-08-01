@@ -10,7 +10,8 @@ public class StaffRegistrationReqJv {
     public int VNVendorID;  
     public String WKDesgn;  
     public String WKFName;  
-    public String WKIDCrdNo;  
+    public String WKIDCrdNo;
+    public String WKDOB;
     public String WKISDCode;  
     public String WKLName;  
     public String WKMobile;  

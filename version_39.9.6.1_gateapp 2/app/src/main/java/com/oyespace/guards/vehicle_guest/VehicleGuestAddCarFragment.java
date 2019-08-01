@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.NameEntryScreen;
 import com.oyespace.guards.activity.StaffEntryRegistration;
@@ -39,6 +40,7 @@ import com.oyespace.guards.camtest.CarImages_Adapter;
 import com.oyespace.guards.camtest.ImageAdapter;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.constants.PrefKeys;
+import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
@@ -183,8 +185,8 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
         Picasso.with(this)
                 .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
 
         if(getIntent().getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHOUTINVITATION)){
@@ -223,6 +225,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 i.putExtra(COMPANY_NAME,getIntent().getStringExtra(COMPANY_NAME));
                 i.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                 i.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                i.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
                 startActivity(i);
                 finish();
             }
@@ -255,8 +258,8 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
 //                }else {
 
                     Intent d = new Intent(VehicleGuestAddCarFragment.this, VehicleGuestEntryRegistration.class);
-                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+//                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
                     d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                     d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                     d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
@@ -268,6 +271,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                     d.putExtra(PERSON_PHOTO, byteArray);
                     d.putExtra(ITEMS_PHOTO_LIST, list);
                     d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
+                d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
 
                     startActivity(d);
                     finish();
@@ -307,20 +311,13 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
         super.onDestroy();
     }
 
-//    @Override
-//    public void onBackPressed() {
-//        super.onBackPressed();
-//        Intent d =new  Intent(VehicleGuestAddCarFragment.this, VehicleGuestNameEntryScreen.class);
-//        d.putExtra(FLOW_TYPE,getIntent().getStringExtra(FLOW_TYPE));
-//        d.putExtra(VISITOR_TYPE,getIntent().getStringExtra(VISITOR_TYPE));
-//        d.putExtra(COMPANY_NAME,getIntent().getStringExtra(COMPANY_NAME));
-//        d.putExtra(UNITID,getIntent().getStringExtra(UNITID) );
-//        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-//        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-//        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+//        Intent d =new  Intent(VehicleGuestAddCarFragment.this, Dashboard.class);
 //        startActivity(d);
-//        finish();
-//    }
+        finish();
+    }
 
     @Override
     public void onClick(View v) {
@@ -390,7 +387,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
             final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.layout.image_list, null);
             list.add(selectedImagePath);
             ImageHelper.loadImage(context, selectedImagePath, imageView);
-            imageAdapter = new ImageAdapter(list, VehicleGuestAddCarFragment.this);
+            imageAdapter = new ImageAdapter(list, VehicleGuestAddCarFragment.this,"On");
             rv_image.setAdapter(imageAdapter);
             // iamgeLyt.addView(imageView);
 

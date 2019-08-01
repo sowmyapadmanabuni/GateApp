@@ -31,7 +31,8 @@
     <!--<dimen name="dp_4">4.0dip</dimen>-->
     <!--<dimen name="dp_16">16.0dip</dimen>-->
     <!--<dimen name="dp_15">15.0dip</dimen>-->
-
+    <dimen name="viewheight">1dp</dimen>
+    <dimen name="dob_layout_marginTop">8dp</dimen>
 
     <dimen name="dp_0">0dp</dimen>
     <dimen name="dp_1">1dp</dimen>
@@ -1042,5 +1043,6 @@
 
     <dimen name="header_btn_height">24dp</dimen>
     <dimen name="header_btn_radius">12dp</dimen>
+
 
 </resources>

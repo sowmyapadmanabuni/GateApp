@@ -38,6 +38,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
+import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
+import kotlinx.android.synthetic.main.activity_unit_list.*
 import kotlinx.android.synthetic.main.search_layout.*
 import java.lang.Exception
 
@@ -55,20 +57,24 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     internal var unitNumber4=""
     internal var unitNumber5=""
     internal var unitNames = ""
-    internal var unitId = 0
+    internal var unitId = ""
+    internal var acAccntID=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_selection)
-        setDarkStatusBar()
+        //setDarkStatusBar()
 
         try{
-            var json:String = (intent.getStringExtra(SELECTED_UNITS))
-            if(json != null) {
-                var selArray: Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)
-                selected = ArrayList(selArray.asList())
-            }
+            try {
+                var json: String = (intent.getStringExtra(SELECTED_UNITS))
+                if (json != null) {
+                    var selArray: Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)
+                    selected = ArrayList(selArray.asList())
+                }
+            }catch (e:IllegalStateException){
 
+            }
             setUnitsAdapter();
 
         }catch (e:Exception){
@@ -158,9 +164,11 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id){
             R.id.buttonNext -> {
-                if (selected?.size > 0) {
+                buttonNext.setEnabled(false)
+                buttonNext.setClickable(false)
+              //  if (selected?.size > 0) {
                     onNextPress()
-                }
+              //  }
             }
             R.id.btn_search_action -> {
                 searchUnits()
@@ -172,96 +180,110 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun onNextPress() {
-        for (j in selected.indices) {
-            if ((unitNames.length != 0) || (unitNumber1.length != 0)) {
-                unitNames += ", "
-                unitNumber1 += ", "
-                unitNumber2 += ", "
-                unitNumber3 += ", "
-                unitNumber4 += ", "
-                unitNumber5 += ", "
-            }
-            unitNames += selected.get(j).unUniName
-            unitId = selected.get(j).unUnitID
-            if (selected.get(j).tenant.size != 0) {
-                try {
-                    unitNumber1 += selected.get(j).tenant[0].utMobile
-                    unitNumber2 += selected.get(j).tenant[0].utMobile1
-                    //0  Toast.makeText(this@UnitListActivity, unitNumber1, Toast.LENGTH_LONG).show()
-                } catch (e: IndexOutOfBoundsException) {
 
+        if (selected?.size > 0) {
+            for (j in selected.indices) {
+                if ((unitNames.length != 0) || (unitNumber1.length != 0)) {
+                    unitNames += ", "
+                    unitId += ", "
+                    acAccntID += ", "
+                    acAccntID += ", "
+                    unitNumber1 += ", "
+                    unitNumber2 += ", "
+                    unitNumber3 += ", "
+                    unitNumber4 += ", "
+                    unitNumber5 += ", "
                 }
-            } else {
-                if (selected.get(j).owner.size != 0) {
+                unitNames += selected.get(j).unUniName
+                unitId += selected.get(j).unUnitID
+                acAccntID += selected.get(j).acAccntID
 
-                    try {
-                        unitNumber1 += selected.get(j).owner[0].uoMobile
-                        unitNumber2 += selected.get(j).owner[0].uoMobile1
-                        unitNumber3 += selected.get(j).owner[0].uoMobile2
-                        unitNumber4 += selected.get(j).owner[0].uoMobile3
-                        unitNumber5 += selected.get(j).owner[0].uoMobile4
 
-                        //   Toast.makeText(this@UnitListActivity,unitNumber1,Toast.LENGTH_LONG).show()
-                    } catch (e: IndexOutOfBoundsException) {
+//                if (selected.get(j).tenant.size != 0) {
+//                    try {
+//                        unitNumber1 += selected.get(j).tenant[0].utMobile
+//                        unitNumber2 += selected.get(j).tenant[0].utMobile1
+//                        //0  Toast.makeText(this@UnitListActivity, unitNumber1, Toast.LENGTH_LONG).show()
+//                    } catch (e: IndexOutOfBoundsException) {
+//
+//                    }
+//                } else {
+//                    if (selected.get(j).owner.size != 0) {
+//
+//                        try {
+//                            unitNumber1 += selected.get(j).owner[0].uoMobile
+//                            unitNumber2 += selected.get(j).owner[0].uoMobile1
+//                            unitNumber3 += selected.get(j).owner[0].uoMobile2
+//                            unitNumber4 += selected.get(j).owner[0].uoMobile3
+//                            unitNumber5 += selected.get(j).owner[0].uoMobile4
+//
+//                            //   Toast.makeText(this@UnitListActivity,unitNumber1,Toast.LENGTH_LONG).show()
+//                        } catch (e: IndexOutOfBoundsException) {
+//
+//                        }
+//
+//                    }
+//
+//                }
 
-                    }
-
-                }
 
             }
 
+            if (unitNames.length > 0) {
 
-        }
-
-        if (unitNames.length > 0) {
-
-            if (intent.getStringExtra(COMPANY_NAME) != null && intent.getStringExtra(COMPANY_NAME).equals("Others")) {
-                val d = Intent(this@BlockSelectionActivity, PurposeScreen::class.java)
+                if (intent.getStringExtra(COMPANY_NAME) != null && intent.getStringExtra(COMPANY_NAME).equals("Others")) {
+                    val d = Intent(this@BlockSelectionActivity, PurposeScreen::class.java)
 //                            Log.d( "intentdata MobileNumber", "buttonNext " + intent.getStringExtra(UNITNAME) +
 // " " + intent.getStringExtra(UNITID) + " " + Ed_phoneNum.text + " " + countryCode );
-                d.putExtra(UNITID, intToString(unitId))
-                d.putExtra(UNITNAME, unitNames)
-                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                d.putExtra(
-                    "RESIDENT_NUMBER",
-                    unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
-                )
+                    d.putExtra(UNITID, unitId)
+                    d.putExtra(UNITNAME, unitNames)
+                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                    d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
+                    d.putExtra(
+                        "RESIDENT_NUMBER",
+                        unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
+                    )
 
-                startActivity(d);
-                finish();
+                    startActivity(d);
+                    finish();
+                } else {
+
+                    val d = Intent(this@BlockSelectionActivity, MobileNumberScreen::class.java)
+                    Log.d(
+                        "intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " "
+                                + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " "
+                                + getIntent().getStringExtra(COUNTRYCODE) + " "
+                    );
+                    d.putExtra(UNITID, unitId)
+                    d.putExtra(UNITNAME, unitNames)
+                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                    d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
+                    //d.putExtra("RESIDENT_NUMBER",unitNumber1)
+                    d.putExtra(
+                        "RESIDENT_NUMBER",
+                        unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
+                    )
+
+
+                    startActivity(d);
+                    finish();
+                }
+
             } else {
+                buttonNext.setEnabled(true)
+                buttonNext.setClickable(true)
+                Toast.makeText(applicationContext, "Select Unit", Toast.LENGTH_SHORT).show()
 
-                val d = Intent(this@BlockSelectionActivity, MobileNumberScreen::class.java)
-                Log.d(
-                    "intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " "
-                            + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " "
-                            + getIntent().getStringExtra(COUNTRYCODE) + " "
-                );
-                d.putExtra(UNITID, intToString(unitId))
-                d.putExtra(UNITNAME, unitNames)
-                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                //d.putExtra("RESIDENT_NUMBER",unitNumber1)
-                d.putExtra(
-                    "RESIDENT_NUMBER",
-                    unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
-                )
-                startActivity(d);
-                finish();
             }
 
-        } else {
-            buttonNext.setEnabled(true)
-            buttonNext.setClickable(true)
-            Toast.makeText(applicationContext, "Select Unit", Toast.LENGTH_SHORT).show()
 
+        }else{
+            Toast.makeText(applicationContext, "No data", Toast.LENGTH_SHORT).show()
         }
-
-
-
     }
 
     private fun onPageClick(selectedBlock:BlocksData, index:Int){
@@ -271,9 +293,6 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         _intent.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
         _intent.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
         _intent.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-
-
-
         var json = Gson().toJson(selected)
         _intent.putExtra(ConstantUtils.SELECTED_UNITS,json);
         startActivity(_intent)
