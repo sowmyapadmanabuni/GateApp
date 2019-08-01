@@ -14,10 +14,11 @@ import android.widget.Toast
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
 import java.io.IOException
 
-open class SosGateAppActivity:AppCompatActivity () {
+open class SosGateAppActivity:BaseKotlinActivity () {
     lateinit var edittext: EditText
     lateinit var edittext1: EditText
     lateinit var edittext2: EditText

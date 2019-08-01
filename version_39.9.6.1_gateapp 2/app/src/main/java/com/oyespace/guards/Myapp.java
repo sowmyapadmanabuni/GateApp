@@ -8,6 +8,7 @@ import android.os.StrictMode;
 import android.support.multidex.MultiDex;
 import android.support.multidex.MultiDexApplication;
 import com.crashlytics.android.Crashlytics;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.oyespace.guards.activity.SplashActivity;
 import com.oyespace.guards.utils.Prefs;
 import io.fabric.sdk.android.Fabric;
@@ -38,7 +39,10 @@ public class Myapp extends MultiDexApplication {
 
         super.onCreate();
        // Fabric.with(this, new Crashlytics());
-        Fabric.with(this, new Crashlytics());
+        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
+                //.disabled(BuildConfig.DEBUG)
+                .build();
+        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
         Timber.plant(new Timber.DebugTree());
         mApplicationContext = getApplicationContext();
         Prefs.initPrefs(getApplicationContext());

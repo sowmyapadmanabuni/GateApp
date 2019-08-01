@@ -38,6 +38,8 @@ import com.malinskiy.superrecyclerview.SuperRecyclerView
 import com.oyespace.guards.activity.*
 import com.oyespace.guards.adapter.VistorEntryListAdapter
 import com.oyespace.guards.adapter.VistorListAdapter
+import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity
+import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.network.*
@@ -1495,6 +1497,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 clickable = 0
             }
             R.id.tv_patrolling -> {
+                //PatrollingActivitynew
                 val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
                 startActivity(i_vehicle)
             }
@@ -1624,6 +1627,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     /// End Added by Rajesh
 
     internal fun init() {
+
+        startService(Intent(this@Dashboard, FRTDBService::class.java))
+
         showProgressrefresh()
         mHandlerr = Handler()
         //startRepeatingTask()
