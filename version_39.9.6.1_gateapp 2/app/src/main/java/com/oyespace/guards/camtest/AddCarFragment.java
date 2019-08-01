@@ -58,6 +58,7 @@ import com.oyespace.guards.request.SendStaffImageReq;
 import com.oyespace.guards.request.StaffRegistrationReqJv;
 import com.oyespace.guards.responce.StaffImageRes;
 import com.oyespace.guards.responce.StaffRegistrationRespJv;
+import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
@@ -91,7 +92,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
     TextView txt_assn_name,txt_device_name,txt_gate_name ;
     private View view;
     private EditText notes, Regno, kms, exp_date, exp_price ,car_id;
-    private Button  image_Gallery, submit_button,buttonCapture;
+    public static Button  image_Gallery, submit_button,buttonCapture;
     ImageView dialog_imageview;
     static ArrayList<String> list = new ArrayList<>();
     private TextView upload_rc_book,
@@ -192,7 +193,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
                 Picasso.with(AddCarFragment.this)
-                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
 
                 builder.setView(dialogView);
@@ -253,13 +254,13 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
         }else{
             if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
-                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
+                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
 
                 Log.v("CALLER IMAGEVIEW",IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
 
                 imageView1.setImageBitmap(personPhoto);
                 Picasso.with(this)
-                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
@@ -269,6 +270,9 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         buttonCapture.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
+
+
+
                 Intent intent =new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 
@@ -367,7 +371,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(PERSON_PHOTO, byteArray);
                         d.putExtra(ITEMS_PHOTO_LIST, list);
                         d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
-
+                        d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                         startActivity(d);
                         finish();
 
@@ -397,6 +401,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         loginReq.WKDesgn= getIntent().getStringExtra(COMPANY_NAME);
         loginReq.WKFName= getIntent().getStringExtra(PERSONNAME);
         loginReq.WKIDCrdNo="";
+        loginReq.WKDOB=getIntent().getStringExtra("DOB");
         loginReq.WKISDCode = "";
         //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
         loginReq.WKLName="";
@@ -642,6 +647,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
     private void setviewPager(final String selectedImagePath, final Context context) {
         try {
 
+
             if (list.size() == 19) {
                 image_Gallery.setVisibility(View.GONE);
             } else {
@@ -651,7 +657,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             list.add(selectedImagePath);
             ImageHelper.loadImage(context, selectedImagePath, imageView);
 
-            imageAdapter = new ImageAdapter(list,AddCarFragment.this);
+            imageAdapter = new ImageAdapter(list,AddCarFragment.this,"On");
             rv_image.setAdapter(imageAdapter);
             // iamgeLyt.addView(imageView);
 
@@ -671,11 +677,11 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                             list.remove(selectedImagePath);
                             //iamgeLyt.removeView(imageView);
                             imageAdapter.notifyDataSetChanged();
-                            if (list.size() == 18) {
-                                image_Gallery.setVisibility(View.VISIBLE);
-                            } else {
-                                image_Gallery.setVisibility(View.GONE);
-                            }
+//                            if (list.size() == 18) {
+//                                image_Gallery.setVisibility(View.VISIBLE);
+//                            } else {
+//                                image_Gallery.setVisibility(View.GONE);
+//                            }
                         }
                     });
 
@@ -687,7 +693,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                     });
                     AlertDialog dialog = builder.create();
                     dialog.show();
-                }
+              }
             });
 
 
@@ -763,6 +769,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                 case REQUEST_CAMERA:
                     if(resultCode == Activity.RESULT_OK){
                     onCaptureImageResult(data, this);
+
                     showViewPager();
                 }
                 break;
@@ -905,7 +912,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             @Override
             public void onResponse(Call<StaffImageRes> call, Response<StaffImageRes> response) {
 
-                Toast.makeText(AddCarFragment.this,"Shalinii",Toast.LENGTH_LONG).show();
+               // Toast.makeText(AddCarFragment.this,"Shalinii",Toast.LENGTH_LONG).show();
 
 
 

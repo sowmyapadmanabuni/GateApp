@@ -1,9 +1,11 @@
 package com.oyespace.guards.utils;
 
 import android.util.Log;
+import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.pojo.VisitorEntryLog;
 import com.oyespace.guards.responce.ResponseVisitorLog;
 import com.oyespace.guards.responce.VisitorLogExitResp;
+import io.realm.Realm;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,11 +28,11 @@ public class RandomUtils {
         return sb.toString();
     }
 
-    public static ArrayList<VisitorEntryLog> getSortedVisitorLog(ArrayList<VisitorEntryLog> arrayList ){
-        ArrayList<VisitorEntryLog> nonExitedSort =new ArrayList<>();
-        ArrayList<VisitorEntryLog> exitedSort =new ArrayList<>();
+    public static ArrayList<VisitorLog> getSortedVisitorLog(ArrayList<VisitorLog> arrayList ){
+        ArrayList<VisitorLog> nonExitedSort =new ArrayList<>();
+        ArrayList<VisitorLog> exitedSort =new ArrayList<>();
 
-        for (VisitorEntryLog s : arrayList) {
+        for (VisitorLog s : arrayList) {
             //if the existing elements contains the search input
             Log.d("button_done ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlExitT().equals("0001-01-01T00:00:00"));
 
@@ -47,24 +49,24 @@ public class RandomUtils {
 
        // LocalDb.saveEnteredVisitorLog(nonExitedSort);
 
-        Collections.sort(exitedSort, new Comparator<VisitorEntryLog>() {
+        Collections.sort(exitedSort, new Comparator<VisitorLog>() {
             @Override
-            public int compare(VisitorEntryLog lhs, VisitorEntryLog rhs) {
+            public int compare(VisitorLog lhs, VisitorLog rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
                 return rhs.getVlExitT().compareTo(lhs.getVlExitT());
 
             }
         });
-        Collections.sort(nonExitedSort, new Comparator<VisitorEntryLog>() {
+        Collections.sort(nonExitedSort, new Comparator<VisitorLog>() {
             @Override
-            public int compare(VisitorEntryLog lhs, VisitorEntryLog rhs) {
+            public int compare(VisitorLog lhs, VisitorLog rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
                 return lhs.getVlVisType().compareTo(rhs.getVlVisType());
 
             }
         });
 
-        ArrayList<VisitorEntryLog> newAl =new ArrayList<>();
+        ArrayList<VisitorLog> newAl =new ArrayList<>();
 
         newAl.addAll(nonExitedSort);
         newAl.addAll(exitedSort);
@@ -122,8 +124,8 @@ public class RandomUtils {
 
 
     public static boolean entryExists(String isdCode ,String mobNum ) {
-
-        ArrayList<VisitorEntryLog> filteredList =new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<VisitorLog> filteredList =new ArrayList<>();
       //  var filteredList = ArrayList<ResponseVisitorLog.Data.Visitorlogbydate>()
 
         if (LocalDb.getVisitorEnteredLog() == null) {
@@ -133,7 +135,7 @@ public class RandomUtils {
         }
 
         //looping through existing elements
-        for (VisitorEntryLog s : filteredList) {
+        for (VisitorLog s : filteredList) {
             //if the existing elements contains the search input
           //  Log.d("button_done ", "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals("0001-01-01T00:00:00", true) + " ");
             Log.d("button_done ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlExitT().equalsIgnoreCase("0001-01-01T00:00:00") + " ");

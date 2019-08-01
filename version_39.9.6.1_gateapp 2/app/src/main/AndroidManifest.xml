@@ -23,8 +23,10 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
     <permission android:name="android.permission.CLEAR_APP_CACHE"/>
-    <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
+
+    <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
 
     <application
             android:name=".Myapp"
@@ -37,9 +39,17 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activity.MapActivity"
-                  android:enabled="true"
-                  android:exported="true">
+        <activity android:name=".activity.NewBiometric">
+        </activity>
+        <activity
+                android:name=".activity.EditStaffActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
+        </activity>
+        <activity
+                android:name=".activity.MapActivity"
+                android:enabled="true"
+                android:exported="true">
         </activity>
 
         <service
@@ -47,6 +57,10 @@
                 android:enabled="true"
                 android:exported="true">
         </service>
+
+        <uses-library
+                android:name="org.apache.http.legacy"
+                android:required="false"/>
 
         <activity android:name=".activity.WalkieTalkieActivity">
         </activity>
@@ -65,7 +79,10 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-
+        <activity
+                android:name=".activity.MobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"/>
         <activity
                 android:name=".activity.MobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"
@@ -76,7 +93,6 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-
         <activity
                 android:name=".guest.GuestCustomViewFinderScannerActivity"
                 android:screenOrientation="portrait"
@@ -127,8 +143,10 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-        <activity android:name=".vehicle_others.VehicleOthersViewFullImageActivity"  android:screenOrientation="portrait"
-                  android:theme="@style/noActionBar">
+        <activity
+                android:name=".vehicle_others.VehicleOthersViewFullImageActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
         </activity>
         <activity
                 android:name=".activity.LocationSearchActivity"
@@ -146,6 +164,12 @@
         </activity>
         <activity
                 android:name=".activity.Biometric"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
+        </activity>
+        <activity
+                android:name=".activity.EditBiometric"
                 android:launchMode="singleTask"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
@@ -210,22 +234,23 @@
                 android:theme="@style/noActionBar">
         </activity>
 
+        <activity android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+
+        </activity>
+
         <meta-data
                 android:name="com.google.android.gms.vision.DEPENDENCIES"
                 android:value="@integer/google_play_services_version"/>
+
         <meta-data
                 android:name="com.google.android.ocr.API_KEY"
-                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w"/>
-
-
-
-
-        <!--<activity-->
-        <!--android:name=".activity.PatrollingActivity"-->
-        <!--android:screenOrientation="portrait"-->
-        <!--android:theme="@style/noActionBar">-->
-        <!--</activity>-->
-
+                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w"/> <!-- <activity -->
+        <!-- android:name=".activity.PatrollingActivity" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@style/noActionBar"> -->
+        <!-- </activity> -->
         <service
                 android:name=".SGPatrollingService"
                 android:enabled="true"
@@ -355,8 +380,6 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-
-
         <activity
                 android:name=".activity.MobileNumberEntryScreenwithOTP"
                 android:exported="true"
@@ -366,17 +389,8 @@
         <activity
                 android:name=".guest.GuestMobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"/>
-        <activity android:name=".com.oyespace.guards.activity.SosGateAppActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
-        </activity>
-        <!--<activity android:name=".activity.BiometricNewAdvance">-->
-        <!--</activity>-->
-
+                android:theme="@style/noActionBar"/> <!-- <activity android:name=".activity.BiometricNewAdvance"> -->
+        <!-- </activity> -->
         <receiver
                 android:name=".BackgroundSyncReceiver"
                 android:enabled="true"
@@ -399,30 +413,57 @@
             </intent-filter>
         </service>
 
+        <service android:enabled="true"
+                 android:name=".com.oyespace.guards.fcm.FRTDBService" />
+
 
 
         <meta-data
                 android:name="io.fabric.ApiKey"
                 android:value="71ecc6e51aa1c6a10438249055c5140043157bc1"/>
-       <service android:name=".com.oyespace.guards.activity.FirebaseNotificationSos">
-            <intent-filter>
-                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:name=".com.oyespace.guards.activity.FirebaseMessagingServiceSos">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-        </service>
-        <service android:enabled="true"
-                 android:name=".com.oyespace.guards.fcm.FRTDBService" />
-        <meta-data
-                android:name="com.google.firebase.messaging.default_notification_icon"
-                android:resource="@drawable/ic_launcher_background" />
 
-        <meta-data
-                android:name="com.google.firebase.messaging.default_notification_color"
-                android:resource="@color/colorAccent" />
+        <activity android:name=".activity.BlockSelectionActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+        </activity>
+
+        <activity android:name=".guest.GuestBlockSelectionActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+        </activity>
+        <activity android:name=".vehicle_others.Vehicle_Others_BlockSelectionActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+        </activity>
+        <activity android:name=".vehicle_guest.Vehicle_Guest_BlockSelectionActivity"
+                  android:windowSoftInputMode="adjustPan"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+        </activity>
+        <activity
+                android:name=".activity.UnitSelectionActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar">
+        </activity>
+            <activity
+                    android:name=".guest.GuestUnitSelectionActivity"
+                    android:screenOrientation="portrait"
+                    android:theme="@style/noActionBar">
+            </activity>
+            <activity
+                    android:name=".vehicle_guest.Vehicle_guest_UnitSelectionActivity"
+                    android:screenOrientation="portrait"
+                    android:theme="@style/noActionBar">
+            </activity>
+            <activity
+                    android:name=".vehicle_others.Vehicle_OthersUnitSelectionActivity"
+                    android:screenOrientation="portrait"
+                    android:theme="@style/noActionBar">
+            </activity>
+
     </application>
 
 </manifest>

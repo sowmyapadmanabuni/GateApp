@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.network.ResponseHandler;
 import com.oyespace.guards.network.RestClient;
 import com.oyespace.guards.network.URLData;
@@ -88,7 +89,7 @@ public class BGService extends Service  {
         };
         overStayingNames="";
         if(LocalDb.getVisitorEnteredLog()!=null) {
-            for (VisitorEntryLog s : LocalDb.getVisitorEnteredLog()) {
+            for (VisitorLog s : LocalDb.getVisitorEnteredLog()) {
                 //if the existing elements contains the search input
                 if (s.getVlVisType().equalsIgnoreCase(DELIVERY)&&deliveryTimeUp(s.getVlEntryT(),getCurrentTimeLocal(),1)) {
                     //adding the element to filtered list
@@ -99,14 +100,14 @@ public class BGService extends Service  {
 
         if(overStayingNames.length()>2){
             if(t1 != null) {
-                t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
+             //   t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
 
                 try {
                     Thread.sleep((long) 3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                t1.speak("Overstaying " + overStayingNames, TextToSpeech.QUEUE_FLUSH, null);
+               // t1.speak("Overstaying " + overStayingNames, TextToSpeech.QUEUE_FLUSH, null);
 
             }
             else {

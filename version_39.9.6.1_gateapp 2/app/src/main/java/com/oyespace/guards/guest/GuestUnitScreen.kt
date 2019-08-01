@@ -15,7 +15,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -39,7 +38,8 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
     var orderListAdapter:UnitListAdapter?=null
     private val REQUEST_CODE_SPEECH_INPUT = 100
     internal var unitNames = "";
-    internal var unitId = 0
+    internal var unitId = ""
+    internal var acAccntID=""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
@@ -90,9 +90,12 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                         if (arrayList.get(j).isSelected) {
                             if(unitNames.length!=0){
                                 unitNames +=  ", "
+                                unitId+= ", "
+                                acAccntID+=", "
                             }
                             unitNames += arrayList.get(j).unUniName
-                            unitId = arrayList.get(j).unUnitID
+                            unitId += arrayList.get(j).unUnitID
+                            acAccntID+=arrayList.get(j).acAccntID
 
                         }
                     }
@@ -107,11 +110,12 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                                 COUNTRYCODE
                             ) + " "
                         );
-                        d.putExtra(UNITID, intToString(unitId))
+                        d.putExtra(UNITID, unitId)
                         d.putExtra(UNITNAME, unitNames)
                         d.putExtra(FLOW_TYPE, GUEST_REGISTRATION)
                         d.putExtra(VISITOR_TYPE, GUEST)
                         d.putExtra(COMPANY_NAME, GUEST)
+                        d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
 
                         startActivity(d);
                         finish()
@@ -248,6 +252,7 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                 intent.putExtra(COMPANY_NAME, GUEST)
                 intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
                 intent.putExtra(UNITNAME, orderData?.unUniName)
+
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
                 if (listVistor!!.get(position).isSelected) {

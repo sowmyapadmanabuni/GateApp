@@ -7,7 +7,6 @@ import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.fragment.BaseKotlinFragment
@@ -18,6 +17,7 @@ import timber.log.Timber
 import android.telephony.TelephonyManager
 import android.content.Context
 import android.view.Gravity
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -344,11 +344,11 @@ class SplashActivity : BaseLocationActivity() {
                         dismissProgress()                    }
 
                     override fun onShowProgress() {
-                        showProgress()
+//                        showProgress()
                     }
 
                     override fun onDismissProgress() {
-                        dismissProgress()
+                     //   dismissProgress()
                     }
                 }))
     }

@@ -14,6 +14,7 @@ import java.util.*
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.vehicle_others.VehicleOthersAddCarFragment
@@ -54,6 +55,7 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                     d.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
                     d.putExtra(ConstantUtils.MOBILENUMBER, intent.getStringExtra(ConstantUtils.MOBILENUMBER))
                     d.putExtra(ConstantUtils.COUNTRYCODE, intent.getStringExtra(ConstantUtils.COUNTRYCODE))
+                    d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(UNIT_ACCOUNT_ID))
 
                     startActivity(d)
                     finish()

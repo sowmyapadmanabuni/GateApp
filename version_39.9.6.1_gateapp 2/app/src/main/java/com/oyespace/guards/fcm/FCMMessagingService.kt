@@ -4,9 +4,7 @@ import android.app.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.media.AudioManager
-import android.media.MediaPlayer
-import android.media.RingtoneManager
+import android.media.*
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
@@ -53,6 +51,7 @@ class FCMMessagingService : FirebaseMessagingService(){
     lateinit var mp:  MediaPlayer
     internal var handler = Handler()
     internal lateinit var mediaPlayer: MediaPlayer
+    var  myFormat="3gp"
 
 //    private val firebaseDatabase = FirebaseDatabase.getInstance()
 //    private val mRootReference = firebaseDatabase.getReference()
@@ -73,46 +72,46 @@ class FCMMessagingService : FirebaseMessagingService(){
         remoteMessage?.let { message ->
             //  Log.i(TAG, message.getData().get("message"))
 
-            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            //Setting up Notification channels for android O and above
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                setupNotificationChannels()
-            }
-            val notificationId = Random().nextInt(60000)
-
-            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-            val notificationBuilder = NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
-                .setSmallIcon(R.drawable.oyespace_launcher)  //a resource for your custom small icon
-                .setContentTitle(message.data["title"]) //the "title" value you sent in your notification
-                .setContentText(message.data["message"]) //ditto
-                .setAutoCancel(true)  //dismisses the notification on click
-                .setSound(defaultSoundUri)
-
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-            notificationManager.notify(notificationId /* ID of notification */, notificationBuilder.build())
+//            notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//            //Setting up Notification channels for android O and above
+//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+//                setupNotificationChannels()
+//            }
+//            val notificationId = Random().nextInt(60000)
+//
+//            val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+//            val notificationBuilder = NotificationCompat.Builder(this, ADMIN_CHANNEL_ID)
+//                .setSmallIcon(R.drawable.oyespace_launcher)  //a resource for your custom small icon
+//                .setContentTitle(message.data["title"]) //the "title" value you sent in your notification
+//                .setContentText(message.data["message"]) //ditto
+//                .setAutoCancel(true)  //dismisses the notification on click
+//                .setSound(defaultSoundUri)
+//
+//            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//
+//            notificationManager.notify(notificationId /* ID of notification */, notificationBuilder.build())
 
         }
 
 
-        Log.d("JSON s", "From:  " + remoteMessage!!.from)
+        Log.e("JSON s", "From:  " + remoteMessage!!.from)
 //        getNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,"Oyespace","Gate App",
 //            "gate_app","Gate",Prefs.getInt(DEVICE_ID,0))
 
         try
         {
             dbh = DataBaseHelper(applicationContext)
-            Log.d("Dgddfdf", "fcm:msg " + remoteMessage!!.data["activt"])
+            Log.e("Dgddfdf", "fcm:msg " + remoteMessage!!.data["activt"])
         }
         catch (ex:Exception) {
             ex.printStackTrace()
-            Log.d("JSON exbg", "Dgddfdfeemer  " + ex.toString() )
+            Log.e("JSON exbg", "Dgddfdfeemer  " + ex.toString() )
 
             Log.d("JSON exbg", "Notification  " + " data " + remoteMessage!!.data)
         }
 
-        Log.d("JSON s", "data: " + remoteMessage!!.data)
+        Log.e("JSON s", "data: " + remoteMessage!!.data)
 
         try
         {
@@ -276,7 +275,7 @@ class FCMMessagingService : FirebaseMessagingService(){
             }
             else if (remoteMessage!!.data["activt"].equals(ConstantUtils.BACKGROUND_SYNC, ignoreCase = true))
             {
-                Log.d("Dgddfdf", "fcm:msg " + remoteMessage!!.data["activt"])
+                Log.e("Dgddfdf", "fcm:msg " + remoteMessage!!.data["activt"])
                 val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
                 intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VISITOR_ENTRY_SYNC)
                 sendBroadcast(intentAction1)
@@ -755,7 +754,6 @@ class FCMMessagingService : FirebaseMessagingService(){
 //Define sound URI
 
 
-
         mp = MediaPlayer.create(applicationContext, R.raw.walkietalkiestart);
 
         try {
@@ -771,20 +769,44 @@ class FCMMessagingService : FirebaseMessagingService(){
             e.printStackTrace()
         }
 
-        val mediaPlayer:MediaPlayer
 
-        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+
+      val mediaPlayer:MediaPlayer
+//
+       val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-        mediaPlayer =  MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        mediaPlayer.setDataSource("http://mediaupload.oyespace.com/"+filename);
-        Log.v("uploadAudio 714",filename)
-        mediaPlayer.prepare();
+       mediaPlayer =  MediaPlayer();
 
-        // Start playing audio from http url
-        mediaPlayer.start();
 
-        Log.v("uploadAudio 720","PLAYYY")
+        var spb =  SoundPool.Builder();
+   spb.setMaxStreams(10);
+   var attrBuilder =  AudioAttributes.Builder();
+   attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC);
+   spb.setAudioAttributes(attrBuilder.build());
+    spb.build();
+
+//        mediaPlayer.setAudioAttributes( AudioAttributes.Builder()
+//.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+//.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+//.build());
+//
+////        var myTrack =  AudioTrack(
+////         AudioAttributes.Builder()
+////            .setUsage(AudioAttributes.USAGE_MEDIA)
+////            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+////            .build(),
+////        myFormat, myBuffSize, AudioTrack.MODE_STREAM, mySession);
+//
+//       // mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+//       // mediaPlayer.setAudioAttributes()
+       mediaPlayer.setDataSource(IMAGE_BASE_URL+filename);
+//        Log.v("uploadAudio 714",filename)
+       mediaPlayer.prepare();
+//        Toast.makeText(applicationContext,"888",Toast.LENGTH_LONG).show()
+//        // Start playing audio from http url
+       mediaPlayer.start();
+//
+//        Log.v("uploadAudio 720","PLAYYY")
 
 //mediaPlayer.setOnErrorListener( MediaPlayer.OnErrorListener() {
 //     boolean onError(mp:MediaPlayer , int what, int extra) {

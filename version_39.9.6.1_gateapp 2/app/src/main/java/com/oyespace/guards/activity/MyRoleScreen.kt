@@ -21,24 +21,29 @@ import com.oyespace.guards.R
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.utils.ConstantUtils.*
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_mobile_number.*
 import java.util.*
-
-
-
-
+import com.oyespace.guards.models.Worker
+import com.oyespace.guards.models.WorkersList
+import io.realm.Sort
 
 
 class MyRoleScreen : BaseKotlinActivity() {
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
-
         getDeviceRegistrationInfo()
+        initRealm()
 
     }
+
+
 
     private fun getDeviceRegistrationInfo() {
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -245,51 +250,70 @@ class MyRoleScreen : BaseKotlinActivity() {
 
     }
 
+    //List of regular staffs
     private fun getStaffList(AssnID: Int) {
 
         RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString(AssnID))
+            .workerList(OYE247TOKEN, intToString(30))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+            .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
 
-                override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
+                override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
+
+                    //Log.d("WorkerList success",workerListResponse.data.worker.toString())
                     if (workerListResponse.data.worker!= null) {
                         Log.d("WorkerList success",workerListResponse.data.toString())
 
                         val arrayList = workerListResponse.data.worker
+                        realm.beginTransaction();
+                        realm.copyToRealmOrUpdate(arrayList);
+                        realm.commitTransaction();
+                        closeRealm()
 
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-                                return lhs.wkfName.compareTo(rhs.wkfName)
-                            }
-                        })
+                        //val workerCount = realm.where(Worker::class.java).findAllSorted("wklName",Sort.ASCENDING)
+                        //Log.d("workerCount",""+(workerCount));
+//                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
+//                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+//                                return lhs.wkfName.compareTo(rhs.wkfName)
+//                            }
+//                        })
 
-                        LocalDb.saveStaffList(arrayList);
+//                       // LocalDb.saveStaffList(arrayList);
                         val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+                        mainIntent.putExtra("STAFF","Available")
                         startActivity(mainIntent)
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
                         finish()
-                    } else {
-                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
-
-                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.google_red)
-                            .setIcon(R.drawable.ic_info_black_24dp)
-                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-                            .setTitle("No Staff Data")
-                            .setTitleGravity(Gravity.CENTER)
-                            .setMessage("No Staff Data")
-                            .setMessageGravity(Gravity.CENTER)
-                            .setPositiveButton("Add") {
-                                val mainIntent = Intent(this@MyRoleScreen, StaffListActivity::class.java)
-                                startActivity(mainIntent)
-                                finish()
-                            }
-
-                            .show()
                     }
+                    else{
+                        //LocalDb.saveStaffList(arrayList);
+                        val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+                        mainIntent.putExtra("STAFF","Not Available")
+                        startActivity(mainIntent)
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
+                        finish()
+                    }
+//                    else {
+//                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//
+//                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
+//                            .setTopColorRes(R.color.google_red)
+//                            .setIcon(R.drawable.ic_info_black_24dp)
+//                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+//                            .setTitle("No Staff Data")
+//                            .setTitleGravity(Gravity.CENTER)
+//                            .setMessage("No Staff Data")
+//                            .setMessageGravity(Gravity.CENTER)
+//                            .setPositiveButton("Add") {
+//                                val mainIntent = Intent(this@MyRoleScreen, StaffListActivity::class.java)
+//                                startActivity(mainIntent)
+//                                finish()
+//                            }
+//
+//                            .show()
+//                    }
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -342,8 +366,12 @@ fun getDeviceList(AssnID: Int){
 //                    finish()
                 } else {
 
-                    //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//                    val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+//                    startActivity(mainIntent)
+//                    finish()
 
+                    //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+//
 //                    LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
 //                        .setTopColorRes(R.color.google_red)
 //                        .setIcon(R.drawable.ic_info_black_24dp)

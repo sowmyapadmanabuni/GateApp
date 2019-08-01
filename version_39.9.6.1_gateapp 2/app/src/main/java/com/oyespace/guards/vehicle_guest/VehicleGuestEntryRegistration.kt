@@ -51,6 +51,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name:TextView
+    var imgName:String?=null
 
     var SPPrdImg1=""
     var SPPrdImg2=""
@@ -74,7 +75,25 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
                 }else{
                     button_done.setEnabled(false)
                     button_done.setClickable(false)
-                    visitorLog();
+
+                    if(intent.getStringExtra(UNITID).contains(",")){
+                        var unitname_dataList: Array<String>
+                        var unitid_dataList: Array<String>
+                        var unitAccountId_dataList: Array<String>
+                        unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        if(unitname_dataList.size>0) {
+                            for (i in 0 until unitname_dataList.size) {
+
+                                showProgress()
+                                visitorLog(unitname_dataList.get(i).replace(" ",""),unitid_dataList.get(i).replace(" ","").toInt(),unitAccountId_dataList.get(i).replace(" ",""));
+                            }
+                        }
+                    }else{
+                        showProgress()
+                        visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(UNIT_ACCOUNT_ID));                    }
+                   // visitorLog();
                 }
 
             }
@@ -211,13 +230,13 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
 
         val mLayoutManager = GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
-        imageAdapter = ImageAdapter(list, this@VehicleGuestEntryRegistration)
+        imageAdapter = ImageAdapter(list, this@VehicleGuestEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
 
     }
 
-    private fun visitorLog() {
-        var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
+    private fun visitorLog(UNUniName: String,UNUnitID: Int,Unit_ACCOUNT_ID:String) {
+         imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
 
 //        var memID:Int=64;
@@ -232,12 +251,12 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
         else if(BASE_URL.contains("uat",true)){
             memID=64;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME),
-            toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, UNUniName,
+            UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
+            LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName)
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""))
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
@@ -250,18 +269,21 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         val d  =  Intent(this@VehicleGuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
-                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
+                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+UNUniName+")")
                         d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                         d.putExtra("name", intent.getStringExtra(PERSONNAME))
                         d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
+                        d.putExtra("unitname", UNUniName)
+                        d.putExtra(UNITID,UNUnitID.toString())
                         d.putExtra("memType", "Owner")
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
+                        d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                         sendBroadcast(d);
-                        uploadImage(imgName,mBitmap)
+                        uploadImage(imgName.toString(),mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
 //                        val d = Intent(this@VehicleGuestEntryRegistration, DashBoard::class.java)
 //                        startActivity(d)
@@ -295,8 +317,8 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
 
         val req = SignUpReq("", "", "", "", "",
             name ,isdCode, "","","","",
-            "",mobNum,"","", "","")
-        Log.d("singUp","StaffEntry "+req.toString())
+            "",mobNum,"","", "","",imgName.toString())
+      //  Log.d("singUp","StaffEntry "+req.toString(),imgName.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
             .subscribeOn(Schedulers.io())
@@ -304,8 +326,8 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
             .subscribeWith(object : CommonDisposable<SignUpResp<Account>>() {
                 override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                     if (globalApiObject.success == true) {
-                        var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                        uploadAccountImage(imgName,mBitmap)
+                       // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
+                        uploadAccountImage(imgName.toString(),mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                     } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -526,7 +548,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-        val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
+        val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)

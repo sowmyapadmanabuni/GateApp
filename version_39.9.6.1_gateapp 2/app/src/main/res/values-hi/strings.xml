@@ -88,7 +88,7 @@
     <string name="textother">अन्य</string>
     <string name="textguest">अतिथि</string>
     <string name="textlookingforqr">गेस्ट क्यूआर कोड की तलाश में</string>
-    <string name="textnoqrcode">कोई qr कोड नहीं है</string>
+    <string name="textnoqrcode">बिना qrcode केै</string>
     <string name="textpatrollingscreen">पैट्रोलिंग स्क्रीन</string>
     <string name="textstart">शुरु</string>
     <string name="textend">समाप्त</string>
@@ -113,9 +113,25 @@
     <string name="textenterpurpose">उद्देश्य दर्ज करें</string>
     <string name="textpersonphotoscreen">व्यक्ति की फोटो स्क्रीन</string>
     <string name="textemergency">आपातकालीन</string>
-    <string name="textvisiting">दौरा</string>
+    <string name="textvisiting">आगंतुक</string>
     <string name="textmissedcallby">
         द्वारा मिस्ड कॉल प्राप्त करें: </string>
     <string name="textnodata">कोई आकड़ा उपलब्ध नहीं है</string>
     <string name="textnobalance">कोई राशि उपलब्ध नहीं है</string>
+    <string name="textselectdob">DOB का चयन करें</string>
+    <string name="textupdate">अद्यतन करें</string>
+    <string name="textstaffdetails">स्टाफ का विवरण</string>
+    <string name="btn1">
+        Cancel
+    </string>
+    <string name="btn2">
+        Update
+    </string>
+    <string name="textstaffedit">
+        स्टाफ संपादित करें
+    </string>
+    <string name="capture">Capture</string><string name="init">Initialize</string>
+    <string name="units_list_title">इकाइयों की सूची</string>
+    <string name="units_selection_title">इकाइयों का चयन करें</string>
+    <string name="blocks_selection_title">ब्लॉक का चयन करें</string>
 </resources>

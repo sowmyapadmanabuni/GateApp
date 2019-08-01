@@ -12,6 +12,7 @@ import com.crashlytics.android.core.CrashlyticsCore;
 import com.oyespace.guards.activity.SplashActivity;
 import com.oyespace.guards.utils.Prefs;
 import io.fabric.sdk.android.Fabric;
+import io.realm.Realm;
 import timber.log.Timber;
 
 /**
@@ -46,7 +47,7 @@ public class Myapp extends MultiDexApplication {
         Timber.plant(new Timber.DebugTree());
         mApplicationContext = getApplicationContext();
         Prefs.initPrefs(getApplicationContext());
-
+        Realm.init(this);
 
 
         mInstance = this;

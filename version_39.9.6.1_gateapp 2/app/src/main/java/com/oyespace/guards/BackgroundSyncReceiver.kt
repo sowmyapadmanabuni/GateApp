@@ -14,6 +14,9 @@ import android.util.Log
 import android.widget.Toast
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
+import com.oyespace.guards.models.GetVisitorsResponse
+import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -22,11 +25,16 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.RealmList
+import io.realm.kotlin.delete
+import io.realm.kotlin.where
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -49,16 +57,27 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         mcontext=context
         if(intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)){
 
-            if(intent.getStringExtra("unitname").contains(",")){
+            if(intent.getStringExtra(UNITID).contains(",")){
                 var unitname_dataList: Array<String>
+                var unitid_dataList: Array<String>
+                var unitAccountId_dataList: Array<String>
                 unitname_dataList = intent.getStringExtra("unitname").split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 if(unitname_dataList.size>0) {
                     for (i in 0 until unitname_dataList.size) {
                         sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
                             intent.getStringExtra("name"), intent.getStringExtra("nr_id"),
                             unitname_dataList.get(i).replace(" ",""), intent.getStringExtra("memType"));
+
+                        getNotificationCreate(unitAccountId_dataList.get(i).replace(" ",""),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",intent.getStringExtra("msg"),unitid_dataList.get(i).replace(" ",""),intent.getIntExtra("VLVisLgID",0).toString(),unitid_dataList.get(i).replace(" ","")+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
+                            DateTimeUtils.getCurrentTimeLocal(),
+                            DateTimeUtils.getCurrentTimeLocal(),
+                            intent.getIntExtra("VLVisLgID",0).toString()
+                        )
+
                         sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,intent.getStringExtra("msg"),intent.getStringExtra(COMPANY_NAME),"gate_app",
-                            Prefs.getInt(DEVICE_ID,0).toString()+"gate_app",Prefs.getInt(DEVICE_ID,0))
+                            unitid_dataList.get(i).replace(" ","")+"admin",Prefs.getInt(DEVICE_ID,0),unitid_dataList.get(i).replace(" ",""))
                     }
                 }
             }else{
@@ -66,8 +85,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
                     intent.getStringExtra("unitname").replace(" ",""),intent.getStringExtra("memType"));
 
+
+                getNotificationCreate(intent.getStringExtra(UNIT_ACCOUNT_ID),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",intent.getStringExtra("msg"),intent.getStringExtra(UNITID),intent.getIntExtra("VLVisLgID",0).toString(),intent.getStringExtra(UNITID)+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
+                    DateTimeUtils.getCurrentTimeLocal(),
+                    DateTimeUtils.getCurrentTimeLocal(),
+                    intent.getIntExtra("VLVisLgID",0).toString()
+                )
+
                 sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,intent.getStringExtra("msg"),intent.getStringExtra(COMPANY_NAME),"gate_app",
-                    Prefs.getInt(DEVICE_ID,0).toString()+"gate_app",Prefs.getInt(DEVICE_ID,0))
+                    intent.getStringExtra(UNITID)+"admin",Prefs.getInt(DEVICE_ID,0),intent.getStringExtra(UNITID))
             }
             sendFCM_toSyncNonreg()
             Log.d("SYCNCHECK","in 65")
@@ -98,7 +124,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             getCheckPointList()
         }
         else if(intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)){
-            Log.d("SYCNCHECK","in 86")
+            Log.e("SYCNCHECK","in 86")
             getVisitorLogEntryList()
         }
 
@@ -116,6 +142,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             }
         }
         else if(intent.getStringExtra(BSR_Action).equals(SENDAUDIO)){
+            Toast.makeText(context,"coming",Toast.LENGTH_LONG).show()
             sendFCM_forAudioMessage(intent.getStringExtra("FILENAME"))
         }
 
@@ -319,42 +346,54 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
     private fun getStaffList() {
+        try {
+            var realm: Realm = Realm.getDefaultInstance();
+            RetrofitClinet.instance
+                .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
 
-        RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+                    override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
 
-                override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
-                    if (workerListResponse.data.worker !=null) {
-                        Log.d("WorkerList success",workerListResponse.data.toString())
-                        var arrayList: ArrayList<WorkerDetails>? = null
-                        arrayList=ArrayList()
-                        arrayList = workerListResponse.data.worker
+                        if (workerListResponse.data.worker != null) {
+                            Log.d("WorkerList success", workerListResponse.data.toString())
 
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-                                return lhs.wkfName.compareTo(rhs.wkfName)
-                            }
-                        })
+                            val arrayList = workerListResponse.data.worker
+                            realm.beginTransaction();
+                            realm.copyToRealmOrUpdate(arrayList);
+                            realm.commitTransaction();
+                            realm.close()
 
-                        LocalDb.saveStaffList(arrayList);
 
-                    } else {
+//                        var arrayList: ArrayList<Worker>? = null
+//
+//                        arrayList = workerListResponse.data.worker
+//
+//                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
+//                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+//                                return lhs.wkfName.compareTo(rhs.wkfName)
+//                            }
+//                        })
+//                        LocalDb.saveStaffList(arrayList);
+
+                        } else {
+
+                        }
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+                        Log.d("Error WorkerList", e.toString())
+                    }
+
+                    override fun noNetowork() {
 
                     }
-                }
+                })
+        }catch (e:java.lang.Exception){
 
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
+        }
     }
 
     private fun getUnitList() {
@@ -429,40 +468,56 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //    }
 
     private fun getVisitorLogEntryList() {
-        Log.d("SYCNCHECK","in 408")
+        Log.e("SYCNCHECK","in 408")
+        var realm: Realm = Realm.getDefaultInstance();
         RetrofitClinet.instance
             .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
+            .subscribeWith(object : CommonDisposable<GetVisitorsResponse<ArrayList<VisitorLog>>>() {
 
-                override fun onSuccessResponse(visitorList: VisitorLogEntryResp<ArrayList<VisitorEntryLog>>) {
-                    Log.d("SYCNCHECK","in 416")
-                    Log.d("SYCNCHECK","in 417"+visitorList.toString())
+                override fun onSuccessResponse(visitorList: GetVisitorsResponse<ArrayList<VisitorLog>>) {
+                    Log.e("SYCNCHECK","in 416")
+                    Log.e("SYCNCHECK","in 417"+visitorList.toString())
 
-                    if (visitorList.success == true) {
-                        Log.d("SYCNCHECK", "in 421")
-                        Log.d("cdvd", visitorList.toString());
-                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
-                        arrayListVisitors = visitorList.data.visitorLog
+                    if (visitorList.success == true && visitorList.data.visitorLog != null) {
+                        Log.e("SYCNCHECK", "in 421-"+visitorList.data.visitorLog.size)
+                        Log.e("cdvd_", ""+visitorList.data.visitorLog);
+                        //val list = RealmList<com.oyespace.guards.models.VisitorLog>()
+                        //list.addAll(visitorList.data.visitorLog)
+                        realm.beginTransaction();
+                        realm.insertOrUpdate(visitorList.data.visitorLog);
+                        realm.commitTransaction();
 
-                        if(visitorList.data.visitorLog!=null) {
+                        Log.e("After_trans",""+realm.where(com.oyespace.guards.models.VisitorLog::class.java).findAll().size);
 
-//                                Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
-//                                    override fun compare(lhs: VisitorEntryLog, rhs: VisitorEntryLog): Int {
-//                                        return lhs.vlEntryT.compareTo(rhs.vlEntryT, true)
-//                                    }
-//                                })
-                        }
-                        LocalDb.saveEnteredVisitorLog(arrayListVisitors);
+                        realm.close()
+//                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
+//                        arrayListVisitors = visitorList.data.visitorLog
+//
+//                        if(visitorList.data.visitorLog!=null) {
+//
+////                                Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
+////                                    override fun compare(lhs: VisitorEntryLog, rhs: VisitorEntryLog): Int {
+////                                        return lhs.vlEntryT.compareTo(rhs.vlEntryT, true)
+////                                    }
+////                                })
+//                        }
+//                        LocalDb.saveEnteredVisitorLog(arrayListVisitors);
+//
 
-                        val smsIntent = Intent(ConstantUtils.SYNC)
-                        smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")
+                        realm.beginTransaction();
+
+                        realm.delete(com.oyespace.guards.models.VisitorLog::class.java);
+                        realm.commitTransaction();
+                        realm.close()
                     }
+                    val smsIntent = Intent(ConstantUtils.SYNC)
+                    smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
+                    LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -501,7 +556,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
                         Log.d("sendFCM","onErrorResponse  "+e.toString())
-                        Log.d("SYCNCHECK","in 473")
+                        Log.d("SYCNCHECK","in cdvd473")
                     }
 
                     override fun noNetowork() {
@@ -636,9 +691,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int) {
+    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
 
-        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID )
+        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
 
 
         CloudFunctionRetrofitClinet.instance
@@ -678,5 +733,52 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
+
+
+
+//    {
+//        "ACAccntID"  : 1,
+//        "ASAssnID"   : 2,
+//        "NTType"     : "Join",
+//        "NTDesc"     : "Joining as Owner",
+//        "SBUnitID" : 23,
+//        "SBMemID"  : 3,
+//        "SBSubID"  : 2,
+//        "SBRoleID" : 2,
+//        "ASAsnName" : "AssociationName",
+//        "MRRolName" : "Owner",
+//        "NTDUpdated" : "2019-09-12 12:00:00",
+//        "NTDCreated" : "2019-01-29 11:11:11"
+//
+//
+//    }
+
+
+    private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {
+
+
+        val dataReq = NotificationCreateReq(ACAccntID,ASAssnID,NTType,NTDesc,SBUnitID,SBMemID,SBSubID,SBRoleID ,ASAsnName,MRRolName,NTDUpdated,NTDCreated,VLVisLgID,"")
+
+
+        RetrofitClinet.instance
+            .getNotificationCreate(OYE247TOKEN, dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<NotificationCreateResponse>() {
+
+                override fun onSuccessResponse(notificationCreateResponse: NotificationCreateResponse) {
+
+                }
+
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList",e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
 
 }

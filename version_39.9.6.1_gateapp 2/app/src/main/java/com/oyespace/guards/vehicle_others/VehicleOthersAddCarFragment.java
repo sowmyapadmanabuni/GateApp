@@ -40,6 +40,7 @@ import com.oyespace.guards.camtest.ImageAdapter;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.constants.PrefKeys;
 import com.oyespace.guards.guest.GuestAddCarFragment;
+import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.oyespace.guards.vehicle_guest.VehicleGuestAddCarFragment;
@@ -71,7 +72,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 
     private View view;
     private EditText notes, Regno, kms, exp_date, exp_price ,car_id;
-    private Button  image_Gallery, submit_button,buttonCapture;
+    public static Button  image_Gallery, submit_button,buttonCapture;
 
     static ArrayList<String> list = new ArrayList<>();
     private TextView upload_rc_book,
@@ -166,7 +167,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
                 Picasso.with(VehicleOthersAddCarFragment.this)
-                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
 
                 builder.setView(dialogView);
@@ -184,7 +185,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
        // iamgeLyt.removeAllViews();
         list.clear();
         Picasso.with(this)
-                .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
@@ -198,13 +199,13 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
         }else{
 
             if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
-                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
+                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
 
-                Log.v("CALLER IMAGEVIEW",IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
+                Log.v("CALLER IMAGEVIEW",IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
 
                 imageView1.setImageBitmap(personPhoto);
                 Picasso.with(this)
-                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
@@ -246,6 +247,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 i.putExtra(COMPANY_NAME,getIntent().getStringExtra(COMPANY_NAME));
                 i.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                 i.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                i.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
                 startActivity(i);
                 finish();
             }
@@ -298,7 +300,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                     d.putExtra(ITEMS_PHOTO_LIST, list);
                     d.putExtra(VEHICLE_NUMBER,getIntent().getStringExtra(VEHICLE_NUMBER));
                     d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
-
+                    d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
                     startActivity(d);
                     finish();
                 }

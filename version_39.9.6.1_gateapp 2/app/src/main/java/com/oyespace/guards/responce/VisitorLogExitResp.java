@@ -10,6 +10,8 @@ public class VisitorLogExitResp {
     @SerializedName("data")
     @Expose
     private Data data;
+
+
     @SerializedName("apiVersion")
     @Expose
     private String apiVersion;
@@ -98,6 +100,9 @@ public class VisitorLogExitResp {
             @Expose
             private Integer vlEntyWID;
             @SerializedName("vlExitWID")
+
+
+
             @Expose
             private Integer vlExitWID;
             @SerializedName("vlEntryT")
@@ -190,6 +195,18 @@ public class VisitorLogExitResp {
             @SerializedName("spPrdImg10")
             @Expose
             private String spPrdImg10;
+
+            @SerializedName("vlEntryImg")
+            @Expose
+            private String vlEntryImg;
+
+            public String getVlEntryImg() {
+                return vlEntryImg;
+            }
+
+            public void setVlEntryImg(String vlEntryImg) {
+                this.vlEntryImg = vlEntryImg;
+            }
 
             public Integer getVlVisLgID() {
                 return vlVisLgID;

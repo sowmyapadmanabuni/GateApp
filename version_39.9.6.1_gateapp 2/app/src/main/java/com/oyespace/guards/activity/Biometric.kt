@@ -7,19 +7,25 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
+import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
+import android.os.PowerManager
 import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
+import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import com.oyespace.guards.*
@@ -33,14 +39,21 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
+import kotlinx.android.synthetic.main.layout_viewpager_iem.*
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.net.URL
 import java.nio.ByteBuffer
+import java.sql.Blob
 import java.util.*
+import kotlin.math.absoluteValue
 
 
 class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
-    var result:Long = 0
 
+    var result:Long ?= null
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name:TextView
@@ -188,6 +201,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     var fingerDetectedHandler: Handler = object : Handler() {
         // @Override
         override fun handleMessage(msg: Message) {
+            Toast.makeText(this@Biometric, "capture finger" , Toast.LENGTH_LONG).show()
+
             //Handle the message
             CaptureFingerPrint()
             if (mAutoOnEnabled) {
@@ -196,7 +211,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             }
         }
     }
-
 
     internal var i = 0
 
@@ -710,9 +724,9 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     fun CaptureFingerPrint() {
         //        this.mCheckBoxMatched.setChecked(false);
+
         var buffer: ByteArray? = ByteArray(mImageWidth * mImageHeight)
-        Toast.makeText(this@Biometric,"HIh",Toast.LENGTH_LONG).show()
-        //long result = sgfplib.GetImage(buffer);
+
         //commented val result = sgfplib!!.GetImage(buffer)
         //        if (this.mToggleButtonNFIQ.isChecked()) {
         //            long nfiq = sgfplib.ComputeNFIQ(buffer, mImageWidth, mImageHeight);
@@ -723,309 +737,305 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     }
 
+
+
+    private fun imageToBitmap(image: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        image.compress(Bitmap.CompressFormat.PNG, 90, stream)
+
+        return stream.toByteArray()
+    }
     override fun onClick(v: View) {
 
-//        if (v === this.mButtonRegister) {
-//            if (mRegisterImage != null)
-//                mRegisterImage = null
-//            mRegisterImage = ByteArray(mImageWidth * mImageHeight)
-//            previous=findViewById(R.id.buttonPrevious)
-//            previous!!.visibility = View.INVISIBLE
-//            next!!.visibility = View.INVISIBLE
-//            save!!.visibility = View.VISIBLE
+        try {
+            if (v === this.mButtonRegister1) {
+                if (mRegisterImage != null) {
+                    mRegisterImage = null
+                    Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
+                }
+
+                mRegisterImage = ByteArray(mImageWidth * mImageHeight)
+                previous = findViewById(R.id.buttonPrevious)
+                previous!!.visibility = View.INVISIBLE
+                next!!.visibility = View.INVISIBLE
+                save!!.visibility = View.VISIBLE
+
+
+
+
+//            try {
 //
-//            var result = sgfplib!!.GetImage(mRegisterImage)
-//            Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)
+////               var res: Resources = getResources();
+////                var drawable: Drawable = res.getDrawable(R.drawable.ic_launcher_background);
+////               var  bitmap:Bitmap  = ((BitmapDrawable)drawable).getBitmap();
 //
-//            //            result = sgfplib.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400);
-//            Log.d("size  2", result.toString() + " " + mRegisterImage!!.size)
-//
-//            var fpInfo: SGFingerInfo? = SGFingerInfo()
-//            for (i in mRegisterTemplate!!.indices)
-//                mRegisterTemplate!![i] = 0
-//            //            result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mRegisterTemplate);
-//
-//            if (copy1 == false) {
-//
-//                mImageFingerprint1!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-//
-//                for (i in mFingerprint1Template!!.indices)
-//                    mFingerprint1Template[i] = 0
-//                result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint1Template)
-//
-//                relLayout1!!.visibility = View.VISIBLE
-//                change = findViewById(R.id.btn_delete_fp1)
-//                change!!.visibility = View.VISIBLE
-//                change = findViewById(R.id.btn_delete_fp2)
-//                change!!.visibility = View.INVISIBLE
-//                change = findViewById(R.id.btn_delete_fp3)
-//                change!!.visibility = View.INVISIBLE
-//                t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
-//
-//                copy1 = true
-//            } else if (copy2 == false) {
-//
-//                for (i in mFingerprint2Template!!.indices)
-//                    mFingerprint2Template[i] = 0
-//                result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint2Template)
-//
-//                var existInDB1 = BooleanArray(1)
-//                existInDB1 = BooleanArray(1)
-//                val res: Long
-//                res = sgfplib!!.MatchTemplate(mFingerprint1Template, mFingerprint2Template, SGFDxSecurityLevel.SL_LOWEST ,
-//                    existInDB1
-//                )
-//                if (existInDB1[0]) {
-//                    mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
-//                    //                    this.mCheckBoxMatched.setChecked(true);
-//                    mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-//                    //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
-//                    //                    mImageFingerprint1.setImageBitmap(waterMarkedPhoto1);
-//
-//                    relLayout2!!.visibility = View.VISIBLE
-//                    t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
-//                    change = findViewById(R.id.btn_delete_fp2)
-//                    change!!.visibility = View.VISIBLE
-//                    change = findViewById(R.id.btn_delete_fp1)
-//                    change!!.visibility = View.INVISIBLE
-//                    change = findViewById(R.id.btn_delete_fp3)
-//                    change!!.visibility = View.INVISIBLE
-//                    copy2 = true
-//                } else {
-//                    t1.speak(" Not match", TextToSpeech.QUEUE_FLUSH, null)
-//                }
-//
-//            } else if (copy3 == false) {
-//
-//                for (i in mFingerprint3Template!!.indices)
-//                    mFingerprint3Template[i] = 0
-//                result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint3Template)
-//
-//                val existInDB1 = BooleanArray(1)
-//                val res: Long
-//                res = sgfplib!!.MatchTemplate(
-//                    mFingerprint1Template,
-//                    mFingerprint3Template,
-//                    SGFDxSecurityLevel.SL_LOWEST,
-//                    existInDB1
-//                )
-//                if (existInDB1[0]) {
-//
-//                    mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
-//                    //                    this.mCheckBoxMatched.setChecked(true);
-//                    mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-//                    relLayout3!!.visibility = View.VISIBLE
-//                    t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
-//                    change = findViewById(R.id.btn_delete_fp3)
-//                    change!!.visibility = View.VISIBLE
-//                    change = findViewById(R.id.btn_delete_fp1)
-//                    change!!.visibility = View.INVISIBLE
-//                    change = findViewById(R.id.btn_delete_fp2)
-//                    change!!.visibility = View.INVISIBLE
-//                    //relLayout3.setVisibility(View.INVISIBLE);
-//                    copy3 = true
-//                } else {
-//                    t1.speak(" Not match", TextToSpeech.QUEUE_FLUSH, null)
-//                }
-//
+////                var url: URL = URL("https://via.placeholder.com/300/09f/fff.png");
+////                val image: Bitmap  = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+////                mRegisterImage = byteArrayOf(81, 80, 79, 0x00, 79, 0x80);//imageToBitmap(bitmap)
+//            } catch(e: IOException) {
+//                System.out.println(e);
 //            }
-//
-//            Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
-//            Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
-//
-//            mRegisterImage = null
-//            fpInfo = null
-//
-//        }
-        if (v === this.mButtonRegister1) {
-            if (mRegisterImage != null){
-                mRegisterImage = null
-            }
 
-            mRegisterImage = ByteArray(mImageWidth * mImageHeight)
-            previous = findViewById(R.id.buttonPrevious)
-            previous!!.visibility = View.INVISIBLE
-            next!!.visibility = View.INVISIBLE
-            save!!.visibility = View.VISIBLE
+                // sgfplib.SetLedOn(true)
 
 
+                result = sgfplib!!.GetImageEx(mRegisterImage, 10000, 50)
+
+                if (result.toString() == "52" || result.toString() == "0" || result.toString().equals(0)) {
+                     // Toast.makeText(this@Biometric, " ElseD: " + result.toString(), Toast.LENGTH_LONG).show()
+                }
+
+                if(result.toString().equals("54"))
+                {
+                    //  Toast.makeText(this@Biometric, " Blue: " + result.toString(), Toast.LENGTH_LONG).show()
+
+                    //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
+
+//                    mImageFingerprint1!!.visibility = View.INVISIBLE
+//                    mImageFingerprint1!!.visibility = View.VISIBLE
+//                    mButtonRegister1!!.visibility = View.VISIBLE
+                }
+
+                var fpInfo: SGFingerInfo? = SGFingerInfo()
 
 
-                result = sgfplib!!.GetImage(mRegisterImage)
+                for (i in mRegisterTemplate!!.indices)
+                    mRegisterTemplate!![i] = 0
+                //            result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mRegisterTemplate);
 
+                if (copy1 == false) {
+                    mImageFingerprint1!!.setImageBitmap(this.toGrayscale(mRegisterImage))
+                    for (i in mFingerprint1Template!!.indices)
+                        mFingerprint1Template[i] = 0
+                    result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint1Template)
 
-
-
-
-
-
-
-            Toast.makeText(this@Biometric,result.toString(),Toast.LENGTH_LONG).show()
-
-
-            var fpInfo: SGFingerInfo? = SGFingerInfo()
-
-            for (i in mRegisterTemplate!!.indices)
-                mRegisterTemplate!![i] = 0
-            //            result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mRegisterTemplate);
-
-            if (copy1 == false) {
-//                var fingerprintData:String?=null
-//                dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID,0)
-
-                mImageFingerprint1!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-
-                for (i in mFingerprint1Template!!.indices)
-                    mFingerprint1Template[i] = 0
-                result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint1Template)
-
-                relLayout1!!.visibility = View.VISIBLE
-                change = findViewById(R.id.btn_delete_fp1)
-                change!!.visibility = View.VISIBLE
-                change = findViewById(R.id.btn_delete_fp2)
-                change!!.visibility = View.INVISIBLE
-                change = findViewById(R.id.btn_delete_fp3)
-                change!!.visibility = View.INVISIBLE
-                mButtonRegister1!!.visibility = View.INVISIBLE
-                t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
-
-                copy1 = true
-            }
-
-            Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
-            Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
-
-            mRegisterImage = null
-            fpInfo = null
-
-        }
-        if (v === this.mButtonRegister2) {
-            if (mRegisterImage != null)
-                mRegisterImage = null
-            mRegisterImage = ByteArray(mImageWidth * mImageHeight)
-            previous = findViewById(R.id.buttonPrevious)
-            previous!!.visibility = View.INVISIBLE
-            next!!.visibility = View.INVISIBLE
-            save!!.visibility = View.VISIBLE
-
-            var result = sgfplib!!.GetImage(mRegisterImage)
-            Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)
-
-            //            result = sgfplib.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400);
-            Log.d("size  2", result.toString() + " " + mRegisterImage!!.size)
-
-            var fpInfo: SGFingerInfo? = SGFingerInfo()
-            for (i in mRegisterTemplate!!.indices)
-                mRegisterTemplate!![i] = 0
-            //            result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mRegisterTemplate);
-
-            if (copy2 == false) {
-
-                for (i in mFingerprint2Template!!.indices)
-                    mFingerprint2Template[i] = 0
-                result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint2Template)
-
-                var existInDB1 = BooleanArray(1)
-                existInDB1 = BooleanArray(1)
-                val res: Long
-                res = sgfplib!!.MatchTemplate(
-                    mFingerprint1Template,
-                    mFingerprint2Template,
-                    SGFDxSecurityLevel.SL_LOWEST,
-                    existInDB1
-                )
-
-                if (existInDB1[0]) {
-                    t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
-                }else {
-                    mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
-                    //                    this.mCheckBoxMatched.setChecked(true);
-                    mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-                    //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
-                    //                    mImageFingerprint1.setImageBitmap(waterMarkedPhoto1);
-
-                    relLayout2!!.visibility = View.VISIBLE
-                    t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
-                    change = findViewById(R.id.btn_delete_fp2)
-                    change!!.visibility = View.VISIBLE
+                    relLayout1!!.visibility = View.VISIBLE
                     change = findViewById(R.id.btn_delete_fp1)
+                    change!!.visibility = View.VISIBLE
+                    change = findViewById(R.id.btn_delete_fp2)
                     change!!.visibility = View.INVISIBLE
                     change = findViewById(R.id.btn_delete_fp3)
                     change!!.visibility = View.INVISIBLE
-                    mButtonRegister2!!.visibility = View.INVISIBLE
-                    copy2 = true
+                    mButtonRegister1!!.visibility = View.INVISIBLE
+                    t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
+
+                    copy1 = true
                 }
+
+                Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
+                Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
+
+                mRegisterImage = null
+                fpInfo = null
+
+            }
+        }
+        catch (e:NullPointerException){
+            //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
+           // Toast.makeText(this@Biometric, " Catch: " + result.toString(), Toast.LENGTH_LONG).show()
+
+            val d = Intent(this, Biometric::class.java)
+            intent.getIntExtra(WORKER_ID, 0)
+            d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME))
+            d.putExtra(UNITID, getIntent().getStringExtra(UNITID))
+            d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME))
+            d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE))
+            d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE))
+            d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME))
+            d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
+            d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE))
+            startActivity(d)
+
+            //  Relaunching the biometric page
+//                   val intent  = Intent(this, Biometric::class.java)
+//                    startActivity(intent);
+//                    finish()
+
+
+            // Restart the APP
+//            var i:Intent  = getBaseContext().getPackageManager()
+//                         .getLaunchIntentForPackage( getBaseContext().getPackageName() );
+//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(i);
+
+
+// To Reboot
+//          var pm: PowerManager = this.getApplicationContext().getSystemService(Context.POWER_SERVICE) as PowerManager;
+//pm.reboot(null);
+        }
+
+        try {
+            if (v === this.mButtonRegister2) {
+                if (mRegisterImage != null)
+                    mRegisterImage = null
+                mRegisterImage = ByteArray(mImageWidth * mImageHeight)
+                previous = findViewById(R.id.buttonPrevious)
+                previous!!.visibility = View.INVISIBLE
+                next!!.visibility = View.INVISIBLE
+                save!!.visibility = View.VISIBLE
+
+                var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
+
+
+                 // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+
+                if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
+                {
+                    // Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                    //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
+
+                }
+                Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)
+
+                //            result = sgfplib.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400);
+                Log.d("size  2", result.toString() + " " + mRegisterImage!!.size)
+
+                var fpInfo: SGFingerInfo? = SGFingerInfo()
+                for (i in mRegisterTemplate!!.indices)
+                    mRegisterTemplate!![i] = 0
+                //            result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mRegisterTemplate);
+
+                if (copy2 == false) {
+
+                    for (i in mFingerprint2Template!!.indices)
+                        mFingerprint2Template[i] = 0
+                    result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint2Template)
+
+                    var existInDB1 = BooleanArray(1)
+                    existInDB1 = BooleanArray(1)
+                    val res: Long
+                    res = sgfplib!!.MatchTemplate(
+                        mFingerprint1Template,
+                        mFingerprint2Template,
+                        SGFDxSecurityLevel.SL_LOWEST,
+                        existInDB1
+                    )
+
+                    if (existInDB1[0]) {
+                        t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
+                    } else {
+                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        //                    this.mCheckBoxMatched.setChecked(true);
+                        mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
+                        //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
+                        //                    mImageFingerprint1.setImageBitmap(waterMarkedPhoto1);
+
+                        relLayout2!!.visibility = View.VISIBLE
+                        t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
+                        change = findViewById(R.id.btn_delete_fp2)
+                        change!!.visibility = View.VISIBLE
+                        change = findViewById(R.id.btn_delete_fp1)
+                        change!!.visibility = View.INVISIBLE
+                        change = findViewById(R.id.btn_delete_fp3)
+                        change!!.visibility = View.INVISIBLE
+                        mButtonRegister2!!.visibility = View.INVISIBLE
+                        copy2 = true
+                    }
 //                } else {
 //                    t1.speak(" Not match", TextToSpeech.QUEUE_FLUSH, null)
 //                }
 
-            }
-
-            Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
-            Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
-
-            mRegisterImage = null
-            fpInfo = null
-
-        }
-        if (v === this.mButtonRegister3) {
-            if (mRegisterImage != null)
-                mRegisterImage = null
-            mRegisterImage = ByteArray(mImageWidth * mImageHeight)
-            previous = findViewById(R.id.buttonPrevious)
-            previous!!.visibility = View.INVISIBLE
-            next!!.visibility = View.INVISIBLE
-            save!!.visibility = View.VISIBLE
-
-            var result = sgfplib!!.GetImage(mRegisterImage)
-            Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)
-            Log.d("size  2", result.toString() + " " + mRegisterImage!!.size)
-
-            var fpInfo: SGFingerInfo? = SGFingerInfo()
-            for (i in mRegisterTemplate!!.indices)
-                mRegisterTemplate!![i] = 0
-
-            if (copy3 == false) {
-
-                for (i in mFingerprint3Template!!.indices)
-                    mFingerprint3Template[i] = 0
-                result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint3Template)
-
-                val existInDB1 = BooleanArray(1)
-                val res: Long
-                res = sgfplib!!.MatchTemplate(mFingerprint2Template, mFingerprint3Template, SGFDxSecurityLevel.SL_LOWEST, existInDB1)
-                if (existInDB1[0]) {
-                    t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
-                }else {
-
-
-                    mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
-                    //                    this.mCheckBoxMatched.setChecked(true);
-                    mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-                    relLayout3!!.visibility = View.VISIBLE
-                    t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
-                    change = findViewById(R.id.btn_delete_fp3)
-                    change!!.visibility = View.VISIBLE
-                    change = findViewById(R.id.btn_delete_fp1)
-                    change!!.visibility = View.INVISIBLE
-                    change = findViewById(R.id.btn_delete_fp2)
-                    change!!.visibility = View.INVISIBLE
-                    //relLayout3.setVisibility(View.INVISIBLE);
-                    mButtonRegister3!!.visibility = View.INVISIBLE
-                    copy3 = true
                 }
-                // } else {
-                // t1.speak(" Not match", TextToSpeech.QUEUE_FLUSH, null)
-                // }
+
+                Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
+                Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
+
+                mRegisterImage = null
+                fpInfo = null
 
             }
+        }
+        catch (e:Exception)
 
-            Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
-            Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
+        {
+            //FingerImage 2
+            //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
+            //t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
+        }
 
-            mRegisterImage = null
-            fpInfo = null
+        try {
+            if (v === this.mButtonRegister3) {
+                if (mRegisterImage != null)
+                    mRegisterImage = null
+                mRegisterImage = ByteArray(mImageWidth * mImageHeight)
+                previous = findViewById(R.id.buttonPrevious)
+                previous!!.visibility = View.INVISIBLE
+                next!!.visibility = View.INVISIBLE
+                save!!.visibility = View.VISIBLE
 
+                var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
+
+              //  Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(true), Toast.LENGTH_LONG).show()
+
+
+                if(result.toString() == "52"||result.toString()=="0"||result.toString()==""||result.toString().equals(0))
+                {
+                    // Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                    // t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
+
+                }
+                Log.d("size  1", result.toString() + " " + mRegisterImage!!.size)
+                Log.d("size  2", result.toString() + " " + mRegisterImage!!.size)
+
+                var fpInfo: SGFingerInfo? = SGFingerInfo()
+                for (i in mRegisterTemplate!!.indices)
+                    mRegisterTemplate!![i] = 0
+
+                if (copy3 == false) {
+
+                    for (i in mFingerprint3Template!!.indices)
+                        mFingerprint3Template[i] = 0
+                    result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint3Template)
+
+
+
+                    val existInDB1 = BooleanArray(1)
+                    val res: Long
+                    res = sgfplib!!.MatchTemplate(
+                        mFingerprint2Template,
+                        mFingerprint3Template,
+                        SGFDxSecurityLevel.SL_LOWEST,
+                        existInDB1
+                    )
+                    if (existInDB1[0]) {
+                        t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
+                    } else {
+
+
+                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        //                    this.mCheckBoxMatched.setChecked(true);
+                        mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
+                        relLayout3!!.visibility = View.VISIBLE
+                        t1.speak("Thank You", TextToSpeech.QUEUE_FLUSH, null)
+                        change = findViewById(R.id.btn_delete_fp3)
+                        change!!.visibility = View.VISIBLE
+                        change = findViewById(R.id.btn_delete_fp1)
+                        change!!.visibility = View.INVISIBLE
+                        change = findViewById(R.id.btn_delete_fp2)
+                        change!!.visibility = View.INVISIBLE
+                        //relLayout3.setVisibility(View.INVISIBLE);
+                        mButtonRegister3!!.visibility = View.INVISIBLE
+                        copy3 = true
+                    }
+                    // } else {
+                    // t1.speak(" Not match", TextToSpeech.QUEUE_FLUSH, null)
+                    // }
+
+                }
+
+                Log.d("size  3", result.toString() + " " + mRegisterImage!!.size)
+                Log.d("size  4", result.toString() + " " + mRegisterTemplate!!.size)
+
+                mRegisterImage = null
+                fpInfo = null
+
+            }
+        }catch (e:Exception)
+        {
+            //Finger Image 3
+            //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
+          //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
         }
 
         if (v.id == R.id.btn_delete_fp1) {
@@ -1400,7 +1410,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         // Toast.makeText(getApplicationContext(),"Hi there"+dbh.fingercount(memId),Toast.LENGTH_SHORT).show();
         // Toast.makeText(this@Biometric,dbh.fingercount(memId),Toast.LENGTH_LONG).show()
 
-        if (dbh.fingercount(memId) > 3) {
+        if (dbh.fingercount(memId) > 1) {
 
             buttonDone!!.visibility = View.VISIBLE
         } else {
@@ -1438,8 +1448,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     finger_type = key_left_small
                     if (bl_left_little) {
                         selectedFinger()
-
-                        Toast.makeText(this@Biometric,"Coming1",Toast.LENGTH_LONG).show()
 
                     }
                 }

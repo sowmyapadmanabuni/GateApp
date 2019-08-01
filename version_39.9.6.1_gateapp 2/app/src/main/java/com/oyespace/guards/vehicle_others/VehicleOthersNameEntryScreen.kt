@@ -12,6 +12,7 @@ import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -47,7 +48,7 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
                    d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
                     d.putExtra(PERSONNAME, Ed_Name.text.toString())
                     d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
-
+                    d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     startActivity(d)
                     finish()
                 }else{
@@ -131,7 +132,7 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
 
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN")
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
 
             try {

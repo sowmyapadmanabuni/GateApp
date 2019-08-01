@@ -1,7 +1,10 @@
 package com.oyespace.guards.activity
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
+import android.speech.RecognizerIntent
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
@@ -11,6 +14,7 @@ import android.widget.TextView
 import com.oyespace.guards.R
 import com.oyespace.guards.listeners.PermissionCallback
 import io.reactivex.disposables.CompositeDisposable
+import io.realm.Realm
 import java.util.*
 
 
@@ -23,16 +27,27 @@ open class BaseKotlinActivity : AppCompatActivity(){
     private var progressDialog: ProgressDialog? = null
 
     val LOCATION_REQ = 7446
-
+    val REQUEST_CODE_SPEECH = 101;
     private var callback: PermissionCallback? = null
     private var requestcode: Int = 0
-
+    lateinit var realm: Realm
 
     companion object {
         val TAG: String = javaClass.name
         val LOCATION_REQ: Int=10
 
     }
+
+    open fun initRealm(){
+        realm = Realm.getDefaultInstance()
+    }
+
+    open fun closeRealm(){
+        if(realm != null && !realm.isClosed){
+            realm.close();
+        }
+    }
+
 
     protected val compositeDisposable = CompositeDisposable()
 
@@ -94,6 +109,11 @@ open class BaseKotlinActivity : AppCompatActivity(){
             progressDialog?.dismiss()
         }
     }
+//    fun setDarkStatusBar() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            this.window.statusBarColor = this.getResources().getColor(R.color.orangedark);
+//        }
+//    }
     fun showProgress() {
         progressDialog = ProgressDialog(this)
         progressDialog?.isIndeterminate = true
@@ -192,6 +212,21 @@ open class BaseKotlinActivity : AppCompatActivity(){
     }
 
 
+    fun openMic() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
+
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH)
+
+        } catch (e: Exception) {
+
+            //    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
 
 }

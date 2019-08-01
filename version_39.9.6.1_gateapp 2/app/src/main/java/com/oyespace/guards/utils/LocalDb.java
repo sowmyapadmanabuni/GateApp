@@ -4,13 +4,18 @@ import android.util.Log;
 import com.google.gson.reflect.TypeToken;
 import com.oyespace.guards.PojoClasses.DashboardPojo;
 import com.oyespace.guards.constants.PrefKeys;
+import com.oyespace.guards.models.VisitorLog;
+import com.oyespace.guards.models.Worker;
 import com.oyespace.guards.pojo.*;
 import com.oyespace.guards.responce.ResponseVisitorLog.Data.Visitorlogbydate;
 import com.oyespace.guards.responce.VisitorLogExitResp;
+import io.realm.Realm;
+import io.realm.Sort;
 
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Kalyan on 4/29/2017.
@@ -109,7 +114,7 @@ public class LocalDb {
         Prefs.putString(PrefKeys.VisitorEnteredLogLocalDB, tojson);
     }
 
-    public static ArrayList<VisitorEntryLog> getVisitorEnteredLog() {
+    public static ArrayList<VisitorEntryLog> _getVisitorEnteredLog() {
         String cartData = Prefs.getString(PrefKeys.VisitorEnteredLogLocalDB, null);
         if (cartData == null) {
             return null;
@@ -121,6 +126,24 @@ public class LocalDb {
 
             return menuList;
         }
+    }
+
+    public static ArrayList<VisitorLog> getVisitorEnteredLog(){
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<VisitorLog> list = new ArrayList<>();
+        list.addAll(realm.where(VisitorLog.class).findAll());
+        realm.close();
+        return list;
+
+    }
+
+    public static ArrayList<Worker> getStaffs(){
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<Worker> list = new ArrayList<>();
+        list.addAll(realm.where(Worker.class).findAll());
+        realm.close();
+        return list;
+
     }
 
     public static void saveEnteredVisitorLog_old(ArrayList<VisitorLogExitResp.Data.VisitorLog> menuItems) {
@@ -167,6 +190,13 @@ public class LocalDb {
             ArrayList<Visitorlogbydate> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
             return menuList;
         }
+    }
+
+    public static ArrayList<Worker> getStaffs(Realm realm){
+        ArrayList<Worker> list = new ArrayList<>();
+        list.addAll(realm.where(Worker.class).sort("wklName", Sort.ASCENDING).findAll());
+        return list;
+
     }
 
     public static ArrayList<WorkerDetails> getStaffList() {

@@ -74,6 +74,7 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         setLocale(Prefs.getString(LANGUAGE, null))
 
         setContentView(R.layout.activity_service_provider_list)
+
         tv_selectdelivery.text=""
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
