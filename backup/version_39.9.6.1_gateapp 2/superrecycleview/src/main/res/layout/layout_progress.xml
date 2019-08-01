@@ -1,7 +1,0 @@
-<com.oyespace.guards.ui.SampleProgressView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-                                               android:layout_width="0dp"
-                                               android:layout_height="0dp"
-                                               android:layout_gravity="center_horizontal"
-                                               android:indeterminate="false"
-    />
