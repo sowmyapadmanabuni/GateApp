@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_margin="10dp"
+                android:layout_height="match_parent">
+
+
+
+    <TextView android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:text="@string/textselectlanguage"
+              android:gravity="center_horizontal"
+              android:textSize="20dp"
+    />
+
+    <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:layout_marginTop="58dp"
+            android:id="@+id/rg_language"
+          >
+
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="55dp"
+                android:text="@string/textenglish"
+                android:layout_marginLeft="20dp"
+                android:id="@+id/rb_english"
+                android:onClick="onRadioButtonClicked"
+                android:textSize="18sp"
+
+        />
+
+        <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/texthindi"
+                android:id="@+id/rb_hindi"
+                android:layout_marginLeft="20dp"
+                android:onClick="onRadioButtonClicked"
+                android:checked="false"
+                android:textSize="18sp"
+                />
+
+
+
+    </RadioGroup>
+
+<Button
+        android:id="@+id/btn_submit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18dp"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/rg_language"
+        android:text="Submit"/>
+
+</RelativeLayout>

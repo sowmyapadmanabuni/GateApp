@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="swipe_progress_bar_height">8dp</dimen>
+    <dimen name="dp_70">70dp</dimen>
+    <dimen name="dp_20">20dp</dimen>
+    <dimen name="dp_10">10dp</dimen>
+
+</resources>
