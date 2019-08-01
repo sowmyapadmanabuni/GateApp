@@ -71,6 +71,7 @@ public class LocalDb {
 
     public static SearchResult getSearchData() {
         String cartData = Prefs.getString(PrefKeys.SEARCH_DATA, null);
+
         if (cartData == null) {
             return null;
         } else {

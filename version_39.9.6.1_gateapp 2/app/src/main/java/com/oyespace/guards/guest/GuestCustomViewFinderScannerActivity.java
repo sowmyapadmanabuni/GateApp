@@ -23,20 +23,18 @@ import android.widget.Toast;
 import com.google.zxing.Result;
 import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
+import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
-import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration;
 import com.oyespace.guards.utils.Prefs;
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-import java.util.Date;
 import java.util.Locale;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
 import static com.oyespace.guards.utils.ConstantUtils.*;
-import static com.oyespace.guards.utils.DateTimeUtils.DATE_FORMAT_DMY;
 import static com.oyespace.guards.utils.DateTimeUtils.compareDate;
 import static com.oyespace.guards.utils.RandomUtils.entryExists;
 

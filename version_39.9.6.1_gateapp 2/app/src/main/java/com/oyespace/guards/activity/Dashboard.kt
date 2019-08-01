@@ -39,6 +39,7 @@ import com.malinskiy.superrecyclerview.SuperRecyclerView
 import com.oyespace.guards.activity.*
 import com.oyespace.guards.adapter.VistorEntryListAdapter
 import com.oyespace.guards.adapter.VistorListAdapter
+import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.com.oyespace.guards.utils.ConnectionDetector
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
@@ -82,7 +83,6 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
-
     lateinit var cd: ConnectionDetector
     var timer:Timer?=null
     private val mInterval = 96000 // 5 seconds by default, can be changed later
@@ -1538,6 +1538,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 clickable = 0
             }
             R.id.tv_patrolling -> {
+                //PatrollingActivitynew
                 val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
                 startActivity(i_vehicle)
             }
@@ -1579,7 +1580,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //                re_delivery!!.setClickable(false)
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
-                // finish()
 
             }
 
@@ -1588,7 +1588,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //                re_guest!!.setClickable(false)
                 val i_guest = Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
-                //  finish()
 
             }
 
@@ -1597,7 +1596,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //                re_staff!!.setClickable(false)
                 val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
                 startActivity(i_staff)
-                // finish()
 
             }
 
@@ -1668,6 +1666,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     /// End Added by Rajesh
 
     internal fun init() {
+
+        startService(Intent(this@Dashboard, FRTDBService::class.java))
+
         showProgressrefresh()
         initRealm()
 //        realm.executeTransaction { realm ->
@@ -2507,8 +2508,6 @@ try {
                 }
             })
     }
-
-
 
 //    override fun onUserInteraction() {
 //        super.onUserInteraction()

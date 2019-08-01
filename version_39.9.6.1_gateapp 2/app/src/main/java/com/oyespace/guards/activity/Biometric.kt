@@ -727,9 +727,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         var buffer: ByteArray? = ByteArray(mImageWidth * mImageHeight)
 
-        //   result = sgfplib.GetImageEx(buffer,10000,50);
-
-
         //commented val result = sgfplib!!.GetImage(buffer)
         //        if (this.mToggleButtonNFIQ.isChecked()) {
         //            long nfiq = sgfplib.ComputeNFIQ(buffer, mImageWidth, mImageHeight);
@@ -752,7 +749,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         try {
             if (v === this.mButtonRegister1) {
-
                 if (mRegisterImage != null) {
                     mRegisterImage = null
                     Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
@@ -1452,7 +1448,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     finger_type = key_left_small
                     if (bl_left_little) {
                         selectedFinger()
-
 
                     }
                 }

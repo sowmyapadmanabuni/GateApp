@@ -661,6 +661,4 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 //        startActivity(i_delivery)
         finish()
     }
-
-
 }

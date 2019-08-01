@@ -14,6 +14,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import android.app.Activity
 import android.widget.ImageView
 import com.oyespace.guards.pojo.VendorPojo
+
 import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity
 import com.squareup.picasso.Picasso
 
@@ -34,7 +35,6 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
 
         val mcontextintent = (mcontext as Activity).intent
-
 
         holder.itemLabel.text = arrayList[position].vendor_names
         holder.lv_itemrecyclerview.setOnClickListener {

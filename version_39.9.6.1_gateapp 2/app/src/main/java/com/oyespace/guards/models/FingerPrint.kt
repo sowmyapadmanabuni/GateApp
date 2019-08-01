@@ -8,14 +8,14 @@ import io.realm.annotations.RealmClass
 @RealmClass
 open class FingerPrint:RealmObject(){
 
-    //@PrimaryKey
-    val ASAssnID: Int=0
-    val FMID: Int=0
-    val FPFngName: String=""
-    val FPImg1: ByteArray = ByteArray(8192)
-    val FPImg2: ByteArray = ByteArray(8192)
-    val FPImg3: ByteArray = ByteArray(8192)
-    val FPMemType: String = ""
+    @PrimaryKey
+    var ASAssnID:Int = 0
+    var FMID: Int=0
+    var FPFngName: String=""
+    var FPImg1: ByteArray = ByteArray(8192)
+    var FPImg2: ByteArray = ByteArray(8192)
+    var FPImg3: ByteArray = ByteArray(8192)
+    var FPMemType: String = ""
 
 
 }

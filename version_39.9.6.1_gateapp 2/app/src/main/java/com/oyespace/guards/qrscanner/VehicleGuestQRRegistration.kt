@@ -369,7 +369,6 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 //        startActivity(d)
         finish()
     }
-
     private fun getUnitLog(unitId:Int) {
 
         RetrofitClinet.instance

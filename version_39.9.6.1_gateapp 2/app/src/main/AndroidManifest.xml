@@ -19,8 +19,7 @@
     <uses-feature android:name="android.hardware.camera.autofocus"/>
 
     <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW"/>
-    <uses-permission
-            android:name="android.permission.WRITE_SECURE_SETTINGS"/> <!-- <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/> -->
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS"/> <!-- <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/> -->
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -33,7 +32,7 @@
             android:name=".Myapp"
             android:allowBackup="true"
             android:icon="@drawable/oyespace_launcher"
-            android:label="@string/app_name"
+
             android:networkSecurityConfig="@xml/network"
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
@@ -85,6 +84,11 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"/>
         <activity
+                android:name=".activity.MobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"/>
+
+        <activity
                 android:name=".activity.MobileNumberforEntryScreen"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
@@ -125,6 +129,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+       <!-- <activity android:name=".activity.SosGateAppActivity" android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>-->
         <activity android:name=".testgridsectionedrecyclerview.SectionedRecyclerView">
         </activity>
         <activity
@@ -223,11 +234,15 @@
                 android:theme="@style/noActionBar">
         </activity>
 
+        <activity android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                  android:screenOrientation="portrait"
+                  android:theme="@style/noActionBar">
+
+        </activity>
+
         <meta-data
                 android:name="com.google.android.gms.vision.DEPENDENCIES"
                 android:value="@integer/google_play_services_version"/>
-
-
 
         <meta-data
                 android:name="com.google.android.ocr.API_KEY"
@@ -304,7 +319,7 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
         </activity>
-        <activity
+      <activity
                 android:name=".vehicle_others.VehicleOthersNameEntryScreen"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar">
@@ -397,6 +412,11 @@
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
             </intent-filter>
         </service>
+
+        <service android:enabled="true"
+                 android:name=".com.oyespace.guards.fcm.FRTDBService" />
+
+
 
         <meta-data
                 android:name="io.fabric.ApiKey"

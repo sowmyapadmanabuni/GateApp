@@ -49,10 +49,11 @@ import static com.oyespace.guards.utils.ConstantUtils.*;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 public class PatrollingActivitynew extends BaseScannerActivity implements ResponseHandler, ZXingScannerView.ResultHandler {
-    private ZXingScannerView mScannerView;
+        private ZXingScannerView mScannerView;
     private Button noQrcodeButton;
     private TextView dataTextView;
     public   String[] patrolingdataList;
+
 
     GPSTracker gpsTracker;
     @Override
@@ -106,6 +107,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         mScannerView.stopCamera();
     }
 
+
     String currentCheckPoint="",nextCheckpoint="";
 
     @Override
@@ -114,15 +116,18 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         Log.d("handleResult patrolling","Contents = " + rawResult.getText() +
                 ", Format = " + rawResult.getBarcodeFormat().toString());
         dataTextView.setText(rawResult.getText());
+
         final String patrolingdata = rawResult.getText();
 
         patrolingdataList = patrolingdata.split(",");
         if(patrolingdataList.length>4) {
-            System.out.println("Patroling Data " + patrolingdataList[0]+" " + patrolingdataList[1] + " " + patrolingdataList[2] + " " + patrolingdataList[3] + " " + patrolingdataList[3]);
+            System.out.println("Patroling Data " + patrolingdataList[0]+" " + patrolingdataList[1] + " " + patrolingdataList[2] + " " + patrolingdataList[3]);
             ((TextView)findViewById(R.id.scanned_text)).setText(""+patrolingdataList[0]);
 
             if (!patrolingdataList[4].equalsIgnoreCase(Prefs.getInt(ASSOCIATION_ID, 0) + "")) {
                 Toast.makeText(this, "Belongs to different Society / Association ", Toast.LENGTH_SHORT).show();
+
+
             } else if (Prefs.getInt(PATROLLING_ID, 0) == 0
                     && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT)
                     ||Prefs.getInt(PATROLLING_ID, 0) == 0
@@ -249,6 +254,8 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
             }
         }else{
             Toast.makeText(this, "Invalid Check Point QR Code ", Toast.LENGTH_SHORT).show();
+
+
         }
 
      /*  new LovelyStandardDialog(PatrollingActivitynew.this, LovelyStandardDialog.ButtonLayout.VERTICAL)

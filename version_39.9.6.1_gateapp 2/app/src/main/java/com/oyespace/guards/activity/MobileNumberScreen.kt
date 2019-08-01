@@ -214,7 +214,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
         //  Toast.makeText(applicationContext, "coming", Toast.LENGTH_LONG).show();
       //  Toast.makeText(this@MobileNumberScreen,intent.getStringExtra( "RESIDENT_NUMBER"),Toast.LENGTH_LONG).show()
-
+        btn_nobalance=findViewById(R.id.btn_nobalance)
 
         receiver =  object : BroadcastReceiver() {
 
