@@ -8,6 +8,10 @@ import com.google.firebase.database.*
 import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.utils.LocalDb
+import io.realm.Realm
+import io.realm.kotlin.createObject
+import io.realm.kotlin.delete
+import io.realm.kotlin.where
 
 class FRTDBService: Service() {
 
@@ -39,15 +43,84 @@ class FRTDBService: Service() {
 
                    val child = dataSnapshot.hasChild(""+23)
 
+                    var realm:Realm = Realm.getDefaultInstance()
+                    realm.beginTransaction()
+                    realm.delete(SOSModel::class.java)
+                    realm.commitTransaction()
 
-                    dataSnapshot.children.forEach{
-                        val user_id = it.key;
-                        //val sos = it.getValue()
-                        val isActive = it.child("isActive").getValue(Boolean::class.java)
+                    try {
+                        dataSnapshot.children.forEach {
+                            val user_id = it.key;
+                            //val sos = it.getValue()
+                            val isActive = it.child("isActive").getValue(Boolean::class.java)
+                            var unitName = ""
+                            var unitId: Int = 0
+                            var userName:String = ""
+                            var userMobile:String = ""
+                            var sosImage:String = ""
+                            var latitude:String = ""
+                            var longitude:String = ""
+                            var id:Int = 0
+                            var userId: Int = 0
 
+                            if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
+                                unitName = it.child("unitName").getValue(String::class.java)!!
+                            }
+                            if(it.hasChild("unitId") && it.hasChild("unitId")!=null){
+                                unitId = it.child("unitId").getValue(Int::class.java)!!
+                            }
+                            if(it.hasChild("userName") && it.hasChild("userName")!=null){
+                                userName = it.child("userName").getValue(String::class.java)!!
+                            }
+                            if(it.hasChild("userMobile") && it.hasChild("userMobile")!=null){
+                                userMobile = it.child("userMobile").getValue(String::class.java)!!
+                            }
 
-                        Log.e("CHILD",""+isActive);
+                            Log.e("LATITUDE",""+it.child("latitude").getValue())
+
+                            if(it.hasChild("latitude")){
+                                latitude = it.child("latitude").getValue().toString()
+                            }
+                            if(it.hasChild("longitude")){
+                                longitude = it.child("longitude").getValue().toString()
+                            }
+                            if(it.hasChild("sosImage")){
+                                sosImage = it.child("sosImage").getValue(String::class.java)!!
+                            }
+                            if(it.hasChild("userId")){
+                                userId = it.child("userId").getValue(Int::class.java)!!
+                            }
+
+                            if (isActive != null && isActive && userId != 0) {
+                                realm.executeTransaction {
+
+                                    val sosObj = it.createObject(SOSModel::class.java,userId)
+                                    sosObj.isActive = isActive
+                                    sosObj.unitName = unitName
+                                    sosObj.unitId = unitId
+                                    sosObj.userName = userName
+                                    sosObj.userMobile = userMobile
+                                    sosObj.latitude = latitude
+                                    sosObj.longitude = longitude
+                                    sosObj.sosImage = sosImage
+                                }
+                            }
+
+                            Log.e("CHILD", "" + isActive);
+                        }
+
+                        val totalSOS = realm.where<SOSModel>().count()
+                        Log.e("totalSOS",""+totalSOS);
+                        if(totalSOS > 0){
+                            val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
+                            i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(i_vehicle)
+                        }
+                    }catch (e:Exception){
+                        e.printStackTrace()
                     }
+
+
 
 
                     //val user = dataSnapshot.getValue(SOSModel::class.java)

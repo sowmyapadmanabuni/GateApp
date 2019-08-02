@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+<ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+<RelativeLayout android:layout_width="match_parent"
                                              android:layout_height="match_parent">
     <!-- Oyespace toolbar-->
     <RelativeLayout android:layout_width="match_parent"
@@ -13,6 +17,7 @@
                     android:background="@color/white">
         <ImageView android:layout_width="60dp" android:layout_height="25dp"
                    android:layout_marginLeft="0dp" android:id="@+id/img_back"
+                   android:visibility="gone"
                    android:src="@mipmap/back_button_new"
 android:layout_marginTop="4.00dp"
                   />
@@ -38,9 +43,16 @@ android:layout_marginTop="4.00dp"
                   android:layout_marginTop="53dp" android:textColor="@color/orangedark"/>
     </RelativeLayout>
     <!--Map view-->
-    <RelativeLayout android:layout_width="500dp" android:layout_height="180dp" android:layout_marginLeft="10dp"  android:layout_marginTop="@dimen/_10sdp" android:layout_marginRight="10dp"
+    <RelativeLayout android:layout_width="match_parent" android:layout_height="170dp" android:layout_marginLeft="10dp"  android:layout_marginTop="@dimen/_10sdp" android:layout_marginRight="10dp"
                     android:id="@+id/r1_imap" android:layout_below="@id/r_sos" android:background="@drawable/border">
-        <ImageView android:layout_width="match_parent" android:layout_height="match_parent"  />
+
+        <fragment
+                android:id="@+id/map"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+
     </RelativeLayout>
 <!--Image to be loaded-->
 
@@ -66,7 +78,7 @@ android:layout_marginTop="4.00dp"
 
     <!--Emergency text-->
 
-    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/r_emer" android:layout_below="@id/r2" android:layout_marginTop="38dp"  >
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/r_emer" android:layout_below="@id/r2" android:layout_marginTop="30dp"  >
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
                   android:textAlignment="center" android:textSize="18sp" android:text="Emergency Contacts"
                   android:textColor="@color/orangedark" android:paddingTop="@dimen/_5sdp" />
@@ -74,13 +86,23 @@ android:layout_marginTop="4.00dp"
 
 
     <include layout="@layout/activity_sos_recycle"  android:layout_height="132dp"
-             android:layout_width="394dp" android:id="@+id/id1" android:layout_below="@id/r_emer" android:layout_marginTop="@dimen/_20sdp"   ></include>
-    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerHorizontal="true" android:orientation="horizontal" android:paddingTop="@dimen/_5sdp" android:layout_below="@id/id1">
+             android:layout_width="match_parent" android:id="@+id/id1" android:layout_below="@id/r_emer" android:layout_marginTop="@dimen/_20sdp"   ></include>
+    <RelativeLayout android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:layout_marginTop="@dimen/_15sdp"
+                    android:layout_marginBottom="25dp"
+                    android:layout_below="@id/id1"
+    android:gravity="center">
         <Button android:layout_width="130dp" android:layout_height="35dp"
-                android:id="@+id/b1_start" android:text="Pass"  android:background="@drawable/round_button_color_red" android:layout_marginLeft="@dimen/_40sdp" android:textColor="@color/white"/>
+                android:id="@+id/btn_dismiss_sos"
+                android:layout_marginRight="@dimen/_60sdp"
+                android:text="Pass"  android:background="@drawable/round_button_color_red" android:textColor="@color/white"/>
         <Button android:layout_width="130dp" android:layout_height="35dp"
-                android:layout_toRightOf="@id/b1_start"
-                android:id="@+id/b1_stop"  android:text="Attend"  android:background="@drawable/round_button_color_orange"  android:layout_marginLeft="@dimen/_60sdp" android:textColor="@color/white"/>
+                android:layout_toRightOf="@id/btn_dismiss_sos"
+                android:id="@+id/btn_attend_sos"  android:text="Attend"  android:background="@drawable/round_button_color_orange"   android:textColor="@color/white"/>
     </RelativeLayout>
 
-</RelativeLayout>
+</RelativeLayout></ScrollView>
