@@ -83,6 +83,7 @@ class MyRoleScreen : BaseKotlinActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<GetDeviceInfobyMobImeiResp<Device>>() {
                 override fun onSuccessResponse(globalApiObject: GetDeviceInfobyMobImeiResp<Device>) {
+                    Log.e("globalApiObject",""+globalApiObject)
                     if (globalApiObject.data.device!= null) {
                        // Utils.showToast(applicationContext, intToString( globalApiObject.data.workers.asAssnID))
                         Log.d("getDeviceInfoCall","StaffEntry " +globalApiObject.data.toString())
@@ -254,7 +255,7 @@ class MyRoleScreen : BaseKotlinActivity() {
     private fun getStaffList(AssnID: Int) {
 
         RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString(30))
+            .workerList(OYE247TOKEN, intToString(AssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {

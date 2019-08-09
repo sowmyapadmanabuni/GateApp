@@ -18,3 +18,8 @@ open class SOSModel: RealmObject() {
     var id:Int = 0
 
 }
+
+data class PassesSOSGuards(
+    val guardId:Int=0,
+    val passedTime:String = ""
+)

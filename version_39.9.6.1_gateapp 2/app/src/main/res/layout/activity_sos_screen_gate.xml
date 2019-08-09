@@ -59,19 +59,27 @@ android:layout_marginTop="4.00dp"
     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:id="@+id/r2" android:layout_below="@id/r1_imap" android:layout_marginTop="@dimen/_45sdp">
         <ImageView android:layout_width="140dp" android:layout_height="120dp" android:layout_marginLeft="10dp"
-                   android:layout_marginTop="0dp" android:layout_alignParentTop="true" android:id="@+id/rl_image1"
-                   android:background="@drawable/border" android:src="@drawable/newicons_camera"/>
+                   android:layout_marginTop="0dp" android:layout_alignParentTop="true"
+                   android:id="@+id/sos_image"
+                   android:background="@drawable/border"
+                   android:src="@drawable/newicons_camera"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:layout_alignRight="@id/rl_image1" android:text="Guard Details"
+                  android:layout_alignRight="@id/sos_image" android:text="Resident Details"
                   android:textColor="@color/orangedark" android:layout_alignParentEnd="true"
                   android:layout_marginLeft="180dp" android:id="@+id/g1" android:paddingBottom="@dimen/_10sdp">
 
         </TextView>
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/g1"
-                  android:layout_marginLeft="180dp" android:text="Device Name:" android:textColor="@color/black"
-                  android:id="@+id/d1" android:paddingBottom="@dimen/_10sdp"/>
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/d1" android:layout_marginLeft="180dp" android:text="Mobile No:" android:textColor="@color/black" />
+                  android:layout_marginLeft="180dp" android:text="Resident Name:" android:textColor="@color/black"
+                  android:id="@+id/sos_username" android:paddingBottom="@dimen/_10sdp"/>
+        <TextView android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@id/sos_username"
+                  android:layout_marginLeft="180dp"
+                  android:text="Resident Mobile No:"
+                  android:id="@+id/sos_usermobile"
+                  android:textColor="@color/black" />
 
     </RelativeLayout>
 

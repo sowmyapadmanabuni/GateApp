@@ -1667,6 +1667,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     internal fun init() {
 
+        Prefs.putBoolean("ACTIVE_SOS",false);
         startService(Intent(this@Dashboard, FRTDBService::class.java))
 
         showProgressrefresh()

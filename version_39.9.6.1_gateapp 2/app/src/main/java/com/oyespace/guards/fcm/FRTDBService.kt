@@ -8,6 +8,7 @@ import com.google.firebase.database.*
 import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
 import io.realm.Realm
 import io.realm.kotlin.createObject
 import io.realm.kotlin.delete
@@ -40,8 +41,6 @@ class FRTDBService: Service() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 Log.e("SOS_LISTEN",""+dataSnapshot)
                 if (dataSnapshot.exists()) {
-
-                   val child = dataSnapshot.hasChild(""+23)
 
                     var realm:Realm = Realm.getDefaultInstance()
                     realm.beginTransaction()
@@ -111,7 +110,9 @@ class FRTDBService: Service() {
 
                         val totalSOS = realm.where<SOSModel>().count()
                         Log.e("totalSOS",""+totalSOS);
-                        if(totalSOS > 0){
+                        val isSOSActive = Prefs.getBoolean("ACTIVE_SOS",false);
+                        Log.e("ANY_SOS?",""+isSOSActive)
+                        if(totalSOS > 0 && !isSOSActive){
                             val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
                             i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i_vehicle)
@@ -119,16 +120,6 @@ class FRTDBService: Service() {
                     }catch (e:Exception){
                         e.printStackTrace()
                     }
-
-
-
-
-                    //val user = dataSnapshot.getValue(SOSModel::class.java)
-
-                    //Log.e("SOS_OBJ",""+user)
-                    //val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
-                    //i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    //startActivity(i_vehicle)
                 }
             }
 

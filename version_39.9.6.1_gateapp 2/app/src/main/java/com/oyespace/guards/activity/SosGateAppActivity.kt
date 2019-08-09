@@ -1,5 +1,6 @@
 package com.oyespace.guards.com.oyespace.guards.activity
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
@@ -18,16 +19,19 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.gms.maps.model.PolylineOptions
+import com.google.android.gms.maps.model.*
+import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.pojo.GoogleMapDTO
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.squareup.picasso.Picasso
+import io.realm.Realm
 import io.realm.kotlin.where
+import kotlinx.android.synthetic.main.activity_img_view.*
 import kotlinx.android.synthetic.main.activity_sos_recycle.*
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
 import okhttp3.OkHttpClient
@@ -44,6 +48,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     var currentSOS:SOSModel = SOSModel()
     var sosLocation : LatLng = LatLng(0.0,0.0)
     var guardLocation : LatLng = LatLng(0.0,0.0)
+    var totalGuards:Int = 10
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
@@ -52,10 +57,42 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     private lateinit var locationRequest: LocationRequest
     private var locationUpdateState = false
 
+    private var mDatabase: DatabaseReference? = null
+    private var mSosReference: DatabaseReference? = null
+    private var isBackEnabled:Boolean = false
+    lateinit var sosMarker:Marker
+    lateinit var sosListener:ValueEventListener
+    lateinit var mPolyline:Polyline
+    private var lineoption = PolylineOptions()
+
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
-        private const val REQUEST_CHECK_SETTINGS = 2
-        private const val PLACE_PICKER_REQUEST = 3
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Prefs.putBoolean("ACTIVE_SOS",true);
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Prefs.putBoolean("ACTIVE_SOS",false);
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if(currentSOS != null) {
+            var lng: Double = currentSOS.longitude.toDouble();
+            var lat: Double = currentSOS.latitude.toDouble();
+            sosLocation = LatLng(lat, lng)
+            getDirections()
+        }else{
+            getSOS()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +108,168 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         btn_dismiss_sos.setOnClickListener {dismissSOS()}
         btn_attend_sos.setOnClickListener({ btn_dismiss_sos.setVisibility(View.GONE) })
 
+    }
+
+
+
+    private fun initFRTDB(){
+        var mSosPath = "SOS/"+ LocalDb.getAssociation()!!.asAssnID+"/"+currentSOS.userId
+        Log.e(TAG,""+mSosPath)
+        mDatabase = FirebaseDatabase.getInstance().reference
+        mSosReference = FirebaseDatabase.getInstance().getReference(mSosPath)
+        initSOSListener()
+    }
+
+
+    private fun initSOSListener(){
+        sosListener = object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.e("SOS_ACTIVE_IN",""+dataSnapshot)
+                if (dataSnapshot.exists()) {
+
+                    try {
+                        //dataSnapshot.children.forEach {
+                        val it = dataSnapshot;
+                            val user_id = it.key;
+                            //val sos = it.getValue()
+                            val isActive = it.child("isActive").getValue(Boolean::class.java)
+                            var unitName = ""
+                            var unitId: Int = 0
+                            var userName:String = ""
+                            var userMobile:String = ""
+                            var sosImage:String = ""
+                            var latitude:String = ""
+                            var longitude:String = ""
+                            var id:Int = 0
+                            var userId: Int = 0
+                            var totalPassed:Int = 0
+
+                            if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
+                                unitName = it.child("unitName").getValue(String::class.java)!!
+                            }
+                            if(it.hasChild("unitId") && it.hasChild("unitId")!=null){
+                                unitId = it.child("unitId").getValue(Int::class.java)!!
+                            }
+                            if(it.hasChild("userName") && it.hasChild("userName")!=null){
+                                userName = it.child("userName").getValue(String::class.java)!!
+                            }
+                            if(it.hasChild("userMobile") && it.hasChild("userMobile")!=null){
+                                userMobile = it.child("userMobile").getValue(String::class.java)!!
+                            }
+
+                            Log.e("LATITUDE",""+it.child("latitude").getValue())
+
+                            if(it.hasChild("latitude")){
+                                latitude = it.child("latitude").getValue().toString()
+                            }
+                            if(it.hasChild("longitude")){
+                                longitude = it.child("longitude").getValue().toString()
+                            }
+                            if(it.hasChild("sosImage")){
+                                sosImage = it.child("sosImage").getValue(String::class.java)!!
+                            }
+                            if(it.hasChild("userId")){
+                                userId = it.child("userId").getValue(Int::class.java)!!
+                            }
+                            if(it.hasChild("totalpassed")){
+                                totalPassed = it.child("totalpassed").getValue(Int::class.java)!!
+                            }
+
+                            if (isActive != null && isActive && userId != 0) {
+
+                                runOnUiThread {
+                                    if(userMobile != "" && userMobile != null){
+                                        sos_usermobile.text = userMobile
+                                    }
+                                    if(userName != "" && userName != null){
+                                        sos_username.text = userName
+                                    }
+                                    if(sosImage != "" && sosImage != null){
+                                        Picasso.with(applicationContext)
+                                            .load(sosImage)
+                                            .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera).into(sos_image)
+                                    }else{
+                                        Picasso.with(applicationContext)
+                                            .load(R.drawable.newicons_camera).into(sos_image)
+                                    }
+                                    if(latitude != "" && latitude != null && longitude != "" && longitude != null){
+                                        val lat = latitude.toDouble()
+                                        val lon = longitude.toDouble()
+                                        sosLocation = LatLng(lat, lon)
+                                        getDirections()
+                                    }
+
+                                    if((totalGuards-totalPassed) == 1){
+                                        btn_dismiss_sos.visibility = View.GONE
+                                    }else{
+                                        btn_dismiss_sos.visibility = View.VISIBLE
+                                    }
+                                }
+                            }else{
+
+                                if(userId != 0 && userId != null) {
+                                    Log.e("USERID","NOT NULL")
+                                    val sosObj = realm.where<SOSModel>().equalTo("userId",userId).findFirst()
+                                    Log.e("SOSOBJE",""+sosObj)
+                                    if(sosObj != null) {
+                                        Log.e("SOSOBJECTCHECK",""+sosObj)
+                                        realm.executeTransaction {
+                                            sosObj.deleteFromRealm()
+                                        }
+
+                                    }
+                                }
+
+                                checkNextSOS()
+
+                              //  isBackEnabled = true
+                              //  onBackPressed()
+                            }
+
+                            Log.e("CHILD", "" + isActive);
+                        //}
+
+                        val totalSOS = realm.where<SOSModel>().count()
+//                        Log.e("totalSOS",""+totalSOS);
+//                        if(totalSOS > 0){
+//                            val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
+//                            i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                            startActivity(i_vehicle)
+//                        }
+                    }catch (e:Exception){
+                        e.printStackTrace()
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("SOS_LISTEN","Error")
+            }
+        }
+        mSosReference!!.addValueEventListener(sosListener)
+    }
+
+    private fun checkNextSOS(){
+        val nextSos = realm.where<SOSModel>().findFirst()
+        if(nextSos != null){
+
+
+            if (::sosMarker.isInitialized) {
+                sosMarker.remove()
+            }
+            if(::sosListener.isInitialized && mSosReference!=null){
+                mSosReference!!.removeEventListener(sosListener)
+            }
+            if(::mPolyline.isInitialized){
+                mPolyline.remove()
+            }
+            getSOS()
+            updateSOSLocation()
+        }else{
+            isBackEnabled = true
+            onBackPressed()
+        }
     }
 
     private fun initMap(){
@@ -110,6 +309,19 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 //mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
             }
         }
+
+    }
+
+    private fun updateSOSLocation(){
+        if(currentSOS!=null && currentSOS.latitude != "" && currentSOS.longitude != "") {
+            var lng:Double = currentSOS.longitude.toDouble();
+            var lat:Double = currentSOS.latitude.toDouble();
+
+            sosLocation = LatLng(lat, lng)
+            val markerOption:MarkerOptions = MarkerOptions().position(sosLocation).title("SOS Location")
+            sosMarker =  mMap.addMarker(markerOption)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosLocation,15.0f))
+        }
     }
 
     private fun placeMarkerOnMap(location: LatLng) {
@@ -118,15 +330,33 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         markerOptions.title(titleStr)
         mMap.addMarker(markerOptions)
 
+        getDirections()
+    }
+
+    private fun getDirections(){
         val URL = getDirectionURL(guardLocation,sosLocation)
         GetDirection(URL).execute()
     }
-
 
     private fun getSOS(){
         val sosObj = realm.where<SOSModel>().findFirst()
         if(sosObj != null){
             currentSOS = sosObj
+            if(currentSOS.userMobile != "" && currentSOS.userMobile != null){
+                sos_usermobile.text = currentSOS.userMobile
+            }
+            if(currentSOS.userName != "" && currentSOS.userName != null){
+                sos_username.text = currentSOS.userName
+            }
+            if(currentSOS.sosImage != "" && currentSOS.sosImage != null){
+                Picasso.with(applicationContext)
+                    .load(currentSOS.sosImage)
+                    .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera).into(sos_image)
+            }else{
+                Picasso.with(applicationContext)
+                    .load(R.drawable.newicons_camera).into(sos_image)
+            }
+            initFRTDB()
         }
     }
 
@@ -139,8 +369,20 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         alert.getWindow().setLayout(900, 500)
         val button: Button = dview.findViewById(R.id.b1)
         button.setOnClickListener({
+            updatePassedSOS()
             alert.dismiss()
+            isBackEnabled = true
+            //onBackPressed()
         })
+    }
+
+    private fun updatePassedSOS(){
+
+        //val key = mSosReference!!.child("passedby").push().key
+       // val key = Prefs.getString("GATE_NO","")
+        Log.e("GATE_NO:",""+"kkkk")
+        mSosReference!!.child("passedby").child("0").setValue(Prefs.getString("GATE_NO",""))
+
     }
 
     private fun setEmergencyContacts(){
@@ -178,27 +420,23 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     override fun onBackPressed() {
         //NO BACK BUTTON SKIP ALLOWED
-        //super.onBackPressed()
+        if(isBackEnabled) {
+            super.onBackPressed()
+        }
     }
 
     override fun onMapReady(p0: GoogleMap) {
         mMap = p0
         mMap.getUiSettings().setZoomControlsEnabled(true)
         setUpMap()
-        if(currentSOS!=null && currentSOS.latitude != "" && currentSOS.longitude != "") {
-            var lng:Double = currentSOS.longitude.toDouble();
-            var lat:Double = currentSOS.latitude.toDouble();
-
-            sosLocation = LatLng(lat, lng)
-            mMap.addMarker(MarkerOptions().position(sosLocation).title("SOS Location"))
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosLocation,15.0f))
-        }
+        updateSOSLocation()
     }
 
     override fun onMarkerClick(p0: Marker?): Boolean {
         return true
     }
-    fun getDirectionURL(origin:LatLng,dest:LatLng) : String{
+
+    private fun getDirectionURL(origin:LatLng,dest:LatLng) : String{
         return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=true&mode=walking&key="+resources.getString(R.string.google_maps_key)
     }
 
@@ -231,18 +469,18 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         }
 
         override fun onPostExecute(result: List<List<LatLng>>) {
-            val lineoption = PolylineOptions()
+            lineoption = PolylineOptions()
             for (i in result.indices){
                 lineoption.addAll(result[i])
                 lineoption.width(10f)
-                lineoption.color(Color.BLUE)
+                lineoption.color(Color.BLACK)
                 lineoption.geodesic(true)
             }
-            mMap.addPolyline(lineoption)
+            mPolyline = mMap.addPolyline(lineoption)
         }
     }
 
-    public fun decodePolyline(encoded: String): List<LatLng> {
+    private fun decodePolyline(encoded: String): List<LatLng> {
 
         val poly = ArrayList<LatLng>()
         var index = 0
