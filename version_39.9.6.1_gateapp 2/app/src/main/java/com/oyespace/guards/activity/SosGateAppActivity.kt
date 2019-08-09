@@ -71,6 +71,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     lateinit var mPolyline:Polyline
     private var lineoption = PolylineOptions()
     private var isResolving = false
+    var userId:Int = 0
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -129,6 +130,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
 
     private fun attendSOS(){
+        Log.e("ATTEND",""+btn_attend_sos.text+" "+isResolving)
         if(isResolving) {
             removeCurrentSOSRealm()
             mSosReference!!.removeValue()
@@ -139,6 +141,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             btn_dismiss_sos.setVisibility(View.GONE)
             btn_attend_sos.text = "Resolved"
             mSosReference!!.child("attendedBy").setValue(Prefs.getString(ConstantUtils.GATE_NO, ""))
+            mSosReference!!.child("attendedByMobile").setValue(Prefs.getString(ConstantUtils.GATE_MOB, ""))
             isResolving = true
         }
     }
@@ -164,7 +167,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             var latitude:String = ""
                             var longitude:String = ""
                             var id:Int = 0
-                            var userId: Int = 0
+                            //var userId: Int = 0
                             var totalPassed:Int = 0
                             var passedBy:HashMap<String,String> = HashMap()
 
@@ -214,6 +217,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                         sos_username.text = userName
                                     }
                                     if(sosImage != "" && sosImage != null){
+
                                         Picasso.with(applicationContext)
                                             .load(sosImage)
                                             .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera).into(sos_image)
@@ -258,7 +262,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             Log.e("CHILD", "" + isActive);
                         //}
 
-                        val totalSOS = realm.where<SOSModel>().count()
+//                        val totalSOS = realm.where<SOSModel>().count()
 //                        Log.e("totalSOS",""+totalSOS);
 //                        if(totalSOS > 0){
 //                            val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
@@ -267,6 +271,23 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 //                        }
                     }catch (e:Exception){
                         e.printStackTrace()
+                    }
+                }else{
+                    try {
+
+                        Log.e("DEleted",""+currentSOS);
+                        val sosObj = realm.where<SOSModel>().equalTo("userId",userId).findFirst()
+                        if(sosObj!= null){
+                            realm.executeTransaction {
+                                sosObj.deleteFromRealm()
+                            }
+                        }
+//                        realm.executeTransaction {
+//                            currentSOS.deleteFromRealm()
+//                        }
+                        checkNextSOS()
+                    }catch (e:Exception){
+                        checkNextSOS()
                     }
                 }
             }
@@ -489,8 +510,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 "101"
             )
         )
-
-        rcv_emergency.layoutManager = GridLayoutManager(this, 3)
+        rcv_emergency.setLayoutManager( GridLayoutManager(this@SosGateAppActivity, 3))
         val adapter = RecyclerViewAdapter(contacts,clickListener = {
                 unit,index -> onEmergencyClick(unit,index)
         })
@@ -505,9 +525,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     override fun onBackPressed() {
         if(isBackEnabled) {
-            super.onBackPressed()
+//            super.onBackPressed()
+            finish()
         }
     }
+
+
 
     override fun onMapReady(p0: GoogleMap) {
         mMap = p0

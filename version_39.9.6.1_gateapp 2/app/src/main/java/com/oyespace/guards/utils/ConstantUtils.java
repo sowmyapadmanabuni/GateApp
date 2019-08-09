@@ -28,6 +28,7 @@ public class ConstantUtils {
     public static final String WORKER_ID = "worker_id";
     public static final String ASSOCIATION_ID = "ASSOCIATION_ID";
     public static final String GATE_NO = "GATE_NO";
+    public static final String GATE_MOB = "GATE_MOB";
     public static final String DEVICE_ID = "DEVICE_ID";
     public static final String SERVICE_PROVIDER = "Service Provider";
     public static final String NUMBER_OF_PERSONS = "number_of_persons";
