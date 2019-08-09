@@ -4,15 +4,33 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
+import android.widget.Toast
 import com.google.firebase.database.*
+import com.oyespace.guards.activity.UnitListActivity
 import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity
+import com.oyespace.guards.com.oyespace.guards.pojo.PassesSOSGuards
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
+import com.oyespace.guards.models.GetGuardsListResponse
+import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.GuardsList
+import com.oyespace.guards.models.WorkersList
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.pojo.UnitList
+import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.utils.AppUtils
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
+import io.realm.RealmList
 import io.realm.kotlin.createObject
 import io.realm.kotlin.delete
 import io.realm.kotlin.where
+import kotlinx.android.synthetic.main.activity_unit_list.*
+import java.util.ArrayList
 
 class FRTDBService: Service() {
 
@@ -24,8 +42,10 @@ class FRTDBService: Service() {
     override fun onCreate() {
         Log.e(TAG,"Started");
         super.onCreate()
+        this.getGuardsList()
         this.initFRTDB()
         this.initSOSListener()
+
     }
 
     private fun initFRTDB(){
@@ -33,6 +53,32 @@ class FRTDBService: Service() {
         Log.e(TAG,""+mSosPath)
         mDatabase = FirebaseDatabase.getInstance().reference
         mSosReference = FirebaseDatabase.getInstance().getReference(mSosPath)
+    }
+
+    private fun getGuardsList(){
+        RetrofitClinet.instance
+            .getGuardsList(ConstantUtils.OYE247TOKEN, AppUtils.intToString(Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)),"Guard")
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<GetGuardsListResponse<GuardsList>>() {
+
+                override fun onSuccessResponse(workerListResponse: GetGuardsListResponse<GuardsList>) {
+                    Log.e("getGuardsList",""+workerListResponse)
+                    if(workerListResponse.data.workers != null){
+                        Prefs.putInt("TOTAL_GUARDS",workerListResponse.data.workers.size)
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+                    Log.e("getGuardsList","Err"+e)
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+
     }
 
     private fun initSOSListener(){
@@ -45,10 +91,16 @@ class FRTDBService: Service() {
                     var realm:Realm = Realm.getDefaultInstance()
                     realm.beginTransaction()
                     realm.delete(SOSModel::class.java)
+                    realm.delete(PassesSOSGuards::class.java)
                     realm.commitTransaction()
+
+                    var isGuardPassed:Boolean = false
 
                     try {
                         dataSnapshot.children.forEach {
+
+                            isGuardPassed = false
+
                             val user_id = it.key;
                             //val sos = it.getValue()
                             val isActive = it.child("isActive").getValue(Boolean::class.java)
@@ -61,6 +113,9 @@ class FRTDBService: Service() {
                             var longitude:String = ""
                             var id:Int = 0
                             var userId: Int = 0
+                            var passedBy:HashMap<String,String> = HashMap()
+                            var passedGuards:RealmList<PassesSOSGuards> = RealmList()
+                            var attendedBy:String = ""
 
                             if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
                                 unitName = it.child("unitName").getValue(String::class.java)!!
@@ -90,19 +145,64 @@ class FRTDBService: Service() {
                                 userId = it.child("userId").getValue(Int::class.java)!!
                             }
 
-                            if (isActive != null && isActive && userId != 0) {
-                                realm.executeTransaction {
+                            if(it.hasChild("attendedBy")){
+                                attendedBy = it.child("attendedBy").getValue(String::class.java)!!
+                            }
 
-                                    val sosObj = it.createObject(SOSModel::class.java,userId)
-                                    sosObj.isActive = isActive
-                                    sosObj.unitName = unitName
-                                    sosObj.unitId = unitId
-                                    sosObj.userName = userName
-                                    sosObj.userMobile = userMobile
-                                    sosObj.latitude = latitude
-                                    sosObj.longitude = longitude
-                                    sosObj.sosImage = sosImage
+
+                            val currentGate = Prefs.getString(ConstantUtils.GATE_NO,"");
+
+                            if (isActive != null && isActive && userId != 0) {
+
+                                if(it.hasChild("passedby")){
+                                    val type = object : GenericTypeIndicator<HashMap<String,String>?>() {}
+                                    passedBy = HashMap()
+                                    passedBy = it.child("passedby").getValue(type)!!
+
+
+                                    var gates = passedBy.keys;
+                                    for(gate in gates){
+                                        realm.executeTransaction {
+                                            val passedGuard = it.createObject(PassesSOSGuards::class.java)
+
+                                            // var passedGuard:PassesSOSGuards = PassesSOSGuards()
+                                            passedGuard.gateName = gate
+                                            passedGuard.passedTime = passedBy[gate]!!
+                                            passedGuards.add(passedGuard)
+
+                                            if(currentGate.equals(gate)){
+                                                isGuardPassed = true
+                                            }
+                                        }
+                                    }
+
+                                    Log.e("passedby",""+passedBy);
                                 }
+
+                                Log.e("ISACTIVE_",""+isGuardPassed+" "+attendedBy+" "+currentGate+" - "+attendedBy.equals(currentGate,true)+" "+attendedBy.trim().length+" "+currentGate.trim().length);
+                                if(!isGuardPassed) {
+                                    Log.e("INSIDE","GUARDPASSED")
+                                    if(attendedBy == "" || attendedBy.trim().equals(currentGate.trim())) {
+                                        Log.e("INSIDE","attendedBy")
+                                        realm.executeTransaction {
+
+                                            val sosObj = it.createObject(SOSModel::class.java, userId)
+                                            sosObj.isActive = isActive
+                                            sosObj.unitName = unitName
+                                            sosObj.unitId = unitId
+                                            sosObj.userName = userName
+                                            sosObj.userMobile = userMobile
+                                            sosObj.latitude = latitude
+                                            sosObj.longitude = longitude
+                                            sosObj.sosImage = sosImage
+                                            sosObj.passedBY = passedGuards
+                                            sosObj.attendedBy = attendedBy
+                                        }
+                                    }
+                                }
+
+
+
                             }
 
                             Log.e("CHILD", "" + isActive);
@@ -111,7 +211,11 @@ class FRTDBService: Service() {
                         val totalSOS = realm.where<SOSModel>().count()
                         Log.e("totalSOS",""+totalSOS);
                         val isSOSActive = Prefs.getBoolean("ACTIVE_SOS",false);
+
                         Log.e("ANY_SOS?",""+isSOSActive)
+
+
+
                         if(totalSOS > 0 && !isSOSActive){
                             val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
                             i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+    <RelativeLayout android:layout_width="wrap_content" android:layout_height="@dimen/_150sdp" android:layout_centerHorizontal="true">
 
+        <TextView
+                android:text="SOS passed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/p1" android:textColor="@color/orange" android:layout_centerHorizontal="true" android:textSize="@dimen/_18sdp" android:layout_marginTop="@dimen/_28sdp"/>
+        <Button android:layout_width="40dp" android:layout_height="20dp" android:text="Ok"
+                android:textColor="@color/white" android:layout_centerHorizontal="true" android:background="@color/orange"
+                android:layout_below="@id/p1" android:layout_marginTop="33dp" android:id="@+id/b1"/>
 
-    <TextView
-            android:text="SOS passed"
-            android:layout_width="100dp"
-            android:layout_height="50dp" android:id="@+id/p1" android:textColor="@color/orange" android:layout_centerHorizontal="true" android:textSize="@dimen/_17sdp" android:layout_marginTop="@dimen/_30sdp"/>
-    <Button android:layout_width="@dimen/_40sdp" android:layout_height="30dp" android:text="Ok"
-            android:textColor="@color/white" android:layout_centerHorizontal="true" android:background="@color/orange"
-            android:layout_below="@id/p1" android:id="@+id/b1"/>
+    </RelativeLayout>
 </RelativeLayout>

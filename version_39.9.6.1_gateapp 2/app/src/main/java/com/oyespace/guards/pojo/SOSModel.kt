@@ -1,6 +1,8 @@
 package com.oyespace.guards.com.oyespace.guards.pojo
 
 import com.google.firebase.database.PropertyName
+import io.realm.RealmList
+import io.realm.RealmModel
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 
@@ -15,11 +17,13 @@ open class SOSModel: RealmObject() {
     var sosImage:String = ""
     var latitude:String = ""
     var longitude:String = ""
+    var attendedBy:String = ""
+    var passedBY:RealmList<PassesSOSGuards> = RealmList()
     var id:Int = 0
 
 }
 
-data class PassesSOSGuards(
-    val guardId:Int=0,
-    val passedTime:String = ""
-)
+open class PassesSOSGuards:RealmObject() {
+    var gateName: String = ""
+    var passedTime: String = ""
+}

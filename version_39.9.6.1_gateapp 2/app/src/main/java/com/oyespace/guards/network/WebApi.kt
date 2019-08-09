@@ -1,14 +1,13 @@
 package com.oyespace.guards.network
 
 
-import com.oyespace.guards.models.GetVisitorsResponse
-import com.oyespace.guards.models.GetWorkersResponse
-import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
 import com.oyespace.guards.com.oyespace.guards.pojo.BlocksList
 import com.oyespace.guards.com.oyespace.guards.pojo.SearchUnitRequest
 import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY
@@ -34,6 +33,10 @@ interface WebApi {
     @GET("oyeliving/api/v1/Unit/GetUnitListByAssocID/{id}")
     fun unitList(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
             : Single<UnitList<ArrayList<UnitPojo>>>
+
+    @GET("oye247/api/v1/GetWorkersListByWorkerTypeAndAssocID/{assnId}/{type}")
+    fun getGuardsList(@Header("X-OYE247-APIKey") token: String, @Path("assnId") assid: String, @Path("type") type: String)
+            : Single<GetGuardsListResponse<GuardsList>>
 
     @GET("oyeliving/api/v1/Block/GetBlockListByAssocID/{id}")
     fun blocksList(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)

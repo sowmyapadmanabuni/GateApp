@@ -33,3 +33,13 @@ data class GetWorkersResponse<T>(
 data class WorkersList(
     val worker: RealmList<Worker>
 )
+
+data class GetGuardsListResponse<T>(
+    val apiVersion: String,
+    val `data`: GuardsList,
+    val success: Boolean
+)
+
+data class GuardsList(
+    val workers: RealmList<Worker>
+)

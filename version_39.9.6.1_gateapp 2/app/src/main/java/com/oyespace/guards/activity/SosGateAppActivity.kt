@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Location
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
@@ -24,8 +25,10 @@ import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.com.oyespace.guards.pojo.PassesSOSGuards
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.pojo.GoogleMapDTO
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
@@ -36,6 +39,9 @@ import kotlinx.android.synthetic.main.activity_sos_recycle.*
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -48,7 +54,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     var currentSOS:SOSModel = SOSModel()
     var sosLocation : LatLng = LatLng(0.0,0.0)
     var guardLocation : LatLng = LatLng(0.0,0.0)
-    var totalGuards:Int = 10
+    var totalGuards:Int = Prefs.getInt("TOTAL_GUARDS",1)
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
@@ -64,6 +70,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     lateinit var sosListener:ValueEventListener
     lateinit var mPolyline:Polyline
     private var lineoption = PolylineOptions()
+    private var isResolving = false
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -106,7 +113,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
 
         btn_dismiss_sos.setOnClickListener {dismissSOS()}
-        btn_attend_sos.setOnClickListener({ btn_dismiss_sos.setVisibility(View.GONE) })
+        btn_attend_sos.setOnClickListener({ attendSOS() })
 
     }
 
@@ -120,6 +127,21 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         initSOSListener()
     }
 
+
+    private fun attendSOS(){
+        if(isResolving) {
+            removeCurrentSOSRealm()
+            mSosReference!!.removeValue()
+            isResolving = false
+            checkNextSOS()
+
+        }else{
+            btn_dismiss_sos.setVisibility(View.GONE)
+            btn_attend_sos.text = "Resolved"
+            mSosReference!!.child("attendedBy").setValue(Prefs.getString(ConstantUtils.GATE_NO, ""))
+            isResolving = true
+        }
+    }
 
     private fun initSOSListener(){
         sosListener = object : ValueEventListener {
@@ -144,6 +166,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             var id:Int = 0
                             var userId: Int = 0
                             var totalPassed:Int = 0
+                            var passedBy:HashMap<String,String> = HashMap()
 
                             if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
                                 unitName = it.child("unitName").getValue(String::class.java)!!
@@ -172,8 +195,13 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             if(it.hasChild("userId")){
                                 userId = it.child("userId").getValue(Int::class.java)!!
                             }
-                            if(it.hasChild("totalpassed")){
-                                totalPassed = it.child("totalpassed").getValue(Int::class.java)!!
+//                            if(it.hasChild("totalpassed")){
+//                                totalPassed = it.child("totalpassed").getValue(Int::class.java)!!
+//                            }
+                            if(it.hasChild("passedby")){
+                                val type = object : GenericTypeIndicator<HashMap<String,String>?>() {}
+                                passedBy = it.child("passedby").getValue(type)!!
+                                totalPassed = passedBy.size
                             }
 
                             if (isActive != null && isActive && userId != 0) {
@@ -340,8 +368,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     private fun getSOS(){
         val sosObj = realm.where<SOSModel>().findFirst()
+        Log.e("getSOS",""+sosObj);
         if(sosObj != null){
             currentSOS = sosObj
+            val currentGate:String = Prefs.getString("GATE_NO",null)
+
             if(currentSOS.userMobile != "" && currentSOS.userMobile != null){
                 sos_usermobile.text = currentSOS.userMobile
             }
@@ -356,6 +387,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 Picasso.with(applicationContext)
                     .load(R.drawable.newicons_camera).into(sos_image)
             }
+            if(currentGate!=null && currentGate != "" && currentSOS.attendedBy.equals(currentGate)){
+                btn_dismiss_sos.visibility = View.GONE
+                btn_attend_sos.text = "Resolved"
+                isResolving = true
+            }
             initFRTDB()
         }
     }
@@ -366,22 +402,63 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         val alert = builder.create()
         alert.setView(dview)
         alert.show()
-        alert.getWindow().setLayout(900, 500)
+        //alert.getWindow().setLayout(900, 500)
         val button: Button = dview.findViewById(R.id.b1)
         button.setOnClickListener({
             updatePassedSOS()
             alert.dismiss()
-            isBackEnabled = true
+            removeCurrentSOSRealm()
+            checkNextSOS()
+            //isBackEnabled = true
             //onBackPressed()
         })
+    }
+
+    private fun removeCurrentSOSRealm(){
+        try {
+            val userId = currentSOS.userId
+            if (userId != 0 && userId != null) {
+                val sosObj = realm.where<SOSModel>().equalTo("userId", userId).findFirst()
+                if (sosObj != null) {
+                    realm.executeTransaction {
+                        sosObj.deleteFromRealm()
+                    }
+
+                }
+            }
+        }catch (e:java.lang.Exception){
+
+        }
     }
 
     private fun updatePassedSOS(){
 
         //val key = mSosReference!!.child("passedby").push().key
        // val key = Prefs.getString("GATE_NO","")
-        Log.e("GATE_NO:",""+"kkkk")
-        mSosReference!!.child("passedby").child("0").setValue(Prefs.getString("GATE_NO",""))
+        var passedReference:DatabaseReference = mSosReference!!.child("passedby")
+        //passedReference.addListenerForSingleValueEvent(n)
+
+        val passedListener = object : ValueEventListener {
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.e("passedListener", "" + dataSnapshot)
+                if (dataSnapshot.exists()) {
+
+                    try {
+                        Log.e("PASSEDCOUNT",""+dataSnapshot.childrenCount)
+                    } catch (e: Exception) {
+                    }
+                }
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("passedListener","Error")
+            }
+        }
+        passedReference!!.addValueEventListener(passedListener)
+        val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
+        val currentDate = sdf.format(Date())
+
+        mSosReference!!.child("passedby").child(Prefs.getString("GATE_NO","")).setValue(""+currentDate)
 
     }
 
@@ -414,12 +491,19 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         )
 
         rcv_emergency.layoutManager = GridLayoutManager(this, 3)
-        val adapter = RecyclerViewAdapter(contacts)
+        val adapter = RecyclerViewAdapter(contacts,clickListener = {
+                unit,index -> onEmergencyClick(unit,index)
+        })
         rcv_emergency.adapter = adapter
     }
 
+    fun onEmergencyClick(unit:MyData, index:Int){
+        val intent = Intent(Intent.ACTION_CALL);
+        intent.data = Uri.parse("tel:"+unit.phoneNum)
+        startActivity(intent)
+    }
+
     override fun onBackPressed() {
-        //NO BACK BUTTON SKIP ALLOWED
         if(isBackEnabled) {
             super.onBackPressed()
         }
