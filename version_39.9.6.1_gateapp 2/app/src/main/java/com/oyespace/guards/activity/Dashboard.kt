@@ -7,7 +7,6 @@ import android.app.Dialog
 import android.app.PendingIntent
 import android.content.*
 import android.content.res.Configuration
-import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.hardware.usb.UsbDevice
@@ -61,6 +60,7 @@ import java.util.*
 import com.oyespace.guards.constants.PrefKeys.BG_NOTIFICATION_ON
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.constants.PrefKeys.PATROLLING_ID
+import com.oyespace.guards.models.FingerPrint
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.pojo.getDeviceList
@@ -79,6 +79,7 @@ import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.lang.NullPointerException
+import kotlin.collections.ArrayList
 import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
@@ -88,7 +89,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private val mInterval = 96000 // 5 seconds by default, can be changed later
     private var mHandlerr: Handler? = null
     var counter:Int?=0
-    internal var database: DBHelper?=null
 
     var audioclip: String? = null
     lateinit var mp:  MediaPlayer
@@ -137,7 +137,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     internal var tempFP1: ByteArray?=null
     internal var tempFP2: ByteArray?=null
     internal var tempFP3: ByteArray?=null
-    internal var curData: Cursor? = null
+    internal var fingerPrints:List<FingerPrint> = arrayListOf(FingerPrint())
     internal var t1: TextToSpeech?=null
     internal var memName = ""
     internal var nnnn = 0
@@ -205,8 +205,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 if (message.equals(VISITOR_ENTRY_SYNC, ignoreCase = true)) {
                     Log.e("VISITOR_ENTRY_SYNC","VISITOR_ENTRY_SYNC");
                     var newAl: ArrayList<VisitorLog>? = ArrayList()
-                    if (LocalDb.getVisitorEnteredLog() != null) {
-                        newAl = LocalDb.getVisitorEnteredLog()
+                    if (DataBaseHelper.getVisitorEnteredLog() != null) {
+                        newAl = DataBaseHelper.getVisitorEnteredLog()
                         // LocalDb.saveAllVisitorLog(newAl);
 
                         if((newAl)!!.isEmpty()){
@@ -412,11 +412,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         //        startService(new Intent(DashBoard.this, SGTrackingService.class));
 
-        //        curData=dbh.getRegularVisitorsFinger(GMT_YMD_CurrentTime());
-        curData = dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID,0))
-        if (curData != null) {
-            curData!!.moveToFirst()
-        }
+
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
             if (status != TextToSpeech.ERROR)
             // t1?.language = Locale.getDefault()
@@ -593,9 +589,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         super.onResume()
 
 
-        if (LocalDb.getVisitorEnteredLog() != null) {
+        if (DataBaseHelper.getVisitorEnteredLog() != null) {
             dismissProgressrefresh()
-            newAl = LocalDb.getVisitorEnteredLog()
+            newAl = DataBaseHelper.getVisitorEnteredLog()
             // LocalDb.saveAllVisitorLog(newAl);
 
             if((newAl)!!.isEmpty()){
@@ -1008,7 +1004,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         loginReq.VLVisLgID = vlVisLgID
         loginReq.VLEntryT = getCurrentTimeLocal()
-        loginReq.VLEntyWID = LocalDb.getStaffs(realm)!![0].wkWorkID.toInt()
+        loginReq.VLEntyWID = DataBaseHelper.getStaffs()!![0].wkWorkID.toInt()
 
         Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
         //  showToast(this, "StaffEntry $loginReq");
@@ -1079,13 +1075,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_LOG)
           t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
         Prefs.putString(BIOMETRICPERSONNAME,personName)
-        if(database!!.insertContact(personName)){
-//            Toast.makeText(getApplicationContext(), "done",
-//                Toast.LENGTH_SHORT).show();
-        } else{
-//            Toast.makeText(getApplicationContext(), "not done",
-//                Toast.LENGTH_SHORT).show();
-        }
+
 
 
 //            Toast.makeText(this@Dashboard,counter.toString(),Toast.LENGTH_LONG).show()
@@ -1122,18 +1112,20 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //            getCurrentTimeLocal(),"")
 
 
-        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
-            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
+        //@Todo
 
-
-        if(id<=0)
-        {
-            //  Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-        } else
-        {
-            // Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
-
-        }
+//        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
+//            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
+//
+//
+//        if(id<=0)
+//        {
+//            //  Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+//        } else
+//        {
+//            // Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
+//
+//        }
 
 
 
@@ -1186,7 +1178,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         loginReq.VLVisLgID = vlVisLgID
         loginReq.VLExitT = getCurrentTimeLocal()
-        loginReq.VLExitWID = LocalDb.getStaffs(realm)!![0].wkWorkID.toInt()
+        loginReq.VLExitWID = DataBaseHelper.getStaffs()!![0].wkWorkID.toInt()
 
         Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
         //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
@@ -1331,10 +1323,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 } else if (tempNumber > 0 && tempNumber < 4) {
 
                     val enteredStaff = ArrayList<VisitorLog>()
-                    Log.d("Biometric 973", " " + (LocalDb.getVisitorEnteredLog() != null))
+                    Log.d("Biometric 973", " " + (DataBaseHelper.getVisitorEnteredLog() != null))
                     //looping through existing elements
-                    if (LocalDb.getVisitorEnteredLog() != null) {
-                        for (s in LocalDb.getVisitorEnteredLog()!!) {
+                    if (DataBaseHelper.getVisitorEnteredLog() != null) {
+                        for (s in DataBaseHelper.getVisitorEnteredLog()!!) {
                             //if the existing elements contains the search input
                             if (s.reRgVisID == Integer.parseInt(memName)) {
                                 //adding the element to filtered list
@@ -1357,11 +1349,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                         //                                t1.speak("Welcome " + dbh.getMemName(Integer.parseInt(memName)), TextToSpeech.QUEUE_FLUSH, null);
 
-                        //LocalDb.getStaffs(realm)
+
                         val filterdNames = ArrayList<Worker>()
 
                         //looping through existing elements
-                        for (s in LocalDb.getStaffs(realm)!!) {
+                        for (s in DataBaseHelper.getStaffs()!!) {
                             //if the existing elements contains the search input
                             if (s.wkWorkID.toInt() == Integer.parseInt(memName)) {
                                 //adding the element to filtered list
@@ -1423,82 +1415,63 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         val exists = false
         var number = 0
         var itera = 0
-        //        curData=dbh.getRegularVisitorsFinger(GMT_YMD_CurrentTime());
-        curData = dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID,0))
-        if (curData != null) {
-            curData!!.moveToFirst()
-        }
-        if (curData != null) {
-            if (curData!!.moveToFirst()) {
-                existInDB1 = BooleanArray(1)
-                existInDB2 = BooleanArray(1)
-                existInDB3 = BooleanArray(1)
-                memName = ""
-                do {
-                    itera++
-                    tempFP1 = ByteArray(mImageWidth * mImageHeight)
-                    for (j in tempFP1!!.indices)
-                        tempFP1!![j] = 0
+
+        fingerPrints = dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID,0))!!.toList()
+        Log.e("CHECK_FNGR",""+fingerPrints)
+
+        if(fingerPrints != null && fingerPrints.size > 0) {
 
 
+            existInDB1 = BooleanArray(1)
+            existInDB2 = BooleanArray(1)
+            existInDB3 = BooleanArray(1)
+            memName = ""
 
-                    if (curData!!.getBlob(3) != null) {
-
-
-                        Log.d(
-                            "Dgddfdf hhjhj : ",
-                            "ff in entrybywalk " + autoooooo + " " + nnnn + " " + curData!!.getString(1) + " " + itera + " " + memName
-                        )
-                        tempFP1 = curData!!.getBlob(3)
-                        val res: Long
-                        res = sgfplib!!.MatchTemplate(template, tempFP1, SGFDxSecurityLevel.SL_HIGH, existInDB1)
-                        if (existInDB1[0]) {
-                            number++
-                            //  Log.d("Dgddfdf string hhjhj", "ff  entrybywalk "+curData.getString(3).toString()+" "+" ");
-                            //                            Toast.makeText(getApplicationContext(), " MATCHED!! " + curData.getString(1) + " " + curData.getString(2), Toast.LENGTH_SHORT).show();
-                            memName = curData!!.getString(1)
-                        }
-                        Log.d("data", curData!!.getString(0) + " ")
+            fingerPrints.forEach {
+                itera++
+                tempFP1 = ByteArray(mImageWidth * mImageHeight)
+                for (j in tempFP1!!.indices)
+                    tempFP1!![j] = 0
+                if (it.FPImg1 != null) {
+                    tempFP1 = it.FPImg1
+                    val res: Long
+                    res = sgfplib!!.MatchTemplate(template, tempFP1, SGFDxSecurityLevel.SL_HIGH, existInDB1)
+                    if (existInDB1[0]) {
+                        number++
+                        memName = it.FPFngName
                     }
-                    else if (curData!!.getBlob(4) != null) {
+                } else if (it.FPImg2 != null) {
+                    tempFP2 = ByteArray(mImageWidth * mImageHeight)
+                    for (j in tempFP2!!.indices)
+                        tempFP2!![j] = 0
 
-                        tempFP2 = ByteArray(mImageWidth * mImageHeight)
-                        for (j in tempFP2!!.indices)
-                            tempFP2!![j] = 0
-
-                        tempFP2 = curData!!.getBlob(4)
-                        val res2: Long
-                        res2 = sgfplib!!.MatchTemplate(template, tempFP2, SGFDxSecurityLevel.SL_HIGH, existInDB2)
-                        if (existInDB2[0]) {
-                            number++
-
-                            //                            Toast.makeText(getApplicationContext(), " MATCHED!! " + curData.getString(1) + " " + curData.getString(2), Toast.LENGTH_SHORT).show();
-                            memName = curData!!.getString(1)
-                        }
-                        Log.d("data", curData!!.getString(0) + " ")
-                    } else if (curData!!.getBlob(5) != null) {
-
-                        tempFP3 = ByteArray(mImageWidth * mImageHeight)
-                        for (j in tempFP3!!.indices)
-                            tempFP3!![j] = 0
-                        tempFP3 = curData!!.getBlob(5)
-                        val res3: Long
-                        res3 = sgfplib!!.MatchTemplate(template, tempFP3, SGFDxSecurityLevel.SL_HIGH, existInDB3)
-                        if (existInDB3[0]) {
-                            number++
-
-                            //                            Toast.makeText(getApplicationContext(), " MATCHED!! " + curData.getString(1) + " " + curData.getString(2), Toast.LENGTH_SHORT).show();
-                            memName = curData!!.getString(1)
-                        }
-                    }
-                    if (number > 0) {
-                        return number
+                    tempFP2 = it.FPImg2
+                    val res2: Long
+                    res2 = sgfplib!!.MatchTemplate(template, tempFP2, SGFDxSecurityLevel.SL_HIGH, existInDB2)
+                    if (existInDB2[0]) {
+                        number++
+                        memName = it.FPFngName
                     }
 
-                } while (curData!!.moveToNext())
+                } else if (it.FPImg3 != null) {
+                    tempFP3 = ByteArray(mImageWidth * mImageHeight)
+                    for (j in tempFP3!!.indices)
+                        tempFP3!![j] = 0
+                    tempFP3 = it.FPImg3
+                    val res3: Long
+                    res3 = sgfplib!!.MatchTemplate(template, tempFP3, SGFDxSecurityLevel.SL_HIGH, existInDB3)
+                    if (existInDB3[0]) {
+                        number++
+                        memName = it.FPFngName
+                    }
+                }
+
+                if (number > 0) {
+                    return number
+                }
             }
         }
-        return number
+        return number;
     }
 
     override fun onStart() {
@@ -1543,8 +1516,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 startActivity(i_vehicle)
             }
             R.id.tv_emergency -> {
-                val i_emer = Intent(this@Dashboard, TicketingDetailsActivity::class.java)
-                startActivity(i_emer)
+//                val i_emer = Intent(this@Dashboard, TicketingDetailsActivity::class.java)
+//                startActivity(i_emer)
             }
         }//            case R.id.tv_filter:
         //                if (clickable1 == 0) {
@@ -1647,16 +1620,22 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     fun downloadBiometricData_Loop() {
-//        for ((_, _, _, _, _, _, _, _, _, wkWorkID) in LocalDb.getStaffs(realm)!!) {
+        DataBaseHelper.getStaffs().forEach{
+            if(dbh!!.fingercount(it.wkWorkID) <= 3){
+                val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                Log.d("btn_biometric", "af "+it.wkWorkID)
+                ddc.putExtra(BSR_Action, SYNC_STAFF_BIOMETRIC)
+                ddc.putExtra("ID", it.wkWorkID)
+                sendBroadcast(ddc)
+            }
+        }
+
+//        for ((_, _, _, _, _, _, _, _, _, wkWorkID) in DataBaseHelper.getStaffs()!!) {
 //            //if the existing elements contains the search input
 //            if (dbh!!.fingercount(wkWorkID) > 3) {
 //
 //            } else {
-//                val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-//                Log.d("btn_biometric", "af $wkWorkID")
-//                ddc.putExtra(BSR_Action, SYNC_STAFF_BIOMETRIC)
-//                ddc.putExtra("ID", wkWorkID)
-//                sendBroadcast(ddc)
+//
 //
 //            }
 //
@@ -1677,7 +1656,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //        }
         mHandlerr = Handler()
         //startRepeatingTask()
-        database =  DBHelper(this);
 
 
         btn_in=findViewById(R.id.btn_in)
@@ -1797,9 +1775,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             btn_in.setBackgroundColor(resources.getColor(R.color.orange))
             btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
-            if (LocalDb.getVisitorEnteredLog() != null) {
+            if (DataBaseHelper.getVisitorEnteredLog() != null) {
 
-                newAl = LocalDb.getVisitorEnteredLog()
+                newAl = DataBaseHelper.getVisitorEnteredLog()
                 // LocalDb.saveAllVisitorLog(newAl);
                 if((newAl)!!.isEmpty()){
                     rv_dashboard!!.setVisibility(View.GONE)

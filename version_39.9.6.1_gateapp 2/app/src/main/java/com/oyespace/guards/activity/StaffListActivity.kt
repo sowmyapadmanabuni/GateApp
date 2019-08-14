@@ -35,6 +35,7 @@ import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.models.WorkersList
@@ -173,12 +174,11 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
                             //Log.d("WorkerList success", workerListResponse.data.toString())
 
                             val _arrayList = workerListResponse.data.worker
-                            realm.beginTransaction();
-                            realm.insertOrUpdate(_arrayList);
-                            realm.commitTransaction();
-                            realm.close()
+                            val realmDB = DataBaseHelper()
+                            realmDB.saveStaffsList(_arrayList)
 
-                            WorkerAdapter = StaffAdapter(LocalDb.getStaffs(), this@StaffListActivity)
+
+                            WorkerAdapter = StaffAdapter(DataBaseHelper.getStaffs(), this@StaffListActivity)
                             rv_staff!!.adapter = WorkerAdapter
                         }
 //                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {

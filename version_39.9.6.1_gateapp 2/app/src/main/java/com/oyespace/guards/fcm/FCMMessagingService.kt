@@ -19,7 +19,6 @@ import com.google.firebase.messaging.RemoteMessage
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.TicketingDetailsActivity
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON
 import com.oyespace.guards.network.CommonDisposable
@@ -303,34 +302,8 @@ class FCMMessagingService : FirebaseMessagingService(){
                 Log.d("JSON in", "PatrollingNotDone: " + remoteMessage!!.data["name"] + " " + remoteMessage!!.data["entry_type"])
 
             }
-            else if (remoteMessage!!.data["activt"].equals("SyncMemberDNDstatus", ignoreCase = true))
-            {
 
-                dbh.updateDNDlocal(Integer.valueOf(remoteMessage!!.data["nr_id"]),
-                    remoteMessage!!.data["name"], remoteMessage!!.data["mobile"]
-                )
 
-                Log.d("JSON in", "SyncMemberDND: " + remoteMessage!!.data["name"] + " " + remoteMessage!!.data["entry_type"])
-            }
-            else if (remoteMessage!!.data["activt"].equals("SyncOtpPhotostatus", ignoreCase = true))
-            {
-
-                dbh.updateOtpStatus_photoStatus(Integer.valueOf(remoteMessage!!.data["nr_id"]),
-                    remoteMessage!!.data["name"], remoteMessage!!.data["mobile"]
-                )
-
-                Log.d("JSON in", "SyncOtpPhotostatus: " + remoteMessage!!.data["name"] + " " + remoteMessage!!.data["entry_type"])
-            }
-            else if (remoteMessage!!.data["activt"].equals("SyncAssociationSettings", ignoreCase = true))
-            {
-
-                dbh.updatesettingStatusAssociation(Integer.valueOf(remoteMessage!!.data["nr_id"]),
-                    remoteMessage!!.data["name"], remoteMessage!!.data["mobile"]
-                )
-
-                Log.d("JSON in", "SyncOtpPhotostatus: " + remoteMessage!!.data["name"] + " " + remoteMessage!!.data["entry_type"])
-
-            }
             else if (remoteMessage!!.data["activt"].equals("emergencyResponse", ignoreCase = true))
             {
 
@@ -506,10 +479,10 @@ class FCMMessagingService : FirebaseMessagingService(){
     internal fun yesNoNotification_25(title:String, mobileNumber:String, emergencyID:String, emergencyB:Boolean, gps:String) {
 
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
-//        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-        val i = Intent(applicationContext, TicketingDetailsActivity::class.java)
-        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(i)
+////        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
+//        val i = Intent(applicationContext, SOS::class.java)
+//        i.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//        startActivity(i)
 
 //                //to play sound external sound files
 //                // final MediaPlayer mediaPlayer;
@@ -642,42 +615,42 @@ class FCMMessagingService : FirebaseMessagingService(){
     }
 
     private fun getEmerResponses(title:String, mobileNumber:String, emergencyId:String, emergencyB:Boolean, gps:String) {
-        RetrofitClinet.instance
-            .getTicketingResponses(OYE247TOKEN,emergencyId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetTicketingResponsesRes<TicketingResponseData>>() {
-
-                override fun onSuccessResponse(visitorList: GetTicketingResponsesRes<TicketingResponseData>) {
-                    Log.d("getEmerResponses","in emergencyId "+emergencyId)
-                    Log.d("getEmerResponses","Dgddfdfeemer in 417"+visitorList.toString())
-
-                    if (visitorList.data.ticketingResponse !=null) {
-                        Log.d("getEmerResponses",visitorList.toString());
-
-                    } else {
-                        Log.d("getEmerResponses","Dgddfdfeemer in 437")
-                        yesNoNotification_25(title, mobileNumber, emergencyId, emergencyB, gps)
-                        dbh.insertSecurityNotificationTable(LocalDb.getAssociation().asAssnID,
-                            Emergency, title, gps, Integer.valueOf(emergencyId), mobileNumber)
-
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("getEmerResponses",e.message);
-                    Log.d("getEmerResponses","Dgddfdfeemer in 441")
-                    yesNoNotification_25(title, mobileNumber, emergencyId, emergencyB, gps)
-                    dbh.insertSecurityNotificationTable(LocalDb.getAssociation().asAssnID,
-                        Emergency, title, gps, Integer.valueOf(emergencyId), mobileNumber)
-
-
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
+//        RetrofitClinet.instance
+//            .getTicketingResponses(OYE247TOKEN,emergencyId)
+//            .subscribeOn(Schedulers.io())
+//            .observeOn(AndroidSchedulers.mainThread())
+//            .subscribeWith(object : CommonDisposable<GetTicketingResponsesRes<TicketingResponseData>>() {
+//
+//                override fun onSuccessResponse(visitorList: GetTicketingResponsesRes<TicketingResponseData>) {
+//                    Log.d("getEmerResponses","in emergencyId "+emergencyId)
+//                    Log.d("getEmerResponses","Dgddfdfeemer in 417"+visitorList.toString())
+//
+//                    if (visitorList.data.ticketingResponse !=null) {
+//                        Log.d("getEmerResponses",visitorList.toString());
+//
+//                    } else {
+//                        Log.d("getEmerResponses","Dgddfdfeemer in 437")
+//                        yesNoNotification_25(title, mobileNumber, emergencyId, emergencyB, gps)
+//                        dbh.insertSecurityNotificationTable(LocalDb.getAssociation().asAssnID,
+//                            Emergency, title, gps, Integer.valueOf(emergencyId), mobileNumber)
+//
+//                    }
+//                }
+//
+//                override fun onErrorResponse(e: Throwable) {
+//                    Log.d("getEmerResponses",e.message);
+//                    Log.d("getEmerResponses","Dgddfdfeemer in 441")
+//                    yesNoNotification_25(title, mobileNumber, emergencyId, emergencyB, gps)
+//                    dbh.insertSecurityNotificationTable(LocalDb.getAssociation().asAssnID,
+//                        Emergency, title, gps, Integer.valueOf(emergencyId), mobileNumber)
+//
+//
+//                }
+//
+//                override fun noNetowork() {
+//
+//                }
+//            })
 
     }
 

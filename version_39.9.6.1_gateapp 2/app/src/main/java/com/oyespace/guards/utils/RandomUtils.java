@@ -1,6 +1,7 @@
 package com.oyespace.guards.utils;
 
 import android.util.Log;
+import com.oyespace.guards.DataBaseHelper;
 import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.pojo.VisitorEntryLog;
 import com.oyespace.guards.responce.ResponseVisitorLog;
@@ -128,10 +129,10 @@ public class RandomUtils {
         ArrayList<VisitorLog> filteredList =new ArrayList<>();
       //  var filteredList = ArrayList<ResponseVisitorLog.Data.Visitorlogbydate>()
 
-        if (LocalDb.getVisitorEnteredLog() == null) {
+        if (DataBaseHelper.getVisitorEnteredLog() == null) {
             filteredList = new ArrayList<>();
         } else {
-            filteredList = LocalDb.getVisitorEnteredLog();
+            filteredList = DataBaseHelper.getVisitorEnteredLog();
         }
 
         //looping through existing elements

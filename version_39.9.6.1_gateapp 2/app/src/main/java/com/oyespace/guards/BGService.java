@@ -88,8 +88,8 @@ public class BGService extends Service  {
             }
         };
         overStayingNames="";
-        if(LocalDb.getVisitorEnteredLog()!=null) {
-            for (VisitorLog s : LocalDb.getVisitorEnteredLog()) {
+        if(DataBaseHelper.getVisitorEnteredLog()!=null) {
+            for (VisitorLog s : DataBaseHelper.getVisitorEnteredLog()) {
                 //if the existing elements contains the search input
                 if (s.getVlVisType().equalsIgnoreCase(DELIVERY)&&deliveryTimeUp(s.getVlEntryT(),getCurrentTimeLocal(),1)) {
                     //adding the element to filtered list

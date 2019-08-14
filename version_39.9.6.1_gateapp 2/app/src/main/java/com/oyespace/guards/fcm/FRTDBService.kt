@@ -89,7 +89,9 @@ class FRTDBService: Service() {
                 if (dataSnapshot.exists()) {
 
                     var realm:Realm = Realm.getDefaultInstance()
-                    realm.beginTransaction()
+                    if(!realm.isInTransaction) {
+                        realm.beginTransaction()
+                    }
                     realm.delete(SOSModel::class.java)
                     realm.delete(PassesSOSGuards::class.java)
                     realm.commitTransaction()

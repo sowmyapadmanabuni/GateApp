@@ -9,8 +9,9 @@ import io.realm.annotations.RealmClass
 open class FingerPrint:RealmObject(){
 
     @PrimaryKey
-    var ASAssnID:Int = 0
     var FMID: Int=0
+    var userName: String=""
+    var ASAssnID:Int = 0
     var FPFngName: String=""
     var FPImg1: ByteArray = ByteArray(8192)
     var FPImg2: ByteArray = ByteArray(8192)

@@ -122,7 +122,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     internal var existInDB = BooleanArray(1)
     internal var tempFP: ByteArray? = null
 
-    internal var curData: Cursor? = null
 
     lateinit var fingerDetails: TextView//080 42074082
     lateinit var left_thumb: ImageView
@@ -299,11 +298,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         next = findViewById(R.id.buttonNext)
         previous = findViewById(R.id.buttonPrevious)
         buttonDone = findViewById(R.id.buttonDone)
-
-        curData = dbh.regularVisitorsFinger
-        if (curData != null) {
-            curData!!.moveToFirst()
-        }
 
 
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
@@ -915,7 +909,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     if (existInDB1[0]) {
                         t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
                     } else {
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text = "MATCHED!!\n"
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -1003,7 +997,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     } else {
 
 
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text = "MATCHED!!\n"
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         relLayout3!!.visibility = View.VISIBLE
@@ -1191,7 +1185,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 )
                 if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
                     showToast(this, "Fingerprint Saved")
-                    dbh.insertUserDetails(
+                    dbh.insertFingerPrints(
                         memId.toString() + "",
                         finger_type,
                         mFingerprint1Template,

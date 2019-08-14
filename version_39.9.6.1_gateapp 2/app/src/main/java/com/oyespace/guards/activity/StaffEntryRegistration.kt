@@ -23,6 +23,7 @@ import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.*
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.*
@@ -32,6 +33,7 @@ import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.NumberUtils.toInteger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.kotlin.createObject
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import kotlinx.android.synthetic.main.activity_img_view.*
 import kotlinx.android.synthetic.main.activity_mobile_number.*
@@ -148,6 +150,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
         initRealm()
+        Log.e("STAFF_ENTRY","registration");
         //launchCamera()
 //        val service =  Intent(getBaseContext(), CapPhoto::class.java)
 //        startService(service);
@@ -337,19 +340,36 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     if (globalApiObject.success == true) {
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
 
-                       var id: Long  = dbh!!.insertVisitorData(intent.getStringExtra(UNITNAME),Prefs.getInt(ASSOCIATION_ID,0).toString(),intent.getStringExtra(PERSONNAME),memID,globalApiObject.data.visitorLog.vlVisLgID, toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(VISITOR_TYPE),1,"","" )
+//                       var id: Long  = dbh!!.insertVisitorData(intent.getStringExtra(UNITNAME),Prefs.getInt(ASSOCIATION_ID,0).toString(),intent.getStringExtra(PERSONNAME),memID,globalApiObject.data.visitorLog.vlVisLgID, toInteger(intent.getStringExtra(UNITID)),
+//                           intent.getStringExtra(MOBILENUMBER),
+//                           intent.getStringExtra(COMPANY_NAME),
+//                           intent.getStringExtra(VISITOR_TYPE),1,"","" )
+
+                        realm.executeTransaction {
+                            val vlog = it.createObject(VisitorLog::class.java, globalApiObject.data.visitorLog.vlVisLgID)
+                            vlog.asAssnID  = Prefs.getInt(ASSOCIATION_ID,0)
+                            vlog.mEMemID = memID
+                            vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
+                            vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
+                            vlog.vlfName = intent.getStringExtra(PERSONNAME)
+                            vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
+                            vlog.vlComName = intent.getStringExtra(COMPANY_NAME)
+                            vlog.vlVisType = intent.getStringExtra(VISITOR_TYPE)
+                            vlog.unUniName = intent.getStringExtra(UNITNAME)
+                            vlog.vlVisCnt = 1
+                            vlog.vlEntryT = getCurrentTimeLocal()
+                        }
 
 
 
-
-                        if(id<=0)
-            {
-              // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-            } else
-            {
-               // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
-
-            }
+//                        if(id<=0)
+//            {
+//              // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+//            } else
+//            {
+//               // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
+//
+//            }
 
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
@@ -638,7 +658,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-//        val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffs(realm)[0].wkWorkID.toInt(), visitorLogID)
+//        val req = VisitorEntryReq(getCurrentTimeLocal(), DataBaseHelper.getStaffs(realm)[0].wkWorkID.toInt(), visitorLogID)
         try {
            // val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
             val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)

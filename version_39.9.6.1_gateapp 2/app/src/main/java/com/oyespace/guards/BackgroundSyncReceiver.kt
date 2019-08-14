@@ -31,10 +31,6 @@ import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
-import io.realm.RealmList
-import io.realm.kotlin.delete
-import io.realm.kotlin.where
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -181,7 +177,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     ba_fp2 = Base64.decode(fp2, Base64.DEFAULT)
                                     ba_fp3 = Base64.decode(fp3, Base64.DEFAULT)
 
-                                    dbh.insertUserDetails(intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
+                                    dbh.insertFingerPrints(intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
                                         staffBiometricResp.data.fingerPrint.get(i).fpFngName,
                                         ba_fp1,
                                         ba_fp2,
@@ -347,7 +343,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     private fun getStaffList() {
         try {
-            var realm: Realm = Realm.getDefaultInstance();
             RetrofitClinet.instance
                 .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
                 .subscribeOn(Schedulers.io())
@@ -361,22 +356,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                             Log.d("WorkerList success", workerListResponse.data.toString())
 
                             val arrayList = workerListResponse.data.worker
-                            realm.beginTransaction();
-                            realm.copyToRealmOrUpdate(arrayList);
-                            realm.commitTransaction();
-                            realm.close()
-
-
-//                        var arrayList: ArrayList<Worker>? = null
-//
-//                        arrayList = workerListResponse.data.worker
-//
-//                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-//                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-//                                return lhs.wkfName.compareTo(rhs.wkfName)
-//                            }
-//                        })
-//                        LocalDb.saveStaffList(arrayList);
+                            val realmDb = DataBaseHelper()
+                            realmDb.saveStaffsList(arrayList)
 
                         } else {
 
@@ -469,7 +450,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     private fun getVisitorLogEntryList() {
         Log.e("SYCNCHECK","in 408")
-        var realm: Realm = Realm.getDefaultInstance();
         RetrofitClinet.instance
             .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
             .subscribeOn(Schedulers.io())
@@ -485,35 +465,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                         Log.e("cdvd_", ""+visitorList.data.visitorLog);
                         //val list = RealmList<com.oyespace.guards.models.VisitorLog>()
                         //list.addAll(visitorList.data.visitorLog)
-                        realm.beginTransaction();
-                        realm.insertOrUpdate(visitorList.data.visitorLog);
-                        realm.commitTransaction();
-
-                        Log.e("After_trans",""+realm.where(com.oyespace.guards.models.VisitorLog::class.java).findAll().size);
-
-                        realm.close()
-//                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
-//                        arrayListVisitors = visitorList.data.visitorLog
-//
-//                        if(visitorList.data.visitorLog!=null) {
-//
-////                                Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
-////                                    override fun compare(lhs: VisitorEntryLog, rhs: VisitorEntryLog): Int {
-////                                        return lhs.vlEntryT.compareTo(rhs.vlEntryT, true)
-////                                    }
-////                                })
-//                        }
-//                        LocalDb.saveEnteredVisitorLog(arrayListVisitors);
-//
-
+                        val visitorsList = visitorList.data.visitorLog
+                        val realmDB = DataBaseHelper()
+                        realmDB.saveVisitors(visitorsList)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")
-                        realm.beginTransaction();
 
-                        realm.delete(com.oyespace.guards.models.VisitorLog::class.java);
-                        realm.commitTransaction();
-                        realm.close()
+
+
                     }
                     val smsIntent = Intent(ConstantUtils.SYNC)
                     smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)

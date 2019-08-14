@@ -34,6 +34,7 @@ import android.content.DialogInterface
 import android.os.Handler
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AlertDialog
+import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.VisitorLog
@@ -138,7 +139,9 @@ class VistorEntryListAdapter(private var listVistor: ArrayList<VisitorLog>, priv
                 //Log.e("VISITOR",""+visitor);
                 makeExitCall(lgid);
                 val visitor = realm.where(VisitorLog::class.java).equalTo("vlMobile", listVistor.get(position).vlMobile).findFirst()
-                realm.beginTransaction()
+               if(!realm.isInTransaction) {
+                   realm.beginTransaction()
+               }
                 visitor!!.deleteFromRealm()
                 realm.commitTransaction()
 
@@ -157,7 +160,7 @@ class VistorEntryListAdapter(private var listVistor: ArrayList<VisitorLog>, priv
 
 
 
-                Log.e("UPDATED", "" + LocalDb.getVisitorEnteredLog());
+                Log.e("UPDATED", "" + DataBaseHelper.getVisitorEnteredLog());
 
                 //listVistor.get(position).vlExitT=DateTimeUtils.getCurrentTimeLocal();
                 listVistor.removeAt(position)

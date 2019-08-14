@@ -181,6 +181,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_mobile_number)
+
         receiver =  object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
 

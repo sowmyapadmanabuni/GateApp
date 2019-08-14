@@ -210,10 +210,10 @@ class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : Recy
             }
           else{
                 val enteredStaff = java.util.ArrayList<VisitorLog>()
-                Log.d("Biometric 973", " " + (LocalDb.getVisitorEnteredLog() != null))
+                Log.d("Biometric 973", " " + (DataBaseHelper.getVisitorEnteredLog() != null))
                 //looping through existing elements
-                if (LocalDb.getVisitorEnteredLog() != null) {
-                    for (s in LocalDb.getVisitorEnteredLog()!!) {
+                if (DataBaseHelper.getVisitorEnteredLog() != null) {
+                    for (s in DataBaseHelper.getVisitorEnteredLog()!!) {
                         //if the existing elements contains the search input
                         if (s.reRgVisID == staffdata.wkWorkID) {
                             //adding the element to filtered list

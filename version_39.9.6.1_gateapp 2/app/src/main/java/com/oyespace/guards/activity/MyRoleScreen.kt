@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
 import com.oyespace.guards.Dashboard
+import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
@@ -269,20 +270,10 @@ class MyRoleScreen : BaseKotlinActivity() {
                         Log.d("WorkerList success",workerListResponse.data.toString())
 
                         val arrayList = workerListResponse.data.worker
-                        realm.beginTransaction();
-                        realm.copyToRealmOrUpdate(arrayList);
-                        realm.commitTransaction();
-                        closeRealm()
 
-                        //val workerCount = realm.where(Worker::class.java).findAllSorted("wklName",Sort.ASCENDING)
-                        //Log.d("workerCount",""+(workerCount));
-//                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-//                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-//                                return lhs.wkfName.compareTo(rhs.wkfName)
-//                            }
-//                        })
+                        val realmDB = DataBaseHelper();
+                        realmDB.saveStaffsList(arrayList)
 
-//                       // LocalDb.saveStaffList(arrayList);
                         val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
                         mainIntent.putExtra("STAFF","Available")
                         startActivity(mainIntent)
