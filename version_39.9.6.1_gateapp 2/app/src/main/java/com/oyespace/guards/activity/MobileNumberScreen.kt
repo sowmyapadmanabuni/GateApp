@@ -216,12 +216,6 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
       //  Toast.makeText(this@MobileNumberScreen,intent.getStringExtra( "RESIDENT_NUMBER"),Toast.LENGTH_LONG).show()
         btn_nobalance=findViewById(R.id.btn_nobalance)
 
-        textview.text = "+919447679700"
-
-        ccd= "+919447679700"
-
-        mobileNumber="+919447679700"
-
         receiver =  object : BroadcastReceiver() {
 
             override fun onReceive(context: Context?, intent: Intent?) {
