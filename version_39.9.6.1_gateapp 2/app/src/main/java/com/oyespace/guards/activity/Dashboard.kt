@@ -1049,8 +1049,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         loginReq.VLEntryImg=wkEntryImg
 
 
-        realm.executeTransaction {
-            val vlog = it.createObject<VisitorLog>();
+        //realm.executeTransaction {
+            if(!realm.isInTransaction){
+                realm.beginTransaction()
+            }
+            val vlog = realm.createObject<VisitorLog>();
             vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
             vlog.mEMemID = memID
             vlog.reRgVisID = staffID
@@ -1062,7 +1065,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             vlog.unUniName = unitName
             vlog.vlVisCnt = 1
             vlog.vlEntryT = getCurrentTimeLocal()
-        }
+            realm.commitTransaction()
+        //}
         //val workerCount = realm.where(VisitorLog::class.java).findAll()
 
 //        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,

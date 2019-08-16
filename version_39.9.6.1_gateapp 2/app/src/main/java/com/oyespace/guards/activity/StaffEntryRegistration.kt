@@ -345,8 +345,11 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //                           intent.getStringExtra(COMPANY_NAME),
 //                           intent.getStringExtra(VISITOR_TYPE),1,"","" )
 
-                        realm.executeTransaction {
-                            val vlog = it.createObject(VisitorLog::class.java, globalApiObject.data.visitorLog.vlVisLgID)
+                        //realm.executeTransaction {
+                            if(!realm.isInTransaction){
+                                realm.beginTransaction()
+                            }
+                            val vlog = realm.createObject(VisitorLog::class.java, globalApiObject.data.visitorLog.vlVisLgID)
                             vlog.asAssnID  = Prefs.getInt(ASSOCIATION_ID,0)
                             vlog.mEMemID = memID
                             vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
@@ -358,7 +361,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             vlog.unUniName = intent.getStringExtra(UNITNAME)
                             vlog.vlVisCnt = 1
                             vlog.vlEntryT = getCurrentTimeLocal()
-                        }
+                            realm.commitTransaction()
+                        //}
 
 
 
