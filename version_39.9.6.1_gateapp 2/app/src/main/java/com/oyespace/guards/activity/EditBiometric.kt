@@ -1194,6 +1194,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                 if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
                     showToast(this, "Fingerprint Saved")
                     dbh.insertFingerPrints(
+                        loginDetailsResponce.FingerPrint().fpid.toInt(),
                         memId.toString() + "",
                         finger_type,
                         mFingerprint1Template,

@@ -1175,36 +1175,40 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     }
 
     override fun onSuccess(responce: String, data: Any, urlId: Int, position: Int) {
-
-        if (urlId == URLData.URL_SAVE_FINGERPRINT.urlId) {
-            val loginDetailsResponce = data as FingerPrintCreateResp
-            if (loginDetailsResponce != null) {
-                Log.d(
-                    "str3",
-                    "str3: " + urlId + " id " + position + " " + memId + " " + MemberType + " " + loginDetailsResponce.success.toString()
-                )
-                if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
-                    showToast(this, "Fingerprint Saved")
-                    dbh.insertFingerPrints(
-                        memId.toString() + "",
-                        finger_type,
-                        mFingerprint1Template,
-                        mFingerprint2Template,
-                        mFingerprint3Template,
-                        MemberType,
-                        Prefs.getInt(ASSOCIATION_ID, 0)
-
+        try {
+            if (urlId == URLData.URL_SAVE_FINGERPRINT.urlId) {
+                val loginDetailsResponce = data as FingerPrintCreateResp
+                if (loginDetailsResponce != null) {
+                    Log.d(
+                        "str3",
+                        "str3: " + urlId + " id " + position + " " + memId + " " + MemberType + " " + loginDetailsResponce.success.toString()
                     )
-                    selectedFinger()
-                    resetCapures()
+                    if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
+                        showToast(this, "Fingerprint Saved")
+                        dbh.insertFingerPrints(
+                            loginDetailsResponce.FingerPrint().fpid.toInt(),
+                            memId.toString() + "",
+                            finger_type,
+                            mFingerprint1Template,
+                            mFingerprint2Template,
+                            mFingerprint3Template,
+                            MemberType,
+                            Prefs.getInt(ASSOCIATION_ID, 0)
+
+                        )
+                        selectedFinger()
+                        resetCapures()
+                    } else {
+                        showToast(this, "Fingerprint not saved ")
+                    }
+
                 } else {
-                    showToast(this, "Fingerprint not saved ")
+                    showToast(this, "Something went wrong . please try again ")
                 }
 
-            } else {
-                showToast(this, "Something went wrong . please try again ")
             }
-
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
         }
         //  showToast(this, urlId+" id "+position+" "+memId+" "+MemberType+" ");
 

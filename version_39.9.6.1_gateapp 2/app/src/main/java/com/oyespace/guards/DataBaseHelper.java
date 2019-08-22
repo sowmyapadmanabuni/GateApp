@@ -28,9 +28,10 @@ public class DataBaseHelper {
     }
 
 
-    public void insertFingerPrints(String uname, String finger_type, byte[] photo1, byte[] photo2, byte[] photo3, String MemberType, int aid)
+    public void insertFingerPrints(int fpId, String uname, String finger_type, byte[] photo1, byte[] photo2, byte[] photo3, String MemberType, int aid)
     {
         boolean commitNow = false;
+
         int _uname = Integer.parseInt(uname);
         Realm realm = Realm.getDefaultInstance();
 
@@ -41,7 +42,8 @@ public class DataBaseHelper {
                 realm.beginTransaction();
                 commitNow = true;
             }
-            FingerPrint fingerPrint = realm.createObject(FingerPrint.class, _uname);
+            FingerPrint fingerPrint = realm.createObject(FingerPrint.class, fpId);
+            fingerPrint.setFMID(_uname);
             fingerPrint.setUserName(uname);
             fingerPrint.setFPFngName(finger_type);
             fingerPrint.setFPImg1(photo1);
@@ -54,6 +56,14 @@ public class DataBaseHelper {
             }
         }
 
+    }
+
+    public int getTotalFingerPrints(){
+        int available=0;
+        Realm realm = Realm.getDefaultInstance();
+        long avail = realm.where(FingerPrint.class).count();
+        available = (int) avail;
+        return available;
     }
 
 
@@ -70,11 +80,15 @@ public class DataBaseHelper {
         return available;
     }
 
-    public int fingercount(int MemberID ) {
+    public int fingercount(int MemberID) {
+        Log.e("Check_FingerCount","OF: "+MemberID);
+        String memberString = ""+MemberID;
+        memberString = memberString.trim();
         int available=0;
         Realm realm = Realm.getDefaultInstance();
-        long avail = realm.where(FingerPrint.class).equalTo("userName",""+MemberID).count();
+        long avail = realm.where(FingerPrint.class).equalTo("FMID",MemberID).count();
         available = (int) avail;
+        Log.e("Check_Exist"," "+available);
         return available;
 
     }

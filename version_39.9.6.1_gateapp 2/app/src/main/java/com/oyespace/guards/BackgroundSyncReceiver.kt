@@ -158,7 +158,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(staffBiometricResp: StaffBiometricResp<StaffBiometricData>) {
 
                     if (staffBiometricResp.success == true) {
-                        Log.d("getStaffBiometric",staffBiometricResp.data.toString())
+                        Log.e("getStaffBiometric",""+staffBiometricResp.data.fingerPrint.toString())
                         try {
                             var dbh: DataBaseHelper= DataBaseHelper(mcontext);
 
@@ -177,7 +177,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     ba_fp2 = Base64.decode(fp2, Base64.DEFAULT)
                                     ba_fp3 = Base64.decode(fp3, Base64.DEFAULT)
 
-                                    dbh.insertFingerPrints(intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
+                                    dbh.insertFingerPrints(staffBiometricResp.data.fingerPrint.get(i).fpid,intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
                                         staffBiometricResp.data.fingerPrint.get(i).fpFngName,
                                         ba_fp1,
                                         ba_fp2,
@@ -185,6 +185,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         staffBiometricResp.data.fingerPrint.get(i).fpMemType,
                                         staffBiometricResp.data.fingerPrint.get(i).asAssnID
                                     )
+
+                                    Log.e("TOTAL_F_SAVED",""+dbh.getTotalFingerPrints());
                                 } catch (e: Exception) {
                                     Log.d("getStaffBiometric", "Exception$e")
                                 }
