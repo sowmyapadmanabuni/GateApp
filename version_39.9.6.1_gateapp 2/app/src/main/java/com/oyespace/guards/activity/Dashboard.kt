@@ -1053,7 +1053,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             if(!realm.isInTransaction){
                 realm.beginTransaction()
             }
-            val vlog = realm.createObject<VisitorLog>();
+            val lgId= (100000 until 99000000).random()
+            val vlog = realm.createObject<VisitorLog>(lgId);
             vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
             vlog.mEMemID = memID
             vlog.reRgVisID = staffID
@@ -1332,6 +1333,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     if (DataBaseHelper.getVisitorEnteredLog() != null) {
                         for (s in DataBaseHelper.getVisitorEnteredLog()!!) {
                             //if the existing elements contains the search input
+                            Log.e("s.reRgVisID",""+s.reRgVisID);
                             if (s.reRgVisID == Integer.parseInt(memName)) {
                                 //adding the element to filtered list
                                 enteredStaff.add(s)
@@ -1401,6 +1403,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
                 Log.d("Biometric 1035", " $ex")
+                ex.printStackTrace()
                 // Toast.makeText(applicationContext, "Biometric not attached correctly ", Toast.LENGTH_LONG).show()
             }
 
@@ -1434,15 +1437,17 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             fingerPrints.forEach {
                 itera++
                 tempFP1 = ByteArray(mImageWidth * mImageHeight)
+                Log.e("BYTEARRAY",""+(mImageWidth * mImageHeight));
                 for (j in tempFP1!!.indices)
                     tempFP1!![j] = 0
                 if (it.FPImg1 != null) {
                     tempFP1 = it.FPImg1
+                    Log.e("CHECKING_ANY?",""+tempFP1);
                     val res: Long
                     res = sgfplib!!.MatchTemplate(template, tempFP1, SGFDxSecurityLevel.SL_HIGH, existInDB1)
                     if (existInDB1[0]) {
                         number++
-                        memName = it.FPFngName
+                        memName = it.userName
                     }
                 } else if (it.FPImg2 != null) {
                     tempFP2 = ByteArray(mImageWidth * mImageHeight)
@@ -1454,7 +1459,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     res2 = sgfplib!!.MatchTemplate(template, tempFP2, SGFDxSecurityLevel.SL_HIGH, existInDB2)
                     if (existInDB2[0]) {
                         number++
-                        memName = it.FPFngName
+                        memName = it.userName
                     }
 
                 } else if (it.FPImg3 != null) {
@@ -1466,7 +1471,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     res3 = sgfplib!!.MatchTemplate(template, tempFP3, SGFDxSecurityLevel.SL_HIGH, existInDB3)
                     if (existInDB3[0]) {
                         number++
-                        memName = it.FPFngName
+                        memName = it.userName
                     }
                 }
 
@@ -1475,6 +1480,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 }
             }
         }
+        Log.e("EXIST??",""+number);
         return number;
     }
 

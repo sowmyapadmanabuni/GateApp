@@ -15,9 +15,9 @@ open class FingerPrint:RealmObject(){
     var userName: String=""
     var ASAssnID:Int = 0
     var FPFngName: String=""
-    var FPImg1: ByteArray = ByteArray(8192)
-    var FPImg2: ByteArray = ByteArray(8192)
-    var FPImg3: ByteArray = ByteArray(8192)
+    var FPImg1: ByteArray = ByteArray(120000)
+    var FPImg2: ByteArray = ByteArray(120000)
+    var FPImg3: ByteArray = ByteArray(120000)
     var FPMemType: String = ""
 
 
