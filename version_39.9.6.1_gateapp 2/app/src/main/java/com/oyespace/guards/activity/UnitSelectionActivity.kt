@@ -242,6 +242,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
      * over ArrayList (assuming arrayFullList object contains complete list of Units)
      */
     private fun setPageData(){
+        Log.e("setPageData_CALL",""+selectedUnits);
         if(arrayFullList.size <=LIMIT){
             btn_page_next.visibility = View.INVISIBLE
             btn_page_prev.visibility = View.INVISIBLE
@@ -331,7 +332,11 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
+        }else{
+            selectedUnits.add(checked);
         }
+        Log.e("_onCheckUnit_",""+isSelected+" - "+selectedUnits);
+        Log.e("_onCheckUnit_CNT"," - "+selectedUnits.size);
         //orderListAdapter!!.notifyDataSetChanged();
     }
 

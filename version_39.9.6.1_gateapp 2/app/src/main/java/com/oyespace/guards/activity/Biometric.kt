@@ -872,7 +872,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
 
 
-                 // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                  Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
 
                 if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
                 {
@@ -943,6 +943,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         catch (e:Exception)
 
         {
+            e.printStackTrace()
             //FingerImage 2
             //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
             //t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
