@@ -54,6 +54,22 @@ public class DataBaseHelper {
             if (commitNow) {
                 realm.commitTransaction();
             }
+        }else{
+            if (!realm.isInTransaction()) {
+                realm.beginTransaction();
+                commitNow = true;
+            }
+            existing.setFMID(_uname);
+            existing.setUserName(uname);
+            existing.setFPFngName(finger_type);
+            existing.setFPImg1(photo1);
+            existing.setFPImg2(photo2);
+            existing.setFPImg3(photo3);
+            existing.setFPMemType(MemberType);
+            existing.setASAssnID(aid);
+            if (commitNow) {
+                realm.commitTransaction();
+            }
         }
 
     }
