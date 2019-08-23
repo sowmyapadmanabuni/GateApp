@@ -28,8 +28,10 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import com.google.gson.Gson
 import com.oyespace.guards.*
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.CaptureFPResponse
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RestClient
 import com.oyespace.guards.network.URLData
@@ -1185,16 +1187,16 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
     override fun onSuccess(responce: String, data: Any, urlId: Int, position: Int) {
 
         if (urlId == URLData.URL_SAVE_FINGERPRINT.urlId) {
-            val loginDetailsResponce = data as FingerPrintCreateResp
+            val loginDetailsResponce = Gson().fromJson(responce, CaptureFPResponse::class.java)
             if (loginDetailsResponce != null) {
                 Log.d(
                     "str3",
                     "str3: " + urlId + " id " + position + " " + memId + " " + MemberType + " " + loginDetailsResponce.success.toString()
                 )
-                if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
+                if (loginDetailsResponce.success) {
                     showToast(this, "Fingerprint Saved")
                     dbh.insertFingerPrints(
-                        loginDetailsResponce.FingerPrint().fpid.toInt(),
+                        loginDetailsResponce.data.fingerPrint.fpid,
                         memId.toString() + "",
                         finger_type,
                         mFingerprint1Template,

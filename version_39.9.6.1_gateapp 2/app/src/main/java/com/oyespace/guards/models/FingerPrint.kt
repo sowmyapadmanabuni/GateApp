@@ -4,6 +4,7 @@ import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.RealmClass
+import java.io.StringReader
 
 @RealmClass
 open class FingerPrint:RealmObject(){
@@ -28,4 +29,33 @@ data class GetFingersResponse<T>(
 )
 data class FingersList(
     val visitorLog: RealmList<FingerPrint>
+)
+
+
+/**
+ * Capture Fingerprint Response Handler
+ */
+
+data class CaptureFPResponse<T>(
+    val apiVersion: String,
+    val `data`: FPLabel,
+    val success: Boolean
+)
+
+data class FPLabel(
+    val fingerPrint: CapturedFPObject
+)
+
+data class CapturedFPObject(
+   val fpid:Int = 0,
+   val fpFngName: String,
+   val fmid: Int,
+   val fpImg1: String,
+   val fpImg2: String,
+   val fpImg3: String,
+   val fpMemType: String = "",
+   val asAssnID: Int,
+   val fpdCreated: String,
+   val fpdUpdated: String,
+   val fpIsActive:Boolean
 )
