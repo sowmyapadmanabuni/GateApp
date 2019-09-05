@@ -1442,14 +1442,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     tempFP1!![j] = 0
                 if (it.FPImg1 != null) {
                     tempFP1 = it.FPImg1
-                    Log.e("CHECKING_ANY?",""+tempFP1);
+                    Log.e("CHECKING_FINGER1",""+template+" with "+tempFP1);
                     val res: Long
                     res = sgfplib!!.MatchTemplate(template, tempFP1, SGFDxSecurityLevel.SL_HIGH, existInDB1)
                     if (existInDB1[0]) {
                         number++
                         memName = it.userName
                     }
-                } else if (it.FPImg2 != null) {
+                }
+                if (it.FPImg2 != null) {
                     tempFP2 = ByteArray(mImageWidth * mImageHeight)
                     for (j in tempFP2!!.indices)
                         tempFP2!![j] = 0
@@ -1462,7 +1463,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         memName = it.userName
                     }
 
-                } else if (it.FPImg3 != null) {
+                }
+                if (it.FPImg3 != null) {
                     tempFP3 = ByteArray(mImageWidth * mImageHeight)
                     for (j in tempFP3!!.indices)
                         tempFP3!![j] = 0

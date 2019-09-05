@@ -549,8 +549,8 @@ class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : Recy
 
         return object : Filter() {
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                searchList = results?.values as? ArrayList<Worker>
-                notifyDataSetChanged()
+//                searchList = results?.values as? ArrayList<Worker>
+//                notifyDataSetChanged()
             }
 
             override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
@@ -572,23 +572,23 @@ class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : Recy
 //
 //                Log.e("FILTER",""+filterResults);
 
-                val charString = charSequence.toString()
-                if (charString.isEmpty()) {
-                    searchList = items
-                } else {
-                    Thread {
-                        val filteredList = ArrayList<Worker>()
-                        val realm:Realm = Realm.getDefaultInstance()
-                        //realm.executeTransactionAsync {
-                            filteredList.addAll(realm.where(Worker::class.java).like("wkfName",charString,Case.INSENSITIVE).findAll());
-                            Log.e("FILTERING",""+charString+filteredList);
-                            searchList = filteredList
-
-                       // }
-                    }.run();
-                }
+//                val charString = charSequence.toString()
+//                if (charString.isEmpty()) {
+//                    searchList = items
+//                } else {
+//                    Thread {
+//                        val filteredList = ArrayList<Worker>()
+//                        val realm:Realm = Realm.getDefaultInstance()
+//                        //realm.executeTransactionAsync {
+//                            filteredList.addAll(realm.where(Worker::class.java).like("wkfName",charString,Case.INSENSITIVE).findAll());
+//                            Log.e("FILTERING",""+charString+filteredList);
+//                            searchList = filteredList
+//
+//                       // }
+//                    }.run();
+//                }
                 val filterResults = Filter.FilterResults()
-                filterResults.values = searchList
+               // filterResults.values = searchList
                 return filterResults
 
             }
