@@ -127,30 +127,59 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
        // if (::WorkerAdapter.isInitialized) {
 
 
-            tv.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+//            tv.addTextChangedListener(object : TextWatcher {
+//                override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+//                    if(WorkerAdapter!=null){
+//                        WorkerAdapter!!.getFilter().filter(charSequence)
+//
+//                    }
+//                }
+//
+//                override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+//                    try{
+//                        if(WorkerAdapter!=null){
+//                            WorkerAdapter!!.getFilter().filter(charSequence)
+//
+//                        }
+//                    }
+//                    catch (e:KotlinNullPointerException){
+//                        e.printStackTrace()
+//                    }
+//                }
+//
+//                override fun afterTextChanged(editable: Editable) {
+//
+//                }
+//            });
+
+
+        tv.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                if(WorkerAdapter!=null){
+                    // WorkerAdapter!!.getFilter().filter(charSequence)
+
+                }
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                try{
                     if(WorkerAdapter!=null){
-                        WorkerAdapter!!.getFilter().filter(charSequence)
+                        // Toast.makeText(this@StaffListActivity,charSequence,Toast.LENGTH_LONG).show()
+                        //  WorkerAdapter!!.getFilter().filter(charSequence)
+                        WorkerAdapter!!.filter(charSequence)
+
 
                     }
                 }
-
-                override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                    try{
-                        if(WorkerAdapter!=null){
-                            WorkerAdapter!!.getFilter().filter(charSequence)
-
-                        }
-                    }
-                    catch (e:KotlinNullPointerException){
-
-                    }
-                }
-
-                override fun afterTextChanged(editable: Editable) {
+                catch (e:KotlinNullPointerException){
 
                 }
-            });
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+
+            }
+        });
       //  }
         btn_mic.setOnClickListener {
             Speak()
