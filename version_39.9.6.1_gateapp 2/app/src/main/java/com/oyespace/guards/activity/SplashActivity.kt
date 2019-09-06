@@ -52,7 +52,7 @@ class SplashActivity : BaseLocationActivity() {
 
     private fun handleLocation() {
         requestPermission(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA), 1, PermissionCallback { isGranted ->
+            Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA, Manifest.permission.MODIFY_PHONE_STATE, Manifest.permission.ANSWER_PHONE_CALLS), 1, PermissionCallback { isGranted ->
             if (isGranted) {
                 checkForLocationStatus()
             } else {
