@@ -134,4 +134,8 @@
     <string name="units_list_title">इकाइयों की सूची</string>
     <string name="units_selection_title">इकाइयों का चयन करें</string>
     <string name="blocks_selection_title">ब्लॉक का चयन करें</string>
+    <string name="tvdynamicsearch">गतिशील खोज</string>
+    <string name="tvresident">निवासी</string>
+    <string name="tvmanualentry">पूर्ण मैनुअल एंट्री</string>
+    <string name="tvverifyotp">OTP को सत्यापित करें</string>
 </resources>

@@ -64,7 +64,7 @@ class WorkersTypeList: BaseKotlinActivity() {
         workType.add("Gym Trainer")
         workType.add("Head Guard")
         workType.add("Health Instructor")
-        workType.add("Lady Head Guard")
+        workType.add("HouseKeeping")
         workType.add("Lady Supervisor")
         workType.add("Lady Senior Security Guard")
         workType.add("Lady Security Guard")

@@ -73,6 +73,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     lateinit var txt_device_name: TextView
     val laststate:Int?=null
     var buttonSkip:Button?=null
+    var btn_manualentry:Button?=null
     var ccd:String?=null
     var mobileNumber:String?=null
     lateinit var btn_nobalance:Button
@@ -91,7 +92,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             R.id.btn_nobalance->{
 
                 val d = Intent(this@MobileNumberforEntryScreen, MobileNumberEntryScreenwithOTP::class.java)
-                d.putExtra("UNITID", intent.getIntExtra("UNITID",0))
+                d.putExtra("UNITID", intent.getStringExtra("UNITID"))
                 d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
                 d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
                 d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
@@ -99,6 +100,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 d.putExtra("WORKTYPE",  intent.getStringExtra("WORKTYPE"))
                 d.putExtra("WORKERID",  intent.getIntExtra("WORKERID",0))
                 d.putExtra("UNITNAME",  intent.getStringExtra("UNITNAME"))
+                d.putExtra("Image",intent.getStringExtra("Image"))
                 startActivity(d);
                 finish();
 
@@ -241,15 +243,39 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
-
-
-       // buttonSkip.setVisibility(View.INVISIBLE)
-
-
         setContentView(R.layout.activity_mobilenumberforentry)
         btn_nobalance=findViewById(R.id.btn_nobalance)
+        btn_manualentry=findViewById(R.id.btn_manualentry)
         timer=findViewById(R.id.timer)
 
+        btn_manualentry!!.setOnClickListener {
+
+            Prefs.putString(TYPE,"Entry")
+            val d = Intent(this@MobileNumberforEntryScreen, WorkersTypeList::class.java)
+            d.putExtra("UNITID", intent.getStringExtra("UNITID"))
+            d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+            d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+            d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+            d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+            d.putExtra("WORKTYPE",  intent.getStringExtra("WORKTYPE"))
+            d.putExtra(WORKER_ID,  intent.getIntExtra(WORKER_ID,0))
+            d.putExtra("UNITNAME",  intent.getStringExtra("UNITNAME"))
+            d.putExtra("BIRTHDAY",intent.getStringExtra("BIRTHDAY"))
+            startActivity(d);
+            finish()
+
+//            val d = Intent(this@MobileNumberforEntryScreen, ManulBlockSelectionActivity::class.java)
+//            d.putExtra("UNITID", intent.getIntExtra("UNITID",0))
+//            d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+//            d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+//            d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+//            d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+//            d.putExtra("WORKTYPE",  intent.getStringExtra("WORKTYPE"))
+//            d.putExtra("WORKERID",  intent.getIntExtra("WORKERID",0))
+//            d.putExtra("UNITNAME",  intent.getStringExtra("UNITNAME"))
+//            startActivity(d);
+//            finish();
+        }
 
         receiver =  object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -769,7 +795,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 ////        }
     }
 
-    private fun visitorLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+    private fun visitorLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
                            workerType:String,staffID:Int,unitName:String) {
 
 
@@ -798,7 +824,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             unitName,unitId ,desgn,
             personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
-            1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+            1,"Staff Missed call Entry",SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",intent.getStringExtra("Image"),Prefs.getString(ConstantUtils.GATE_NO, ""));
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
@@ -813,9 +839,67 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                             visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
 
-                            getUnitLog(intent.getStringExtra("UNITID").toInt(), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
-                                intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME"),globalApiObject.data.visitorLog.vlVisLgID)
+                            if(unitId.contains(",")) {
 
+                                var unitname_dataList: Array<String>
+                                var unitid_dataList: Array<String>
+
+                                unitname_dataList =
+                                    unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                unitid_dataList =
+                                    unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                if (unitid_dataList.size > 0) {
+                                    for (i in 0 until unitid_dataList.size) {
+
+                                        val ddc =
+                                            Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
+                                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                        ddc.putExtra("msg", personName + " " + desgn + " is coming to your home"+ "(" + "(" + unitname_dataList.get(
+                                            i
+                                        ).replace(" ", "") + ")"+ ")")
+                                        ddc.putExtra("mobNum", mobileNumb)
+                                        ddc.putExtra("name", personName)
+                                        ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID.toString())
+                                        ddc.putExtra("unitname", unitname_dataList.get(i).replace(" ", ""))
+                                        ddc.putExtra("memType", "Owner")
+                                        ddc.putExtra(UNITID, unitid_dataList.get(i).replace(" ", ""))
+                                        ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                        //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                                        ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                        ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                        this@MobileNumberforEntryScreen.sendBroadcast(ddc);
+
+                                    }}}
+                            else{
+                                val ddc =
+                                    Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
+                                ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                ddc.putExtra("msg", personName + " " + desgn + " is coming to your home"+ "(" +unitName+ ")")
+                                ddc.putExtra("mobNum", mobileNumb)
+                                ddc.putExtra("name", personName)
+                                ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID.toString())
+                                ddc.putExtra("unitname", unitName)
+                                ddc.putExtra("memType", "Owner")
+                                ddc.putExtra(UNITID, unitId.toString())
+                                ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                                ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                this@MobileNumberforEntryScreen.sendBroadcast(ddc);
+
+                            }
+
+
+//                            getUnitLog(intent.getStringExtra("UNITID").toInt(), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
+//                                intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME"),globalApiObject.data.visitorLog.vlVisLgID)
+//
 
 
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
@@ -852,7 +936,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
+        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID.toInt(), visitorLogID)
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
@@ -958,7 +1042,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                            workerType:String,staffID:Int,unitName:String,vlVisLgID:Int) {
 
         RetrofitClinet.instance
-            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toString())
+            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
@@ -969,7 +1053,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
                         val ddc  =  Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
                         ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home"+"("+unitName+")")
                         ddc.putExtra("mobNum", mobileNumb)
                         ddc.putExtra("name", personName)
                         ddc.putExtra("nr_id", vlVisLgID.toString())
@@ -977,8 +1061,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                         ddc.putExtra("memType", "Owner")
                         ddc.putExtra(UNITID,unitId.toString())
                         ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-                        ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                       // ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
                         ddc.putExtra("VLVisLgID",vlVisLgID)
+                        ddc.putExtra(VISITOR_TYPE,"Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -1022,44 +1107,18 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
                 override fun onErrorResponse(e: Throwable) {
 
-                    if (intent.getStringExtra("UNITID").contains(",")) {
-                        var unitname_dataList: Array<String>
-                        var unitid_dataList: Array<String>
-                        //   var unitAccountId_dataList: Array<String>
-                        unitname_dataList =
-                            intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() })
-                                .toTypedArray()
-                        unitid_dataList =
-                            intent.getStringExtra("UNITID").split(",".toRegex()).dropLastWhile({ it.isEmpty() })
-                                .toTypedArray()
-                        //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                        if (unitname_dataList.size > 0) {
-                            for (i in 0 until unitname_dataList.size) {
 
-                                visitorLog(
-                                    unitid_dataList.get(i).replace(" ", "").toInt(),
-                                    intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
-                                    intent.getStringExtra(MOBILENUMBER),
-                                    intent.getStringExtra("DESIGNATION"),
-                                    intent.getStringExtra("WORKTYPE"),
-                                    workerID,
-                                    unitname_dataList.get(i).replace(" ", "")
-                                );
-
-                            }
-                        }
-                    } else {
 
                         visitorLog(
-                            intent.getStringExtra("UNITID").toInt(),
+                            intent.getStringExtra("UNITID"),
                             intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
                             intent.getStringExtra(MOBILENUMBER),
                             intent.getStringExtra("DESIGNATION"),
                             intent.getStringExtra("WORKTYPE"),
-                            workerID,
+                            workerID.toInt(),
                             intent.getStringExtra("UNITNAME")
                         );
-                    }
+                 //   }
 
 //                        visitorLog(intent.getIntExtra("UNITID",0), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
 //                            intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")

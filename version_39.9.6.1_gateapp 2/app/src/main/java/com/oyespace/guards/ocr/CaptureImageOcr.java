@@ -61,6 +61,7 @@ import static com.oyespace.guards.utils.Utils.showToast;
 
 public class  CaptureImageOcr extends Activity implements View.OnClickListener, ResponseHandler {
 
+    String imgNamee;
     public static final int REQUEST_CAMERA = 0, SELECT_FILE = 1, PICK_INSURANCE_REQUEST_CODE = 2, PICK_RCBOOK_REQUEST_CODE = 3;
     private static final int DIM_BATCH_SIZE = 1;
     private static final int DIM_PIXEL_SIZE = 3;
@@ -238,6 +239,7 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
                 break;
             case R.id.guest:
 
+                deleteImage();
                 Intent in = new Intent(this, CustomViewFinderScannerActivity.class);
                 startActivity(in);
                 finish();
@@ -245,9 +247,9 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
 
             case R.id.other_guest:
 
+                deleteImage();
                 Intent in2 = new Intent(this, VehicleOthersServiceProviderListActivity.class);
                 in2.putExtra(VEHICLE_NUMBER,vehicalnumber.getText().toString());
-
                 startActivity(in2);
                 finish();
                 break;
@@ -365,9 +367,10 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
         runCloudTextRecognition(thumbnail);
+         imgNamee=System.currentTimeMillis() + ".jpg";
 
         File destination = new File(Environment.getExternalStorageDirectory().getPath(),
-                System.currentTimeMillis() + ".jpg");
+                imgNamee);
 
           setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
         Log.d("Image url ", destination.getAbsoluteFile().toString());
@@ -498,5 +501,11 @@ final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.l
         Intent i=new Intent(CaptureImageOcr.this,Dashboard.class);
         startActivity(i);
         finish();
+    }
+
+    public void deleteImage(){
+        File dir = new File(Environment.getExternalStorageDirectory().getPath());
+        File file = new File(dir, imgNamee);
+        file.delete();
     }
 }

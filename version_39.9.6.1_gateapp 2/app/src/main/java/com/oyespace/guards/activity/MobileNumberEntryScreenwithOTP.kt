@@ -29,7 +29,9 @@ import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
+import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.getOTPbyCall.OTPbyCallRetrofitClinet
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
@@ -333,10 +335,10 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
             mobilenumber= phone
 
-            if (phone!!.length > 0) {
+            if (phone!=null) {
 
                 Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
-                if (intent.getStringExtra(MOBILENUMBER).equals(phone)) {
+                if (intent.getStringExtra(MOBILENUMBER).equals("+91"+phone)) {
 
                     sendotp()
 
@@ -860,8 +862,21 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         dialogs!!.setCancelable(false)
         dialogs!!.setContentView(R.layout.layout_otp_dialog)
         val ed_otp = dialogs!!.findViewById(R.id.ed_otp) as EditText
+        val btn_otpbycall=dialogs!!.findViewById(R.id.btn_otpbycall) as Button
         otpnumber = ed_otp.text.toString()
         val btn_verifyotp = dialogs!!.findViewById(R.id.btn_verifyotp) as Button
+        val btn_cancel= dialogs!!.findViewById(R.id.btn_cancel) as Button
+
+        btn_otpbycall.setOnClickListener{
+            Toast.makeText(this@MobileNumberEntryScreenwithOTP,"coming",Toast.LENGTH_LONG).show()
+            sendOTPbyCallReq( "261622AtznpKYJ5c5ab60e",countryCode.toString()
+                    +phone,"voice")
+        }
+
+        btn_cancel.setOnClickListener {
+            dialogs!!.dismiss()
+        }
+
         btn_verifyotp.setOnClickListener {
 
 
@@ -913,9 +928,10 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                            // getAccountDetails(countryCode.toString(), phone.toString());
 
-                            visitorLog(intent.getIntExtra("UNITID",0), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
-                                intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
-                            );
+                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME"),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"),intent.getStringExtra("WORKTYPE"),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("UNITNAME"),intent.getStringExtra("Image"))
+
+
+
                         } else {
 
 
@@ -963,7 +979,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
 
     }
-    private fun visitorLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+    private fun visitorLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
                            workerType:String,staffID:Int,unitName:String) {
 
 
@@ -993,7 +1009,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             personName,"",0,"+",mobileNumb,
             "","","","",
             1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","",Prefs.getString(ConstantUtils.GATE_NO, ""));
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",intent.getStringExtra("Image"),Prefs.getString(ConstantUtils.GATE_NO, ""));
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(
@@ -1054,7 +1070,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
+        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID.toInt(), visitorLogID)
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
@@ -1095,5 +1111,130 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //        startActivity(i_delivery)
         finish()
     }
+
+    private fun sendOTPbyCallReq(  authkey: String, mobile: String, retrytype: String) {
+
+        val dataReq = GetOTPbyCallReq(authkey,mobile,retrytype)
+
+
+        OTPbyCallRetrofitClinet.instance
+            .sendOTPbyCallReq(dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<OTPbyCallResponse>() {
+
+                override fun onSuccessResponse(otPbyCallResponse: OTPbyCallResponse) {
+
+//                    if (workerListResponse.data.checkPointListByAssocID !=null) {
+//                        Log.d("WorkerList success",workerListResponse.data.toString())
+//                        var arrayList: ArrayList<CheckPointByAssocID>? = null
+//                        arrayList=ArrayList()
+//                        arrayList = workerListResponse.data.checkPointListByAssocID
+//
+//                        Collections.sort(arrayList, object : Comparator<CheckPointByAssocID>{
+//                            override  fun compare(lhs: CheckPointByAssocID, rhs: CheckPointByAssocID): Int {
+//                                return lhs.cpCkPName.compareTo(rhs.cpCkPName)
+//                            }
+//                        })
+//
+//                        LocalDb.saveCheckPointList(arrayList);
+//
+//                    } else {
+//
+//                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList",e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
+
+    fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: String, personName: String, mobileNumb: String, desgn: String,
+                             workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
+
+        // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
+        RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
+
+                override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
+
+                    if (getdata.success == true) {
+                        Utils.showToast(
+                            this@MobileNumberEntryScreenwithOTP,
+                            "Duplicate Entry not allowed"
+                        )
+                        //  showToast(this@Dashboard,workerID.toString())
+
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+//                    if (intent.getStringExtra("UNITID").contains(",")) {
+//                        var unitname_dataList: Array<String>
+//                        var unitid_dataList: Array<String>
+//                        //   var unitAccountId_dataList: Array<String>
+//                        unitname_dataList =
+//                            intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                .toTypedArray()
+//                        unitid_dataList =
+//                            intent.getStringExtra("UNITID").split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                .toTypedArray()
+//                        //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//                        if (unitname_dataList.size > 0) {
+//                            for (i in 0 until unitname_dataList.size) {
+//
+//                                visitorLog(
+//                                    unitid_dataList.get(i).replace(" ", ""),
+//                                    intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+//                                    intent.getStringExtra(MOBILENUMBER),
+//                                    intent.getStringExtra("DESIGNATION"),
+//                                    intent.getStringExtra("WORKTYPE"),
+//                                    workerID.toInt(),
+//                                    unitname_dataList.get(i).replace(" ", "")
+//                                );
+//
+//                            }
+//                        }
+//                    } else {
+
+//                    visitorLog(
+//                        intent.getStringExtra("UNITID"),
+//                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+//                        intent.getStringExtra(MOBILENUMBER),
+//                        intent.getStringExtra("DESIGNATION"),
+//                        intent.getStringExtra("WORKTYPE"),
+//                        workerID.toInt(),
+//                        intent.getStringExtra("UNITNAME")
+//                    );
+
+                    visitorLog(intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"), intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
+                    );
+
+                    //   }
+
+//                        visitorLog(intent.getIntExtra("UNITID",0), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"),
+//                            intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
+//                        );
+                    buttonNext.setEnabled(false)
+                    buttonNext.setClickable(false)
+                }
+
+                override fun noNetowork() {
+                    Toast.makeText(this@MobileNumberEntryScreenwithOTP, "No network call ", Toast.LENGTH_LONG)
+                        .show()
+                }
+            })
+    }
+
+
+
 }
 

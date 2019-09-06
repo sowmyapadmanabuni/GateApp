@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.ui
+package com.oyespace.guards.ui
 
 import android.content.Context
 import android.support.annotation.Nullable

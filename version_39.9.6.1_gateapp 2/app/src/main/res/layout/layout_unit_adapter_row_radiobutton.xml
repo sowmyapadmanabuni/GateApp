@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+
+                                    app:cardBackgroundColor="@android:color/white"
+                                    app:cardCornerRadius="4dp"
+                                    app:cardElevation="5dp"
+                                    android:layout_margin="5dp"
+                                    app:contentPadding="0dp">
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/itemName"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+
+        <RelativeLayout
+                android:id="@+id/menuRemove"
+                android:textSize="16sp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/tab_left_divider"
+                android:gravity="center"
+                android:padding="@dimen/dp_5"
+                android:text="-"
+                android:textColor="@color/orange" >
+
+            <RadioButton
+                    android:id="@+id/rb_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitXY" />
+
+            <!--<CheckBox-->
+                    <!--android:id="@+id/cb_unit"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentLeft="true"-->
+                    <!--android:paddingTop="5dp"-->
+                    <!--android:textColor="@android:color/black"-->
+                    <!--android:textSize="15sp"/>-->
+        </RelativeLayout>
+
+
+        <RelativeLayout
+                android:textSize="16sp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/lv_itemrecyclerview"
+                android:layout_weight="2"
+                android:background="@drawable/tab_middle_divider"
+                android:gravity="center"
+                android:padding="@dimen/dp_5"
+                android:text="1"
+                android:textColor="@color/orange" >
+            <TextView
+                    android:id="@+id/tv_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Unit Name"
+            />
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:id="@+id/menuAdd"
+                android:textSize="16sp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/tab_right_divider"
+                android:gravity="center"
+                android:padding="@dimen/dp_5"
+                android:text="+"
+                android:textColor="@color/orange" >
+            <ImageView
+                    android:id="@+id/iv_unit"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/call"
+                    android:gravity="right"
+                    android:padding="5dp"
+            />
+        </RelativeLayout>
+
+    </LinearLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="gone"
+            android:orientation="vertical">
+
+
+
+    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+
+            >
+        <CheckBox
+                android:id="@+id/cb_unit1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:paddingTop="5dp"
+                android:textColor="@android:color/black"
+                android:textSize="15sp"/>
+
+        <ImageView
+                android:id="@+id/iv_unit1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/call"
+                android:gravity="right"
+                android:padding="5dp"
+                />
+    </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>

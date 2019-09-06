@@ -1,10 +1,10 @@
-package com.oyespace.guards.com.oyespace.guards.ui
+package com.oyespace.guards.ui
 
 import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
-import com.oyespace.guards.com.oyespace.guards.utils.RecyclerViewEnum
+import com.oyespace.guards.utils.RecyclerViewEnum
 
 class RecyclerViewEmptyLoadingSupport : RecyclerView {
 

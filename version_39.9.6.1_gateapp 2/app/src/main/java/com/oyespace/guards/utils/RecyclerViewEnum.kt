@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.utils
+package com.oyespace.guards.utils
 
 enum class RecyclerViewEnum {
     LOADING,

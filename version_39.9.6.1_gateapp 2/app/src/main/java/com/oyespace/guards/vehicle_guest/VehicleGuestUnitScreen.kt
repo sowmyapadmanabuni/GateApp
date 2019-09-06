@@ -252,7 +252,7 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
                 intent.putExtra(FLOW_TYPE, VEHICLE_GUESTWITHOUTINVITATION)
                 intent.putExtra(VISITOR_TYPE,ConstantUtils.GUEST)
                 intent.putExtra(COMPANY_NAME,"Guest")
-                intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
+                intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()

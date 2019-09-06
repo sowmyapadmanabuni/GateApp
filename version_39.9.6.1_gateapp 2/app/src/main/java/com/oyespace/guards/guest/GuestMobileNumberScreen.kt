@@ -105,7 +105,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 d.putExtra(MOBILENUMBER, "")
                 d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-
+                d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
 
@@ -133,8 +133,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)
-                        builder.setTitle("Guest Entry already done")
-                        builder.setMessage("No Duplicates allowed")
+                      //  builder.setTitle("Guest Entry already done")
+                        builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
                             dialog.cancel()
                             val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
@@ -532,6 +532,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                             )
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                            d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
 
                             startActivity(d);
                             finish();
@@ -572,6 +573,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         d.putExtra(MOBILENUMBER, mobileNumber)
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+        d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
         startActivity(d);
         finish();
     }

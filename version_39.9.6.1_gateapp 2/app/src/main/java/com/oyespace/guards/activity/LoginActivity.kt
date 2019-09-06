@@ -56,6 +56,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
             R.id.Btn_SendOtp -> {
 
                 mobilenumber= phone.toString()
+                phone=Ed_phoneNum.text.toString().replace(" ","")
 
                 if (TextUtils.isEmpty(Ed_phoneNum.text.toString())) {
 

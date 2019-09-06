@@ -152,42 +152,43 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
             holder.btn_makeentry.setEnabled(false)
             holder.btn_makeentry.setClickable(false)
 
-            if(holder.btn_biometric.visibility==View.VISIBLE){
-                val dialogBuilder = AlertDialog.Builder(mcontext)
-
-                // set message of alert dialog
-                dialogBuilder.setMessage("Fingerprint is not captured")
-                    // if the dialog is cancelable
-                    .setCancelable(false)
-                    // positive button text and action
-                    .setPositiveButton("Proceed", DialogInterface.OnClickListener {
-                            dialog, id ->  val d = Intent(mcontext, Biometric::class.java)
-                        d.putExtra(ConstantUtils.WORKER_ID, staffdata.wkWorkID)
-                        d.putExtra(ConstantUtils.PERSONNAME, staffdata.wkfName + " " + staffdata.wklName)
-                        d.putExtra(UNITID, staffdata.unUnitID)
-                        d.putExtra(UNITNAME, staffdata.unUniName)
-                        d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
-                        d.putExtra(VISITOR_TYPE, "STAFF")
-                        d.putExtra(UNITID,staffdata.unUnitID)
-                        d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
-                        d.putExtra(COUNTRYCODE,"")
-                        d.putExtra(MOBILENUMBER, staffdata.wkMobile)
-                        mcontext.startActivity(d);
-                        (mcontext as Activity).finish()
-
-                    })
-                    // negative button text and action
-                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
-                            dialog, id -> dialog.cancel()
-                    })
-
-                // create dialog box
-                val alert = dialogBuilder.create()
-                // set title for alert dialog box
-                // show alert dialog
-                alert.show()
-            }
-          else if(staffdata?.wkMobile.toString().length > 0){
+//            if(holder.btn_biometric.visibility==View.VISIBLE){
+//                val dialogBuilder = AlertDialog.Builder(mcontext)
+//
+//                // set message of alert dialog
+//                dialogBuilder.setMessage("Fingerprint is not captured")
+//                    // if the dialog is cancelable
+//                    .setCancelable(false)
+//                    // positive button text and action
+//                    .setPositiveButton("Proceed", DialogInterface.OnClickListener {
+//                            dialog, id ->  val d = Intent(mcontext, Biometric::class.java)
+//                        d.putExtra(ConstantUtils.WORKER_ID, staffdata.wkWorkID)
+//                        d.putExtra(ConstantUtils.PERSONNAME, staffdata.wkfName + " " + staffdata.wklName)
+//                        d.putExtra(UNITID, staffdata.unUnitID)
+//                        d.putExtra(UNITNAME, staffdata.unUniName)
+//                        d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+//                        d.putExtra(VISITOR_TYPE, "STAFF")
+//                        d.putExtra(UNITID,staffdata.unUnitID)
+//                        d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
+//                        d.putExtra(COUNTRYCODE,"")
+//                        d.putExtra(MOBILENUMBER, staffdata.wkMobile)
+//                        mcontext.startActivity(d);
+//                        (mcontext as Activity).finish()
+//
+//                    })
+//                    // negative button text and action
+//                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+//                            dialog, id -> dialog.cancel()
+//                    })
+//
+//                // create dialog box
+//                val alert = dialogBuilder.create()
+//                // set title for alert dialog box
+//                // show alert dialog
+//                alert.show()
+//            }
+//          else
+             //   if(staffdata?.wkMobile.toString().length > 0){
 
                 val d=Intent(mcontext, MobileNumberforEntryScreen::class.java)
                 d.putExtra("UNITID", staffdata.unUnitID)
@@ -200,69 +201,68 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                 d.putExtra("UNITNAME",  staffdata.unUniName)
                 d.putExtra("Image",staffdata.wkEntryImg)
                 d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
+            d.putExtra("BIRTHDAY",staffdata.wkdob)
 
                 mcontext.startActivity(d);
                 (mcontext as Activity).finish()
 
-            }
-          else{
-                val enteredStaff = java.util.ArrayList<VisitorEntryLog>()
-                Log.d("Biometric 973", " " + (LocalDb.getVisitorEnteredLog() != null))
-                //looping through existing elements
-                if (LocalDb.getVisitorEnteredLog() != null) {
-                    for (s in LocalDb.getVisitorEnteredLog()!!) {
-                        //if the existing elements contains the search input
-                        if (s.reRgVisID == staffdata.wkWorkID) {
-                            //adding the element to filtered list
-                            enteredStaff.add(s)
-                        } else {
-
-                        }
-                    }
-                }
-                Log.d("Biometric 983", " ")
-
-                if (enteredStaff.size > 0) run {
-
-                    // t1.speak("Thank You " + enteredStaff[0].vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                    Log.d("check 79 ", "bio")
-                    Utils.showToast(mcontext, "Duplicate Entry not allowed")
-
-                }else {
-
-
-                    if(staffdata.unUniName.contains(",")){
-                        var unitname_dataList: Array<String>
-                        var unitid_dataList: Array<String>
-                      //  var unitAccountId_dataList: Array<String>
-                        unitname_dataList = staffdata.unUniName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                        unitid_dataList=staffdata.unUnitID.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                      //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                        if(unitname_dataList.size>0) {
-                            for (i in 0 until unitname_dataList.size) {
-                                try {
-                                    visitorLog(
-                                        unitid_dataList.get(i).replace(" ", "").toInt(),
-                                        staffdata.wkfName + " " + staffdata.wklName,
-                                        staffdata.wkMobile,
-                                        staffdata.wkDesgn,
-                                        staffdata.wkWrkType,
-                                        staffdata.wkWorkID,
-                                        unitname_dataList.get(i).replace(" ", ""),
-                                        staffdata.wkEntryImg
-                                    );
-                                }catch (e:ArrayIndexOutOfBoundsException){
-
-                                }
-                            }
-                        }
-                    }else{
-                        visitorLog(staffdata.unUnitID.toInt(), staffdata.wkfName + " " + staffdata.wklName, staffdata.wkMobile, staffdata.wkDesgn, staffdata.wkWrkType, staffdata.wkWorkID, staffdata.unUniName,staffdata.wkEntryImg);
-                    }
-
-
-                }
-            }
+//            }
+//          else{
+//                val enteredStaff = java.util.ArrayList<VisitorEntryLog>()
+//                Log.d("Biometric 973", " " + (LocalDb.getVisitorEnteredLog() != null))
+//                //looping through existing elements
+//                if (LocalDb.getVisitorEnteredLog() != null) {
+//                    for (s in LocalDb.getVisitorEnteredLog()!!) {
+//                        //if the existing elements contains the search input
+//                        if (s.reRgVisID == staffdata.wkWorkID) {
+//                            //adding the element to filtered list
+//                            enteredStaff.add(s)
+//                        } else {
+//
+//                        }
+//                    }
+//                }
+//                Log.d("Biometric 983", " ")
+//
+//                if (enteredStaff.size > 0) run {
+//
+//                    // t1.speak("Thank You " + enteredStaff[0].vlfName, TextToSpeech.QUEUE_FLUSH, null)
+//                    Log.d("check 79 ", "bio")
+//                    Utils.showToast(mcontext, "Duplicate Entry not allowed")
+//
+//                }else {
+//
+//
+////                    if(staffdata.unUniName.contains(",")){
+////                       var unitname_dataList: Array<String>
+////                        var unitid_dataList: Array<String>
+////                      //  var unitAccountId_dataList: Array<String>
+////                        unitname_dataList = staffdata.unUniName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+////                       unitid_dataList=staffdata.unUnitID.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+////                      //  unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+////                        if(unitname_dataList.size>0) {
+////                            for (i in 0 until unitname_dataList.size) {
+////                                try {
+//                                   visitorLog(
+//                                       staffdata.unUnitID.toString(),
+//                                        staffdata.wkfName + " " + staffdata.wklName,
+//                                        staffdata.wkMobile,
+//                                       staffdata.wkDesgn,                                        staffdata.wkWrkType,
+//                                        staffdata.wkWorkID,
+//                                       staffdata.unUniName,
+//                                        staffdata.wkEntryImg                                    );
+////                              }catch (e:ArrayIndexOutOfBoundsException){
+////
+////                                }
+////                          }
+////                       }
+////                    }else{
+////                        visitorLog(staffdata.unUnitID, staffdata.wkfName + " " + staffdata.wklName, staffdata.wkMobile, staffdata.wkDesgn, staffdata.wkWrkType, staffdata.wkWorkID, staffdata.unUniName,staffdata.wkEntryImg);
+////                    }
+//
+//
+//                }
+           // }
 
         }
 
@@ -316,7 +316,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
 
     }
 
-    private fun visitorLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+    private fun visitorLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
                            workerType:String,staffID:Int,unitName:String,vlEntryImage:String) {
 
 
@@ -345,7 +345,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
             unitName,unitId ,desgn,
             personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
-            1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+            1,"Staff Manaual Entry",SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""));
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
@@ -359,11 +359,69 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
                             visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
-                         //  if (  (globalApiObject.data.visitorLog.unUniName).contains(","))
+
+                            if(unitId.contains(",")) {
+
+                                var unitname_dataList: Array<String>
+                                var unitid_dataList: Array<String>
+
+                                unitname_dataList =
+                                    unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                unitid_dataList =
+                                    unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                if (unitid_dataList.size > 0) {
+                                    for (i in 0 until unitid_dataList.size) {
+
+                                        val ddc =
+                                            Intent(mcontext, BackgroundSyncReceiver::class.java)
+                                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                        ddc.putExtra("msg", personName + " " + desgn + " is coming to your home"+ "(" + "(" + unitname_dataList.get(
+                                            i
+                                        ).replace(" ", "") + ")"+ ")")
+                                        ddc.putExtra("mobNum", mobileNumb)
+                                        ddc.putExtra("name", personName)
+                                        ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID.toString())
+                                        ddc.putExtra("unitname", unitname_dataList.get(i).replace(" ", ""))
+                                        ddc.putExtra("memType", "Owner")
+                                        ddc.putExtra(UNITID, unitid_dataList.get(i).replace(" ", ""))
+                                        ddc.putExtra(COMPANY_NAME, "Staff")
+                                        //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                                        ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                        ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                        mcontext.sendBroadcast(ddc);
+
+                                    }}}
+                            else{
+                                val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
+                                ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                ddc.putExtra("msg", personName+" "+desgn +" is coming to your home"+"("+unitName+")")
+                                ddc.putExtra("mobNum", mobileNumb)
+                                ddc.putExtra("name", personName)
+                                ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID.toString())
+                                ddc.putExtra("unitname", unitName)
+                                ddc.putExtra("memType", "Owner")
+                                ddc.putExtra(UNITID,unitId.toString())
+                                ddc.putExtra(COMPANY_NAME,"Staff")
+                                ddc.putExtra(UNIT_ACCOUNT_ID,0)
+                                ddc.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+                                ddc.putExtra(VISITOR_TYPE,"Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                mcontext.sendBroadcast(ddc);
+                            }
 
 
 
-                            getUnitLog(unitId, personName,  " " ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
+                            //  if (  (globalApiObject.data.visitorLog.unUniName).contains(","))
+
+
+
+                           // getUnitLog(unitId, personName,  " " ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
 
 //                            val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
 //                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
@@ -412,11 +470,11 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
     }
 
 
-    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+    private fun getUnitLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
                            workerType:String,staffID:Int,unitName:String,vlVisLgID:Int) {
 
         RetrofitClinet.instance
-            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toString())
+            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toInt())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
@@ -427,7 +485,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
 
                         val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
                         ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home"+"("+unitName+")")
                         ddc.putExtra("mobNum", mobileNumb)
                         ddc.putExtra("name", personName)
                         ddc.putExtra("nr_id", vlVisLgID.toString())
@@ -437,6 +495,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
                         ddc.putExtra(COMPANY_NAME,"Staff")
                         ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
                         ddc.putExtra("VLVisLgID",vlVisLgID)
+                        ddc.putExtra(VISITOR_TYPE,"Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")

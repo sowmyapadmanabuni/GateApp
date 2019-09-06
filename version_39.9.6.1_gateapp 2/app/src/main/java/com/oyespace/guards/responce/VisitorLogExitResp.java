@@ -131,7 +131,7 @@ public class VisitorLogExitResp {
             private String vlGtName;
             @SerializedName("unUnitID")
             @Expose
-            private Integer unUnitID;
+            private String unUnitID;
             @SerializedName("vlPrmStat")
             @Expose
             private String vlPrmStat;
@@ -384,11 +384,11 @@ public class VisitorLogExitResp {
                 this.vlGtName = vlGtName;
             }
 
-            public Integer getUnUnitID() {
+            public String getUnUnitID() {
                 return unUnitID;
             }
 
-            public void setUnUnitID(Integer unUnitID) {
+            public void setUnUnitID(String unUnitID) {
                 this.unUnitID = unUnitID;
             }
 

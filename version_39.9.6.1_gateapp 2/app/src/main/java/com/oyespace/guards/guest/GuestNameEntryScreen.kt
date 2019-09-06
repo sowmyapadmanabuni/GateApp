@@ -54,6 +54,7 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
                     d.putExtra(PERSONNAME, Ed_Name.getText().toString())
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
                     startActivity(d)
                     finish()
                 } else {

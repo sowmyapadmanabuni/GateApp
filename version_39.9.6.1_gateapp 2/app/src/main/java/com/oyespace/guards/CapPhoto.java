@@ -479,8 +479,9 @@ private Camera openFrontFacingCameraGingerbread() {
                 ddc.putExtra("GUARD_PHOTO", byteArray);
                 sendBroadcast(ddc);
 
+
         File imagesFolder = new File(
-        Environment.getExternalStorageDirectory(), "MYGALLERY");
+        Environment.getExternalStorageDirectory(), "/DCIM/myCapturedImages");
         if (!imagesFolder.exists())
         imagesFolder.mkdirs(); // <----
         File image = new File(imagesFolder, System.currentTimeMillis()
@@ -548,9 +549,9 @@ private Camera openFrontFacingCameraGingerbread() {
 
         @Override
         public void run() {
-        Toast.makeText(getApplicationContext(),
-        "Your Picture has been taken !", Toast.LENGTH_SHORT)
-        .show();
+//        Toast.makeText(getApplicationContext(),
+//        "Your Picture has been taken !", Toast.LENGTH_SHORT)
+//        .show();
         }
         });
         stopSelf();

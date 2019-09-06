@@ -7,27 +7,18 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.support.v7.widget.*
-import android.util.Log
 import android.view.*
 import android.widget.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.com.oyespace.guards.adapter.PaginationAdapter
-import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsData
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.UnitList
 import com.oyespace.guards.pojo.UnitPojo
-import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_unit_list.*
@@ -35,13 +26,17 @@ import kotlinx.android.synthetic.main.pager_view.*
 import kotlinx.android.synthetic.main.subtitle_bar.*
 import kotlinx.android.synthetic.main.title_bar.*
 import java.lang.Exception
-import java.util.function.Predicate
 import kotlin.collections.ArrayList
+import android.widget.RadioButton
+import com.oyespace.guards.adapter.PaginationAdapter
+import com.oyespace.guards.pojo.PaginationData
+import com.oyespace.guards.pojo.UnitsList
+
 
 class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter:PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter?=null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -329,6 +324,9 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 selectedUnits.removeAt(indices[0]);
             }
         }
+        else{
+            selectedUnits.add(checked);
+        }
         //orderListAdapter!!.notifyDataSetChanged();
     }
 
@@ -386,6 +384,8 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
+        private var lastSelectedPosition = -1
+        private var lastCheckedRB: RadioButton? = null
 
 
         init {
@@ -403,6 +403,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             val orderData = listVistor?.get(position)
             val vistordate = orderData?.asAssnID
             holder.apartmentNamee.text = orderData?.unUniName
+
             if(listVistor!!.get(position).isSelected){
                 holder.cb_unit.setChecked(true)
                 holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
@@ -422,6 +423,68 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 checkListener(listVistor!!.get(position),isChecked)
 
             }
+
+//            val rbClick = object : View.OnClickListener {
+//                override fun onClick(v: View) {
+//                    val checked_rb = v as RadioButton
+//                    if (lastCheckedRB != null) {
+//                        lastCheckedRB!!.isChecked = false
+//                    }
+//                    lastCheckedRB = checked_rb
+//                }
+//            }
+
+//            if (listVistor[position].equals(lastSelectedPosition)) {
+//                Toast.makeText(mcontext,"hi",Toast.LENGTH_LONG).show()
+//                listVistor!!.get(lastSelectedPosition).isSelected=false
+//                notifyDataSetChanged();
+//            }
+//            else{
+//                Toast.makeText(mcontext,"bye",Toast.LENGTH_LONG).show()
+//                listVistor!!.get(position).isSelected=false
+//                notifyDataSetChanged();
+//            }
+
+//            holder.rb_unit.setOnClickListener(View.OnClickListener {
+//
+//                lastSelectedPosition = position;
+//                listVistor!!.get(lastSelectedPosition).isSelected=true
+//                notifyDataSetChanged();
+//
+//
+//
+//            })
+
+//            if(listVistor!!.get(position).isSelected){
+//                holder.rb_unit.setChecked(true)
+//                holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
+//            }else{
+//                holder.rb_unit.isChecked = false;
+//                holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+//            }
+//
+//            holder.rb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
+//                // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
+//
+////                listVistor!!.get(position).isSelected=true
+////                lastSelectedPosition = getAdapterPosition();
+////                notifyDataSetChanged();
+//
+//
+//
+//
+//                if(isChecked) {
+//                    holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
+//                    listVistor!!.get(position).isSelected=isChecked
+//                    lastSelectedPosition=position
+//                }else{
+//
+//                    holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+//
+//                }
+//               // checkListener(listVistor!!.get(position),isChecked)
+//
+//            }
             //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
 
             holder.iv_unit.setOnClickListener {
@@ -691,10 +754,11 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
+                intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
+
 
                 if( listVistor!!.get(position).isSelected){
                     listVistor!!.get(position).isSelected=false
@@ -703,6 +767,8 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                     listVistor!!.get(position).isSelected=true
                     holder.cb_unit.setChecked(true)
                 }
+
+
                 //checkListener(listVistor!!.get(position))
 
             })
@@ -715,7 +781,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
-            val cb_unit: AppCompatCheckBox
+            val cb_unit: CheckBox
             val apartmentNamee: TextView
             val lv_itemrecyclerview: RelativeLayout
 
@@ -725,6 +791,64 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 cb_unit = view.findViewById(R.id.cb_unit)
                 apartmentNamee = view.findViewById(R.id.tv_unit)
                 lv_itemrecyclerview=view.findViewById(R.id.lv_itemrecyclerview)
+
+//                rb_unit.setOnCheckedChangeListener { buttonView, isChecked ->
+//                    lastSelectedPosition = getAdapterPosition();
+//                    listVistor!!.get(lastSelectedPosition).isSelected=true
+//
+//                    if (lastSelectedPosition != -1) {
+//                        listVistor.removeAt(lastSelectedPosition);
+//                        lastSelectedPosition = -1;//after removing selectedPosition set it back to -1
+//                        notifyDataSetChanged();
+//                    }
+//
+//                    notifyDataSetChanged();
+//
+//                }
+
+//                rb_unit.setOnClickListener(View.OnClickListener {
+//
+//
+//
+//
+//
+//
+//                        lastSelectedPosition = getAdapterPosition();
+//                        listVistor!!.get(lastSelectedPosition).isSelected=true
+//                        notifyDataSetChanged();
+//
+//
+//
+////                                        lastSelectedPosition = getAdapterPosition();
+////                    listVistor!!.get(lastSelectedPosition).isSelected=true
+////                    notifyDataSetChanged();
+////
+////                    if (lastSelectedPosition != -1) {
+////                        listVistor!!.get(lastSelectedPosition).isSelected=false
+////                        Toast.makeText(mcontext,
+////                            "Hi",
+////                            Toast.LENGTH_LONG).show();
+//////                        listVistor.removeAt(lastSelectedPosition);
+//////                        lastSelectedPosition = -1;//after removing selectedPosition set it back to -1
+//////                        notifyDataSetChanged();
+////                   }
+////                        else{
+////
+////                        Toast.makeText(mcontext,
+////                            "Byw",
+////                            Toast.LENGTH_LONG).show();
+////                        }
+//
+//
+////                    lastSelectedPosition = getAdapterPosition();
+////                    listVistor!!.get(lastSelectedPosition).isSelected=true
+////                    notifyDataSetChanged();
+//
+//
+////                    Toast.makeText(mcontext,
+////                        "selected offer is " + listVistor[lastSelectedPosition].unUniName,
+////                        Toast.LENGTH_LONG).show();
+//                })
 
             }
 

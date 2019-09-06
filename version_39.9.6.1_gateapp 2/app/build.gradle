@@ -30,12 +30,13 @@ androidExtensions {
 
 android {
     compileSdkVersion 28
+    buildToolsVersion "28.0.3"
     defaultConfig {
         applicationId "com.oyespace.guards"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 54
-        versionName "10.4D"
+        versionCode 60
+        versionName "10.12"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -128,7 +129,7 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.16'
     //implementation 'com.intuit.sdp:sdp-android:1.0.4'
     implementation 'de.hdodenhof:circleimageview:2.2.0'
-
+    // implementation  'com.github.bumptech.glide:glide:4.9.0'
 
 
 }

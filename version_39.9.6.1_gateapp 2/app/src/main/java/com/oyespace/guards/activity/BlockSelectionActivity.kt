@@ -15,18 +15,13 @@ import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.Gson
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.adapter.BlockSelectionAdapter
-import com.oyespace.guards.com.oyespace.guards.adapter.SelectedUnitsAdapter
-import com.oyespace.guards.com.oyespace.guards.adapter.UnitSearchResultAdapter
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksList
-import com.oyespace.guards.com.oyespace.guards.pojo.SearchUnitRequest
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.adapter.BlockSelectionAdapter
+import com.oyespace.guards.adapter.SelectedUnitsAdapter
+import com.oyespace.guards.adapter.UnitSearchResultAdapter
+
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.UnitList
-import com.oyespace.guards.pojo.UnitListSearch
-import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
@@ -46,9 +41,9 @@ import java.lang.Exception
 class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter:BlockSelectionAdapter?=null
-    var mUnitsAdapter:SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter:UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter?=null
+    var mUnitsAdapter: SelectedUnitsAdapter?=null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter?=null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""
@@ -57,6 +52,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     internal var unitNumber4=""
     internal var unitNumber5=""
     internal var unitNames = ""
+    internal var blockID = ""
     internal var unitId = ""
     internal var acAccntID=""
 
@@ -187,7 +183,8 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unitNames += ", "
                     unitId += ", "
                     acAccntID += ", "
-                    acAccntID += ", "
+                    blockID+=","
+                    //acAccntID += ", "
                     unitNumber1 += ", "
                     unitNumber2 += ", "
                     unitNumber3 += ", "
@@ -197,6 +194,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
                 acAccntID += selected.get(j).acAccntID
+                blockID += selected.get(j).blBlockID
 
 
 //                if (selected.get(j).tenant.size != 0) {
@@ -241,6 +239,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
+                    d.putExtra(BLOCK_ID,blockID)
                     d.putExtra(
                         "RESIDENT_NUMBER",
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
@@ -262,6 +261,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
+                    d.putExtra(BLOCK_ID,blockID)
                     //d.putExtra("RESIDENT_NUMBER",unitNumber1)
                     d.putExtra(
                         "RESIDENT_NUMBER",

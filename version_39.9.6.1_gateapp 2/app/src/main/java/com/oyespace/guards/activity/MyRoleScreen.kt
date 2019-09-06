@@ -150,7 +150,7 @@ class MyRoleScreen : BaseKotlinActivity() {
                         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,null)
                         LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
                             .setTopColorRes(R.color.google_red)
-                            // .setIcon(R.drawable.ic_info_black_24dp)
+                             .setIcon(R.drawable.ic_info_black_24dp)
                             //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
                             .setTitle("Device is not registered as Gate device")
                             .setTitleGravity(Gravity.CENTER)

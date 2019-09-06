@@ -127,8 +127,14 @@
     <string name="textstaffedit">
         Staff Edit
     </string>
-    <string name="capture">Capture</string><string name="init">Initialize</string>
+    <string name="capture">Capture</string>
+    <string name="init">Initialize</string>
     <string name="units_list_title">Units List</string>
     <string name="units_selection_title">Select Units</string>
     <string name="blocks_selection_title">Select Blocks</string>
+    <string name="tvdynamicsearch">Dynamic Search</string>
+    <string name="tvresident">Resident</string>
+    <string name="tvmanualentry"> Full Manual Entry</string>
+    <string name="tvverifyotp">Verify OTP</string>
+
 </resources>

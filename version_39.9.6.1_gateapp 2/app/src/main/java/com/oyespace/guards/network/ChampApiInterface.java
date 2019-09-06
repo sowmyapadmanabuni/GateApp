@@ -1,6 +1,7 @@
 package com.oyespace.guards.network;
 
 import com.oyespace.guards.request.FingerPrintCreateReq;
+import com.oyespace.guards.request.InvitationUpdateReq;
 import com.oyespace.guards.request.SendStaffImageReq;
 import com.oyespace.guards.responce.*;
 import okhttp3.MultipartBody;
@@ -30,6 +31,14 @@ public interface ChampApiInterface {
     @POST("oye247/api/v1/Worker/WorkerEntryImgGPSUpdate")
     @Headers("X-OYE247-APIKey:7470AD35-D51C-42AC-BC21-F45685805BBE")
     Call<StaffImageRes>sendStaffImage(@Body SendStaffImageReq sendStaffImageReq);
+
+    @GET("oye247/api/v1/Invitation/GetInvitationByInvitationID/{id}")
+    @Headers("X-OYE247-APIKey:7470AD35-D51C-42AC-BC21-F45685805BBE")
+    Call<InvitationRequestResponse> getInvitationResponse( @Path("id") int invitationID);
+
+    @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
+    @Headers("X-OYE247-APIKey:7470AD35-D51C-42AC-BC21-F45685805BBE")
+    Call<InvitationRequestResponse>updateInvitation(@Body InvitationUpdateReq invitationUpdateReq);
 
 //
 //    @GET("oyesafe/api/v1/GetVisitorLogEntryListByMobileNumber/{}")

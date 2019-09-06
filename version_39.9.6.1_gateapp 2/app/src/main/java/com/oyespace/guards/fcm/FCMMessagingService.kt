@@ -8,6 +8,7 @@ import android.media.*
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Build
+import android.os.Environment
 import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
@@ -785,64 +786,15 @@ class FCMMessagingService : FirebaseMessagingService(){
    spb.setAudioAttributes(attrBuilder.build());
     spb.build();
 
-//        mediaPlayer.setAudioAttributes( AudioAttributes.Builder()
-//.setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-//.setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-//.build());
-//
-////        var myTrack =  AudioTrack(
-////         AudioAttributes.Builder()
-////            .setUsage(AudioAttributes.USAGE_MEDIA)
-////            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-////            .build(),
-////        myFormat, myBuffSize, AudioTrack.MODE_STREAM, mySession);
-//
-//       // mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-//       // mediaPlayer.setAudioAttributes()
        mediaPlayer.setDataSource(IMAGE_BASE_URL+filename);
-//        Log.v("uploadAudio 714",filename)
        mediaPlayer.prepare();
-//        Toast.makeText(applicationContext,"888",Toast.LENGTH_LONG).show()
-//        // Start playing audio from http url
+
        mediaPlayer.start();
-//
-//        Log.v("uploadAudio 720","PLAYYY")
-
-//mediaPlayer.setOnErrorListener( MediaPlayer.OnErrorListener() {
-//     boolean onError(mp:MediaPlayer , int what, int extra) {
-//        mp.reset();
-//        return false;
-//    }
-//});
 
 
-
-
-
-
-//           // val body = MultipartBody.Part.createFormData("Test", audioclip, requestFile)
-//            val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-//            val call = apiService.getAudioFile()
-//
-//            call.enqueue(object : Callback<Any> {
-//                override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-//                    try {
-//
-//
-//                        Log.d("PLAYAudio1", "response:" + response.body()!!)
-//
-//                    } catch (ex: Exception) {
-//                        Log.d("PLAYAudio2", "errr:" + ex.toString())
-//
-//                    }
-//
-//                }
-//
-//                override fun onFailure(call: Call<Any>, t: Throwable) {
-//                    Log.d("PLAYAudio3", t.toString())
-//
-//                }
-//            })
+val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+val f =  File(baseDir + filename);
+ f.delete();
 
     }
 

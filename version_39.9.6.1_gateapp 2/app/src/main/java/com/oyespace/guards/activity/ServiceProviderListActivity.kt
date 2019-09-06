@@ -22,7 +22,6 @@ import kotlinx.android.synthetic.main.activity_service_provider_list.*
 import java.util.*
 
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.utils.NetworkAvailable
 import com.oyespace.guards.pojo.VendorPojo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
@@ -45,6 +44,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.zomoto,
         R.mipmap.sw,
         R.mipmap.foodpanda,
+        R.drawable.ubereats,
+        R.drawable.dominospizza,
         R.mipmap.bluedart,
         R.mipmap.dtdc,
         R.mipmap.fedex,
@@ -60,6 +61,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.ola,
         R.drawable.uber,
         R.drawable.meru,
+        R.drawable.gas_cylinder,
         R.drawable.others
 
 
@@ -68,6 +70,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         "Zomato",
         "Swiggy",
         "FoodPanda",
+        "Uber Eats",
+        "Dominos",
         "BlueDart",
         "DTDC",
         "Fedex",
@@ -83,6 +87,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         "OLA",
         "Uber",
         "Meru",
+        "Gas Cylinder",
         "Others"
 
     )

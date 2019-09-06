@@ -251,7 +251,7 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                 intent.putExtra(FLOW_TYPE, GUEST_REGISTRATION)
                 intent.putExtra(VISITOR_TYPE, GUEST)
                 intent.putExtra(COMPANY_NAME, GUEST)
-                intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
+                intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
 
 //                mcontext.startActivity(intent)

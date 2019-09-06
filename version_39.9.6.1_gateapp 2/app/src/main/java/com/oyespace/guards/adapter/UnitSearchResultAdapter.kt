@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.adapter
+package com.oyespace.guards.adapter
 
 import android.content.Context
 import android.support.v7.widget.AppCompatTextView
@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
 import com.oyespace.guards.pojo.UnitPojo
 
 

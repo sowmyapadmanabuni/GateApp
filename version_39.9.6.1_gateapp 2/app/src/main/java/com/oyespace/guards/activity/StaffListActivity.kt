@@ -55,6 +55,7 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonAdd -> {
+                Prefs.putString(ConstantUtils.TYPE,"Create")
                 buttonAdd.setEnabled(false)
                 buttonAdd.setClickable(false)
                 val intentReg = Intent(this@StaffListActivity, WorkersTypeList::class.java)

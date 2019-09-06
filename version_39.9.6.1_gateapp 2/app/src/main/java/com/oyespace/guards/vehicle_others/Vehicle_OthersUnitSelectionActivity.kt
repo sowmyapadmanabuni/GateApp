@@ -15,14 +15,14 @@ import android.widget.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.com.oyespace.guards.adapter.PaginationAdapter
-import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsData
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.adapter.PaginationAdapter
+
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.pojo.PaginationData
 import com.oyespace.guards.pojo.UnitList
 import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.pojo.UnitsList
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
@@ -41,7 +41,7 @@ import kotlin.collections.ArrayList
 class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter:PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter?=null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -329,6 +329,8 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
+        }else{
+            selectedUnits.add(checked);
         }
         //orderListAdapter!!.notifyDataSetChanged();
     }
@@ -692,7 +694,7 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
+                intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
                 intent.putExtra(UNITNAME, orderData?.unUniName)
 //                mcontext.startActivity(intent)

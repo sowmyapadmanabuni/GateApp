@@ -495,7 +495,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/layout_fp1_done"
                         android:layout_margin="@dimen/_2sdp"
-                        android:padding="@dimen/_5sdp"
+                        android:padding="@dimen/_10sdp"
                         android:text="@string/captureFingerPrint"
                         android:textColor="@android:color/white"
                         android:background="@drawable/square"
@@ -534,13 +534,16 @@
                         android:textColor="@color/black" />
 
                 </RelativeLayout>
+
+
+
                 <Button
                         android:id="@+id/buttonRegister2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_below="@+id/layout_fp2_done"
                         android:layout_margin="@dimen/_2sdp"
-                        android:padding="@dimen/_2sdp"
+                        android:padding="@dimen/_10sdp"
                         android:layout_centerHorizontal="true"
                         android:text="@string/captureFingerPrint"
                         android:textColor="@android:color/white"

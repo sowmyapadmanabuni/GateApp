@@ -16,10 +16,7 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.os.Bundle
-import android.os.Handler
-import android.os.Message
-import android.os.PowerManager
+import android.os.*
 import android.speech.tts.TextToSpeech
 import android.support.v7.app.AppCompatActivity
 import android.util.Base64
@@ -43,6 +40,7 @@ import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
 import kotlinx.android.synthetic.main.layout_viewpager_iem.*
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.nio.ByteBuffer
@@ -243,6 +241,16 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
 
         setContentView(R.layout.activity_register_finger_print)
+
+        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+        if (dir.isDirectory()) {
+            val children = dir.list()
+            for (i in children!!.indices) {
+                File(dir, children!![i]).delete()
+            }
+        }
+
+
         Log.d("btn_biometric", "af setContentView")
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
@@ -755,7 +763,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
                 if (mRegisterImage != null) {
                     mRegisterImage = null
-                    Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
+                        //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
                 }
 
                 mRegisterImage = ByteArray(mImageWidth * mImageHeight)
@@ -1181,7 +1189,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     override fun onFailure(e: Exception, urlId: Int) {
 
-        showToast(this, e.message + " id " + urlId)
+        //showToast(this, e.message + " id " + urlId)
     }
 
     override fun onSuccess(responce: String, data: Any, urlId: Int, position: Int) {

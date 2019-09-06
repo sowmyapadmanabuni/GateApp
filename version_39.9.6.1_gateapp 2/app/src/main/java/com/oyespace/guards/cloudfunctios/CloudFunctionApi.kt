@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.cloudfunctios
+package oyespace.guards.cloudfunctios
 
 import com.oyespace.guards.pojo.CloudFunctionNotificationReq
 import com.oyespace.guards.pojo.SendGateAppNotificationRequest

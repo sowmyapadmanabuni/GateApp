@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.oyespace.guards.BackgroundSyncReceiver;
 import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.NameEntryScreen;
@@ -44,6 +45,7 @@ import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.oyespace.guards.vehicle_guest.VehicleGuestAddCarFragment;
+import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -53,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Random;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
 import static com.oyespace.guards.utils.ConstantUtils.*;
@@ -61,6 +64,7 @@ import static com.oyespace.guards.utils.ConstantUtils.*;
 public class VehicleOthersAddCarFragment extends Activity implements View.OnClickListener {
 
     /*sumeeth fragment*/
+    File file;
     TextView tv_name;
     private FragmentManager fragmentManager ;
     private ViewPager viewPager;
@@ -68,7 +72,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
     RecyclerView rv_image;
     ImageView iv_delete,imageView1,iv_edit;
     int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    Bitmap personPhoto = null ;
+    Bitmap photo = null ;
 
     private View view;
     private EditText notes, Regno, kms, exp_date, exp_price ,car_id;
@@ -166,9 +170,12 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
-                Picasso.with(VehicleOthersAddCarFragment.this)
-                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
+                Picasso.with(VehicleOthersAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+
+
+//                Picasso.with(VehicleOthersAddCarFragment.this)
+//                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
 
                 builder.setView(dialogView);
 
@@ -184,9 +191,13 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 
        // iamgeLyt.removeAllViews();
         list.clear();
-        Picasso.with(this)
-                .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+
+        Picasso.with(VehicleOthersAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+
+
+//        Picasso.with(this)
+//                .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -203,10 +214,14 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 
                 Log.v("CALLER IMAGEVIEW",IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
 
-                imageView1.setImageBitmap(personPhoto);
-                Picasso.with(this)
-                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+                imageView1.setImageBitmap(photo);
+
+                Picasso.with(VehicleOthersAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+
+
+//                Picasso.with(this)
+//                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
+//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
 
@@ -264,7 +279,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 try {
                     Log.d("Dgddfdf picas","5 2");
                     ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    personPhoto.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                    photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                     byteArray = bos.toByteArray();
                     int len = bos.toByteArray().length;
                     System.out.println("AFTER COMPRESSION-===>" + len);
@@ -275,7 +290,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 }
 //                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
 
-                if(personPhoto==null && imageView1.getDrawable()==null) {
+                if(photo==null && imageView1.getDrawable()==null) {
                     submit_button.setEnabled(true);
                     submit_button.setClickable(true);
                     Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
@@ -313,8 +328,8 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
 
-            personPhoto=bitmap;
-            imageView1.setImageBitmap(personPhoto);
+            photo=bitmap;
+            imageView1.setImageBitmap(photo);
             Log.d("target picas","onBitmapLoaded");
         }
 
@@ -389,26 +404,77 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
     }
 
     public void onCaptureImageResult(Intent data, Context context) {
+//        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+//        assert thumbnail != null;
+//        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+//
+//        File destination = new File(Environment.getExternalStorageDirectory().getPath(),
+//                System.currentTimeMillis() + ".jpg");
+//
+//        // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
+//        setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
+//
+//        FileOutputStream fo;
+//        try {
+//            destination.createNewFile();
+//            fo = new FileOutputStream(destination);
+//            fo.write(bytes.toByteArray());
+//            fo.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        byte[] byteArray=null;
+        try {
+            Log.d("Dgddfdf picas","5 2");
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+            byteArray = bos.toByteArray();
+            int len = bos.toByteArray().length;
+            System.out.println("AFTER COMPRESSION-===>" + len);
+            bos.flush();
+            bos.close();
+        }catch (Exception ex){
+            Log.d("Dgddfdf picas","7");
+        }
+
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+        String imgName=System.currentTimeMillis() + ".jpg";
 
-        File destination = new File(Environment.getExternalStorageDirectory().getPath(),
-                System.currentTimeMillis() + ".jpg");
+        file= new File(Environment.getExternalStorageDirectory().getPath(), imgName);
+        // file= new File(Environment.getExternalStorageDirectory()+ "/DCIM/myCapturedImages", imgName);
 
         // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
-        setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
+        setviewPager(String.valueOf(file.getAbsoluteFile()), context);
+//
+        Intent ddc =new Intent(VehicleOthersAddCarFragment.this, BackgroundSyncReceiver.class);
+        Log.d("btn_biometric", "af " + String.valueOf(file.getAbsoluteFile()));
+
+        ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
+        ddc.putExtra("imgName", String.valueOf(imgName));
+        ddc.putExtra(PERSON_PHOTO, byteArray);
+        sendBroadcast(ddc);
 
         FileOutputStream fo;
         try {
-            destination.createNewFile();
-            fo = new FileOutputStream(destination);
+            file.createNewFile();
+            fo = new FileOutputStream(file);
             fo.write(bytes.toByteArray());
             fo.close();
         } catch (IOException e) {
             e.printStackTrace();
+
         }
+
+
+
+
+
     }
 
     private void setviewPager(final String selectedImagePath, final Context context) {
@@ -522,9 +588,10 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 showViewPager();
 
         } else  if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-            Bitmap photo = (Bitmap) data.getExtras().get("data");
+             photo = (Bitmap) data.getExtras().get("data");
             imageView1.setImageBitmap(photo);
-            personPhoto=photo;
+            //personPhoto=photo;
+            SaveImage(photo);
             Log.d("Activity", "CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE ");
         }
         Log.d("Activity", "Result Fail");
@@ -548,6 +615,34 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 //        Intent intent=new Intent(VehicleOthersAddCarFragment.this, Dashboard.class);
 //        startActivity(intent);
         finish();
+    }
+
+    public void SaveImage(Bitmap showedImgae){
+
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/DCIM/myCapturedImages");
+        myDir.mkdirs();
+        Random generator = new Random();
+        int n = 10000;
+        n = generator.nextInt(n);
+        String fname = "FILENAME-"+ n +".jpg";
+        file = new File (myDir, fname);
+        if (file.exists ()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            showedImgae.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            // Toast.makeText(AddCarFragment.this, "Image Saved", Toast.LENGTH_SHORT).show();
+            out.flush();
+            out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        Uri contentUri = Uri.fromFile(file);
+        mediaScanIntent.setData(contentUri);
+        getApplicationContext().sendBroadcast(mediaScanIntent);
     }
 }
 

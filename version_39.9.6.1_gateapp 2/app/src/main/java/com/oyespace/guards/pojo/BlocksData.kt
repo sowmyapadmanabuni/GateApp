@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.pojo
+package com.oyespace.guards.pojo
 
 data class BlocksData(
     var isSelected: Boolean = false,

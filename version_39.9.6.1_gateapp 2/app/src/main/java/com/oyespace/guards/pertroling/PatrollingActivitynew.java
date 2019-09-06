@@ -59,7 +59,6 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setLocale(Prefs.getString(LANGUAGE, null));
-
         setContentView(R.layout.activity_check_scanner_point);
 
         gpsTracker=new GPSTracker(getApplicationContext());
@@ -119,14 +118,11 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         patrolingdataList = patrolingdata.split(",");
         if(patrolingdataList.length>4) {
             System.out.println("Patroling Data " + patrolingdataList[0]+" " + patrolingdataList[1] + " " + patrolingdataList[2] + " " + patrolingdataList[3] + " " + patrolingdataList[3]);
-            ((TextView)findViewById(R.id.scanned_text)).setText(""+patrolingdataList[0]);
+          //  ((TextView)findViewById(R.id.scanned_text)).setText(""+patrolingdataList[0]);
 
-            if (!patrolingdataList[4].equalsIgnoreCase(Prefs.getInt(ASSOCIATION_ID, 0) + "")) {
+            if (!patrolingdataList[3].equalsIgnoreCase(Prefs.getInt(ASSOCIATION_ID, 0) + "")) {
                 Toast.makeText(this, "Belongs to different Society / Association ", Toast.LENGTH_SHORT).show();
-            } else if (Prefs.getInt(PATROLLING_ID, 0) == 0
-                    && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT)
-                    ||Prefs.getInt(PATROLLING_ID, 0) == 0
-                    && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT_AND_END_POINT)) {
+            } else if (Prefs.getInt(PATROLLING_ID, 0) == 0 && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT) ||Prefs.getInt(PATROLLING_ID, 0) == 0 && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT_AND_END_POINT)) {
 
                 currentCheckPoint=patrolingdataList[0];
                 if(LocalDb.getCheckPointList()!=null) {
@@ -366,7 +362,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
                 Log.d("str3", "str3: " + urlId+" id "+position+" "+" "+" "+loginDetailsResponce.success.toString());
                 if(loginDetailsResponce.success.equalsIgnoreCase("true")) {
                     Prefs.putInt(PATROLLING_ID,0);
-                    showToast(this, "Patrollling stoped");
+                    showToast(this, "Patrollling stopped");
                     finish();
                 }else{
                     showToast(this, "Patrollling not stopped "+loginDetailsResponce.toString());

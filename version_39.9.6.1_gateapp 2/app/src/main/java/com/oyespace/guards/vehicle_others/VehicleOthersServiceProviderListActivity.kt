@@ -31,6 +31,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         "Zomato",
         "Swiggy",
         "FoodPanda",
+        "Uber Eats",
+        "Dominos",
         "BlueDart",
         "DTDC",
         "Fedex",
@@ -43,6 +45,7 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         "Carpenter",
         "Plumber",
         "electrician",
+        "Gas Cylinder",
         "Others"
 
     )
@@ -53,6 +56,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.zomoto,
         R.mipmap.sw,
         R.mipmap.foodpanda,
+        R.drawable.ubereats,
+        R.drawable.dominospizza,
         R.mipmap.bluedart,
         R.mipmap.dtdc,
         R.mipmap.fedex,
@@ -65,6 +70,7 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.carpenter,
         R.drawable.plumber,
         R.drawable.electrician,
+        R.drawable.gas_cylinder,
         R.drawable.others
 
 

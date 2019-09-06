@@ -15,14 +15,14 @@ import android.widget.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.com.oyespace.guards.adapter.PaginationAdapter
-import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsData
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.adapter.PaginationAdapter
+
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.pojo.PaginationData
 import com.oyespace.guards.pojo.UnitList
 import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.pojo.UnitsList
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
@@ -41,7 +41,7 @@ import kotlin.collections.ArrayList
 class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter:PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter?=null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -284,7 +284,12 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             /**
              * Sublist end index is exclusive. So an additional one is added to the end index
              */
-            arrayList = ArrayList(arrayFullList.subList(start,end+1))
+
+            try {
+                arrayList = ArrayList(arrayFullList.subList(start, end + 1))
+            }catch (e:IndexOutOfBoundsException){
+
+            }
             rv_unit.showProgress()
                 orderListAdapter =
                     GuestUnitSelectionActivity.UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@GuestUnitSelectionActivity, checkListener = {
@@ -328,6 +333,9 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
+        }
+        else{
+            selectedUnits.add(checked);
         }
         //orderListAdapter!!.notifyDataSetChanged();
     }
@@ -691,7 +699,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
+                intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()

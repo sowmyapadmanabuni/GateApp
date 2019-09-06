@@ -17,18 +17,14 @@ import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.UnitSelectionActivity
-import com.oyespace.guards.com.oyespace.guards.adapter.BlockSelectionAdapter
-import com.oyespace.guards.com.oyespace.guards.adapter.SelectedUnitsAdapter
-import com.oyespace.guards.com.oyespace.guards.adapter.UnitSearchResultAdapter
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksList
-import com.oyespace.guards.com.oyespace.guards.pojo.SearchUnitRequest
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.adapter.BlockSelectionAdapter
+import com.oyespace.guards.adapter.SelectedUnitsAdapter
+import com.oyespace.guards.adapter.UnitSearchResultAdapter
+
+
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.UnitList
-import com.oyespace.guards.pojo.UnitListSearch
-import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
@@ -48,9 +44,9 @@ import java.lang.Exception
 class Vehicle_Others_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter:BlockSelectionAdapter?=null
-    var mUnitsAdapter:SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter:UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter?=null
+    var mUnitsAdapter: SelectedUnitsAdapter?=null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter?=null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""

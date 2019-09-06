@@ -313,7 +313,7 @@ class SplashActivity : BaseLocationActivity() {
                                 .setTitle("Device is not registered as Gate device")
                                 .setTitleGravity(Gravity.CENTER)
                                  .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
-                                .setMessage(Mobile_IMEI_NO + " and +" + getSimNumber + " is not registered as Gate Device")
+                                .setMessage(Mobile_IMEI_NO + " and " + getSimNumber + " is not registered as Gate Device")
 
                                 .setMessageGravity(Gravity.CENTER)
                                 .setPositiveButton(android.R.string.ok) {

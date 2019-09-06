@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.adapter
+package com.oyespace.guards.adapter
 
 import android.content.Context
 import android.support.v7.widget.AppCompatTextView
@@ -10,8 +10,8 @@ import android.view.ViewGroup
 import android.widget.RelativeLayout
 import com.malinskiy.superrecyclerview.swipe.SwipeLayout
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
-import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
+
+import com.oyespace.guards.pojo.BlocksData
 
 
 class BlockSelectionAdapter(private val mcontext: Context, private val arrayList: ArrayList<BlocksData>, val clickListener:(BlocksData, Int) -> Unit):

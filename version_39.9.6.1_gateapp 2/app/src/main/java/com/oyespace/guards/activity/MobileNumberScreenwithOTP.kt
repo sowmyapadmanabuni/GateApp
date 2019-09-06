@@ -585,6 +585,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                             d.putExtra(MOBILENUMBER, MobNumber)
                             d.putExtra(COUNTRYCODE, isdCode)
                             d.putExtra(

@@ -59,7 +59,7 @@ class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val m
             intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
             intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
             intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-            intent.putExtra(UNITID, intToString(orderData?.unUnitID))
+            intent.putExtra(UNITID, orderData?.unUnitID)
             intent.putExtra(UNITNAME, orderData?.unUniName)
             mcontext.startActivity(intent)
             (mcontext as Activity).finish()

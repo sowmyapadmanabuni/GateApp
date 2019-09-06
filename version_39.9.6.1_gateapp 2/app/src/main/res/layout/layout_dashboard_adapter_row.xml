@@ -28,7 +28,7 @@
                         android:id="@+id/iv_user"
                         android:layout_width="@dimen/_80sdp"
                         android:layout_height="@dimen/_120sdp"
-                        android:src="@mipmap/oyespace_cropped"
+                        android:src="@drawable/user_icon_black"
                         android:layout_gravity="center_horizontal"
                         android:padding="2dp"
                 />

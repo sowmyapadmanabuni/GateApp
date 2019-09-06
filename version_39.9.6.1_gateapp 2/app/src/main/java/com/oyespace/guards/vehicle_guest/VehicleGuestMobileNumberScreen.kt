@@ -132,7 +132,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@VehicleGuestMobileNumberScreen)
                       //  builder.setTitle("Vendor Entry already done")
-                        builder.setMessage("No Duplicates allowed")
+                        builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
 
 //                            val d = Intent(this@VehicleGuestMobileNumberScreen, Dashboard::class.java)
