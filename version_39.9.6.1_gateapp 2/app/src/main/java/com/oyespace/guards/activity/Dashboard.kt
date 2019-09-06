@@ -29,6 +29,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import com.google.firebase.messaging.FirebaseMessaging
+import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -60,9 +61,7 @@ import java.util.*
 import com.oyespace.guards.constants.PrefKeys.BG_NOTIFICATION_ON
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.constants.PrefKeys.PATROLLING_ID
-import com.oyespace.guards.models.FingerPrint
-import com.oyespace.guards.models.VisitorLog
-import com.oyespace.guards.models.Worker
+import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.getDeviceList
 import com.oyespace.guards.pojo.getVisitorDataByWorker
 import com.oyespace.guards.utils.*
@@ -842,12 +841,28 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 val loginDetailsResponce = data as VisitorLogCreateResp
                 if (loginDetailsResponce != null) {
 
-                    Log.d(
+                    Log.e(
                         "str3",
-                        "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
+                        "str3: " +responce
                     )
+                    val loginDetailsResponceGson = Gson().fromJson(responce, GetVisitorEntryResponse::class.java)
+
                     if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
                         //   showToast(this, " Saved");
+                        Log.e(
+                            "str3",
+                            "str3: " +loginDetailsResponceGson.data.visitorLog.vlVisLgID
+                        )
+                        //val loginDetailsResponce = Gson().fromJson(responce, CaptureFPResponse::class.java)
+//                        val pkeyString = ""+LocalDb.getAssociation()!!.asAssnID+""+loginDetailsResponceGson.data.visitorLog.+""+unitId
+//                        val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", vlVisLgID).findFirst()
+//                        if (!realm.isInTransaction) {
+//                            realm.beginTransaction()
+//                        }
+//                        visitor!!.deleteFromRealm()
+//                        realm.commitTransaction()
+
+
                         visitorEntryLog(loginDetailsResponce.data.visitorLog.vlVisLgID)
 
 
@@ -1014,14 +1029,61 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     }
 
+    private fun reloadVisitorsList(){
+        newAl = DataBaseHelper.getVisitorEnteredLog();
+        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+        rv_dashboard?.adapter = vistorEntryListAdapter
+        vistorEntryListAdapter!!.notifyDataSetChanged()
+    }
+
     private fun visitorLog(
         unitId: Int, personName: String, mobileNumb: String, desgn: String,
         workerType: String, staffID: Int, unitName: String,wkEntryImg:String
     ) {
 
-        val restClient = RestClient.getInstance()
+        try {
+            var memID = 410;
+            if (BASE_URL.contains("dev", true)) {
+                memID = 64;
+            } else if (BASE_URL.contains("uat", true)) {
+                memID = 64;
+            }
+//            Toast.makeText(this@Dashboard, "VISITORLOG ", Toast.LENGTH_LONG)
+//                .show()
+            //realm.executeTransaction {
 
-        val loginReq = RequestDTO()
+//            if(!realm.isInTransaction){
+//                realm.beginTransaction()
+//            }
+//            var pkeyString = ""+LocalDb.getAssociation()!!.asAssnID+""+staffID+""+unitId
+//            val pkey = pkeyString.toInt()
+//
+//            val lgId= pkey
+//            val vlog = realm.createObject<VisitorLog>(lgId);
+//            vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
+//            vlog.mEMemID = memID
+//            vlog.reRgVisID = staffID
+//            vlog.uNUnitID = unitId
+//            vlog.vlfName = personName
+//            vlog.vlMobile = mobileNumb
+//            vlog.vlComName = desgn
+//            vlog.vlVisType = workerType
+//            vlog.unUniName = unitName
+//            vlog.vlVisCnt = 1
+//            vlog.vlEntryT = getCurrentTimeLocal()
+//            vlog.vlExitT = "0001-01-01T00:00:00"
+//            vlog.vlEntryImg = wkEntryImg
+//            realm.commitTransaction()
+//            //}
+//            reloadVisitorsList();
+
+            t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
+            Prefs.putString(BIOMETRICPERSONNAME, personName)
+
+
+            val restClient = RestClient.getInstance()
+
+            val loginReq = RequestDTO()
 
 //        var memID = 64
 //        if (!BASE_URL.contains("dev")) {
@@ -1029,57 +1091,31 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //        }
 
 
-        var memID=410;
-        if(BASE_URL.contains("dev",true)){
-            memID=64;
-        }
-        else if(BASE_URL.contains("uat",true)){
-            memID=64;
-        }
-        loginReq.aSAssnID = LocalDb.getAssociation()!!.asAssnID
-        loginReq.mEMemID = memID
-        loginReq.rERgVisID = staffID
-        loginReq.uNUnitID = unitId
-        loginReq.vLFName = personName
-        loginReq.vLMobile = mobileNumb
-        loginReq.vLComName = desgn
-        loginReq.vLVisType = workerType
-        loginReq.uNUniName = unitName
-        loginReq.vLVisCnt = 1
-        loginReq.VLEntryImg=wkEntryImg
+
+            loginReq.aSAssnID = LocalDb.getAssociation()!!.asAssnID
+            loginReq.mEMemID = memID
+            loginReq.rERgVisID = staffID
+            loginReq.uNUnitID = unitId
+            loginReq.vLFName = personName
+            loginReq.vLMobile = mobileNumb
+            loginReq.vLComName = desgn
+            loginReq.vLVisType = workerType
+            loginReq.uNUniName = unitName
+            loginReq.vLVisCnt = 1
+            loginReq.VLEntryImg = wkEntryImg
 
 
-        //realm.executeTransaction {
-            if(!realm.isInTransaction){
-                realm.beginTransaction()
-            }
-            val lgId= (100000 until 99000000).random()
-            val vlog = realm.createObject<VisitorLog>(lgId);
-            vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
-            vlog.mEMemID = memID
-            vlog.reRgVisID = staffID
-            vlog.uNUnitID = unitId
-            vlog.vlfName = personName
-            vlog.vlMobile = mobileNumb
-            vlog.vlComName = desgn
-            vlog.vlVisType = workerType
-            vlog.unUniName = unitName
-            vlog.vlVisCnt = 1
-            vlog.vlEntryT = getCurrentTimeLocal()
-            realm.commitTransaction()
-        //}
-        //val workerCount = realm.where(VisitorLog::class.java).findAll()
+
+            //val workerCount = realm.where(VisitorLog::class.java).findAll()
 
 //        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
 //            getCurrentTimeLocal(),"")
 //getCurrentTimeLocal()
-        Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
-        //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
+            Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
+            //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
 
-        restClient.addHeader(OYE247KEY, OYE247TOKEN)
-        restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_LOG)
-          t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
-        Prefs.putString(BIOMETRICPERSONNAME,personName)
+            restClient.addHeader(OYE247KEY, OYE247TOKEN)
+            restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_LOG)
 
 
 
@@ -1117,7 +1153,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //            getCurrentTimeLocal(),"")
 
 
-        //@Todo
+            //@Todo
 
 //        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
 //            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
@@ -1133,7 +1169,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //        }
 
 
-
 //        d.putExtra(BSR_Action, VisitorEntryFCM)
 //        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
 //        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
@@ -1145,22 +1180,19 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
 
 
-
-        val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
-        d.putExtra(BSR_Action, VisitorEntryFCM)
-        d.putExtra("msg", "$personName $desgn "+" is coming to your home")
-        d.putExtra("mobNum", mobileNumb)
-        d.putExtra("name", personName)
-        d.putExtra("nr_id", "0")
-        d.putExtra("unitname",unitName)
-        d.putExtra("memType", "Owner")
-        d.putExtra(UNITID,unitId.toString())
-        d.putExtra(COMPANY_NAME,"Staff")
-        d.putExtra(UNIT_ACCOUNT_ID,"0")
-        d.putExtra("VLVisLgID",0)
-        sendBroadcast(d);
-
-
+            val d = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+            d.putExtra(BSR_Action, VisitorEntryFCM)
+            d.putExtra("msg", "$personName $desgn " + " is coming to your home")
+            d.putExtra("mobNum", mobileNumb)
+            d.putExtra("name", personName)
+            d.putExtra("nr_id", "0")
+            d.putExtra("unitname", unitName)
+            d.putExtra("memType", "Owner")
+            d.putExtra(UNITID, unitId.toString())
+            d.putExtra(COMPANY_NAME, "Staff")
+            d.putExtra(UNIT_ACCOUNT_ID, "0")
+            d.putExtra("VLVisLgID", 0)
+            sendBroadcast(d);
 
 
 //        val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
@@ -1172,27 +1204,51 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 ////        ddc.putExtra("unitname", unitName)
 ////        ddc.putExtra("memType", "Owner")
 //        sendBroadcast(ddc)
+        }catch (e:Exception){
+            e.printStackTrace()
+//            Toast.makeText(this@Dashboard, "VISITORLOG ERROR "+e.toString(), Toast.LENGTH_LONG)
+//                .show()
+        }
 
 
     }
 
     fun VisitorExit(vlVisLgID: Int,vlfName:String) {
-        val restClient = RestClient.getInstance()
 
-        val loginReq = VisitorExitReqJv()
+        try {
+           // val total = realm.where(VisitorLog::class.java).count();
+//            Toast.makeText(this@Dashboard, "VISITORLOG BEFORE "+total, Toast.LENGTH_LONG)
+//                .show()
+            val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", vlVisLgID).findFirst()
+            if (!realm.isInTransaction) {
+                realm.beginTransaction()
+            }
+            visitor!!.deleteFromRealm()
+            realm.commitTransaction()
+           // val _total = realm.where(VisitorLog::class.java).count();
+//            Toast.makeText(this@Dashboard, "VISITORLOG AFTER "+_total+" "+total, Toast.LENGTH_LONG)
+//                .show()
+           // vistorEntryListAdapter!!.notifyDataSetChanged()
+            reloadVisitorsList();
 
-        loginReq.VLVisLgID = vlVisLgID
-        loginReq.VLExitT = getCurrentTimeLocal()
-        loginReq.VLExitWID = DataBaseHelper.getStaffs()!![0].wkWorkID.toInt()
+            val restClient = RestClient.getInstance()
 
-        Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
-        //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
+            val loginReq = VisitorExitReqJv()
 
-        restClient.addHeader(OYE247KEY, OYE247TOKEN)
-        restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_MAKE_EXIT)
-        // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
+            loginReq.VLVisLgID = vlVisLgID
+            loginReq.VLExitT = getCurrentTimeLocal()
+            loginReq.VLExitWID = DataBaseHelper.getStaffs()!![0].wkWorkID.toInt()
 
+            Log.d("CreateVisitorLogResp", "StaffEntry ${loginReq.VLVisLgID}")
+            //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
 
+            restClient.addHeader(OYE247KEY, OYE247TOKEN)
+            restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_MAKE_EXIT)
+            // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
+
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
 
     }
 
@@ -1284,12 +1340,14 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         Log.d("abcdef", "7172")
         if (bSecuGenDeviceOpened == true) {
+
             //DEBUG Log.d(TAG, "Clicked MATCH");
             if (mVerifyImage != null)
                 mVerifyImage = null
             mVerifyImage = ByteArray(mImageWidth * mImageHeight)
 
             try {
+
                 var result = sgfplib!!.GetImage(mVerifyImage)
                 Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
 
@@ -1318,8 +1376,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                 //                AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 //                am.setStreamVolume(AudioManager.STREAM_SYSTEM, am.getStreamMaxVolume(AudioManager.STREAM_SYSTEM), 0);
-
+                showProgressrefresh()
                 val tempNumber = checkFingerPrint(mVerifyTemplate!!)
+                dismissProgressrefresh()
                 Log.d("Biometric 953", " ")
                 if (tempNumber == 0) {
                     t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
@@ -1331,24 +1390,27 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     Log.d("Biometric 973", " " + (DataBaseHelper.getVisitorEnteredLog() != null))
                     //looping through existing elements
                     if (DataBaseHelper.getVisitorEnteredLog() != null) {
+                        Log.e("getVisitorEnteredLog","NOTNULL")
                         for (s in DataBaseHelper.getVisitorEnteredLog()!!) {
                             //if the existing elements contains the search input
                             Log.e("s.reRgVisID",""+s.reRgVisID);
                             if (s.reRgVisID == Integer.parseInt(memName)) {
                                 //adding the element to filtered list
+                                Log.e("Adding",""+s.reRgVisID+" - "+memName);
                                 enteredStaff.add(s)
                             } else {
 
                             }
                         }
+                    }else{
+                        Log.e("getVisitorEnteredLog","ISNULL")
                     }
-                    Log.d("Biometric 983", " ")
+                    Log.e("Biometric 983", " ")
 
                     if (enteredStaff.size > 0) {
-
+                        Log.e("enteredStaff", ""+enteredStaff.size)
                         t1?.speak("Thank You " + enteredStaff[0].vlfName, TextToSpeech.QUEUE_FLUSH, null)
 
-                        Log.d("check 79 ", "bio")
                         VisitorExit(enteredStaff[0].vlVisLgID,enteredStaff[0].vlfName)
 
                     } else {
@@ -1366,13 +1428,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                                 filterdNames.add(s)
                             }
                         }
+                        Log.e("filterdNames",""+filterdNames.size)
+                        Log.e("filterdNames_List",""+filterdNames)
                         if (filterdNames.size > 0) {
 
 
                         //    val (_, _, unUnitID, unUniName, _, wkDesgn, _, _, wkMobile, wkWorkID, wkWrkType, _, _, wkfName, _, _, wklName) = filterdNames[0]
                             var worker:Worker = filterdNames[0];
 
-                        getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),worker.wkWorkID.toInt(),worker.unUnitID.toInt(),"${worker.wkfName} ${worker.wklName}",worker.wkMobile, worker.wkDesgn, worker.wkWrkType,worker.wkWorkID.toInt(), worker.unUniName, worker.wkEntryImg)
+                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),worker.wkWorkID.toInt(),worker.unUnitID.toInt(),"${worker.wkfName} ${worker.wklName}",worker.wkMobile, worker.wkDesgn, worker.wkWrkType,worker.wkWorkID.toInt(), worker.unUniName, worker.wkEntryImg)
                            // t1?.speak("Welcome $wkfName$wklName", TextToSpeech.QUEUE_FLUSH, null)
                           // showToast(this@Dashboard,"came")
 //                            visitorLog(
@@ -1394,16 +1458,18 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 } else {
                     //                                Toast.makeText(getApplicationContext(), "" + tempNumber, Toast.LENGTH_LONG).show();
                 }
-                Log.d("Biometric 1030", " ")
+                Log.e("Biometric 1030", " ")
 
                 mVerifyImage = null
                 fpInfo = null
                 matched = null
                 this.sgfplib!!.SetBrightness(100)
+               // dismissProgressrefresh()
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
-                Log.d("Biometric 1035", " $ex")
+                Log.e("Biometric 1035", " $ex")
                 ex.printStackTrace()
+                //dismissProgressrefresh()
                 // Toast.makeText(applicationContext, "Biometric not attached correctly ", Toast.LENGTH_LONG).show()
             }
 
@@ -1418,6 +1484,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     fun checkFingerPrint(template: ByteArray): Int {
+
         nnnn++
         val exists = false
         var number = 0
@@ -1483,6 +1550,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             }
         }
         Log.e("EXIST??",""+number);
+        //dismissProgressrefresh()
         return number;
     }
 
@@ -2460,14 +2528,14 @@ try {
     fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: Int, personName: String, mobileNumb: String, desgn: String,
                              workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
 
-        // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
+         Log.e("getVisitorByWorkerId",assnID.toString()+".."+workerID+"..."+personName)
         RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
 
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
-
+                    Log.e("onSuccessResponse",""+getdata);
                     if (getdata.success == true) {
                         // showToast(this@Dashboard,"already entered")
                         //  showToast(this@Dashboard,workerID.toString())
@@ -2479,7 +2547,7 @@ try {
 
                     // showToast(this@Dashboard,"false")
                     //showToast(this@Dashboard,workerID.toString()+"-"+unitId+"-"+personName+"-"+mobileNumb+"-"+desgn+"-"+workerType+"-"+staffID+"-"+unitName)
-
+                    Log.e("onErrorResponse",""+personName);
                     visitorLog(
                         unitId, personName,
                         mobileNumb, desgn, workerType,
@@ -2494,6 +2562,11 @@ try {
                 }
 
                 override fun noNetowork() {
+//                    visitorLog(
+//                        unitId, personName,
+//                        mobileNumb, desgn, workerType,
+//                        staffID, unitName,wkEntryImg
+//                    )
                     Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG)
                         .show()
                 }

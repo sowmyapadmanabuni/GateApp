@@ -239,6 +239,8 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
                                 mobileNumber=number.substring(3,13)
                             }
+
+                            LocalDb.disconnectCall(context)
                         }
                     }
 
@@ -246,7 +248,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
                 //
             }
-        };
+        }
 
         addEntries()
         btn_nobalance=findViewById(R.id.btn_nobalance)

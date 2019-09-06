@@ -8,9 +8,11 @@ import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.models.Worker;
 import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.Sort;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
+import java.util.Comparator;
 
 
 public class DataBaseHelper {
@@ -140,7 +142,15 @@ public class DataBaseHelper {
     public static ArrayList<VisitorLog> getVisitorEnteredLog(){
         Realm realm = Realm.getDefaultInstance();
         ArrayList<VisitorLog> list = new ArrayList<>();
-        list.addAll(realm.where(VisitorLog.class).findAll());
+        list.addAll(realm.where(VisitorLog.class).findAll().sort("vlVisLgID", Sort.DESCENDING));
+
+//        Collections.sort(list, new Comparator<VisitorLog>() {
+//            @Override
+//            public int compare(VisitorLog o1, VisitorLog o2) {
+//                return 0;
+//            }
+//        });
+
         realm.close();
         return list;
     }

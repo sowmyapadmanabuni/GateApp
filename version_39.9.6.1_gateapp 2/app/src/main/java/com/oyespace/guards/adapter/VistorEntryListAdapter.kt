@@ -138,7 +138,7 @@ class VistorEntryListAdapter(private var listVistor: ArrayList<VisitorLog>, priv
 
                 //Log.e("VISITOR",""+visitor);
                 makeExitCall(lgid);
-                val visitor = realm.where(VisitorLog::class.java).equalTo("vlMobile", listVistor.get(position).vlMobile).findFirst()
+                val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", listVistor.get(position).vlVisLgID).findFirst()
                if(!realm.isInTransaction) {
                    realm.beginTransaction()
                }

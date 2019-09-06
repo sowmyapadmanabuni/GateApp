@@ -205,9 +205,6 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                                mobileNumber=number.substring(3,13)
 
 
-
-
-
                             }
                         }
                     }

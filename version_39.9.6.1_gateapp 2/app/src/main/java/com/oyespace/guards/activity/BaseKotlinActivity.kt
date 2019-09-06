@@ -104,6 +104,15 @@ open class BaseKotlinActivity : AppCompatActivity(){
         progressDialog?.show()
     }
 
+    fun showProgressrefreshWithText(text:String) {
+        progressDialog = ProgressDialog(this)
+        progressDialog?.isIndeterminate = true
+        progressDialog?.setCancelable(false)
+        progressDialog?.setMessage(text)
+        progressDialog?.setCanceledOnTouchOutside(false)
+        progressDialog?.show()
+    }
+
     fun dismissProgressrefresh() {
         progressDialog?.isShowing.let {
             progressDialog?.dismiss()
