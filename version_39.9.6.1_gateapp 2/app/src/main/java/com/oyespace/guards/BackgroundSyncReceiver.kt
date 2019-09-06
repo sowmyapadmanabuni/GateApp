@@ -451,7 +451,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //    }
 
     private fun getVisitorLogEntryList() {
-        Log.e("SYCNCHECK","in 408")
+        Log.e("SYCNCHECK","in 408: "+Prefs.getInt(ASSOCIATION_ID,0))
         RetrofitClinet.instance
             .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
             .subscribeOn(Schedulers.io())

@@ -156,7 +156,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var grayBitmap: Bitmap? = null
     private var filter: IntentFilter? = null //2014-04-11
     private var autoOn: SGAutoOnEventNotifier? = null
-
+    var pkeyString = "-2"
 
     //    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
     //    private DatabaseReference mRootReference =firebaseDatabase.getReference();
@@ -854,8 +854,20 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                             "str3: " +loginDetailsResponceGson.data.visitorLog.vlVisLgID
                         )
                         //val loginDetailsResponce = Gson().fromJson(responce, CaptureFPResponse::class.java)
-//                        val pkeyString = ""+LocalDb.getAssociation()!!.asAssnID+""+loginDetailsResponceGson.data.visitorLog.+""+unitId
-//                        val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", vlVisLgID).findFirst()
+                        if(!pkeyString.equals("-2")) {
+                            val pkey = pkeyString.toInt();
+                            val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", pkey).findFirst()
+                            if (visitor != null) {
+                                if (!realm.isInTransaction) {
+                                    realm.beginTransaction()
+                                }
+                                val temp = realm.copyFromRealm(visitor)
+                                temp.vlVisLgID = loginDetailsResponceGson.data.visitorLog.vlVisLgID;
+                                realm.copyToRealmOrUpdate(temp)
+                                visitor.deleteFromRealm()
+                                realm.commitTransaction()
+                            }
+                        }
 //                        if (!realm.isInTransaction) {
 //                            realm.beginTransaction()
 //                        }
@@ -1052,30 +1064,30 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //                .show()
             //realm.executeTransaction {
 
-//            if(!realm.isInTransaction){
-//                realm.beginTransaction()
-//            }
-//            var pkeyString = ""+LocalDb.getAssociation()!!.asAssnID+""+staffID+""+unitId
-//            val pkey = pkeyString.toInt()
-//
-//            val lgId= pkey
-//            val vlog = realm.createObject<VisitorLog>(lgId);
-//            vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
-//            vlog.mEMemID = memID
-//            vlog.reRgVisID = staffID
-//            vlog.uNUnitID = unitId
-//            vlog.vlfName = personName
-//            vlog.vlMobile = mobileNumb
-//            vlog.vlComName = desgn
-//            vlog.vlVisType = workerType
-//            vlog.unUniName = unitName
-//            vlog.vlVisCnt = 1
-//            vlog.vlEntryT = getCurrentTimeLocal()
-//            vlog.vlExitT = "0001-01-01T00:00:00"
-//            vlog.vlEntryImg = wkEntryImg
-//            realm.commitTransaction()
-//            //}
-//            reloadVisitorsList();
+            if(!realm.isInTransaction){
+                realm.beginTransaction()
+            }
+            pkeyString = ""+staffID
+            val pkey = pkeyString.toInt()
+
+            val lgId= pkey
+            val vlog = realm.createObject<VisitorLog>(lgId);
+            vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
+            vlog.mEMemID = memID
+            vlog.reRgVisID = staffID
+            vlog.uNUnitID = unitId
+            vlog.vlfName = personName
+            vlog.vlMobile = mobileNumb
+            vlog.vlComName = desgn
+            vlog.vlVisType = workerType
+            vlog.unUniName = unitName
+            vlog.vlVisCnt = 1
+            vlog.vlEntryT = getCurrentTimeLocal()
+            vlog.vlExitT = "0001-01-01T00:00:00"
+            vlog.vlEntryImg = wkEntryImg
+            realm.commitTransaction()
+            //}
+            reloadVisitorsList();
 
             t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
             Prefs.putString(BIOMETRICPERSONNAME, personName)

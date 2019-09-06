@@ -8,6 +8,7 @@ import android.location.Location
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
@@ -15,6 +16,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -72,6 +74,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     private var lineoption = PolylineOptions()
     private var isResolving = false
     var userId:Int = 0
+    internal var t1: TextToSpeech?=null
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -115,6 +118,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
         btn_dismiss_sos.setOnClickListener {dismissSOS()}
         btn_attend_sos.setOnClickListener({ attendSOS() })
+
+        t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
+            if (status != TextToSpeech.ERROR)
+                t1?.language=Locale.getDefault()
+        })
 
     }
 
@@ -166,6 +174,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             var sosImage:String = ""
                             var latitude:String = ""
                             var longitude:String = ""
+                            var attendedBy:String = ""
                             var id:Int = 0
                             //var userId: Int = 0
                             var totalPassed:Int = 0
@@ -207,35 +216,61 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                 totalPassed = passedBy.size
                             }
 
+                            if(it.hasChild("attendedBy")){
+                                attendedBy = it.child("attendedBy").getValue(String::class.java)!!
+                            }
+
                             if (isActive != null && isActive && userId != 0) {
 
                                 runOnUiThread {
-                                    if(userMobile != "" && userMobile != null){
-                                        sos_usermobile.text = userMobile
-                                    }
-                                    if(userName != "" && userName != null){
-                                        sos_username.text = userName
-                                    }
-                                    if(sosImage != "" && sosImage != null){
+                                    val currentGate = Prefs.getString(ConstantUtils.GATE_NO,"");
+                                    if(attendedBy.equals("") || attendedBy.equals(currentGate)) {
 
-                                        Picasso.with(applicationContext)
-                                            .load(sosImage)
-                                            .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera).into(sos_image)
-                                    }else{
-                                        Picasso.with(applicationContext)
-                                            .load(R.drawable.newicons_camera).into(sos_image)
-                                    }
-                                    if(latitude != "" && latitude != null && longitude != "" && longitude != null){
-                                        val lat = latitude.toDouble()
-                                        val lon = longitude.toDouble()
-                                        sosLocation = LatLng(lat, lon)
-                                        getDirections()
-                                    }
 
-                                    if((totalGuards-totalPassed) == 1){
-                                        btn_dismiss_sos.visibility = View.GONE
+                                        if (userMobile != "" && userMobile != null) {
+                                            sos_usermobile.text = userMobile
+                                        }
+                                        if (userName != "" && userName != null) {
+                                            sos_username.text = userName
+                                        }
+                                        if (sosImage != "" && sosImage != null) {
+
+                                            Picasso.with(applicationContext)
+                                                .load(sosImage)
+                                                .placeholder(R.drawable.newicons_camera)
+                                                .error(R.drawable.newicons_camera).into(sos_image)
+                                        } else {
+                                            Picasso.with(applicationContext)
+                                                .load(R.drawable.newicons_camera).into(sos_image)
+                                        }
+                                        if (latitude != "" && latitude != null && longitude != "" && longitude != null) {
+                                            val lat = latitude.toDouble()
+                                            val lon = longitude.toDouble()
+                                            sosLocation = LatLng(lat, lon)
+                                            getDirections()
+                                        }
+
+                                        if ((totalGuards - totalPassed) == 1) {
+                                            btn_dismiss_sos.visibility = View.GONE
+                                        } else {
+                                            btn_dismiss_sos.visibility = View.VISIBLE
+                                        }
                                     }else{
-                                        btn_dismiss_sos.visibility = View.VISIBLE
+                                        //Someone else accepted the SOS
+                                        try {
+                                            Toast.makeText(this@SosGateAppActivity,""+attendedBy+" accepted the S.O.S",Toast.LENGTH_LONG).show()
+                                            t1?.speak(""+attendedBy+" accepted the SOS", TextToSpeech.QUEUE_FLUSH, null)
+                                            Log.e("DEleted",""+currentSOS);
+                                            val sosObj = realm.where<SOSModel>().equalTo("userId",userId).findFirst()
+                                            if(sosObj!= null){
+                                                realm.executeTransaction {
+                                                    sosObj.deleteFromRealm()
+                                                }
+                                            }
+                                            checkNextSOS()
+                                        }catch (e:Exception){
+                                            checkNextSOS()
+                                        }
                                     }
                                 }
                             }else{

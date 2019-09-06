@@ -33,6 +33,7 @@ import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.NumberUtils.toInteger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
 import io.realm.kotlin.createObject
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import kotlinx.android.synthetic.main.activity_img_view.*
@@ -337,33 +338,48 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
-                    if (globalApiObject.success == true) {
-                        // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                    try {
+                        if (globalApiObject.success == true) {
+                            // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
 
 //                       var id: Long  = dbh!!.insertVisitorData(intent.getStringExtra(UNITNAME),Prefs.getInt(ASSOCIATION_ID,0).toString(),intent.getStringExtra(PERSONNAME),memID,globalApiObject.data.visitorLog.vlVisLgID, toInteger(intent.getStringExtra(UNITID)),
 //                           intent.getStringExtra(MOBILENUMBER),
 //                           intent.getStringExtra(COMPANY_NAME),
 //                           intent.getStringExtra(VISITOR_TYPE),1,"","" )
 
-                        //realm.executeTransaction {
-                            if(!realm.isInTransaction){
+                            Log.e("createVisitorLogCall", "" + globalApiObject.data.visitorLog.vlVisLgID);
+                            //realm.executeTransaction {
+                            realm = Realm.getDefaultInstance()
+                            if (!realm.isInTransaction) {
                                 realm.beginTransaction()
                             }
-                            val vlog = realm.createObject(VisitorLog::class.java, globalApiObject.data.visitorLog.vlVisLgID)
-                            vlog.asAssnID  = Prefs.getInt(ASSOCIATION_ID,0)
-                            vlog.mEMemID = memID
-                            vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
-                            vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
-                            vlog.vlfName = intent.getStringExtra(PERSONNAME)
-                            vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
-                            vlog.vlComName = intent.getStringExtra(COMPANY_NAME)
-                            vlog.vlVisType = intent.getStringExtra(VISITOR_TYPE)
-                            vlog.unUniName = intent.getStringExtra(UNITNAME)
-                            vlog.vlVisCnt = 1
-                            vlog.vlEntryT = getCurrentTimeLocal()
-                            realm.commitTransaction()
-                        //}
 
+                            var vlog = realm.where(VisitorLog::class.java)
+                                .equalTo("vlVisLgID", globalApiObject.data.visitorLog.vlVisLgID).findFirst()
+                            Log.e("createVisi_VLOG", "" + vlog);
+                            var vlogCount = (realm.where(VisitorLog::class.java).equalTo(
+                                "vlVisLgID",
+                                globalApiObject.data.visitorLog.vlVisLgID
+                            ).count()).toInt()
+                            if (vlogCount == null || vlogCount == 0) {
+                                vlog = realm.createObject(
+                                    VisitorLog::class.java,
+                                    globalApiObject.data.visitorLog.vlVisLgID
+                                )
+                            }
+                            vlog!!.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
+                            vlog!!.mEMemID = memID
+                            vlog!!.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
+                            vlog!!.uNUnitID = toInteger(intent.getStringExtra(UNITID))
+                            vlog!!.vlfName = intent.getStringExtra(PERSONNAME)
+                            vlog!!.vlMobile = intent.getStringExtra(MOBILENUMBER)
+                            vlog!!.vlComName = intent.getStringExtra(COMPANY_NAME)
+                            vlog!!.vlVisType = intent.getStringExtra(VISITOR_TYPE)
+                            vlog!!.unUniName = intent.getStringExtra(UNITNAME)
+                            vlog!!.vlVisCnt = 1
+                            vlog!!.vlEntryT = getCurrentTimeLocal()
+                            realm.commitTransaction()
+                            //}
 
 
 //                        if(id<=0)
@@ -375,31 +391,37 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //
 //            }
 
-                        visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
-                        val d  =  Intent(this@StaffEntryRegistration,BackgroundSyncReceiver::class.java)
-                        d.putExtra(BSR_Action, VisitorEntryFCM)
-                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+UNUniName+")")
-                        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-                        d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                        d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                        d.putExtra("unitname", UNUniName)
-                        d.putExtra("memType", "Owner")
-                        d.putExtra(UNITID,UNUnitID.toString())
-                        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-                        d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
-                        d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+                            val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
+                            d.putExtra(BSR_Action, VisitorEntryFCM)
+                            d.putExtra(
+                                "msg",
+                                intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + UNUniName + ")"
+                            )
+                            d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+                            d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                            d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                            d.putExtra("unitname", UNUniName)
+                            d.putExtra("memType", "Owner")
+                            d.putExtra(UNITID, UNUnitID.toString())
+                            d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
+                            d.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        sendBroadcast(d);
-                        // var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +globalApiObject.data.visitorLog.vlVisLgID  + ".jpg"
+                            sendBroadcast(d);
+                            // var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +globalApiObject.data.visitorLog.vlVisLgID  + ".jpg"
 
 
-                        uploadImage(imgName,mBitmap)
-                        Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
+                            uploadImage(imgName, mBitmap)
+                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
+                        } else {
+                            Utils.showToast(applicationContext, globalApiObject.apiVersion)
+                        }
+                    }catch (e:java.lang.Exception){
+                        e.printStackTrace()
                     }
                 }
                 override fun onErrorResponse(e: Throwable) {
