@@ -225,7 +225,7 @@
                 <!--android:layout_margin="5dp"-->
         <!--/>-->
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/swipeContainer"
                 android:layout_width="wrap_content"
@@ -233,13 +233,13 @@
                 android:layout_weight="4.5">
 
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_dashboard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
             />
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         <include
                 android:id="@+id/ly_bottombar"
                 android:layout_width="fill_parent"

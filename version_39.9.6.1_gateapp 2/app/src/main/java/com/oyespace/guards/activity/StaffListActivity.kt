@@ -7,9 +7,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.SearchView
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -108,7 +108,7 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
             txt_device_name.text = " "
 
         }
-        rv_staff?.setLayoutManager(GridLayoutManager(this@StaffListActivity, 1))
+        rv_staff?.setLayoutManager(androidx.recyclerview.widget.GridLayoutManager(this@StaffListActivity, 1))
 
         //    sv_staff = findViewById(R.id.sv_staff);
 

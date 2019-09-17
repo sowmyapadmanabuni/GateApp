@@ -128,6 +128,10 @@ interface WebApi {
     fun getTicketingResponses(@Header(OYE247KEY) token: String, @Path("id") ticketID: String)
             : Single<GetTicketingResponsesRes<TicketingResponseData>>
 
+    @GET("oye247/api/v1/CheckPoint/GetCheckPointListByCheckPointID/{id}")
+    fun getCheckPointInfo(@Header(OYE247KEY) token: String, @Path("id") checkPointId: String)
+            : Single<GetCheckPointResponse<CheckPointData>>
+
     @GET("oyesafe/api/v1/Device/GetDeviceListByAssocID/{id}")
     fun getDeviceListResponse(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String):Single<getDeviceList>
 

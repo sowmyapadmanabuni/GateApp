@@ -12,17 +12,15 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -480,7 +478,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                 );
                 dlgAlert.setCancelable(false);
 //            dlgAlert.create().show();
-                new android.support.v7.app.AlertDialog.Builder(RegisterFingerPrint.this)
+                new androidx.appcompat.app.AlertDialog.Builder(RegisterFingerPrint.this)
                         .setTitle("Finger Print Registration")
                         .setMessage("Please connect biometric device2")
                         .setNeutralButton("OK", new DialogInterface.OnClickListener() {

@@ -17,12 +17,12 @@ import android.net.Uri
 import android.os.*
 import android.provider.Settings
 import android.speech.tts.TextToSpeech
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
+import androidx.core.content.ContextCompat.startActivity
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.Toolbar
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.MotionEvent
@@ -62,6 +62,7 @@ import com.oyespace.guards.constants.PrefKeys.BG_NOTIFICATION_ON
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.constants.PrefKeys.PATROLLING_ID
 import com.oyespace.guards.models.*
+import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.getDeviceList
 import com.oyespace.guards.pojo.getVisitorDataByWorker
 import com.oyespace.guards.utils.*
@@ -114,7 +115,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     var re_delivery: RelativeLayout?=null
     var lyt_settings: RelativeLayout?=null
     var champApiInterface: ChampApiInterface?=null
-    var rv_dashboard: RecyclerView?=null
+    var rv_dashboard: androidx.recyclerview.widget.RecyclerView?=null
     var tv_subscriptiondate: TextView?=null
     var tv_version: TextView?=null
     var tv_languagesettings: TextView?=null
@@ -306,6 +307,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
 
+        //showAnimatedDialog("Text",R.raw.error, true,"OK")
 
         cd = ConnectionDetector()
         cd.isConnectingToInternet(this@Dashboard)
@@ -625,7 +627,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         if (isTimeAutomatic(application)) {
 
         } else {
-            val alertDialogBuilder = android.support.v7.app.AlertDialog.Builder(this@Dashboard)
+            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this@Dashboard)
             alertDialogBuilder.setTitle("Time settings")
 
             // Setting Dialog Message
@@ -649,7 +651,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         if (isTimeZoneAutomatic(application)) {
 
         } else {
-            val alertDialogBuilder = android.support.v7.app.AlertDialog.Builder(this@Dashboard)
+            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this@Dashboard)
             alertDialogBuilder.setTitle("Time settings")
 
             // Setting Dialog Message
@@ -1604,7 +1606,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             }
             R.id.tv_patrolling -> {
                 //PatrollingActivitynew
-                val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
+                val i_vehicle = Intent(this@Dashboard, PatrollingLocActivity::class.java)
                 startActivity(i_vehicle)
             }
             R.id.tv_emergency -> {
@@ -1839,7 +1841,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         re_delivery = findViewById(R.id.re_delivery)
         re_delivery?.setOnClickListener(this)
         rv_dashboard = findViewById(R.id.rv_dashboard)
-        rv_dashboard?.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false))
+        rv_dashboard?.setLayoutManager(
+            androidx.recyclerview.widget.LinearLayoutManager(
+                this,
+                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                false
+            )
+        )
 
 
 

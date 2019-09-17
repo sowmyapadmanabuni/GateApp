@@ -3,8 +3,8 @@ package com.oyespace.guards.ui;
 import android.content.Context;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 
 public class SwitchTrackTextDrawable extends Drawable {
 

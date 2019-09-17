@@ -3,7 +3,7 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/recycler" android:layout_marginLeft="10dp">
-    <android.support.v7.widget.RecyclerView android:layout_margin="1dp" android:layout_width="match_parent"
-                                            android:layout_height="match_parent"
-                                            android:id="@+id/rcv_emergency"></android.support.v7.widget.RecyclerView>
+    <androidx.recyclerview.widget.RecyclerView android:layout_margin="1dp" android:layout_width="match_parent"
+                                               android:layout_height="match_parent"
+                                               android:id="@+id/rcv_emergency"></androidx.recyclerview.widget.RecyclerView>
 </RelativeLayout>

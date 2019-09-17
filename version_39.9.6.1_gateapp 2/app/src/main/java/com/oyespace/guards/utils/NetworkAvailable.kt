@@ -3,7 +3,7 @@ package com.oyespace.guards.com.oyespace.guards.utils
 import android.content.Context
 import android.net.NetworkInfo
 import android.content.Context.CONNECTIVITY_SERVICE
-import android.support.v4.content.ContextCompat.getSystemService
+import androidx.core.content.ContextCompat.getSystemService
 import android.net.ConnectivityManager
 import android.util.Log
 

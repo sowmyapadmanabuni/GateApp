@@ -1,8 +1,8 @@
 package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.content.Context
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +14,7 @@ class SectionRecyclerViewAdapter(
     private val context: Context,
     private val recyclerViewType: RecyclerViewType?,
     private val sectionModelArrayList: ArrayList<SectionModel>
-) : RecyclerView.Adapter<SectionRecyclerViewAdapter.SectionViewHolder>() {
+) : androidx.recyclerview.widget.RecyclerView.Adapter<SectionRecyclerViewAdapter.SectionViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionViewHolder {
@@ -38,7 +38,7 @@ class SectionRecyclerViewAdapter(
         when (recyclerViewType) {
 
             RecyclerViewType.GRID -> {
-                val gridLayoutManager = GridLayoutManager(context, 3)
+                val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
                 holder.itemRecyclerView.layoutManager = gridLayoutManager
             }
         }
@@ -53,9 +53,9 @@ class SectionRecyclerViewAdapter(
         return sectionModelArrayList.size
     }
 
-    class SectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class SectionViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
-        val itemRecyclerView: RecyclerView
+        val itemRecyclerView: androidx.recyclerview.widget.RecyclerView
         val section_label: TextView
 
         init {

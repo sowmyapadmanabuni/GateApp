@@ -8,9 +8,9 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Handler
-import android.support.v4.app.ActivityCompat.startActivityForResult
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v7.widget.RecyclerView
+import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.core.content.ContextCompat.startActivity
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -41,7 +41,7 @@ import kotlinx.android.synthetic.main.activity_mobile_number.*
 
 
 
-class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : RecyclerView.Adapter<StaffAdapter.StaffViewHolder>() ,Filterable{
+class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<StaffAdapter.StaffViewHolder>() ,Filterable{
 
     private var searchList: ArrayList<Worker>? = null
 
@@ -74,7 +74,7 @@ class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : Recy
         holder.lv_staff.setOnClickListener {
 
 
-            val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
             val factory = LayoutInflater.from(mcontext)
             val view = factory.inflate(R.layout.dialog_big_image, null)
             var dialog_imageview: ImageView? = null
@@ -520,7 +520,7 @@ class StaffAdapter (val items : ArrayList<Worker>, val mcontext: Context) : Recy
         return position
     }
 
-    class StaffViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class StaffViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tv_staff: TextView
         val iv_staff: ImageView
         val lv_staff: LinearLayout

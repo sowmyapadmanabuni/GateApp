@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.speech.tts.TextToSpeech
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,8 +32,8 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import android.content.DialogInterface
 import android.os.Handler
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v7.app.AlertDialog
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import androidx.appcompat.app.AlertDialog
 import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
@@ -46,7 +46,7 @@ import kotlinx.android.synthetic.main.activity_img_view.*
 
 class VistorEntryListAdapter(private var listVistor: ArrayList<VisitorLog>, private val mcontext: Context) :
 
-    RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
 
     private val mInflater: LayoutInflater
     var number:String?=null
@@ -404,7 +404,7 @@ class VistorEntryListAdapter(private var listVistor: ArrayList<VisitorLog>, priv
         refresh(1000)
     }
 
-    inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val entryTime: TextView
         val exitTime: TextView
         val visitorName: TextView

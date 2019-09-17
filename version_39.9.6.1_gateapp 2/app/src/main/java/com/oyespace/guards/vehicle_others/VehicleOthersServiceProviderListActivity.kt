@@ -2,8 +2,8 @@ package com.oyespace.guards.vehicle_others
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
@@ -95,9 +95,10 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         }
 
-        val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
+        val rv_serviceProvider = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_serviceProvider)
         rv_serviceProvider.setHasFixedSize(true)
-        val gridLayoutManager = GridLayoutManager(this@VehicleOthersServiceProviderListActivity, 3)
+        val gridLayoutManager =
+            androidx.recyclerview.widget.GridLayoutManager(this@VehicleOthersServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         //  val sectionModelArrayList: ArrayList<SectionModel> = ArrayList()

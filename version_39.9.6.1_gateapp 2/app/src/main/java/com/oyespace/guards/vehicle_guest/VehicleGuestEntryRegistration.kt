@@ -7,8 +7,8 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -228,7 +228,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
 
         list=intent.getStringArrayListExtra(ITEMS_PHOTO_LIST);
 
-        val mLayoutManager = GridLayoutManager(applicationContext, 2)
+        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
         imageAdapter = ImageAdapter(list, this@VehicleGuestEntryRegistration,"Off")
         rv_image.adapter = imageAdapter

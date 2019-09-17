@@ -8,10 +8,10 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
@@ -82,7 +82,13 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
         checkAndroidVersion()
 //        makeVisitorLog()
 //        makeUnitLog()
-        rv_dashboard.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false))
+        rv_dashboard.setLayoutManager(
+            androidx.recyclerview.widget.LinearLayoutManager(
+                this,
+                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                false
+            )
+        )
 
         Dexter.withActivity(this)
             .withPermissions(

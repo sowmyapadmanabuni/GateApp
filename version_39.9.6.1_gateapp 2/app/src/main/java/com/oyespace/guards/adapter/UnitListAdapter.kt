@@ -2,7 +2,7 @@ package com.oyespace.guards.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +18,7 @@ import android.widget.*
 
 
 class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-    RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
     private val mInflater: LayoutInflater
 
@@ -71,7 +71,7 @@ class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val m
         return listVistor?.size ?: 0
     }
 
-    inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 //        val entryTime: TextView
 //        val exitTime: TextView
         val iv_unit: ImageView

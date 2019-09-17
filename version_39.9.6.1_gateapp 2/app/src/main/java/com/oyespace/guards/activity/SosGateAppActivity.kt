@@ -9,9 +9,8 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
+import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -27,16 +26,14 @@ import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.com.oyespace.guards.pojo.PassesSOSGuards
+import com.oyespace.guards.activity.GalleryViewActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.pojo.GoogleMapDTO
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import io.realm.Realm
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.activity_img_view.*
 import kotlinx.android.synthetic.main.activity_sos_recycle.*
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
 import okhttp3.OkHttpClient
@@ -44,6 +41,7 @@ import okhttp3.Request
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -74,7 +72,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     private var lineoption = PolylineOptions()
     private var isResolving = false
     var userId:Int = 0
+    var emergencyImages:ArrayList<String> = ArrayList();
     internal var t1: TextToSpeech?=null
+    var mSosPath:String = "";
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -124,12 +124,22 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 t1?.language=Locale.getDefault()
         })
 
+        sos_image.setOnClickListener({
+            if(emergencyImages.size > 0) {
+                val galleryIntent = Intent(this@SosGateAppActivity, GalleryViewActivity::class.java)
+                var emergencyImagesJson = Gson().toJson(emergencyImages)
+                galleryIntent.putExtra("images", emergencyImagesJson)
+                galleryIntent.putExtra("sospath", mSosPath)
+                startActivity(galleryIntent)
+            }
+        })
+
     }
 
 
 
     private fun initFRTDB(){
-        var mSosPath = "SOS/"+ LocalDb.getAssociation()!!.asAssnID+"/"+currentSOS.userId
+        mSosPath = "SOS/"+ LocalDb.getAssociation()!!.asAssnID+"/"+currentSOS.userId
         Log.e(TAG,""+mSosPath)
         mDatabase = FirebaseDatabase.getInstance().reference
         mSosReference = FirebaseDatabase.getInstance().getReference(mSosPath)
@@ -146,6 +156,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             checkNextSOS()
 
         }else{
+            //mSosReference
             btn_dismiss_sos.setVisibility(View.GONE)
             btn_attend_sos.text = "Resolved"
             mSosReference!!.child("attendedBy").setValue(Prefs.getString(ConstantUtils.GATE_NO, ""))
@@ -179,6 +190,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             //var userId: Int = 0
                             var totalPassed:Int = 0
                             var passedBy:HashMap<String,String> = HashMap()
+
 
                             if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
                                 unitName = it.child("unitName").getValue(String::class.java)!!
@@ -215,14 +227,19 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                 passedBy = it.child("passedby").getValue(type)!!
                                 totalPassed = passedBy.size
                             }
+                            if(it.hasChild("emergencyImages")){
+                                val _tp = object: GenericTypeIndicator<ArrayList<String>>(){}
+                                emergencyImages = (it.child("emergencyImages").getValue(_tp))!!
+                            }
 
                             if(it.hasChild("attendedBy")){
                                 attendedBy = it.child("attendedBy").getValue(String::class.java)!!
                             }
 
+                        Log.e("EMER_G",""+emergencyImages);
                             if (isActive != null && isActive && userId != 0) {
-
                                 runOnUiThread {
+
                                     val currentGate = Prefs.getString(ConstantUtils.GATE_NO,"");
                                     if(attendedBy.equals("") || attendedBy.equals(currentGate)) {
 
@@ -233,10 +250,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                         if (userName != "" && userName != null) {
                                             sos_username.text = userName
                                         }
-                                        if (sosImage != "" && sosImage != null) {
+                                        if (emergencyImages != null && emergencyImages.size > 0) {
 
                                             Picasso.with(applicationContext)
-                                                .load(sosImage)
+                                                .load(emergencyImages[0])
                                                 .placeholder(R.drawable.newicons_camera)
                                                 .error(R.drawable.newicons_camera).into(sos_image)
                                         } else {
@@ -322,6 +339,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 //                        }
                         checkNextSOS()
                     }catch (e:Exception){
+                        e.printStackTrace()
                         checkNextSOS()
                     }
                 }
@@ -545,7 +563,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 "101"
             )
         )
-        rcv_emergency.setLayoutManager( GridLayoutManager(this@SosGateAppActivity, 3))
+        rcv_emergency.setLayoutManager(androidx.recyclerview.widget.GridLayoutManager(this@SosGateAppActivity, 3))
         val adapter = RecyclerViewAdapter(contacts,clickListener = {
                 unit,index -> onEmergencyClick(unit,index)
         })

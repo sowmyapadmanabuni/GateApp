@@ -43,7 +43,7 @@
                     android:paddingRight="@dimen/horizontal_padding_medium">
 
                 <!--name-->
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/input_otp"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
@@ -76,11 +76,11 @@
                             android:textCursorDrawable="@null"
                             android:textSize="@dimen/font_size_xmedium"
                     />
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>
         </LinearLayout>
-        <android.support.v7.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/verifyBtn"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

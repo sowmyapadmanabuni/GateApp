@@ -8,7 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -64,7 +64,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     for (i in 0 until unitname_dataList.size) {
                         sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
                             intent.getStringExtra("name"), intent.getStringExtra("nr_id"),
-                            unitname_dataList.get(i).replace(" ",""), intent.getStringExtra("memType"));
+                            unitname_dataList
+                                .get(i).replace(" ",""), intent.getStringExtra("memType"));
 
                         getNotificationCreate(unitAccountId_dataList.get(i).replace(" ",""),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",intent.getStringExtra("msg"),unitid_dataList.get(i).replace(" ",""),intent.getIntExtra("VLVisLgID",0).toString(),unitid_dataList.get(i).replace(" ","")+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
                             DateTimeUtils.getCurrentTimeLocal(),

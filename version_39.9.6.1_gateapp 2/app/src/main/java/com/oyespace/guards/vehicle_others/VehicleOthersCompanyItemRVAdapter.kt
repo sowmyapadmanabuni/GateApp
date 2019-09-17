@@ -2,7 +2,7 @@ package com.oyespace.guards.vehicle_others
 
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,7 +19,7 @@ import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity
 import com.squareup.picasso.Picasso
 
 class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
-    RecyclerView.Adapter<VehicleOthersCompanyItemRVAdapter.ItemViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<VehicleOthersCompanyItemRVAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder(
@@ -68,7 +68,7 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
         return arrayList.size
     }
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
         val img_logo: ImageView

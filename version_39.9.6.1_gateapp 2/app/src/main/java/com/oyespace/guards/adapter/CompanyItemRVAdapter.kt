@@ -2,7 +2,7 @@ package com.oyespace.guards.adapter
 
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,7 +21,7 @@ import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
 
 class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
-    RecyclerView.Adapter<CompanyItemRVAdapter.ItemViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<CompanyItemRVAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder(
@@ -64,7 +64,7 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
         return arrayList.size
     }
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
         val img_logo:ImageView

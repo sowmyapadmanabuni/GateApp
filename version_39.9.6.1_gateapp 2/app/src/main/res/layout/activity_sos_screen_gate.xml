@@ -58,9 +58,10 @@ android:layout_marginTop="4.00dp"
 
     <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:id="@+id/r2" android:layout_below="@id/r1_imap" android:layout_marginTop="@dimen/_45sdp">
-        <ImageView android:layout_width="140dp" android:layout_height="120dp" android:layout_marginLeft="10dp"
+        <ImageView android:layout_width="140dp" android:layout_height="140dp" android:layout_marginLeft="10dp"
                    android:layout_marginTop="0dp" android:layout_alignParentTop="true"
                    android:id="@+id/sos_image"
+                   android:scaleType="fitXY"
                    android:background="@drawable/border"
                    android:src="@drawable/newicons_camera"/>
 

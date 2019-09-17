@@ -44,11 +44,11 @@ public class SGPatrollingService extends Service implements ResponseHandler {
     public int onStartCommand(Intent intent2, int flags, int startId) {
         // Let it continue running until it is stopped.
 
-        handler = new Handler();
-        gpsTracker = new GPSTracker(SGPatrollingService.this);
+        //handler = new Handler();
+        //gpsTracker = new GPSTracker(SGPatrollingService.this);
 
         // check if GPS enabled
-        saveLatLongPoints();
+        //saveLatLongPoints();
 
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         am.setStreamVolume(AudioManager.STREAM_MUSIC,am.getStreamMaxVolume(AudioManager.STREAM_MUSIC),0);

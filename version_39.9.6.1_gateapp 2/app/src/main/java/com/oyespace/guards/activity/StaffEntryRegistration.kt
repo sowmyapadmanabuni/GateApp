@@ -9,9 +9,9 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.provider.MediaStore
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -284,8 +284,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             println(list[i])
         }
 
-        val mLayoutManager = GridLayoutManager(applicationContext, 2)
-        rv_image.layoutManager = mLayoutManager as RecyclerView.LayoutManager?
+        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
+        rv_image.layoutManager = mLayoutManager as androidx.recyclerview.widget.RecyclerView.LayoutManager?
         imageAdapter = ImageAdapter(list, this@StaffEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
 

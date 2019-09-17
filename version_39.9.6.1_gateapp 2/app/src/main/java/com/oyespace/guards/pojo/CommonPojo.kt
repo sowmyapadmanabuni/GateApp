@@ -1203,7 +1203,8 @@ data class CheckPointByAssocID(
     val cpdCreated: String,
     val cpdUpdated: String,
     val cpgpsPnt: String,
-    val meMemID: Int
+    val meMemID: Int,
+    val cpSurrName:String
 )
 //getDeviceList
 data class getDeviceList(
@@ -1578,6 +1579,31 @@ data class UnitListSearch<T>(
 
 data class UnitDataSingle(
     val unit: UnitPojo
+)
+
+
+///Patrolling Checkpoint Detail Responses
+data class GetCheckPointResponse<T>(
+    val apiVersion: String,
+    val `data`: CheckPointKey,
+    val success: Boolean
+)
+
+data class CheckPointKey(
+    val checkPointListByChkPntID: CheckPointData
+)
+
+data class CheckPointData(
+    val asAssnID: Int,
+    val cpChkPntID: Int,
+    val cpCkPName: String,
+    val cpIsActive: Boolean,
+    val cpdCreated: String,
+    val cpdUpdated: String,
+    val cpgpsPnt: String,
+    val meMemID: Int,
+    val cpSurrName:String,
+    val cpcPntAt:String
 )
 
 

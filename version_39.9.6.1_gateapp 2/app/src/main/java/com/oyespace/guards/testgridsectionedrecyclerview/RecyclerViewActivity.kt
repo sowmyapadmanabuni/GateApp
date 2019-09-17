@@ -1,10 +1,10 @@
 package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.os.Bundle
-import android.support.annotation.Nullable
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.Nullable
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.MenuItem
 import com.oyespace.guards.R
 import com.oyespace.guards.pojo.SPData
@@ -12,7 +12,7 @@ import com.oyespace.guards.pojo.SPData
 
 class RecyclerViewActivity : AppCompatActivity() {
     var recyclerViewType: RecyclerViewType? = null
-    var recyclerView: RecyclerView? = null
+    var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
 
     override fun onCreate(@Nullable savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,9 +37,9 @@ class RecyclerViewActivity : AppCompatActivity() {
 
     //setup recycler view
     private fun setUpRecyclerView() {
-        recyclerView = findViewById(R.id.sectioned_recycler_view) as RecyclerView
+        recyclerView = findViewById(R.id.sectioned_recycler_view) as androidx.recyclerview.widget.RecyclerView
         recyclerView!!.setHasFixedSize(true)
-        val linearLayoutManager = LinearLayoutManager(this)
+        val linearLayoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
         recyclerView!!.layoutManager = linearLayoutManager
     }
 

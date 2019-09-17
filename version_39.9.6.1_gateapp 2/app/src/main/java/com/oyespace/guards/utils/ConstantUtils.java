@@ -90,4 +90,11 @@ public static final String BASE_URL="https://api.oyespace.com/";
     public static final String SELECTED_BLOCK_NAME = "selected_block_name";
     public static final String DOB = "dob";
 
+    public static final String ACTIVE_PATROLLING_SCHEDULE="ACTIVE_PATROLLING_SCHEDULE";
+    public static final String ACTIVE_PATROLLING_LAST_CP="ACTIVE_PATROLLING_LAST_CP";
+    public static final String CHECKPOINT_TYPE_START="StartPoint";
+    public static final String CHECKPOINT_TYPE_NORMAL="Checkpoint";
+    public static final String CHECKPOINT_TYPE_END="EndPoint";
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD=15.0f;
+
 }

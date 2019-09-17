@@ -8,7 +8,7 @@ import android.content.*
 import android.graphics.*
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message

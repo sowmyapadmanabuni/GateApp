@@ -2,8 +2,8 @@ package com.oyespace.guards.activity
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
@@ -115,9 +115,9 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
         //  getServiceProviderList()
-        val rv_serviceProvider = findViewById(R.id.rv_serviceProvider) as RecyclerView
+        val rv_serviceProvider = findViewById(R.id.rv_serviceProvider) as androidx.recyclerview.widget.RecyclerView
         rv_serviceProvider!!.setHasFixedSize(true)
-        val gridLayoutManager = GridLayoutManager(this@ServiceProviderListActivity, 3)
+        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(this@ServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         val data: ArrayList<VendorPojo> = prepareData()

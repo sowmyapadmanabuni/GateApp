@@ -1,8 +1,8 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +13,7 @@ import com.oyespace.guards.testgridsectionedrecyclerview.RecyclerViewType
 import com.oyespace.guards.testgridsectionedrecyclerview.SectionModel
 
 class ServiceProviderAdapter  (private val context: Context, private val itemArrayList: ArrayList<SectionModel>
-) : RecyclerView.Adapter<ServiceProviderAdapter.ServiceProviderViewHolder>() {
+) : androidx.recyclerview.widget.RecyclerView.Adapter<ServiceProviderAdapter.ServiceProviderViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServiceProviderViewHolder {
 
@@ -36,7 +36,7 @@ class ServiceProviderAdapter  (private val context: Context, private val itemArr
 
 
 
-                val gridLayoutManager = GridLayoutManager(context, 3)
+                val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
                 holder.itemRecyclerView.layoutManager = gridLayoutManager
 
 
@@ -49,9 +49,9 @@ class ServiceProviderAdapter  (private val context: Context, private val itemArr
         return itemArrayList.size
     }
 
-    class ServiceProviderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ServiceProviderViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
-        val itemRecyclerView: RecyclerView
+        val itemRecyclerView: androidx.recyclerview.widget.RecyclerView
         val section_label: TextView
 
         init {

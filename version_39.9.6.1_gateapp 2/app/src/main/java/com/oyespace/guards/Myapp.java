@@ -3,16 +3,14 @@ package com.oyespace.guards;
 import android.content.Context;
 
 
-import android.content.Intent;
-import android.os.StrictMode;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
-import com.oyespace.guards.activity.SplashActivity;
 import com.oyespace.guards.utils.Prefs;
 import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import timber.log.Timber;
 
 /**
@@ -47,8 +45,13 @@ public class Myapp extends MultiDexApplication {
         Timber.plant(new Timber.DebugTree());
         mApplicationContext = getApplicationContext();
         Prefs.initPrefs(getApplicationContext());
-        Realm.init(this);
 
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().name("oysepace.realm")
+                .schemaVersion(2)
+                .migration(new RealmDataMigration())
+                .build();
+        Realm.setDefaultConfiguration(config);
 
         mInstance = this;
 

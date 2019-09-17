@@ -1,8 +1,8 @@
 package com.oyespace.guards.com.oyespace.guards.adapter
 
 import android.content.Context
-import android.support.v7.widget.AppCompatTextView
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +12,7 @@ import com.oyespace.guards.pojo.UnitPojo
 
 
 class UnitSearchResultAdapter(private val mcontext: Context, private val arrayList: ArrayList<UnitPojo>, val clickListener:(UnitPojo, Int) -> Unit):
-    RecyclerView.Adapter<UnitSearchResultAdapter.ItemViewHolder>(){
+    androidx.recyclerview.widget.RecyclerView.Adapter<UnitSearchResultAdapter.ItemViewHolder>(){
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
@@ -38,7 +38,7 @@ class UnitSearchResultAdapter(private val mcontext: Context, private val arrayLi
     }
 
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val mPageNumber: AppCompatTextView
 
 
