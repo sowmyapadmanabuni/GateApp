@@ -1,9 +1,9 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
-import android.support.v7.widget.AppCompatTextView
-import android.support.v7.widget.CardView
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +15,7 @@ import com.oyespace.guards.pojo.BlocksData
 
 
 class BlockSelectionAdapter(private val mcontext: Context, private val arrayList: ArrayList<BlocksData>, val clickListener:(BlocksData, Int) -> Unit):
-    RecyclerView.Adapter<BlockSelectionAdapter.ItemViewHolder>(){
+    androidx.recyclerview.widget.RecyclerView.Adapter<BlockSelectionAdapter.ItemViewHolder>(){
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
@@ -58,9 +58,9 @@ class BlockSelectionAdapter(private val mcontext: Context, private val arrayList
     }
 
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val mPageNumber: AppCompatTextView
-        val mPageCard: CardView
+        val mPageCard: androidx.cardview.widget.CardView
 
 
         init {

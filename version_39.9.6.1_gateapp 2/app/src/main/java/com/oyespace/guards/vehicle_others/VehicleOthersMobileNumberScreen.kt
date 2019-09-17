@@ -13,7 +13,7 @@ import android.os.CountDownTimer
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -194,6 +194,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                                 mobileNumber=number.substring(3,13)
                             }
                         }
+                        LocalDb.disconnectCall(context);
                     }
 
                 }, PhoneStateListener.LISTEN_CALL_STATE);

@@ -13,7 +13,7 @@ import android.os.CountDownTimer
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -300,6 +300,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
                                // GetWorkersListByMobileNumberAndAssocID(ccd.toString()+mobileNumber.toString(),Prefs.getInt(ASSOCIATION_ID, 0))
                             }
+                            LocalDb.disconnectCall(context);
                         }
                     }
 

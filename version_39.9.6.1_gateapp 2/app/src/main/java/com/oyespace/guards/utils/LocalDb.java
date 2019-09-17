@@ -1,5 +1,9 @@
 package com.oyespace.guards.utils;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.Build;
+import android.telecom.TelecomManager;
 import android.util.Log;
 import com.google.gson.reflect.TypeToken;
 import com.oyespace.guards.PojoClasses.DashboardPojo;
@@ -213,4 +217,24 @@ public class LocalDb {
         }
         Prefs.putString(PrefKeys.UnitList, tojson);
     }
+
+    @SuppressLint("MissingPermission")
+    public static void disconnectCall(Context context){
+        try {
+
+            if(Build.VERSION.SDK_INT>=28){
+                TelecomManager tm = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+
+                if (tm != null) {
+                    boolean success = tm.endCall();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+
+        }
+    }
+
 }

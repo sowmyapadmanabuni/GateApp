@@ -4,8 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -140,7 +140,7 @@ if(!intent.getStringExtra("UNITNAME").equals("")){
                     unit,index -> onSearchResultClick(unit,index)
             })
         rcv_searched_units.adapter = mSearchUnitsAdapter
-        rcv_searched_units.setLayoutManager(LinearLayoutManager(this@ManulBlockSelectionActivity));
+        rcv_searched_units.setLayoutManager(androidx.recyclerview.widget.LinearLayoutManager(this@ManulBlockSelectionActivity));
         mSearchUnitsAdapter!!.notifyDataSetChanged()
         rcv_searched_units.visibility = View.VISIBLE
     }
@@ -151,7 +151,12 @@ if(!intent.getStringExtra("UNITNAME").equals("")){
                     unit,index -> onUnitClose(unit,index)
             })
         rcv_selected_units.adapter = mUnitsAdapter
-        rcv_selected_units.setLayoutManager(GridLayoutManager(this@ManulBlockSelectionActivity,5));
+        rcv_selected_units.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@ManulBlockSelectionActivity,
+                5
+            )
+        );
         mUnitsAdapter!!.notifyDataSetChanged()
     }
 
@@ -161,7 +166,12 @@ if(!intent.getStringExtra("UNITNAME").equals("")){
                     block,index -> onPageClick(block,index)
             })
         rcv_blocks.adapter = mBlocksAdapter
-        rcv_blocks.setLayoutManager(GridLayoutManager(this@ManulBlockSelectionActivity,5));
+        rcv_blocks.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@ManulBlockSelectionActivity,
+                5
+            )
+        );
         mBlocksAdapter!!.notifyDataSetChanged()
     }
 

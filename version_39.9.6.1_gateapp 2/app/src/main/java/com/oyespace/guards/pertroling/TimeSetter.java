@@ -3,7 +3,8 @@ package com.oyespace.guards.pertroling;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 public class TimeSetter extends AppCompatActivity {
 
@@ -17,7 +18,7 @@ public class TimeSetter extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    final Intent mainIntent = new Intent(TimeSetter.this,ReciverTimmer.class );
+                    final Intent mainIntent = new Intent(TimeSetter.this, ReciverTimmer.class );
                     TimeSetter.this.startActivity(mainIntent);
                     TimeSetter.this.finish();
                 }
@@ -28,7 +29,7 @@ public class TimeSetter extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    final Intent mainIntent = new Intent(TimeSetter.this,ReciverTimmer.class);
+                    final Intent mainIntent = new Intent(TimeSetter.this, ReciverTimmer.class);
                     TimeSetter.this.startActivity(mainIntent);
                     TimeSetter.this.finish();
                 }

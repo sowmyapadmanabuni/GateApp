@@ -8,8 +8,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -75,7 +75,12 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
         }else {
             makeUnitLog()
         }
-        rv_unit.setLayoutManager( GridLayoutManager(this@VehicleGuestUnitScreen, 2))
+        rv_unit.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@VehicleGuestUnitScreen,
+                2
+            )
+        )
 
         btn_mic.setOnClickListener {
             Speak()
@@ -206,7 +211,7 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
 
 
     class VehicleGuestUnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-        RecyclerView.Adapter<VehicleGuestUnitListAdapter.MenuHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<VehicleGuestUnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
 
@@ -272,7 +277,7 @@ class VehicleGuestUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
             //        val entryTime: TextView
 //        val exitTime: TextView
             val iv_unit: ImageView

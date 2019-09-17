@@ -3,7 +3,7 @@ package com.oyespace.guards.adapter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +17,7 @@ import com.oyespace.guards.utils.Prefs
 
 
 
-class WorkersTypeListAdapter (val items : ArrayList<String>, val mcontext: Context) : RecyclerView.Adapter<WorkersTypeListAdapter.WorkerViewHolder>() {
+class WorkersTypeListAdapter (val items : ArrayList<String>, val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<WorkersTypeListAdapter.WorkerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): WorkerViewHolder {
         return WorkerViewHolder(LayoutInflater.from(mcontext).inflate(R.layout.layout_worker_adapter_row, parent, false))
@@ -67,7 +67,7 @@ class WorkersTypeListAdapter (val items : ArrayList<String>, val mcontext: Conte
         return items.size
     }
 
-    class WorkerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class WorkerViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val lv_staff : LinearLayout
         val tv_worktype : TextView
 

@@ -14,8 +14,8 @@ import android.os.*
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
 import android.telecom.TelecomManager
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
@@ -245,6 +245,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                                // endCall(this@MobileNumberScreen)
 
                             }
+                            LocalDb.disconnectCall(context);
                         }
                     }
 

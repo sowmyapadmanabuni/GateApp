@@ -1,7 +1,7 @@
 package com.oyespace.guards.activity
 
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.adapter.WorkersTypeListAdapter
 import kotlinx.android.synthetic.main.activity_worker.*
 import com.oyespace.guards.R
@@ -48,7 +48,12 @@ class WorkersTypeList: BaseKotlinActivity() {
         }
 
         addEntries()
-        rv_workerlist.setLayoutManager( GridLayoutManager(this@WorkersTypeList, 3))
+        rv_workerlist.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@WorkersTypeList,
+                3
+            )
+        )
         rv_workerlist.adapter = WorkersTypeListAdapter( workType,this)
 
     }

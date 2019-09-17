@@ -24,15 +24,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.google.zxing.Result;
-import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
-import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity;
 import com.oyespace.guards.network.ChampApiClient;
 import com.oyespace.guards.network.ChampApiInterface;
 import com.oyespace.guards.request.InvitationUpdateReq;
 import com.oyespace.guards.responce.InvitationRequestResponse;
 import com.oyespace.guards.utils.Prefs;
-import com.oyespace.guards.vehicle_guest.VehicleGuestUnitScreen;
 import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity;
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
@@ -41,12 +38,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.Date;
 import java.util.Locale;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
 import static com.oyespace.guards.utils.ConstantUtils.*;
-import static com.oyespace.guards.utils.DateTimeUtils.DATE_FORMAT_DMY;
 import static com.oyespace.guards.utils.DateTimeUtils.compareDate;
 import static com.oyespace.guards.utils.RandomUtils.entryExists;
 
@@ -55,7 +50,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
     private Button noQrcodeButton;
     private TextView dataTextView;
     ChampApiInterface champApiInterface;
-    android.support.v7.app.AlertDialog alertDialog;
+    androidx.appcompat.app.AlertDialog alertDialog;
 
     @Override
     public void onCreate(Bundle state) {
@@ -152,7 +147,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                         TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
@@ -201,7 +196,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                     View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                     ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                     Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
@@ -234,7 +229,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                 View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
@@ -267,7 +262,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
             View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
             ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
             Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
@@ -388,7 +383,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                         TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
@@ -435,7 +430,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                         Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
@@ -495,7 +490,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                 View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
+                androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 TextView tv_msg=dialogView.findViewById(R.id.tv_msg);

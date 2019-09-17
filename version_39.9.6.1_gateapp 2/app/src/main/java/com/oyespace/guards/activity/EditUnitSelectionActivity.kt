@@ -8,7 +8,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v7.widget.*
+import androidx.appcompat.widget.*
 import android.util.Log
 import android.view.*
 import android.widget.*
@@ -85,7 +85,12 @@ class EditUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
         getUnitsFromBlock()
 
-        rv_unit.setLayoutManager( GridLayoutManager(this@EditUnitSelectionActivity, 2))
+        rv_unit.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@EditUnitSelectionActivity,
+                2
+            )
+        )
     }
 
     override fun onClick(v: View?) {
@@ -231,7 +236,13 @@ class EditUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                 })
             rv_page.adapter = pageNumberAdapter
 
-            rv_page.setLayoutManager(LinearLayoutManager(this@EditUnitSelectionActivity,LinearLayoutManager.HORIZONTAL,false));
+            rv_page.setLayoutManager(
+                androidx.recyclerview.widget.LinearLayoutManager(
+                    this@EditUnitSelectionActivity,
+                    androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
+                    false
+                )
+            );
 
 
         }
@@ -386,7 +397,7 @@ class EditUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
     }
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context, val checkListener:(UnitPojo, Boolean) -> Unit) :
-        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
 
@@ -466,7 +477,7 @@ class EditUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                     if (orderData!!.tenant.size != 0) {
 
-                        val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -533,7 +544,7 @@ class EditUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                         if (orderData!!.owner.size != 0) {
 
-                            val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -715,7 +726,7 @@ class EditUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: AppCompatCheckBox

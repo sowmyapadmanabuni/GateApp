@@ -5,7 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.speech.tts.TextToSpeech
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,7 +32,7 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import android.content.DialogInterface
 import android.os.Handler
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.oyespace.guards.R
@@ -44,7 +44,7 @@ import kotlinx.android.synthetic.main.activity_emergency_response.view.*
 import kotlinx.android.synthetic.main.activity_img_view.*
 
 
-class VistorEntryListAdapter( var listVistor: ArrayList<VisitorEntryLog>, private val mcontext: Context) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>(),Filterable {
+class VistorEntryListAdapter( var listVistor: ArrayList<VisitorEntryLog>, private val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>(),Filterable {
 
     private var searchList: ArrayList<VisitorEntryLog>? = null
     private val mInflater: LayoutInflater
@@ -434,7 +434,7 @@ try {
         refresh(1000)
     }
 
-    inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val entryTime: TextView
         val exitTime: TextView
         val visitorName: TextView

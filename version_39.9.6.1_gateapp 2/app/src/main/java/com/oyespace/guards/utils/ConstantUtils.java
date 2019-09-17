@@ -23,6 +23,8 @@ public class ConstantUtils {
     public static final String VISITOR_PURPOSE="Visitor_Purpose";
     public static final String TYPE="Type";
 
+
+
     public static final String PERSON_PHOTO = "person_photo";
     public static final String ITEMS_PHOTO_LIST = "items_photo_list";
 
@@ -31,6 +33,7 @@ public class ConstantUtils {
     public static final String WORKER_ID = "worker_id";
     public static final String ASSOCIATION_ID = "ASSOCIATION_ID";
     public static final String GATE_NO = "GATE_NO";
+    public static final String GATE_MOB = "GATE_MOB";
     public static final String DEVICE_ID = "DEVICE_ID";
     public static final String SERVICE_PROVIDER = "Service Provider";
     public static final String NUMBER_OF_PERSONS = "number_of_persons";
@@ -91,5 +94,12 @@ public static final String BASE_URL="https://api.oyespace.com/";
     public static final String SELECTED_BLOCK = "selected_block";
     public static final String SELECTED_BLOCK_NAME = "selected_block_name";
     public static final String DOB = "dob";
+
+    public static final String ACTIVE_PATROLLING_SCHEDULE="ACTIVE_PATROLLING_SCHEDULE";
+    public static final String ACTIVE_PATROLLING_LAST_CP="ACTIVE_PATROLLING_LAST_CP";
+    public static final String CHECKPOINT_TYPE_START="StartPoint";
+    public static final String CHECKPOINT_TYPE_NORMAL="Checkpoint";
+    public static final String CHECKPOINT_TYPE_END="EndPoint";
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD=15.0f;
 
 }

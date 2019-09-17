@@ -8,7 +8,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.provider.MediaStore
-import android.support.v4.content.LocalBroadcastManager
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -492,7 +492,7 @@ try {
 
                         val smsIntent = Intent(ConstantUtils.SYNC)
                         smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
+                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")

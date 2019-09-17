@@ -5,8 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.speech.tts.TextToSpeech
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
 
 class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Data.VisitorLog>, private val mcontext: Context) :
 
-    RecyclerView.Adapter<VistorListAdapter.MenuHolder>(),Filterable {
+    androidx.recyclerview.widget.RecyclerView.Adapter<VistorListAdapter.MenuHolder>(),Filterable {
     private var searchList: ArrayList<VisitorLogExitResp.Data.VisitorLog>? = null
 
     private val mInflater: LayoutInflater
@@ -349,7 +349,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         return searchList?.size ?: 0
     }
 
-    inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val entryTime: TextView
         val exitTime: TextView
         val visitorName: TextView

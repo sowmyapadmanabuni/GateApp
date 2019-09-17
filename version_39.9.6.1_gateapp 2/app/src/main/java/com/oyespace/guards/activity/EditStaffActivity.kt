@@ -1,6 +1,6 @@
 package com.oyespace.guards.activity
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.oyespace.guards.R
 import android.R.attr.country
@@ -20,7 +20,7 @@ import android.content.*
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.os.Environment
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
@@ -222,6 +222,7 @@ System.out.println("Day = " + out[1]);
                          tv_mobilenumber!!.text.toString(),
                            Prefs.getInt(ASSOCIATION_ID, 0))
                             }
+                            LocalDb.disconnectCall(context);
                         }
                     }
 

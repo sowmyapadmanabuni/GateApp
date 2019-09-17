@@ -12,24 +12,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
-import android.media.AudioManager;
-import android.media.FaceDetector;
-import android.media.FaceDetector.Face;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.*;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
-import com.oyespace.guards.camtest.AddCarFragment;
-import com.oyespace.guards.utils.ConstantUtils;
-import com.oyespace.guards.utils.Prefs;
 
 import static com.oyespace.guards.utils.ConstantUtils.*;
 

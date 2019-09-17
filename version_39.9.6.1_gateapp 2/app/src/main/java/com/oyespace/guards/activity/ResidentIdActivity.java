@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
-import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
 
 import me.dm7.barcodescanner.core.IViewFinder;

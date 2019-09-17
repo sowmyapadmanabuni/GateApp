@@ -7,7 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.support.v7.widget.*
+import androidx.appcompat.widget.*
 import android.view.*
 import android.widget.*
 import com.google.gson.Gson
@@ -81,7 +81,12 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
         getUnitsFromBlock()
 
-        rv_unit.setLayoutManager( GridLayoutManager(this@Vehicle_guest_UnitSelectionActivity, 2))
+        rv_unit.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@Vehicle_guest_UnitSelectionActivity,
+                2
+            )
+        )
     }
 
     override fun onClick(v: View?) {
@@ -227,7 +232,13 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 })
             rv_page.adapter = pageNumberAdapter
 
-            rv_page.setLayoutManager(LinearLayoutManager(this@Vehicle_guest_UnitSelectionActivity,LinearLayoutManager.HORIZONTAL,false));
+            rv_page.setLayoutManager(
+                androidx.recyclerview.widget.LinearLayoutManager(
+                    this@Vehicle_guest_UnitSelectionActivity,
+                    androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
+                    false
+                )
+            );
 
 
         }
@@ -381,7 +392,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
     }
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context, val checkListener:(UnitPojo, Boolean) -> Unit) :
-        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
         private var lastSelectedPosition = -1
@@ -526,7 +537,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                     if (orderData!!.tenant.size != 0) {
 
-                        val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -593,7 +604,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                         if (orderData!!.owner.size != 0) {
 
-                            val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -778,7 +789,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: CheckBox

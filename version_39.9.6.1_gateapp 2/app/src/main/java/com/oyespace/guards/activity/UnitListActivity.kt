@@ -9,8 +9,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -86,7 +86,12 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
             makeUnitLog()
         }
 
-        rv_unit.setLayoutManager( GridLayoutManager(this@UnitListActivity, 2))
+        rv_unit.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@UnitListActivity,
+                2
+            )
+        )
 
         btn_mic.setOnClickListener {
             Speak()
@@ -279,7 +284,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
 
@@ -346,7 +351,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                     if (orderData!!.tenant.size != 0) {
 
-                        val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -413,7 +418,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                         if (orderData!!.owner.size != 0) {
 
-                            val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -594,7 +599,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: CheckBox

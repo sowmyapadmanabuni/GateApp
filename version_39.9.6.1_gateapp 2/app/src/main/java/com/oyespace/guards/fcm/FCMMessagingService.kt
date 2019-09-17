@@ -10,8 +10,8 @@ import android.os.AsyncTask
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
+import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import android.util.Log
 import android.widget.Toast
 import com.google.firebase.iid.FirebaseInstanceId

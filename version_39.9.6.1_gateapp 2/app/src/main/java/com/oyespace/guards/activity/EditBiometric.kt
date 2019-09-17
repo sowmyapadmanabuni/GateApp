@@ -21,7 +21,7 @@ import android.os.Handler
 import android.os.Message
 import android.os.PowerManager
 import android.speech.tts.TextToSpeech
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
@@ -569,7 +569,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                 )
                 dlgAlert.setCancelable(false)
                 //            dlgAlert.create().show();
-                android.support.v7.app.AlertDialog.Builder(this@EditBiometric)
+                androidx.appcompat.app.AlertDialog.Builder(this@EditBiometric)
                     .setTitle("Finger Print Registration")
                     .setMessage("Please connect biometric device2")
                     .setNeutralButton("OK") { dialog, which -> dialog.dismiss() }

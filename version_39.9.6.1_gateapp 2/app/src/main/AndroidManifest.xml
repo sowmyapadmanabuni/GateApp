@@ -18,6 +18,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -30,6 +32,7 @@
 
     <permission android:name="android.permission.CLEAR_APP_CACHE" />
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
 
     <application
@@ -231,6 +234,14 @@
                 android:screenOrientation="portrait"
                 android:windowSoftInputMode="adjustPan"
                 android:theme="@style/noActionBar" />
+        <activity
+                android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".pertroling.PatrollingLocActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
 
         <meta-data
                 android:name="com.google.android.gms.vision.DEPENDENCIES"
@@ -243,6 +254,10 @@
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/noActionBar"> -->
         <!-- </activity> -->
+        <service
+                android:name=".com.oyespace.guards.fcm.FRTDBService"
+                android:enabled="true"/>
+
         <service
                 android:name=".SGPatrollingService"
                 android:enabled="true"

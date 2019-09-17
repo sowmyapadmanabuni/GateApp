@@ -32,7 +32,7 @@
                 android:src="@drawable/prev_page"/>
 
 
-        <android.support.v7.widget.RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rv_page"
                 android:padding="5dp"
                 android:layout_width="wrap_content"

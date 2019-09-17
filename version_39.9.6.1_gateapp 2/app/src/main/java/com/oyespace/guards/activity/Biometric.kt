@@ -18,7 +18,7 @@ import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.*
 import android.speech.tts.TextToSpeech
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
@@ -576,7 +576,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 )
                 dlgAlert.setCancelable(false)
                 //            dlgAlert.create().show();
-                android.support.v7.app.AlertDialog.Builder(this@Biometric)
+                androidx.appcompat.app.AlertDialog.Builder(this@Biometric)
                     .setTitle("Finger Print Registration")
                     .setMessage("Please connect biometric device2")
                     .setNeutralButton("OK") { dialog, which -> dialog.dismiss() }
