@@ -43,6 +43,7 @@
             android:networkSecurityConfig="@xml/network"
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
+            android:hardwareAccelerated="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
@@ -108,9 +109,12 @@
                 android:name="org.apache.http.legacy"
                 android:required="false" />
 
+<!--        <meta-data-->
+<!--                android:name="com.google.android.geo.API_KEY"-->
+<!--                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />-->
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />
+                android:value="@string/google_maps_key"/>
 
         <activity
                 android:name=".DashboardActivity"
@@ -238,6 +242,12 @@
                 android:name=".com.oyespace.guards.activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".activity.GalleryViewActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
         <activity
                 android:name=".pertroling.PatrollingLocActivity"
                 android:screenOrientation="portrait"
