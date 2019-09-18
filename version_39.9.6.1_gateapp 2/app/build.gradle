@@ -140,6 +140,7 @@ dependencies {
     implementation 'com.veinhorn.scrollgalleryview:library:1.2.8'
     implementation 'com.veinhorn.scrollgalleryview:picasso-loader:1.2.8'
     implementation 'com.google.maps.android:android-maps-utils:0.4'
+    implementation 'com.github.smhdk:KM-Popup-Image-Slider:v1.2.1'
 
 
 }

@@ -520,6 +520,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         try {
 
+            Prefs.putBoolean("ACTIVE_SOS",false);
+            //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
+                startService(Intent(this@Dashboard, FRTDBService::class.java))
+            //}
             downloadBiometricData_Loop()
         }catch (e:NullPointerException){
 
@@ -1229,6 +1233,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     override fun onStart() {
+        Prefs.putBoolean("ACTIVE_SOS",false);
+        //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
+        startService(Intent(this@Dashboard, FRTDBService::class.java))
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         super.onStart()
@@ -1353,7 +1360,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     /// End Added by Rajesh
 
     internal fun init() {
-        startService(Intent(this@Dashboard, FRTDBService::class.java))
         showProgressrefresh()
         mHandlerr = Handler()
         //startRepeatingTask()

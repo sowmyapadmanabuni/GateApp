@@ -43,6 +43,7 @@
             android:networkSecurityConfig="@xml/network"
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
+            android:hardwareAccelerated="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
@@ -241,6 +242,12 @@
                 android:name=".com.oyespace.guards.activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".activity.GalleryViewActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
         <activity
                 android:name=".pertroling.PatrollingLocActivity"
                 android:screenOrientation="portrait"

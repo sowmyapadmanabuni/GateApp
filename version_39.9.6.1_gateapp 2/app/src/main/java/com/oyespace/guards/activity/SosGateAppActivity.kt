@@ -24,6 +24,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.firebase.database.*
 import com.google.gson.Gson
+import com.kodmap.app.library.PopopDialogBuilder
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.GalleryViewActivity
@@ -98,7 +99,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     override fun onResume() {
         super.onResume()
-        if(currentSOS != null) {
+        if(currentSOS != null && currentSOS.isValid) {
             var lng: Double = currentSOS.longitude.toDouble();
             var lat: Double = currentSOS.latitude.toDouble();
             sosLocation = LatLng(lat, lng)
@@ -128,14 +129,23 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
         sos_image.setOnClickListener({
             if(emergencyImages.size > 0) {
-                val galleryIntent = Intent(this@SosGateAppActivity, GalleryViewActivity::class.java)
-                var emergencyImagesJson = Gson().toJson(emergencyImages)
-                galleryIntent.putExtra("images", emergencyImagesJson)
-                galleryIntent.putExtra("sospath", mSosPath)
-                startActivity(galleryIntent)
+//                val galleryIntent = Intent(this@SosGateAppActivity, GalleryViewActivity::class.java)
+//                var emergencyImagesJson = Gson().toJson(emergencyImages)
+//                galleryIntent.putExtra("images", emergencyImagesJson)
+//                galleryIntent.putExtra("sospath", mSosPath)
+//                startActivity(galleryIntent)
+                showImages()
             }
         })
 
+    }
+
+
+    private fun showImages(){
+        val urlList = ArrayList<String>()
+        urlList.addAll(emergencyImages);
+        val dialog = PopopDialogBuilder(this@SosGateAppActivity).setList(urlList).build();
+        dialog.show();
     }
 
 
