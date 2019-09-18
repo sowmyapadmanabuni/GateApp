@@ -219,6 +219,7 @@ class FRTDBService: Service() {
 
 
                         if(totalSOS > 0 && !isSOSActive){
+                            Log.e("STARTING","SOS>STSRTSTS");
                             val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
                             i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i_vehicle)

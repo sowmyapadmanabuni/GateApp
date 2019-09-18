@@ -1,6 +1,7 @@
 package com.oyespace.guards.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.location.Location
@@ -40,6 +41,7 @@ class SplashActivity : BaseLocationActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
+        Prefs.putBoolean("ACTIVE_SOS",false);
        // app = getApplication() as Myapp?;
         val searchData = LocalDb.getSearchData()
 
@@ -93,6 +95,7 @@ class SplashActivity : BaseLocationActivity() {
         Toast.makeText(this, "location failed", Toast.LENGTH_SHORT).show()
     }
 
+    @SuppressLint("MissingPermission")
     private fun launchMainActivity() {
        // val mainIntent = Intent(this@SplashActivity, DashboardActivity::class.java)
 

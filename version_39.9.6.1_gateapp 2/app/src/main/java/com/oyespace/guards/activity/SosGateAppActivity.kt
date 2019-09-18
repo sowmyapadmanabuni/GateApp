@@ -86,6 +86,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     override fun onDestroy() {
+        mSosReference!!.removeEventListener(sosListener)
+        Prefs.putBoolean("ACTIVE_SOS",false);
         super.onDestroy()
     }
 
