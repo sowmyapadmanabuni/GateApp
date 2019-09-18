@@ -18,7 +18,7 @@ open class Worker:RealmObject(){
     var wkdob:String = ""
     var wkidCrdNo:String =""
     var vnVendorID:Long = 0
-    var blBlockID:Long = 0
+    var blBlockID: String = ""
     var unUnitID:String = ""
     var asAssnID:Long = 0
     var wkIsActive:Boolean = false

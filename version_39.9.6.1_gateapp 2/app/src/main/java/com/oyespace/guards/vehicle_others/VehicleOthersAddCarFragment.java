@@ -30,20 +30,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
-import com.oyespace.guards.Dashboard;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import com.oyespace.guards.R;
-import com.oyespace.guards.activity.NameEntryScreen;
-import com.oyespace.guards.camtest.AddCarFragment;
 import com.oyespace.guards.camtest.CarImages_Adapter;
-import com.oyespace.guards.camtest.ImageAdapter;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.constants.PrefKeys;
-import com.oyespace.guards.guest.GuestAddCarFragment;
 import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
-import com.oyespace.guards.vehicle_guest.VehicleGuestAddCarFragment;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -55,7 +55,21 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ACCOUNT_ID;
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.ITEMS_PHOTO_LIST;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_OTHERS;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 
 public class VehicleOthersAddCarFragment extends Activity implements View.OnClickListener {
@@ -260,22 +274,10 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
 
-                byte[] byteArray=null;
-                try {
-                    Log.d("Dgddfdf picas","5 2");
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    personPhoto.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                    byteArray = bos.toByteArray();
-                    int len = bos.toByteArray().length;
-                    System.out.println("AFTER COMPRESSION-===>" + len);
-                    bos.flush();
-                    bos.close();
-                }catch (Exception ex){
-                    Log.d("Dgddfdf picas","7");
-                }
+
 //                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
 
-                if(personPhoto==null && imageView1.getDrawable()==null) {
+                if (personPhoto == null && imageView1.getDrawable() == null) {
                     submit_button.setEnabled(true);
                     submit_button.setClickable(true);
                     Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
@@ -284,6 +286,20 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 //                    Toast.makeText(getApplicationContext(),"Capture Product Photo ", Toast.LENGTH_SHORT).show();
 //                }
                 else {
+
+                    byte[] byteArray = null;
+                    try {
+                        Log.d("Dgddfdf picas", "5 2");
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        personPhoto.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                        byteArray = bos.toByteArray();
+                        int len = bos.toByteArray().length;
+                        System.out.println("AFTER COMPRESSION-===>" + len);
+                        bos.flush();
+                        bos.close();
+                    } catch (Exception ex) {
+                        Log.d("Dgddfdf picas", "7");
+                    }
 
                     Intent d = new Intent(VehicleOthersAddCarFragment.this, VehicleOthersEntryRegistration.class);
 //                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
