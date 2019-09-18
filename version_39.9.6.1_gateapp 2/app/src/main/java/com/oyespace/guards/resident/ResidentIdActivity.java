@@ -74,11 +74,8 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
     @Override
     public void handleResult(Result result) {
 
-//        String phone = result.getText().split(";")[0];
-//        String associateId = result.getText().split(";")[1];
-
-        String phone = "+919071531825";
-        String associateId = "8";
+        String phone = result.getText().split(";")[0];
+        String associateId = result.getText().split(";")[1];
 
         new ResidentChecker().isResident(phone, Integer.parseInt(associateId), new ResidentChecker.ResponseListener() {
             @Override
