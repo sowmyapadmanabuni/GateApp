@@ -8,13 +8,14 @@ import android.location.Location
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.v4.app.ActivityCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,16 +26,14 @@ import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.com.oyespace.guards.pojo.PassesSOSGuards
+import com.oyespace.guards.activity.GalleryViewActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.pojo.GoogleMapDTO
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import io.realm.Realm
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.activity_img_view.*
 import kotlinx.android.synthetic.main.activity_sos_recycle.*
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
 import okhttp3.OkHttpClient
@@ -42,6 +41,7 @@ import okhttp3.Request
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -72,6 +72,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     private var lineoption = PolylineOptions()
     private var isResolving = false
     var userId:Int = 0
+    var emergencyImages: ArrayList<String> = ArrayList();
+    internal var t1: TextToSpeech? = null
+    var mSosPath: String = "";
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -83,6 +86,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     override fun onDestroy() {
+        mSosReference!!.removeEventListener(sosListener)
+        Prefs.putBoolean("ACTIVE_SOS", false);
         super.onDestroy()
     }
 
@@ -116,12 +121,27 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         btn_dismiss_sos.setOnClickListener {dismissSOS()}
         btn_attend_sos.setOnClickListener({ attendSOS() })
 
+        t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
+            if (status != TextToSpeech.ERROR)
+                t1?.language = Locale.getDefault()
+        })
+
+        sos_image.setOnClickListener({
+            if (emergencyImages.size > 0) {
+                val galleryIntent = Intent(this@SosGateAppActivity, GalleryViewActivity::class.java)
+                var emergencyImagesJson = Gson().toJson(emergencyImages)
+                galleryIntent.putExtra("images", emergencyImagesJson)
+                galleryIntent.putExtra("sospath", mSosPath)
+                startActivity(galleryIntent)
+            }
+        })
+
     }
 
 
 
     private fun initFRTDB(){
-        var mSosPath = "SOS/"+ LocalDb.getAssociation()!!.asAssnID+"/"+currentSOS.userId
+        mSosPath = "SOS/" + LocalDb.getAssociation()!!.asAssnID + "/" + currentSOS.userId
         Log.e(TAG,""+mSosPath)
         mDatabase = FirebaseDatabase.getInstance().reference
         mSosReference = FirebaseDatabase.getInstance().getReference(mSosPath)
@@ -138,6 +158,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             checkNextSOS()
 
         }else{
+            //mSosReference
             btn_dismiss_sos.setVisibility(View.GONE)
             btn_attend_sos.text = "Resolved"
             mSosReference!!.child("attendedBy").setValue(Prefs.getString(ConstantUtils.GATE_NO, ""))
@@ -166,10 +187,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             var sosImage:String = ""
                             var latitude:String = ""
                             var longitude:String = ""
+                        var attendedBy: String = ""
                             var id:Int = 0
                             //var userId: Int = 0
                             var totalPassed:Int = 0
                             var passedBy:HashMap<String,String> = HashMap()
+
 
                             if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
                                 unitName = it.child("unitName").getValue(String::class.java)!!
@@ -206,36 +229,77 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                 passedBy = it.child("passedby").getValue(type)!!
                                 totalPassed = passedBy.size
                             }
+                        if (it.hasChild("emergencyImages")) {
+                            val _tp = object : GenericTypeIndicator<ArrayList<String>>() {}
+                            emergencyImages = (it.child("emergencyImages").getValue(_tp))!!
+                        }
 
+                        if (it.hasChild("attendedBy")) {
+                            attendedBy = it.child("attendedBy").getValue(String::class.java)!!
+                        }
+
+                        Log.e("EMER_G", "" + emergencyImages);
                             if (isActive != null && isActive && userId != 0) {
-
                                 runOnUiThread {
-                                    if(userMobile != "" && userMobile != null){
-                                        sos_usermobile.text = userMobile
-                                    }
-                                    if(userName != "" && userName != null){
-                                        sos_username.text = userName
-                                    }
-                                    if(sosImage != "" && sosImage != null){
 
-                                        Picasso.with(applicationContext)
-                                            .load(sosImage)
-                                            .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera).into(sos_image)
-                                    }else{
-                                        Picasso.with(applicationContext)
-                                            .load(R.drawable.newicons_camera).into(sos_image)
-                                    }
-                                    if(latitude != "" && latitude != null && longitude != "" && longitude != null){
-                                        val lat = latitude.toDouble()
-                                        val lon = longitude.toDouble()
-                                        sosLocation = LatLng(lat, lon)
-                                        getDirections()
-                                    }
+                                    val currentGate = Prefs.getString(ConstantUtils.GATE_NO, "");
+                                    if (attendedBy.equals("") || attendedBy.equals(currentGate)) {
 
-                                    if((totalGuards-totalPassed) == 1){
-                                        btn_dismiss_sos.visibility = View.GONE
-                                    }else{
-                                        btn_dismiss_sos.visibility = View.VISIBLE
+
+                                        if (userMobile != "" && userMobile != null) {
+                                            sos_usermobile.text = userMobile
+                                        }
+                                        if (userName != "" && userName != null) {
+                                            sos_username.text = userName
+                                        }
+                                        if (emergencyImages != null && emergencyImages.size > 0) {
+
+                                            Picasso.with(applicationContext)
+                                                .load(emergencyImages[0])
+                                                .placeholder(R.drawable.newicons_camera)
+                                                .error(R.drawable.newicons_camera).into(sos_image)
+                                        } else {
+                                            Picasso.with(applicationContext)
+                                                .load(R.drawable.newicons_camera).into(sos_image)
+                                        }
+                                        if (latitude != "" && latitude != null && longitude != "" && longitude != null) {
+                                            val lat = latitude.toDouble()
+                                            val lon = longitude.toDouble()
+                                            sosLocation = LatLng(lat, lon)
+                                            getDirections()
+                                        }
+
+                                        if ((totalGuards - totalPassed) == 1) {
+                                            btn_dismiss_sos.visibility = View.GONE
+                                        } else {
+                                            btn_dismiss_sos.visibility = View.VISIBLE
+                                        }
+                                    } else {
+                                        //Someone else accepted the SOS
+                                        try {
+                                            Toast.makeText(
+                                                this@SosGateAppActivity,
+                                                "" + attendedBy + " accepted the S.O.S",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            t1?.speak(
+                                                "" + attendedBy + " accepted the SOS",
+                                                TextToSpeech.QUEUE_FLUSH,
+                                                null
+                                            )
+                                            Log.e("DEleted", "" + currentSOS);
+                                            val sosObj =
+                                                realm.where<SOSModel>().equalTo("userId", userId)
+                                                    .findFirst()
+                                            if (sosObj != null) {
+                                                realm.executeTransaction {
+                                                    sosObj.deleteFromRealm()
+                                                }
+                                            }
+                                            checkNextSOS()
+                                        } catch (e: Exception) {
+                                            checkNextSOS()
+                                        }
                                     }
                                 }
                             }else{
@@ -287,6 +351,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 //                        }
                         checkNextSOS()
                     }catch (e:Exception){
+                        e.printStackTrace()
                         checkNextSOS()
                     }
                 }
@@ -485,9 +550,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     private fun setEmergencyContacts(){
 
-        val contacts = ArrayList<MyData>()
+        val contacts = ArrayList<EmergencyModel>()
         contacts.add(
-            MyData(
+            EmergencyModel(
                 BitmapFactory.decodeResource(resources, R.mipmap.amb_new),
                 "Ambulance",
                 BitmapFactory.decodeResource(resources, R.mipmap.call_orange_call),
@@ -495,7 +560,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             )
         )
         contacts.add(
-            MyData(
+            EmergencyModel(
                 BitmapFactory.decodeResource(resources, R.mipmap.pol_ice_1),
                 "Police",
                 BitmapFactory.decodeResource(resources, R.mipmap.call_orange_call),
@@ -503,21 +568,26 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             )
         )
         contacts.add(
-            MyData(
+            EmergencyModel(
                 BitmapFactory.decodeResource(resources, R.mipmap.fir_birgade_new),
                 "Fire Brigade",
                 BitmapFactory.decodeResource(resources, R.mipmap.call_orange_call),
                 "101"
             )
         )
-        rcv_emergency.setLayoutManager( GridLayoutManager(this@SosGateAppActivity, 3))
-        val adapter = RecyclerViewAdapter(contacts,clickListener = {
+        rcv_emergency.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@SosGateAppActivity,
+                3
+            )
+        )
+        val adapter = EmrgencyContactAdapter(contacts, clickListener = {
                 unit,index -> onEmergencyClick(unit,index)
         })
         rcv_emergency.adapter = adapter
     }
 
-    fun onEmergencyClick(unit:MyData, index:Int){
+    fun onEmergencyClick(unit: EmergencyModel, index: Int) {
         val intent = Intent(Intent.ACTION_CALL);
         intent.data = Uri.parse("tel:"+unit.phoneNum)
         startActivity(intent)

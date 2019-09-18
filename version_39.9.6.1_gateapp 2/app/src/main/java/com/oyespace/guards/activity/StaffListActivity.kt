@@ -1,50 +1,34 @@
 package com.oyespace.guards.activity
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.Gravity
 import android.view.View
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.R
 import com.oyespace.guards.adapter.StaffAdapter
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.GetWorkerListbyAssnIDResp
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_staff_list.*
-import com.oyespace.guards.R
-import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.pojo.WorkerDetails
 import com.oyespace.guards.pojo.WorkerListbyAssnIDData
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.yarolegovich.lovelydialog.LovelyStandardDialog
-import kotlinx.android.synthetic.main.activity_name_entry.*
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import com.oyespace.guards.DataBaseHelper
-import com.oyespace.guards.models.GetWorkersResponse
-import com.oyespace.guards.models.Worker
-import com.oyespace.guards.models.WorkersList
-import com.oyespace.guards.utils.ConstantUtils
-import kotlinx.android.synthetic.main.activity_final_registration.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_staff_list.*
 import java.io.File
 import java.util.*
-import java.util.Locale.filter
-import kotlin.collections.ArrayList
 
 
 class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
@@ -60,6 +44,7 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonAdd -> {
+                Prefs.putString(ConstantUtils.TYPE, "Create")
                 buttonAdd.setEnabled(false)
                 buttonAdd.setClickable(false)
                 val intentReg = Intent(this@StaffListActivity, WorkersTypeList::class.java)
@@ -74,14 +59,14 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
     //    val staff: ArrayList<String> = ArrayList();
     // private var sv_staff: SearchView? = null
     //    private var rv_staff: RecyclerView? = null
-    private var arrayList: ArrayList<Worker>? = null
+    private var arrayList: ArrayList<WorkerDetails>? = null
     //private lateinit var WorkerAdapter: StaffAdapter
     var WorkerAdapter: StaffAdapter?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_staff_list)
-        initRealm()
+
         getServiceProviderList()
 
         tv_nodata = findViewById(R.id.tv_nodata)
@@ -108,7 +93,12 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
             txt_device_name.text = " "
 
         }
-        rv_staff?.setLayoutManager(GridLayoutManager(this@StaffListActivity, 1))
+        rv_staff?.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@StaffListActivity,
+                1
+            )
+        )
 
         //    sv_staff = findViewById(R.id.sv_staff);
 
@@ -127,51 +117,21 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
        // if (::WorkerAdapter.isInitialized) {
 
 
-//            tv.addTextChangedListener(object : TextWatcher {
-//                override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-//                    if(WorkerAdapter!=null){
-//                        WorkerAdapter!!.getFilter().filter(charSequence)
-//
-//                    }
-//                }
-//
-//                override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-//                    try{
-//                        if(WorkerAdapter!=null){
-//                            WorkerAdapter!!.getFilter().filter(charSequence)
-//
-//                        }
-//                    }
-//                    catch (e:KotlinNullPointerException){
-//                        e.printStackTrace()
-//                    }
-//                }
-//
-//                override fun afterTextChanged(editable: Editable) {
-//
-//                }
-//            });
-
-
         tv.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                if(WorkerAdapter!=null){
-                    // WorkerAdapter!!.getFilter().filter(charSequence)
+                if (WorkerAdapter != null) {
+                    WorkerAdapter!!.getFilter().filter(charSequence)
 
                 }
             }
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                try{
-                    if(WorkerAdapter!=null){
-                        // Toast.makeText(this@StaffListActivity,charSequence,Toast.LENGTH_LONG).show()
-                        //  WorkerAdapter!!.getFilter().filter(charSequence)
-                        WorkerAdapter!!.filter(charSequence)
-
+                try {
+                    if (WorkerAdapter != null) {
+                        WorkerAdapter!!.getFilter().filter(charSequence)
 
                     }
-                }
-                catch (e:KotlinNullPointerException){
+                } catch (e: KotlinNullPointerException) {
 
                 }
             }
@@ -192,33 +152,35 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
             .workerList("7470AD35-D51C-42AC-BC21-F45685805BBE", intToString(LocalDb.getAssociation().asAssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
+            .subscribeWith(object :
+                CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
 
+                override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
-                override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
                     if (workerListResponse.data.worker != null) {
                         tv_nodata.visibility=View.INVISIBLE
-                        Log.d("getServiceProviderList", ""+workerListResponse.data.worker.size)
-                        if (workerListResponse.data.worker != null) {
-                            //Log.d("WorkerList success", workerListResponse.data.toString())
+                        Log.d("WorkerList success", workerListResponse.data.toString())
 
-                            val _arrayList = workerListResponse.data.worker
-                            val realmDB = DataBaseHelper()
-                            realmDB.saveStaffsList(_arrayList)
+                        arrayList = ArrayList()
+                        arrayList = workerListResponse.data.worker
+//                        val WorkerAdapter = StaffAdapter( arrayList,this@StaffListActivity)
+//                        rv_staff.adapter = WorkerAdapter
+//                        arrayList=ArrayList()
+//                        arrayList = workerListResponse.data.worker
 
+                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {
+                            override fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+                                return lhs.wkfName.compareTo(rhs.wkfName)
+                            }
+                        })
 
-                            WorkerAdapter = StaffAdapter(DataBaseHelper.getStaffs(), this@StaffListActivity)
-                            rv_staff!!.adapter = WorkerAdapter
-                        }
-//                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {
-//                            override fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-//                                return lhs.wkfName.compareTo(rhs.wkfName)
-//                            }
-//                        })
-//
-//                        LocalDb.saveStaffList(arrayList);
-//
+                        LocalDb.saveStaffList(arrayList);
 
+                        WorkerAdapter = StaffAdapter(
+                            arrayList as ArrayList<WorkerDetails>,
+                            this@StaffListActivity
+                        )
+                        rv_staff!!.adapter = WorkerAdapter
 
                     } else {
 

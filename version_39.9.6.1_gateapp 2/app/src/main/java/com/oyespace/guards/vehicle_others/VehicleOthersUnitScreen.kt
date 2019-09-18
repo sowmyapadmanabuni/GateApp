@@ -8,32 +8,25 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.oyespace.guards.Dashboard
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.PurposeScreen
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.UnitList
 import com.oyespace.guards.pojo.UnitPojo
-import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_unit_list.*
 import java.util.*
 
 class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
@@ -78,7 +71,12 @@ class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
         }else {
             makeUnitLog()
         }
-        rv_unit.setLayoutManager( GridLayoutManager(this@VehicleOthersUnitScreen, 2))
+        rv_unit.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@VehicleOthersUnitScreen,
+                2
+            )
+        )
 
         btn_mic.setOnClickListener {
             Speak()
@@ -234,7 +232,7 @@ class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
 
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
 
@@ -280,7 +278,7 @@ class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID, AppUtils.intToString(orderData.unUnitID))
+                intent.putExtra(UNITID, orderData.unUnitID)
                 intent.putExtra(UNITNAME, orderData.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
@@ -299,7 +297,8 @@ class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
             return listVistor.size
         }
 
-        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) :
+            androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: CheckBox

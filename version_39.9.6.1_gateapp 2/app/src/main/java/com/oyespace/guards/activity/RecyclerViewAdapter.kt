@@ -1,15 +1,12 @@
 package com.oyespace.guards.com.oyespace.guards.activity
 
-import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
-
 
 
 class RecyclerViewAdapter(val list: ArrayList<MyData>,val clickListener:(MyData, Int) -> Unit) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {

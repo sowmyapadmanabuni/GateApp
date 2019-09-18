@@ -12,13 +12,13 @@ import android.os.Bundle
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.app.AlertDialog
 import android.text.InputFilter
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -43,8 +43,6 @@ import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
 import java.util.*
 
 
@@ -585,6 +583,10 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            d.putExtra(
+                                UNIT_ACCOUNT_ID,
+                                intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
+                            )
                             d.putExtra(MOBILENUMBER, MobNumber)
                             d.putExtra(COUNTRYCODE, isdCode)
                             d.putExtra(

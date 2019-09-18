@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
                                     android:layout_width="match_parent"
                                     android:layout_height="wrap_content"
                                     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -28,7 +28,7 @@
                         android:id="@+id/iv_user"
                         android:layout_width="@dimen/_80sdp"
                         android:layout_height="@dimen/_120sdp"
-                        android:src="@mipmap/oyespace_cropped"
+                        android:src="@drawable/user_icon_black"
                         android:layout_gravity="center_horizontal"
                         android:padding="2dp"
                 />
@@ -235,4 +235,4 @@
         </RelativeLayout>
     </LinearLayout>
 
-</android.support.v7.widget.CardView>
+</androidx.cardview.widget.CardView>

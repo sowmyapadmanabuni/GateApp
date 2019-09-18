@@ -8,10 +8,8 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.MobileNumberScreen
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -54,6 +52,7 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
                     d.putExtra(PERSONNAME, Ed_Name.getText().toString())
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                     startActivity(d)
                     finish()
                 } else {

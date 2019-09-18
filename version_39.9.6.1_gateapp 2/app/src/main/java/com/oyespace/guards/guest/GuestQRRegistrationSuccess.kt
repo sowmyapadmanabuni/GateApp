@@ -16,14 +16,16 @@ import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.network.*
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
+import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.NumberUtils.toInteger
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -161,7 +163,11 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         if(!BASE_URL.contains("dev",true)){
             memID=410;
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
+        val req = CreateVisitorLogReq(
+            Prefs.getInt(ASSOCIATION_ID, 0),
+            0,
+            intent.getStringExtra(UNITNAME),
+            intent.getStringExtra(UNITID),
             intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), LocalDb.getAssociation()!!.asAsnName, 0, "",
             intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
@@ -174,6 +180,9 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
+
+                        //  getInvitationCreate(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(PERSONNAME),"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),"","","","",getCurrentTimeLocal(),getCurrentTimeLocal(),"",true,Prefs.getInt(ASSOCIATION_ID,0),true)
+
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         var imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + globalApiObject.data.visitorLog.vlVisLgID + ".jpg"
 
@@ -184,9 +193,10 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra("name", intent.getStringExtra(PERSONNAME))
                         d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
                         d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-
+                        d.putExtra(VISITOR_TYPE, GUEST)
                         d.putExtra("memType", "Owner")
                         d.putExtra(UNITID,intent.getStringExtra(UNITID))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
 
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
@@ -441,5 +451,65 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //        startActivity(d)
         finish()
     }
+
+    private fun getInvitationCreate(
+        unUnitID: String,
+        INFName: String,
+        INLName: String,
+        INMobile: String,
+        INEmail: String,
+        INVchlNo: String,
+        INVisCnt: String,
+        INPhoto: String,
+        INSDate: String,
+        INEDate: String,
+        INPOfInv: String,
+        INMultiEy: Boolean,
+        ASAssnID: Int,
+        INQRCode: Boolean
+    ) {
+
+
+        val dataReq = InviteCreateReq(
+            unUnitID,
+            INFName,
+            INLName,
+            INMobile,
+            INEmail,
+            INVchlNo,
+            INVisCnt,
+            INPhoto,
+            INSDate,
+            INEDate,
+            INPOfInv,
+            INMultiEy,
+            ASAssnID,
+            INQRCode
+        )
+
+
+        RetrofitClinet.instance
+            .sendInviteRequest(OYE247TOKEN, dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<InviteCreateRes>() {
+
+                override fun onSuccessResponse(inviteCreateRes: InviteCreateRes) {
+
+
+                }
+
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList", e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
+
+
 
 }

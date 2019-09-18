@@ -1,19 +1,20 @@
 package com.oyespace.guards.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Bundle
-import android.os.CountDownTimer
+import android.os.*
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.support.v7.app.AlertDialog
+import android.telecom.TelecomManager
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -24,6 +25,8 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -31,7 +34,6 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys
@@ -47,8 +49,6 @@ import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
 import java.util.*
 
 
@@ -100,7 +100,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                 d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
-
+                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
 
@@ -115,6 +115,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
 
@@ -147,7 +148,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@MobileNumberScreen)
                        // builder.setTitle("Vendor Entry already done")
-                        builder.setMessage("Number is already registered")
+                       builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
 
 
@@ -214,12 +215,11 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
         //  Toast.makeText(applicationContext, "coming", Toast.LENGTH_LONG).show();
       //  Toast.makeText(this@MobileNumberScreen,intent.getStringExtra( "RESIDENT_NUMBER"),Toast.LENGTH_LONG).show()
-        btn_nobalance=findViewById(R.id.btn_nobalance)
+
 
         receiver =  object : BroadcastReceiver() {
 
             override fun onReceive(context: Context?, intent: Intent?) {
-
                 val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 telephony.listen(object : PhoneStateListener() {
 
@@ -238,9 +238,10 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                                 ccd= number.substring(0,3)
 
                                 mobileNumber=number.substring(3,13)
-                            }
+                                // endCall(this@MobileNumberScreen)
 
-                            LocalDb.disconnectCall(context)
+                            }
+                            LocalDb.disconnectCall(context);
                         }
                     }
 
@@ -248,7 +249,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
                 //
             }
-        }
+        };
 
         addEntries()
         btn_nobalance=findViewById(R.id.btn_nobalance)
@@ -597,38 +598,53 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                         if (globalApiObject.data != null) {
                             progressBar?.visibility = View.GONE
 
-//                            Log.d("getAccountDetails", globalApiObject.data.toString())
-//                            Log.d("getAccountDetails", globalApiObject.data.accountByMobile.toString())
-                            val d = Intent(this@MobileNumberScreen, AddCarFragment::class.java)
+                            Prefs.putString("Retake", "Yes")
 
-//                            Log.d(
-//                                "intentdata NameEntr",
-//                                "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(
-//                                    UNITID
-//                                )
-//                                        + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(
-//                                    COUNTRYCODE
-//                                ) + " "
-//                                        + globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-//                            );
-                            d.putExtra(UNITID, intent.getStringExtra(UNITID))
-                            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-                            d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                            d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                            d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                            d.putExtra(MOBILENUMBER, MobNumber)
-                            d.putExtra(COUNTRYCODE, isdCode)
-                            d.putExtra(PERSONNAME,
-                                globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-                            )
-                            d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
-                            d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-
-
-
-
-                            startActivity(d);
-                            finish();
+                            if ((intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION))) {
+                                val d = Intent(this@MobileNumberScreen, NameEntryScreen::class.java)
+                                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                                d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                                d.putExtra(MOBILENUMBER, mobileNumber)
+                                d.putExtra(COUNTRYCODE, ccd)
+                                d.putExtra(
+                                    UNIT_ACCOUNT_ID,
+                                    intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
+                                )
+                                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                                d.putExtra(
+                                    PERSONNAME,
+                                    globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
+                                )
+                                startActivity(d);
+                                finish();
+                            } else {
+                                val d = Intent(this@MobileNumberScreen, AddCarFragment::class.java)
+                                d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                                d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                d.putExtra(MOBILENUMBER, MobNumber)
+                                d.putExtra(COUNTRYCODE, isdCode)
+                                d.putExtra(
+                                    PERSONNAME,
+                                    globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
+                                )
+                                d.putExtra(
+                                    ACCOUNT_ID,
+                                    globalApiObject.data.accountByMobile[0].acAccntID
+                                )
+                                d.putExtra(
+                                    UNIT_ACCOUNT_ID,
+                                    intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
+                                )
+                                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                                startActivity(d);
+                                finish();
+                            }
 
                         } else {
                             progressBar?.visibility = View.GONE
@@ -655,11 +671,6 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
 
     fun deliveryFlow_launchNameEntryScreen() {
         val d = Intent(this@MobileNumberScreen, NameEntryScreen::class.java)
-//        Log.d(
-//            "intentdata MobileNumber",
-//            "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-//                    + " " + textview.text + " " + countryCode
-//        );
         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
@@ -668,7 +679,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
         d.putExtra(MOBILENUMBER, mobileNumber)
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-
+        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
         startActivity(d);
         finish();
     }
@@ -863,7 +874,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
         workType.add("Head Guard")
         workType.add("Senior Security")
         workType.add("Lady Supervisor")
-        workType.add("Lady Head Guard")
+    // workType.add("Lady Head Guard")
         workType.add("Lady Senior Security Guard")
         workType.add("Lady Security Guard")
 
@@ -934,6 +945,44 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                     }
                 })
         )
+    }
+
+    @SuppressLint("PrivateApi")
+    fun endCall(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ANSWER_PHONE_CALLS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                telecomManager.endCall()
+                return true
+            }
+            return false
+        }
+        //use unofficial API for older Android versions, as written here: https://stackoverflow.com/a/8380418/878126
+        try {
+            val telephonyClass = Class.forName("com.android.internal.telephony.ITelephony")
+            val telephonyStubClass = telephonyClass.classes[0]
+            val serviceManagerClass = Class.forName("android.os.ServiceManager")
+            val serviceManagerNativeClass = Class.forName("android.os.ServiceManagerNative")
+            val getService = serviceManagerClass.getMethod("getService", String::class.java)
+            val tempInterfaceMethod =
+                serviceManagerNativeClass.getMethod("asInterface", IBinder::class.java)
+            val tmpBinder = Binder()
+            tmpBinder.attachInterface(null, "fake")
+            val serviceManagerObject = tempInterfaceMethod.invoke(null, tmpBinder)
+            val retbinder = getService.invoke(serviceManagerObject, "phone") as IBinder
+            val serviceMethod = telephonyStubClass.getMethod("asInterface", IBinder::class.java)
+            val telephonyObject = serviceMethod.invoke(null, retbinder)
+            val telephonyEndCall = telephonyClass.getMethod("endCall")
+            telephonyEndCall.invoke(telephonyObject)
+            return true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
+        }
     }
 
 }

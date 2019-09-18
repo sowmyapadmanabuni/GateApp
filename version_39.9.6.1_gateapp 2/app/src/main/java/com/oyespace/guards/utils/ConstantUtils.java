@@ -17,8 +17,13 @@ public class ConstantUtils {
     public static final String VISITOR_TYPE = "visitor_type";
     public static final String PERSONNAME = "person_name";
     public static final String ACCOUNT_ID = "account_id";
+    public static final String BLOCK_ID = "block_id";
     public static final String UNIT_ACCOUNT_ID = "unit_account_id";
     public static final String VEHICLE_NUMBER = "VEHICLE_NUMBER";
+    public static final String VISITOR_PURPOSE = "Visitor_Purpose";
+    public static final String TYPE = "Type";
+
+
 
     public static final String PERSON_PHOTO = "person_photo";
     public static final String ITEMS_PHOTO_LIST = "items_photo_list";
@@ -72,7 +77,7 @@ public class ConstantUtils {
     //public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
 //public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
 //public static final String BASE_URL="https://apidev.oyespace.com/";
-// public static final String BASE_URL="https://apiuat.oyespace.com/";
+    //public static final String BASE_URL="https://apiuat.oyespace.com/";
     public static final String BASE_URL = "https://api.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT="Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT="Patrolling Start Point";
@@ -89,5 +94,12 @@ public class ConstantUtils {
     public static final String SELECTED_BLOCK = "selected_block";
     public static final String SELECTED_BLOCK_NAME = "selected_block_name";
     public static final String DOB = "dob";
+
+    public static final String ACTIVE_PATROLLING_SCHEDULE = "ACTIVE_PATROLLING_SCHEDULE";
+    public static final String ACTIVE_PATROLLING_LAST_CP = "ACTIVE_PATROLLING_LAST_CP";
+    public static final String CHECKPOINT_TYPE_START = "StartPoint";
+    public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
+    public static final String CHECKPOINT_TYPE_END = "EndPoint";
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 15.0f;
 
 }

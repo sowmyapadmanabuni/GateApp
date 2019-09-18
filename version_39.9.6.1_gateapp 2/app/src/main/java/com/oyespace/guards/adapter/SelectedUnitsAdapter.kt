@@ -1,23 +1,17 @@
-package com.oyespace.guards.com.oyespace.guards.adapter
+package com.oyespace.guards.adapter
 
 import android.content.Context
-import android.support.v7.widget.AppCompatTextView
-import android.support.v7.widget.CardView
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
-import com.malinskiy.superrecyclerview.swipe.SwipeLayout
+import androidx.appcompat.widget.AppCompatTextView
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
-import com.oyespace.guards.com.oyespace.guards.pojo.PaginationData
 import com.oyespace.guards.pojo.UnitPojo
 
 
 class SelectedUnitsAdapter(private val mcontext: Context, private val arrayList: ArrayList<UnitPojo>, val clickListener:(UnitPojo, Int) -> Unit):
-    RecyclerView.Adapter<SelectedUnitsAdapter.ItemViewHolder>(){
+    androidx.recyclerview.widget.RecyclerView.Adapter<SelectedUnitsAdapter.ItemViewHolder>() {
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
@@ -64,7 +58,8 @@ class SelectedUnitsAdapter(private val mcontext: Context, private val arrayList:
     }
 
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val mUnitName: AppCompatTextView
         val mChipClose: ImageView
 

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:layout_alignParentBottom="true"
-              android:orientation="vertical">
-<RelativeLayout android:layout_width="match_parent"
-                android:layout_height="2dp"
-android:background="@color/orange"></RelativeLayout>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/orange"></RelativeLayout>
+
     <LinearLayout
             android:id="@+id/main_bottom"
             android:layout_width="match_parent"
@@ -14,6 +17,19 @@ android:background="@color/orange"></RelativeLayout>
             android:background="@color/ninety_percent_white"
             android:gravity="center_vertical"
             android:orientation="horizontal">
+
+        <!--        <ScrollView-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="wrap_content"-->
+        <!--                android:fillViewport="false">-->
+
+        <!--            <LinearLayout-->
+
+        <!--                    android:layout_width="match_parent"-->
+        <!--                    android:layout_height="match_parent"-->
+        <!--                    android:background="@color/ninety_percent_white"-->
+        <!--                    android:gravity="center_vertical"-->
+        <!--                    android:orientation="horizontal">-->
 
         <RelativeLayout
                 android:id="@+id/re_delivery"
@@ -24,11 +40,13 @@ android:background="@color/orange"></RelativeLayout>
                 android:focusableInTouchMode="true"
                 android:onClick="onClick"
                 android:padding="2dp">
+
             <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:gravity="center"
+                    android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:layout_height="match_parent">
+                    android:gravity="center">
+
                 <ImageView
                         android:id="@+id/iv_delivery"
                         android:layout_width="wrap_content"
@@ -37,8 +55,7 @@ android:background="@color/orange"></RelativeLayout>
                         android:background="#ffffff"
                         android:focusable="false"
                         android:scaleType="centerInside"
-                        android:src="@drawable/iconsdelivery"
-                />
+                        android:src="@drawable/iconsdelivery" />
 
                 <TextView
                         android:id="@+id/tv_resturant"
@@ -48,9 +65,9 @@ android:background="@color/orange"></RelativeLayout>
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="1dp"
                         android:text="@string/textdelivery"
-                        android:visibility="visible"
                         android:textColor="#000000"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="visible" />
 
 
                 <TextView
@@ -58,13 +75,13 @@ android:background="@color/orange"></RelativeLayout>
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
+                        android:layout_marginRight="8dp"
                         android:background="@drawable/aii"
                         android:gravity="center"
                         android:text="7"
-                        android:visibility="gone"
-                        android:layout_marginRight="8dp"
                         android:textColor="@android:color/white"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="gone" />
             </RelativeLayout>
         </RelativeLayout>
 
@@ -75,11 +92,13 @@ android:background="@color/orange"></RelativeLayout>
                 android:layout_weight="1"
                 android:onClick="onTabClicked"
                 android:padding="2dp">
+
             <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:gravity="center"
+                    android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:layout_height="match_parent">
+                    android:gravity="center">
+
                 <ImageView
                         android:id="@+id/ib_staff"
                         android:layout_width="wrap_content"
@@ -88,7 +107,7 @@ android:background="@color/orange"></RelativeLayout>
                         android:background="#ffffff"
                         android:focusable="false"
                         android:scaleType="centerInside"
-                        android:src="@drawable/iconsstaff"/>
+                        android:src="@drawable/iconsstaff" />
 
                 <TextView
                         android:id="@+id/tv_staff_profile"
@@ -99,22 +118,22 @@ android:background="@color/orange"></RelativeLayout>
                         android:layout_marginTop="1dp"
 
                         android:text="@string/textstaff"
-                        android:visibility="visible"
                         android:textColor="#000000"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="visible" />
 
                 <TextView
                         android:id="@+id/unread_address_number"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentRight="true"
+                        android:layout_marginRight="8dp"
                         android:background="@drawable/aii"
                         android:gravity="center"
-                        android:layout_marginRight="8dp"
                         android:text="7"
-                        android:visibility="gone"
                         android:textColor="@android:color/white"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="gone" />
             </RelativeLayout>
         </RelativeLayout>
 
@@ -127,11 +146,13 @@ android:background="@color/orange"></RelativeLayout>
 
                 android:onClick="onTabClicked"
                 android:padding="2dp">
+
             <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:gravity="center"
+                    android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:layout_height="match_parent">
+                    android:gravity="center">
+
                 <ImageView
                         android:id="@+id/ib_vehicle"
                         android:layout_width="wrap_content"
@@ -140,7 +161,7 @@ android:background="@color/orange"></RelativeLayout>
                         android:background="#ffffff"
                         android:focusable="false"
                         android:scaleType="centerInside"
-                        android:src="@drawable/iconstrafficjam"/>
+                        android:src="@drawable/iconstrafficjam" />
 
                 <TextView
                         android:id="@+id/tv_vehicle"
@@ -150,21 +171,22 @@ android:background="@color/orange"></RelativeLayout>
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="3dp"
                         android:text="@string/textvehiclle"
-                        android:visibility="visible"
                         android:textColor="#000000"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="visible" />
+
                 <TextView
                         android:id="@+id/uread"
                         android:layout_width="10dp"
                         android:layout_height="10dp"
                         android:layout_alignParentRight="true"
+                        android:layout_marginRight="10dp"
                         android:background="@drawable/aii"
                         android:gravity="center"
                         android:text=""
-                        android:visibility="gone"
-                        android:layout_marginRight="10dp"
                         android:textColor="@android:color/white"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="gone" />
             </RelativeLayout>
         </RelativeLayout>
 
@@ -175,11 +197,13 @@ android:background="@color/orange"></RelativeLayout>
                 android:layout_weight="1"
                 android:onClick="onTabClicked"
                 android:padding="2dp">
+
             <RelativeLayout
                     android:layout_width="wrap_content"
-                    android:gravity="center"
+                    android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
-                    android:layout_height="match_parent">
+                    android:gravity="center">
+
                 <ImageView
                         android:id="@+id/ib_guest"
                         android:layout_width="wrap_content"
@@ -188,7 +212,7 @@ android:background="@color/orange"></RelativeLayout>
                         android:background="#ffffff"
                         android:focusable="false"
                         android:scaleType="centerInside"
-                        android:src="@drawable/iconsuseravatar"/>
+                        android:src="@drawable/guest" />
 
                 <TextView
                         android:id="@+id/tv_guest_profile"
@@ -198,9 +222,61 @@ android:background="@color/orange"></RelativeLayout>
                         android:layout_centerHorizontal="true"
                         android:layout_marginTop="1dp"
                         android:text="@string/textguest"
-                        android:visibility="visible"
                         android:textColor="#000000"
-                        android:textSize="12sp"/>
+                        android:textSize="12sp"
+                        android:visibility="visible" />
+                <!--<TextView-->
+                <!--android:id="@+id/uread"-->
+                <!--android:layout_width="10dp"-->
+                <!--android:layout_height="10dp"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:background="@drawable/aii"-->
+                <!--android:gravity="center"-->
+                <!--android:text=""-->
+
+                <!--android:visibility="gone"-->
+                <!--android:layout_marginRight="10dp"-->
+                <!--android:textColor="@android:color/white"-->
+                <!--android:textSize="12sp"/>-->
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:id="@+id/re_resident"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:onClick="onTabClicked"
+                android:padding="2dp"
+                android:visibility="gone">
+
+            <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center">
+
+                <ImageView
+                        android:id="@+id/ib_resident"
+                        android:layout_width="wrap_content"
+                        android:layout_height="50dp"
+                        android:layout_centerHorizontal="true"
+                        android:background="#ffffff"
+                        android:focusable="false"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/iconsuseravatar" />
+
+                <TextView
+                        android:id="@+id/tv_guest_resident"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/ib_resident"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="1dp"
+                        android:text="@string/tvresident"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:visibility="visible" />
                 <!--<TextView-->
                         <!--android:id="@+id/uread"-->
                         <!--android:layout_width="10dp"-->
@@ -216,6 +292,8 @@ android:background="@color/orange"></RelativeLayout>
                         <!--android:textSize="12sp"/>-->
             </RelativeLayout>
         </RelativeLayout>
+        <!--            </LinearLayout>-->
+        <!--        </ScrollView>-->
 
     </LinearLayout>
 

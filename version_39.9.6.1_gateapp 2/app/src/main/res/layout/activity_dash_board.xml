@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:keepScreenOn="true"
-        >
+        android:layout_height="match_parent"
+        android:keepScreenOn="true">
     <!--<include-->
     <!--layout="@layout/layout_toolbar"-->
     <!--android:layout_width="match_parent"-->
@@ -145,6 +142,68 @@
         />
         </RelativeLayout>
 
+
+        <RelativeLayout
+                android:id="@+id/rl_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:padding="1dp">
+
+            <!--            <ImageView android:layout_width="35dp"-->
+            <!--                    android:layout_height="35dp"-->
+            <!--                    android:id="@+id/rl_logo"-->
+            <!--                    android:layout_marginLeft="@dimen/_5sdp"-->
+            <!--                    android:layout_centerVertical="true"-->
+            <!--                    android:src="@drawable/oyespace_launcher"/>-->
+
+
+            <EditText
+                    android:id="@+id/edt_search_text1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/btn_mic"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/tvdynamicsearch"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:lines="1"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="@android:color/darker_gray"
+                    android:textSize="14sp" />
+
+
+            <Button
+                    android:id="@+id/btn_mic"
+                    android:layout_width="@dimen/_35sdp"
+                    android:layout_height="@dimen/_35sdp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="@dimen/horizontal_padding_small"
+                    android:layout_marginLeft="189dp"
+                    android:layout_marginEnd="@dimen/horizontal_padding_small"
+                    android:layout_marginRight="@dimen/horizontal_padding_small"
+                    android:background="@drawable/microphone_640"
+                    android:textColor="@color/white"
+                    android:visibility="visible" />
+
+
+            <!--            <Button-->
+            <!--                    android:id="@+id/buttonAdd"-->
+            <!--                    android:layout_width="wrap_content"-->
+            <!--                    android:layout_height="wrap_content"-->
+            <!--                    android:layout_alignParentRight="true"-->
+            <!--                    android:onClick="onClick"-->
+            <!--                    android:text="@string/textadd"-->
+            <!--                    android:textColor="@android:color/white"-->
+            <!--                    android:background="@drawable/square"-->
+            <!--                    android:textSize="@dimen/_10sdp" />-->
+
+        </RelativeLayout>
+
         <Switch
                 android:id="@+id/button_favorite"
                 android:layout_width="wrap_content"
@@ -225,7 +284,7 @@
                 <!--android:layout_margin="5dp"-->
         <!--/>-->
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/swipeContainer"
                 android:layout_width="wrap_content"
@@ -233,13 +292,13 @@
                 android:layout_weight="4.5">
 
 
-            <android.support.v7.widget.RecyclerView
+            <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rv_dashboard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
 
             />
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         <include
                 android:id="@+id/ly_bottombar"
                 android:layout_width="fill_parent"

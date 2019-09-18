@@ -7,31 +7,27 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
-import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Message
-import android.os.PowerManager
 import android.speech.tts.TextToSpeech
-import android.support.v7.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import com.google.gson.Gson
-import com.oyespace.guards.*
+import androidx.appcompat.app.AppCompatActivity
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.Dashboard
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.models.CaptureFPResponse
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RestClient
 import com.oyespace.guards.network.URLData
@@ -41,16 +37,11 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
-import kotlinx.android.synthetic.main.layout_viewpager_iem.*
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.net.URL
+import java.io.File
 import java.nio.ByteBuffer
-import java.sql.Blob
 import java.util.*
-import kotlin.math.absoluteValue
 
 
 class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
@@ -124,6 +115,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     internal var existInDB = BooleanArray(1)
     internal var tempFP: ByteArray? = null
 
+    internal var curData: Cursor? = null
 
     lateinit var fingerDetails: TextView//080 42074082
     lateinit var left_thumb: ImageView
@@ -244,6 +236,17 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
 
         setContentView(R.layout.activity_register_finger_print)
+
+        val dir =
+            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+        if (dir.isDirectory()) {
+            val children = dir.list()
+            for (i in children!!.indices) {
+                File(dir, children!![i]).delete()
+            }
+        }
+
+
         Log.d("btn_biometric", "af setContentView")
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
@@ -300,6 +303,11 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         next = findViewById(R.id.buttonNext)
         previous = findViewById(R.id.buttonPrevious)
         buttonDone = findViewById(R.id.buttonDone)
+
+        curData = dbh.regularVisitorsFinger
+        if (curData != null) {
+            curData!!.moveToFirst()
+        }
 
 
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
@@ -564,7 +572,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 )
                 dlgAlert.setCancelable(false)
                 //            dlgAlert.create().show();
-                android.support.v7.app.AlertDialog.Builder(this@Biometric)
+                androidx.appcompat.app.AlertDialog.Builder(this@Biometric)
                     .setTitle("Finger Print Registration")
                     .setMessage("Please connect biometric device2")
                     .setNeutralButton("OK") { dialog, which -> dialog.dismiss() }
@@ -723,6 +731,9 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         var buffer: ByteArray? = ByteArray(mImageWidth * mImageHeight)
 
+        //   result = sgfplib.GetImageEx(buffer,10000,50);
+
+
         //commented val result = sgfplib!!.GetImage(buffer)
         //        if (this.mToggleButtonNFIQ.isChecked()) {
         //            long nfiq = sgfplib.ComputeNFIQ(buffer, mImageWidth, mImageHeight);
@@ -745,9 +756,10 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         try {
             if (v === this.mButtonRegister1) {
+
                 if (mRegisterImage != null) {
                     mRegisterImage = null
-                    Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
+                    //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
                 }
 
                 mRegisterImage = ByteArray(mImageWidth * mImageHeight)
@@ -874,7 +886,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
 
 
-                  Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
 
                 if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
                 {
@@ -911,7 +923,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     if (existInDB1[0]) {
                         t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
                     } else {
-                        mTextViewResult!!.text = "MATCHED!!\n"
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -945,7 +958,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         catch (e:Exception)
 
         {
-            e.printStackTrace()
             //FingerImage 2
             //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
             //t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
@@ -1000,7 +1012,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     } else {
 
 
-                        mTextViewResult!!.text = "MATCHED!!\n"
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         relLayout3!!.visibility = View.VISIBLE
@@ -1174,50 +1187,40 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     override fun onFailure(e: Exception, urlId: Int) {
 
-        showToast(this, e.message + " id " + urlId)
+        //showToast(this, e.message + " id " + urlId)
     }
 
     override fun onSuccess(responce: String, data: Any, urlId: Int, position: Int) {
-        try {
-            if (urlId == URLData.URL_SAVE_FINGERPRINT.urlId) {
-                //val loginDetailsResponce = data as FingerPrintCreateResp
-                val loginDetailsResponce = Gson().fromJson(responce, CaptureFPResponse::class.java)
-                Log.e("GSON_CPON0",""+responce);
-                Log.e("GSON_CPON",""+loginDetailsResponce);
-                Log.e("GSON_CPON2",""+loginDetailsResponce.data.fingerPrint.fpid);
 
-                if (loginDetailsResponce != null) {
-                    Log.d(
-                        "str3",
-                        "str3: " + urlId + " id " + position + " " + memId + " " + MemberType + " " + loginDetailsResponce.success.toString()
+        if (urlId == URLData.URL_SAVE_FINGERPRINT.urlId) {
+            val loginDetailsResponce = data as FingerPrintCreateResp
+            if (loginDetailsResponce != null) {
+                Log.d(
+                    "str3",
+                    "str3: " + urlId + " id " + position + " " + memId + " " + MemberType + " " + loginDetailsResponce.success.toString()
+                )
+                if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
+                    showToast(this, "Fingerprint Saved")
+                    dbh.insertUserDetails(
+                        memId.toString() + "",
+                        finger_type,
+                        mFingerprint1Template,
+                        mFingerprint2Template,
+                        mFingerprint3Template,
+                        MemberType,
+                        Prefs.getInt(ASSOCIATION_ID, 0)
+
                     )
-                    if (loginDetailsResponce.success) {
-                        showToast(this, "Fingerprint Saved")
-                        Log.e("CAPTURE_F",""+loginDetailsResponce)
-                        dbh.insertFingerPrints(
-                            loginDetailsResponce.data.fingerPrint.fpid.toInt(),
-                            memId.toString() + "",
-                            finger_type,
-                            mFingerprint1Template,
-                            mFingerprint2Template,
-                            mFingerprint3Template,
-                            MemberType,
-                            Prefs.getInt(ASSOCIATION_ID, 0)
-
-                        )
-                        selectedFinger()
-                        resetCapures()
-                    } else {
-                        showToast(this, "Fingerprint not saved ")
-                    }
-
+                    selectedFinger()
+                    resetCapures()
                 } else {
-                    showToast(this, "Something went wrong . please try again ")
+                    showToast(this, "Fingerprint not saved ")
                 }
 
+            } else {
+                showToast(this, "Something went wrong . please try again ")
             }
-        }catch (e:java.lang.Exception){
-            e.printStackTrace()
+
         }
         //  showToast(this, urlId+" id "+position+" "+memId+" "+MemberType+" ");
 
@@ -1455,6 +1458,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     finger_type = key_left_small
                     if (bl_left_little) {
                         selectedFinger()
+
 
                     }
                 }

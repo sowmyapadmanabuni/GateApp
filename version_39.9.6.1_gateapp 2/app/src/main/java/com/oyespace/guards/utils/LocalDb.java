@@ -1,26 +1,23 @@
 package com.oyespace.guards.utils;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Binder;
-import android.os.IBinder;
+import android.os.Build;
 import android.telecom.TelecomManager;
-import android.util.Log;
+
 import com.google.gson.reflect.TypeToken;
-import com.oyespace.guards.PojoClasses.DashboardPojo;
 import com.oyespace.guards.constants.PrefKeys;
-import com.oyespace.guards.models.VisitorLog;
-import com.oyespace.guards.models.Worker;
-import com.oyespace.guards.pojo.*;
+import com.oyespace.guards.pojo.Association;
+import com.oyespace.guards.pojo.CheckPointByAssocID;
+import com.oyespace.guards.pojo.SearchResult;
+import com.oyespace.guards.pojo.UnitPojo;
+import com.oyespace.guards.pojo.VisitorEntryLog;
+import com.oyespace.guards.pojo.WorkerDetails;
 import com.oyespace.guards.responce.ResponseVisitorLog.Data.Visitorlogbydate;
 import com.oyespace.guards.responce.VisitorLogExitResp;
-import io.realm.Realm;
-import io.realm.Sort;
 
-
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Kalyan on 4/29/2017.
@@ -52,10 +49,31 @@ public class LocalDb {
         Prefs.putString(PrefKeys.CheckPointList, tojson);
     }
 
+    public static ArrayList<SearchResult> getRecentSearchData() {
+        String cartData = Prefs.getString(PrefKeys.RECENT_SEARCH_DATA, null);
+        if (cartData == null) {
+            return null;
+        } else {
+            Type type = new TypeToken<ArrayList<SearchResult>>() {
+            }.getType();
+            ArrayList<SearchResult> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
+            return menuList;
+        }
+    }
+
+    public static void saveSearchData(ArrayList<SearchResult> menuItems) {
+        String tojson;
+        if (menuItems == null || menuItems.size() == 0) {
+            // saveHotelId("");
+            tojson = "";
+        } else {
+            tojson = ParseUtils.tojson(menuItems, "LocalDb");
+        }
+        Prefs.putString(PrefKeys.RECENT_SEARCH_DATA, tojson);
+    }
 
     public static SearchResult getSearchData() {
         String cartData = Prefs.getString(PrefKeys.SEARCH_DATA, null);
-
         if (cartData == null) {
             return null;
         } else {
@@ -85,9 +103,32 @@ public class LocalDb {
         }
     }
 
+    public static void saveEnteredVisitorLog(ArrayList<VisitorEntryLog> menuItems) {
+        String tojson;
+        //Log.d("SYCNCHECK","in 79"+menuItems.size());
 
+        if (menuItems == null || menuItems.size() == 0) {
+            // saveHotelId("");
+            tojson = "";
+        } else {
+            tojson = ParseUtils.tojson(menuItems, "LocalDb");
+        }
+        Prefs.putString(PrefKeys.VisitorEnteredLogLocalDB, tojson);
+    }
 
+    public static ArrayList<VisitorEntryLog> getVisitorEnteredLog() {
+        String cartData = Prefs.getString(PrefKeys.VisitorEnteredLogLocalDB, null);
+        if (cartData == null) {
+            return null;
+        } else {
+            Type type = new TypeToken<ArrayList<VisitorEntryLog>>() {
+            }.getType();
+            ArrayList<VisitorEntryLog> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
+            // Log.d("SYCNCHECK","in 99"+menuList.size());
 
+            return menuList;
+        }
+    }
 
     public static void saveEnteredVisitorLog_old(ArrayList<VisitorLogExitResp.Data.VisitorLog> menuItems) {
         String tojson;
@@ -100,7 +141,17 @@ public class LocalDb {
         Prefs.putString(PrefKeys.VisitorEnteredLogLocalDBOLD, tojson);
     }
 
-
+    public static ArrayList<Visitorlogbydate> getVisitorEnteredLog_old() {
+        String cartData = Prefs.getString(PrefKeys.VisitorEnteredLogLocalDBOLD, null);
+        if (cartData == null) {
+            return null;
+        } else {
+            Type type = new TypeToken<ArrayList<Visitorlogbydate>>() {
+            }.getType();
+            ArrayList<Visitorlogbydate> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
+            return menuList;
+        }
+    }
 
     public static void saveAllVisitorLog(ArrayList<VisitorLogExitResp.Data.VisitorLog> menuItems) {
         String tojson;
@@ -113,7 +164,17 @@ public class LocalDb {
         Prefs.putString(PrefKeys.VisitorAllLogLocalDB, tojson);
     }
 
-
+    public static ArrayList<Visitorlogbydate> getVisitorAllLog() {
+        String cartData = Prefs.getString(PrefKeys.VisitorAllLogLocalDB, null);
+        if (cartData == null) {
+            return null;
+        } else {
+            Type type = new TypeToken<ArrayList<Visitorlogbydate>>() {
+            }.getType();
+            ArrayList<Visitorlogbydate> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
+            return menuList;
+        }
+    }
 
     public static ArrayList<WorkerDetails> getStaffList() {
         String cartData = Prefs.getString(PrefKeys.StaffList, null);
@@ -127,6 +188,16 @@ public class LocalDb {
         }
     }
 
+    public static void saveStaffList(ArrayList<WorkerDetails> menuItems) {
+        String tojson;
+        if (menuItems == null || menuItems.size() == 0) {
+            // saveHotelId("");
+            tojson = "";
+        } else {
+            tojson = ParseUtils.tojson(menuItems, "LocalDb");
+        }
+        Prefs.putString(PrefKeys.StaffList, tojson);
+    }
 
     public static ArrayList<UnitPojo> getUnitList() {
         String cartData = Prefs.getString(PrefKeys.UnitList, null);
@@ -140,34 +211,28 @@ public class LocalDb {
         }
     }
 
+    public static void saveUnitList(ArrayList<UnitPojo> menuItems) {
+        String tojson;
+        if (menuItems == null || menuItems.size() == 0) {
+            // saveHotelId("");
+            tojson = "";
+        } else {
+            tojson = ParseUtils.tojson(menuItems, "LocalDb");
+        }
+        Prefs.putString(PrefKeys.UnitList, tojson);
+    }
+
+    @SuppressLint("MissingPermission")
     public static void disconnectCall(Context context){
         try {
 
-            String serviceManagerName = "android.os.ServiceManager";
-            String serviceManagerNativeName = "android.os.ServiceManagerNative";
-            String telephonyName = "com.android.internal.telephony.ITelephony";
-            Class<?> telephonyClass;
-            Class<?> telephonyStubClass;
-            Class<?> serviceManagerClass;
-            Class<?> serviceManagerNativeClass;
-            Method telephonyEndCall;
-            Object telephonyObject;
-            Object serviceManagerObject;
-            telephonyClass = Class.forName(telephonyName);
-            telephonyStubClass = telephonyClass.getClasses()[0];
-            serviceManagerClass = Class.forName(serviceManagerName);
-            serviceManagerNativeClass = Class.forName(serviceManagerNativeName);
-            Method getService = // getDefaults[29];
-                    serviceManagerClass.getMethod("getService", String.class);
-            Method tempInterfaceMethod = serviceManagerNativeClass.getMethod("asInterface", IBinder.class);
-            Binder tmpBinder = new Binder();
-            tmpBinder.attachInterface(null, "fake");
-            serviceManagerObject = tempInterfaceMethod.invoke(null, tmpBinder);
-            IBinder retbinder = (IBinder) getService.invoke(serviceManagerObject, "phone");
-            Method serviceMethod = telephonyStubClass.getMethod("asInterface", IBinder.class);
-            telephonyObject = serviceMethod.invoke(null, retbinder);
-            telephonyEndCall = telephonyClass.getMethod("endCall");
-            telephonyEndCall.invoke(telephonyObject);
+            if (Build.VERSION.SDK_INT >= 28) {
+                TelecomManager tm = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+
+                if (tm != null) {
+                    boolean success = tm.endCall();
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

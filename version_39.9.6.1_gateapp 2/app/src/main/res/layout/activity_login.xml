@@ -188,7 +188,7 @@
                         </com.hbb20.CountryCodePicker>
                     </LinearLayout>
 
-                    <TextView
+                    <EditText
                             android:id="@+id/Ed_phoneNum"
                             style="@style/EditTextCustomHolo"
                             android:layout_width="0dp"
@@ -200,7 +200,6 @@
                             android:hint="@string/textphonenumber"
                             android:inputType="phone"
                             android:maxLength="12"
-                            android:editable="false"
                             android:paddingLeft="2dp"
                             android:paddingRight="2dp"
                             android:singleLine="true"

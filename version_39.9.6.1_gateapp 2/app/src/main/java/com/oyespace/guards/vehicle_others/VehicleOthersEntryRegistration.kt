@@ -1,36 +1,31 @@
 package com.oyespace.guards.vehicle_others
 
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.ImageBigView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.camtest.ImageAdapter
-import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.network.*
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
+import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.NumberUtils.toInteger
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
 import com.squareup.picasso.Picasso
@@ -43,7 +38,9 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import timber.log.Timber
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
@@ -87,12 +84,20 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         for (i in 0 until unitname_dataList.size) {
 
                             showProgress()
-                            visitorLog(unitname_dataList.get(i).replace(" ",""),unitid_dataList.get(i).replace(" ","").toInt(),unitAccountId_dataList.get(i).replace(" ",""));
+                            visitorLog(
+                                unitname_dataList.get(i).replace(" ", ""),
+                                unitid_dataList.get(i).replace(" ", ""),
+                                unitAccountId_dataList.get(i).replace(" ", "")
+                            );
                         }
                     }
                 }else{
                     showProgress()
-                    visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(UNIT_ACCOUNT_ID));                }
+                    visitorLog(
+                        intent.getStringExtra(UNITNAME),
+                        intent.getStringExtra(UNITID),
+                        intent.getStringExtra(UNIT_ACCOUNT_ID)
+                    ); }
 
                // visitorLog()
             }
@@ -250,14 +255,14 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             }
             println(list[i])
         }
-        val mLayoutManager = GridLayoutManager(applicationContext, 2)
+        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
         imageAdapter = VehicleOthersImageAdapter(list, this@VehicleOthersEntryRegistration)
         rv_image.adapter = imageAdapter
 
     }
 
-    private fun visitorLog(UNUniName: String,UNUnitID: Int,Unit_ACCOUNT_ID:String) {
+    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
    //      imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
         imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
@@ -291,6 +296,13 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                     if (globalApiObject.success == true) {
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
 
+                        for (i in list.indices) {
+                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
+                            val dir = Environment.getExternalStorageDirectory().getPath()
+                            val file = File(dir, fileName)
+                            file.delete()
+                        }
+
                        try {
                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                        }catch (e:NullPointerException){
@@ -308,6 +320,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -345,9 +358,9 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
     private fun singUp(name :String, isdCode: String, mobNum : String) {
 
         val req = SignUpReq("", "", "", "", "",
-            name ,"+"+isdCode, "","","","",
+            name, isdCode, "", "", "", "",
             "",mobNum,"","", "","",imgName.toString())
-        Log.d("singUp","StaffEntry "+req.toString())
+        Log.d("singUp", "StaffEntry " + req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
             .subscribeOn(Schedulers.io())
@@ -417,23 +430,23 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             Log.d("uploadImage ererer bf", ex.toString())
         }
 
-        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-
-        val imageFileOS: OutputStream?
-        try {
-            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-            imageFileOS!!.write(byteArrayProfile!!)
-            imageFileOS.flush()
-            imageFileOS.close()
-
-            Log.d("uploadImage Path bf", uriTarget.toString())
-        } catch (e: FileNotFoundException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        } catch (e: IOException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        }
+//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
+//
+//        val imageFileOS: OutputStream?
+//        try {
+//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
+//            imageFileOS!!.write(byteArrayProfile!!)
+//            imageFileOS.flush()
+//            imageFileOS.close()
+//
+//            Log.d("uploadImage Path bf", uriTarget.toString())
+//        } catch (e: FileNotFoundException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        } catch (e: IOException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        }
 
         val file = File(imageFile.toString())
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
@@ -504,24 +517,24 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             byteArrayProfile = null
             Log.d("uploadImage ererer bf", ex.toString())
         }
-
-        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-
-        val imageFileOS: OutputStream?
-        try {
-            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-            imageFileOS!!.write(byteArrayProfile!!)
-            imageFileOS.flush()
-            imageFileOS.close()
-
-            Log.d("uploadImage Path bf", uriTarget.toString())
-        } catch (e: FileNotFoundException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        } catch (e: IOException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        }
+//
+//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
+//
+//        val imageFileOS: OutputStream?
+//        try {
+//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
+//            imageFileOS!!.write(byteArrayProfile!!)
+//            imageFileOS.flush()
+//            imageFileOS.close()
+//
+//            Log.d("uploadImage Path bf", uriTarget.toString())
+//        } catch (e: FileNotFoundException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        } catch (e: IOException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        }
 
         val file = File(imageFile.toString())
         val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
@@ -588,8 +601,17 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
 
-                        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
-                        startActivity(intent)
+
+                        val dir =
+                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        if (dir.isDirectory) {
+                            val children = dir.list()
+                            for (i in children!!.indices) {
+                                File(dir, children[i]).delete()
+                            }
+                        }
+//                        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
+//                        startActivity(intent)
                         finish()
                         dismissProgress()
                     } else {

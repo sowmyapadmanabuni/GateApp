@@ -1,13 +1,13 @@
 package com.oyespace.guards.camtest;
 
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
 import com.oyespace.guards.R;
-import java.util.ArrayList;
 
 public class ViewFullImageActivity extends AppCompatActivity {
 

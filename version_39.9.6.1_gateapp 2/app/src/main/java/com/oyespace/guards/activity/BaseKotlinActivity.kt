@@ -3,14 +3,17 @@ package com.oyespace.guards.activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.speech.RecognizerIntent
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.MenuItem
+import android.view.View
+import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.airbnb.lottie.LottieAnimationView
 import com.oyespace.guards.R
 import com.oyespace.guards.listeners.PermissionCallback
 import io.reactivex.disposables.CompositeDisposable
@@ -31,6 +34,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
     private var callback: PermissionCallback? = null
     private var requestcode: Int = 0
     lateinit var realm: Realm
+    var alertDialog: AlertDialog? = null;
 
     companion object {
         val TAG: String = javaClass.name
@@ -47,7 +51,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
             realm.close();
         }
     }
-
 
     protected val compositeDisposable = CompositeDisposable()
 
@@ -100,15 +103,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
         progressDialog?.isIndeterminate = true
         progressDialog?.setCancelable(false)
         progressDialog?.setMessage("Refreshing")
-        progressDialog?.setCanceledOnTouchOutside(false)
-        progressDialog?.show()
-    }
-
-    fun showProgressrefreshWithText(text:String) {
-        progressDialog = ProgressDialog(this)
-        progressDialog?.isIndeterminate = true
-        progressDialog?.setCancelable(false)
-        progressDialog?.setMessage(text)
         progressDialog?.setCanceledOnTouchOutside(false)
         progressDialog?.show()
     }
@@ -236,6 +230,42 @@ open class BaseKotlinActivity : AppCompatActivity(){
             //    Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
     }
+
+
+    fun showAnimatedDialog(desc: String, json: Int, isCancellable: Boolean, btnText: String) {
+        val dialogBuilder = AlertDialog.Builder(this)
+
+        val inflater = this.layoutInflater
+        val dialogView = inflater.inflate(R.layout.animated_dialog, null)
+        val text: TextView = dialogView.findViewById(R.id.animdlg_text)
+        val animView: LottieAnimationView = dialogView.findViewById(R.id.animdlg_lottie)
+        val btn: Button = dialogView.findViewById(R.id.animdlg_btn);
+        if (!btnText.equals("") && btnText != null) {
+
+            btn.visibility = View.VISIBLE
+            btn.text = btnText
+            btn.setOnClickListener {
+                alertDialog?.dismiss()
+            }
+        } else {
+            btn.visibility = View.GONE
+        }
+        animView.setAnimation(json)
+        animView.playAnimation()
+        text.setText(desc)
+        dialogBuilder.setView(dialogView)
+
+        alertDialog = dialogBuilder.create()
+        alertDialog?.setCancelable(isCancellable)
+        alertDialog?.show()
+    }
+
+    fun hideAnimatedDialog() {
+        if (alertDialog != null) {
+            alertDialog?.dismiss()
+        }
+    }
+
 
 
 }

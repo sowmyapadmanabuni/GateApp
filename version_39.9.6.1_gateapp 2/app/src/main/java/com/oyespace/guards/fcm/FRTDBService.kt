@@ -4,20 +4,14 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.database.*
-import com.oyespace.guards.activity.UnitListActivity
 import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.PassesSOSGuards
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.models.GetGuardsListResponse
-import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.models.GuardsList
-import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.UnitList
-import com.oyespace.guards.pojo.UnitPojo
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
@@ -26,11 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import io.realm.RealmList
-import io.realm.kotlin.createObject
-import io.realm.kotlin.delete
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.activity_unit_list.*
-import java.util.ArrayList
 
 class FRTDBService: Service() {
 
@@ -219,6 +209,7 @@ class FRTDBService: Service() {
 
 
                         if(totalSOS > 0 && !isSOSActive){
+                            Log.e("STARTING", "SOS>STSRTSTS");
                             val i_vehicle = Intent(applicationContext, SosGateAppActivity::class.java)
                             i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i_vehicle)

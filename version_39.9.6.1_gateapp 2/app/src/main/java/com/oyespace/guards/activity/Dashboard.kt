@@ -7,6 +7,7 @@ import android.app.Dialog
 import android.app.PendingIntent
 import android.content.*
 import android.content.res.Configuration
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.hardware.usb.UsbDevice
@@ -16,105 +17,104 @@ import android.media.MediaRecorder
 import android.net.Uri
 import android.os.*
 import android.provider.Settings
+import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.telephony.TelephonyManager
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.gson.Gson
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.malinskiy.superrecyclerview.SuperRecyclerView
 import com.oyespace.guards.activity.*
 import com.oyespace.guards.adapter.VistorEntryListAdapter
 import com.oyespace.guards.adapter.VistorListAdapter
 import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
-import com.oyespace.guards.com.oyespace.guards.utils.ConnectionDetector
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.network.*
-import com.oyespace.guards.ocr.*
+import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pertroling.PatrollingActivitynew
+import com.oyespace.guards.pertroling.PatrollingLocActivity
+import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.request.VisitorExitReqJv
-import com.oyespace.guards.responce.*
+import com.oyespace.guards.responce.RequestDTO
+import com.oyespace.guards.responce.SubscriptionResponse
+import com.oyespace.guards.responce.VisitorLogCreateResp
+import com.oyespace.guards.responce.VisitorLogExitResp
+import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.DateTimeUtils.*
+import com.oyespace.guards.utils.Utils.showToast
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
-import com.oyespace.guards.constants.PrefKeys.BG_NOTIFICATION_ON
-import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.constants.PrefKeys.PATROLLING_ID
-import com.oyespace.guards.models.*
-import com.oyespace.guards.pojo.getDeviceList
-import com.oyespace.guards.pojo.getVisitorDataByWorker
-import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
-import com.oyespace.guards.utils.Utils.showToast
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import io.realm.kotlin.createObject
-import kotlinx.android.synthetic.main.activity_final_registration.*
-import kotlinx.android.synthetic.main.activity_walkie_talkie.*
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import java.lang.NullPointerException
-import kotlin.collections.ArrayList
-import kotlin.concurrent.fixedRateTimer
-
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
+
+    private val REQUEST_CODE_SPEECH_INPUT = 100
+    var unAccountID: String? = null
+    private lateinit var tv: EditText
+    var value: String? = ""
+    var handler: Handler? = null
+    var runnable: Runnable? = null
+    private var arrayList: ArrayList<VisitorLogExitResp.Data.VisitorLog>? = null
     lateinit var cd: ConnectionDetector
     var timer:Timer?=null
     private val mInterval = 96000 // 5 seconds by default, can be changed later
     private var mHandlerr: Handler? = null
     var counter:Int?=0
+    //  internal var database: DBHelper?=null
 
     var audioclip: String? = null
     lateinit var mp:  MediaPlayer
 
-    internal var newAl: ArrayList<VisitorLog>? = ArrayList()
-     var mHandler: Handler?=null
+    internal var newAl: ArrayList<VisitorEntryLog>? = ArrayList()
+    var mHandler: Handler? = null
     lateinit var btn_in:Button
     lateinit var btn_out:Button
+    lateinit var btn_mic: Button
 
     private var audiofile: File? = null
     var vistorEntryListAdapter: VistorEntryListAdapter?=null
-    // var spinner: Spinner?=null
+    var vistorListAdapter: VistorListAdapter? = null
     private var mFileName = ""
     private var myAudioRecorder: MediaRecorder? = null
-    // var record: ImageView?=null
+
     var iv_settings: ImageView?=null
     lateinit var tv_nodata: TextView
     // LinearLayout lyt_settings;
     var clickable = 0
     var clickable1 = 0
+    var re_resident: RelativeLayout? = null
     var re_vehicle: RelativeLayout?=null
     var re_staff: RelativeLayout?=null
     var re_guest: RelativeLayout?=null
     var re_delivery: RelativeLayout?=null
     var lyt_settings: RelativeLayout?=null
     var champApiInterface: ChampApiInterface?=null
-    var rv_dashboard: RecyclerView?=null
+    var rv_dashboard: androidx.recyclerview.widget.RecyclerView? = null
     var tv_subscriptiondate: TextView?=null
     var tv_version: TextView?=null
     var tv_languagesettings: TextView?=null
@@ -136,12 +136,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     internal var tempFP1: ByteArray?=null
     internal var tempFP2: ByteArray?=null
     internal var tempFP3: ByteArray?=null
-    internal var fingerPrints:List<FingerPrint> = arrayListOf(FingerPrint())
+    internal var curData: Cursor? = null
     internal var t1: TextToSpeech?=null
     internal var memName = ""
     internal var nnnn = 0
     internal var autoooooo = 0
-    private var swipeContainer: SwipeRefreshLayout? = null
+    private var swipeContainer: androidx.swiperefreshlayout.widget.SwipeRefreshLayout? = null
     ///Start Added by Rajesh
     private val imageUri: Uri? = null
     private var mPermissionIntent: PendingIntent? = null
@@ -157,10 +157,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var filter: IntentFilter? = null //2014-04-11
     private var autoOn: SGAutoOnEventNotifier? = null
 
-
-    //    private FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-    //    private DatabaseReference mRootReference =firebaseDatabase.getReference();
-    //    private DatabaseReference mChildReference;
     private var mLed: Boolean = false
     private var mAutoOnEnabled = true
     private var bSecuGenDeviceOpened: Boolean = false
@@ -202,15 +198,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 val message = intent.getStringExtra("message")
 
                 if (message.equals(VISITOR_ENTRY_SYNC, ignoreCase = true)) {
-                    Log.e("VISITOR_ENTRY_SYNC","VISITOR_ENTRY_SYNC");
-                    var newAl: ArrayList<VisitorLog>? = ArrayList()
-                    if (DataBaseHelper.getVisitorEnteredLog() != null) {
-                        newAl = DataBaseHelper.getVisitorEnteredLog()
+                    var newAl: ArrayList<VisitorEntryLog>? = ArrayList()
+                    if (LocalDb.getVisitorEnteredLog() != null) {
+                        newAl = LocalDb.getVisitorEnteredLog()
                         // LocalDb.saveAllVisitorLog(newAl);
 
-                        if((newAl)!!.isEmpty()){
+                        if ((newAl as ArrayList<VisitorEntryLog>?)!!.isEmpty()) {
                             rv_dashboard!!.setVisibility(View.GONE)
                             tv_nodata!!.setVisibility(View.VISIBLE)
+                            dismissProgressrefresh()
                         }else {
                             rv_dashboard!!.setVisibility(View.VISIBLE)
                             tv_nodata!!.setVisibility(View.GONE)
@@ -276,47 +272,73 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     internal var rg_language: RadioGroup?=null
     internal var dialogs: Dialog?=null
 
-    //public void refreshAdapter(){
-    //    final Handler handler = new Handler();
-    //    handler.postDelayed( new Runnable() {
-    //
-    //        @Override
-    //        public void run() {
-    //            refreshAdapter();
-    //             vistorEntryListAdapter.notifyDataSetChanged();
-    //            //handler.postDelayed( this, 60 * 1000 );
-    //        }
-    //    }, 30 * 1000 );
-    //}
 
-//    private val m_Runnable = object : Runnable {
-//        override fun run() {
-//            var i:Intent  = getBaseContext().getPackageManager()
-//                         .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(i);
-//            this@Dashboard.mHandler?.postDelayed(this, 20000)
-//        }
-//
-//    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
 
-
         cd = ConnectionDetector()
         cd.isConnectingToInternet(this@Dashboard)
         init()
+        Prefs.putString("BUTTON", "IN")
+        tv.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
 
-//        wvvalue=Prefs.getString(WALKIETALKIE,null)
-//        if (wvvalue != null) {
-//            Log.v("wvvalue", wvvalue)
-//
-//        }
 
+                if (Prefs.getString("BUTTON", null).contains("IN")) {
+
+                    if (vistorEntryListAdapter != null) {
+                        vistorEntryListAdapter!!.getFilter().filter(charSequence)
+
+                    }
+                } else {
+                    if (vistorListAdapter != null) {
+                        vistorListAdapter!!.getFilter().filter(charSequence)
+
+                    }
+                }
+
+
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                try {
+                    if (Prefs.getString("BUTTON", null).contains("IN")) {
+                        if (vistorEntryListAdapter != null) {
+                            vistorEntryListAdapter!!.getFilter().filter(charSequence)
+
+                        }
+                    } else {
+                        if (vistorListAdapter != null) {
+                            vistorListAdapter!!.getFilter().filter(charSequence)
+
+                        }
+                    }
+                } catch (e: KotlinNullPointerException) {
+
+                }
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+                try {
+                    if (Prefs.getString("BUTTON", null).contains("IN")) {
+                        if (vistorEntryListAdapter != null) {
+                            vistorEntryListAdapter!!.getFilter().filter(editable)
+
+                        }
+                    } else {
+                        if (vistorListAdapter != null) {
+                            vistorListAdapter!!.getFilter().filter(editable)
+
+                        }
+                    }
+                } catch (e: KotlinNullPointerException) {
+
+                }
+            }
+        });
         language = Prefs.getString(LANGUAGE, null)
         if (language != null) {
             Log.v("language", language)
@@ -362,31 +384,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             .onSameThread()
             .check()
 
-        //        prefManager=new PrefManager(getApplicationContext());
-        //        mChildReference = mRootReference.child("message"+prefManager.getAssociationId());
-        //
-        //        mChildReference.addValueEventListener(new ValueEventListener() {
-        //            @Override
-        //            public void onDataChange(DataSnapshot dataSnapshot) {
-        //                if(dataSnapshot.getValue(String.class)==null)
-        //                {
-        //                    prefManager.setWelcomeMessage("Welcome");
-        //                }else {
-        //                    prefManager.setWelcomeMessage(dataSnapshot.getValue(String.class));
-        //                    sendFCM_welcomeMsg(prefManager.getWelcomeMessage());
-        //                }
-        //                Log.d("Message","A"+prefManager.getWelcomeMessage());
-        //            }
-        //
-        //            @Override
-        //            public void onCancelled(DatabaseError databaseError) {
-        //
-        //            }
-        //        });
 
-        //        setLocale(prefManager.getLanguage());
-        //Todo setContentView here for Language
-        //        language=prefManager.getLanguage();
 
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -397,21 +395,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         sendAnalyticsData("SDDashB_Oncreate", "Start", Date().toString() + "")
 
-        //        imageView= (ImageView) findViewById(leftpalm.id.imageViewV);
 
-        //        if(prefManager.getMemRoleID()==ROLE_GUARD) {
-        //            FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + prefManager.getAssociationId());
-        //            FirebaseMessaging.getInstance().subscribeToTopic("Guard" + prefManager.getGuardID());
-        //        }
-        //        if(prefManager.getMemRoleID()==ROLE_SUPERVISOR ){
-        //            FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + prefManager.getAssociationId());
-        //            FirebaseMessaging.getInstance().subscribeToTopic("AllSupervisor" + prefManager.getAssociationId());
-        //            FirebaseMessaging.getInstance().subscribeToTopic("Guard" + prefManager.getGuardID());
-        //        }
-
-        //        startService(new Intent(DashBoard.this, SGTrackingService.class));
-
-
+        curData = dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID, 0))
+        if (curData != null) {
+            curData!!.moveToFirst()
+        }
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
             if (status != TextToSpeech.ERROR)
             // t1?.language = Locale.getDefault()
@@ -504,74 +492,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             txt_device_name?.text = " "
 
         }
-//        if(intent.getStringExtra("STAFF")!=null) {
-//            if (intent.getStringExtra("STAFF").equals("Available")) {
-//                downloadBiometricData_Loop()
-//            } else {
-//                Log.e("Value", "Not Available")
-//            }
-//        }
 
-
-    }
-
-    private fun sendFCM_welcomeMsg(welcomeMessage: String) {
-        //        FCMApiInterface apiService =
-        //                FCMApiClient.getClient().create(FCMApiInterface.class);
-        //
-        //        EntryPermissionPayload payloadData = new EntryPermissionPayload("getFirebaseWelcomeMsgReply",
-        //                welcomeMessage,1,
-        //                entry_type[3], GlobalVariables.getGlobal_mobilenumber(),prefManager.getAssociationId());
-        //        SendEntryPermissionRequest sendOTPRequest = new SendEntryPermissionRequest(payloadData, "/topics/Admin" +prefManager.getAssociationId());
-        //        Call<SendFCMResponse> call = apiService.sendEntryPermission(sendOTPRequest);
-        //
-        //        call.enqueue(new Callback<SendFCMResponse>() {
-        //            @Override
-        //            public void onResponse(Call<SendFCMResponse> call, Response<SendFCMResponse> response) {
-        //                Log.d("Dgddfdf", "fcm: " + response.body().getMessage_id());
-        //                if (response.body().getMessage_id() != null) {
-        //
-        //                } else {
-        //
-        //                }
-        //            }
-        //
-        //            @Override
-        //            public void onFailure(Call<SendFCMResponse> call, Throwable t) {
-        //                 Log error here since request failed
-        //                Log.d("TAG", t.toString());
-        //                sendExceptions("SGDash","FCM fail 4522"+t.toString());
-        //            }
-        //        });
     }
 
     override fun onResume() {
-
-
-
-        timer = Timer()
-        Log.i("Main", "Invoking logout timer")
-        val logoutTimeTask = LogOutTimerTask()
-        timer!!.schedule(logoutTimeTask, 300000)
-
-        if (timer != null) {
-            timer!!.cancel();
-            Log.i("Main", "cancel timer");
-            timer = null;
-        }
 
         try {
 
             downloadBiometricData_Loop()
         }catch (e:NullPointerException){
 
-        }
-
-        try {
-
-            //  Dashboard..notifyDatasetChanged()
-        } catch (e: Throwable) {
-            //error occured. Probably null
         }
 
 
@@ -584,16 +514,17 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         updateHandler.postDelayed(runnable, 1000)
         //  stopRepeatingTask()
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("SYNC"))//constant
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .registerReceiver(receiver, IntentFilter("SYNC"))//constant
         super.onResume()
 
 
-        if (DataBaseHelper.getVisitorEnteredLog() != null) {
+        if (LocalDb.getVisitorEnteredLog() != null) {
             dismissProgressrefresh()
-            newAl = DataBaseHelper.getVisitorEnteredLog()
+            newAl = LocalDb.getVisitorEnteredLog()
             // LocalDb.saveAllVisitorLog(newAl);
 
-            if((newAl)!!.isEmpty()){
+            if ((newAl as ArrayList<VisitorEntryLog>?)!!.isEmpty()) {
                 rv_dashboard!!.setVisibility(View.GONE)
                 tv_nodata!!.setVisibility(View.VISIBLE)
                 dismissProgressrefresh()
@@ -615,17 +546,19 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 btn_out.setBackgroundColor(resources.getColor(R.color.grey))
             }
+        } else {
+            dismissProgressrefresh()
         }
-        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
-        sendBroadcast(intentAction1)
+//        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+//        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
+//        sendBroadcast(intentAction1)
         //Toast.makeText(DashBoard.this,"NO data",Toast.LENGTH_LONG).show();
         //}
 
         if (isTimeAutomatic(application)) {
 
         } else {
-            val alertDialogBuilder = android.support.v7.app.AlertDialog.Builder(this@Dashboard)
+            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this@Dashboard)
             alertDialogBuilder.setTitle("Time settings")
 
             // Setting Dialog Message
@@ -649,7 +582,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         if (isTimeZoneAutomatic(application)) {
 
         } else {
-            val alertDialogBuilder = android.support.v7.app.AlertDialog.Builder(this@Dashboard)
+            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this@Dashboard)
             alertDialogBuilder.setTitle("Time settings")
 
             // Setting Dialog Message
@@ -669,12 +602,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         }
 
-        //        Intent intentAction3 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //        intentAction3.putExtra(action, UPLOAD_IMAGES);
-        //        sendBroadcast(intentAction3);
 
-        //        Log.d("Count_image","ll"+idb.pending_getImages_toUpload());
-        //        sendAnalyticsData("SDDashB_OnResume ", "Image Count "+dbh.getAssociationName(prefManager.getAssociationId()), "Count: "+idb.pending_getImages_toUpload());
 
         bSecuGenDeviceOpened = false
         usbPermissionRequested = false
@@ -684,14 +612,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         autoOn = SGAutoOnEventNotifier(sgfplib, this)
         nCaptureModeN = 0
 
-        //        prefManager.setOnForeground(true);
 
-        //        Log.d("AppVersionValidity"," onresume "+prefManager.getAppVersionValidity()+" ");
-
-        //        Intent intentAction = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //        intentAction.putExtra(action, DAILY_HELP);
-        //         sendBroadcast(intentAction);
-        //        Log.d("stfdhi ",prefManager.getGuardStartTime().equalsIgnoreCase("0001-01-01T00:00:00")+" ");
 
         try {
             var error = sgfplib!!.Init(SGFDxDeviceName.SG_DEV_AUTO)
@@ -769,62 +690,14 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
 
 
-//        handler =  Handler();
-//
-//
-//        r = Runnable() {
-//            run() {
-//                Toast.makeText(
-//                    this@Dashboard, "user Is Idle from last 5 minutes",
-//                    Toast.LENGTH_SHORT
-//                ).show();
-//            }
-//        }
 
-//        r =  Runnable() {
-//
-//            @Override
-//           fun run() {
-//                // TODO Auto-generated method stub
-//                Toast.makeText(this@Dashboard, "user Is Idle from last 5 minutes",
-//                    Toast.LENGTH_SHORT).show();
-//            }
-//        };
-//        startHandler();
 
 
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        //  dbh?.residentsLogVehicles
-        //            prefManager.setOnForeground(false);
-        //            startService(new Intent(DashBoard.this, ByteDownloaderService.class));
-        //            Intent intentAction1 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //            intentAction1.putExtra(action, NONREGULAR);
-        //            sendBroadcast(intentAction1);
-        //            Intent intentAction3 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //            intentAction3.putExtra(action, UPLOAD_IMAGES);
-        //            sendBroadcast(intentAction3);
-        //            Intent intentAction22 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //            intentAction22.putExtra(action, DAILY_HELP);
-        //            sendBroadcast(intentAction22);
-        //            Intent intentAction23 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //            intentAction23.putExtra(action, PATROLLING);
-        //            sendBroadcast(intentAction23);
-        //            Intent intentAction24 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //            intentAction24.putExtra(action, "SYNC_ASSOCIATIONS");
-        //            sendBroadcast(intentAction24);
-        //            Cursor cur=dbh.getMemberByAssnID_date(prefManager.getAssociationId(),IConstant.dateFormat_YMD.format(new Date()));
-        //            Cursor cur1=dbh.getMemberByAssnID(prefManager.getAssociationId());
 
-        //            if(cur.getCount()>0 || cur1.getCount()<1) {
-        //                Intent intentAction2 = new Intent(getApplicationContext(), DownloadResDataReceiver.class);
-        //                intentAction2.putExtra(action, OYE_MEMBER);
-        //                sendBroadcast(intentAction2);
-        //            }
-
-        //            startService(new Intent(DashBoard.this, ImageUploadService.class));
 
     }
 
@@ -841,28 +714,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 val loginDetailsResponce = data as VisitorLogCreateResp
                 if (loginDetailsResponce != null) {
 
-                    Log.e(
+                    Log.d(
                         "str3",
-                        "str3: " +responce
+                        "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
                     )
-                    val loginDetailsResponceGson = Gson().fromJson(responce, GetVisitorEntryResponse::class.java)
-
                     if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
                         //   showToast(this, " Saved");
-                        Log.e(
-                            "str3",
-                            "str3: " +loginDetailsResponceGson.data.visitorLog.vlVisLgID
-                        )
-                        //val loginDetailsResponce = Gson().fromJson(responce, CaptureFPResponse::class.java)
-//                        val pkeyString = ""+LocalDb.getAssociation()!!.asAssnID+""+loginDetailsResponceGson.data.visitorLog.+""+unitId
-//                        val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", vlVisLgID).findFirst()
-//                        if (!realm.isInTransaction) {
-//                            realm.beginTransaction()
-//                        }
-//                        visitor!!.deleteFromRealm()
-//                        realm.commitTransaction()
-
-
                         visitorEntryLog(loginDetailsResponce.data.visitorLog.vlVisLgID)
 
 
@@ -931,84 +788,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
 
 
-//        if (urlId == URLData.URL_VISITOR_LOG.urlId) {
-//            val loginDetailsResponce = data as VisitorLogCreateResp
-//            if (loginDetailsResponce != null) {
-//                Log.d(
-//                    "str3",
-//                    "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
-//                )
-//                if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
-//                    //                    showToast(this, " Saved");
-//                    visitorEntryLog(loginDetailsResponce.data.visitorLog.vlVisLgID)
-//
-//                } else {
-//                    showToast(this, "Visitor Data not saved ")
-//                }
-//
-//            } else {
-//                showToast(this, "Something went wrong . please try again ")
-//            }
-//
-//        }
-//        else
-//            if (urlId == URLData.URL_VISITOR_MAKE_ENTRY.urlId) {
-//
-//            val loginDetailsResponce = data as VisitorLogCreateResp
-//            if (loginDetailsResponce != null) {
-//                Log.d(
-//                    "str3",
-//                    "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
-//                )
-//                if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
-//                    showToast(this, " Welcome")
-//
-//                    val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-//                    intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
-//                    sendBroadcast(intentAction1)
-//
-//                } else {
-//                    showToast(this, "Visitor Details not saved ")
-//                }
-//
-//            } else {
-//
-//
-//                showToast(this, "Something went wrong . please try again ")
-//            }
-//        }
-//        else if (urlId == URLData.URL_VISITOR_MAKE_EXIT.urlId) {
-//
-//            val loginDetailsResponce = data as VisitorLogCreateResp
-//            if (loginDetailsResponce != null) {
-//
-//                Log.d(
-//                    "str3",
-//                    "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success.toString()
-//                )
-//                if (loginDetailsResponce.success.equals("true", ignoreCase = true)) {
-//                    showToast(this, " Thank You")
-//                    // rv_dashboard.setVisibility(View.VISIBLE);
-//                    // tv_nodata.setVisibility(View.GONE);
-//                    val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-//                    intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
-//                    sendBroadcast(intentAction1)
-//
-//                } else {
-//                    showToast(this, "Exit Details not saved ")
-//                }
-//
-//            } else {
-//                showToast(this, "Something went wrong . please try again ")
-//
-//
-//            }
-//
-//        }
 
-        //  showToast(this, urlId+" id "+position+" "+memId+" "+MemberType+" ");
-
-        //  finish();
     }
 
     private fun visitorEntryLog(vlVisLgID: Int) {
@@ -1019,7 +799,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         loginReq.VLVisLgID = vlVisLgID
         loginReq.VLEntryT = getCurrentTimeLocal()
-        loginReq.VLEntyWID = DataBaseHelper.getStaffs()!![0].wkWorkID.toInt()
+        loginReq.VLEntyWID = LocalDb.getStaffList()!![0].wkWorkID.toInt()
+
+        Toast.makeText(
+            this@Dashboard,
+            LocalDb.getStaffList()!![0].wkWorkID.toString(),
+            Toast.LENGTH_LONG
+        ).show()
 
         Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
         //  showToast(this, "StaffEntry $loginReq");
@@ -1029,231 +815,108 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     }
 
-    private fun reloadVisitorsList(){
-        newAl = DataBaseHelper.getVisitorEnteredLog();
-        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
-        rv_dashboard?.adapter = vistorEntryListAdapter
-        vistorEntryListAdapter!!.notifyDataSetChanged()
-    }
-
     private fun visitorLog(
         unitId: Int, personName: String, mobileNumb: String, desgn: String,
         workerType: String, staffID: Int, unitName: String,wkEntryImg:String
     ) {
 
-        try {
-            var memID = 410;
-            if (BASE_URL.contains("dev", true)) {
-                memID = 64;
-            } else if (BASE_URL.contains("uat", true)) {
-                memID = 64;
-            }
-//            Toast.makeText(this@Dashboard, "VISITORLOG ", Toast.LENGTH_LONG)
-//                .show()
-            //realm.executeTransaction {
+        val restClient = RestClient.getInstance()
 
-//            if(!realm.isInTransaction){
-//                realm.beginTransaction()
-//            }
-//            var pkeyString = ""+LocalDb.getAssociation()!!.asAssnID+""+staffID+""+unitId
-//            val pkey = pkeyString.toInt()
-//
-//            val lgId= pkey
-//            val vlog = realm.createObject<VisitorLog>(lgId);
-//            vlog.asAssnID  = LocalDb.getAssociation()!!.asAssnID
-//            vlog.mEMemID = memID
-//            vlog.reRgVisID = staffID
-//            vlog.uNUnitID = unitId
-//            vlog.vlfName = personName
-//            vlog.vlMobile = mobileNumb
-//            vlog.vlComName = desgn
-//            vlog.vlVisType = workerType
-//            vlog.unUniName = unitName
-//            vlog.vlVisCnt = 1
-//            vlog.vlEntryT = getCurrentTimeLocal()
-//            vlog.vlExitT = "0001-01-01T00:00:00"
-//            vlog.vlEntryImg = wkEntryImg
-//            realm.commitTransaction()
-//            //}
-//            reloadVisitorsList();
-
-            t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
-            Prefs.putString(BIOMETRICPERSONNAME, personName)
+        val loginReq = RequestDTO()
 
 
-            val restClient = RestClient.getInstance()
-
-            val loginReq = RequestDTO()
-
-//        var memID = 64
-//        if (!BASE_URL.contains("dev")) {
-//            memID = 410
-//        }
-
-
-
-            loginReq.aSAssnID = LocalDb.getAssociation()!!.asAssnID
-            loginReq.mEMemID = memID
-            loginReq.rERgVisID = staffID
-            loginReq.uNUnitID = unitId
-            loginReq.vLFName = personName
-            loginReq.vLMobile = mobileNumb
-            loginReq.vLComName = desgn
-            loginReq.vLVisType = workerType
-            loginReq.uNUniName = unitName
-            loginReq.vLVisCnt = 1
-            loginReq.VLEntryImg = wkEntryImg
-
-
-
-            //val workerCount = realm.where(VisitorLog::class.java).findAll()
-
-//        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
-//            getCurrentTimeLocal(),"")
-//getCurrentTimeLocal()
-            Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
-            //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
-
-            restClient.addHeader(OYE247KEY, OYE247TOKEN)
-            restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_LOG)
-
-
-
-//            Toast.makeText(this@Dashboard,counter.toString(),Toast.LENGTH_LONG).show()
-//            val dialogBuilder = AlertDialog.Builder(this@Dashboard)
-//
-//            // set message of alert dialog
-//            dialogBuilder.setMessage("")
-//                // if the dialog is cancelable
-//                .setCancelable(false)
-//                // positive button text and action
-//                .setPositiveButton("Proceed", DialogInterface.OnClickListener {
-//                        dialog, id ->
-//                    counter=0
-//
-//
-//                })
-//                // negative button text and action
-//                .setNegativeButton("Cancel", DialogInterface.OnClickListener {
-//                        dialog, id -> dialog.cancel()
-//                })
-//
-//            // create dialog box
-//            val alert = dialogBuilder.create()
-//            // set title for alert dialog box
-//            // show alert dialog
-//            alert.show()
-//
-//        }else{
-//            Toast.makeText(this@Dashboard,counter.toString(),Toast.LENGTH_LONG).show()
-//
-//        }
-
-//        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
-//            getCurrentTimeLocal(),"")
-
-
-            //@Todo
-
-//        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
-//            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
-//
-//
-//        if(id<=0)
-//        {
-//            //  Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-//        } else
-//        {
-//            // Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
-//
-//        }
-
-
-//        d.putExtra(BSR_Action, VisitorEntryFCM)
-//        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
-//        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-//        d.putExtra("name", intent.getStringExtra(PERSONNAME))
-//        d.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-//        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-//        d.putExtra("memType", "Owner")
-//        d.putExtra(UNITID,intent.getStringExtra(UNITID))
-//        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-
-
-            val d = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-            d.putExtra(BSR_Action, VisitorEntryFCM)
-            d.putExtra("msg", "$personName $desgn " + " is coming to your home")
-            d.putExtra("mobNum", mobileNumb)
-            d.putExtra("name", personName)
-            d.putExtra("nr_id", "0")
-            d.putExtra("unitname", unitName)
-            d.putExtra("memType", "Owner")
-            d.putExtra(UNITID, unitId.toString())
-            d.putExtra(COMPANY_NAME, "Staff")
-            d.putExtra(UNIT_ACCOUNT_ID, "0")
-            d.putExtra("VLVisLgID", 0)
-            sendBroadcast(d);
-
-
-//        val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-//        ddc.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
-////        ddc.putExtra("msg", "$personName $desgn is coming to your home")
-////        ddc.putExtra("mobNum", mobileNumb)
-////        ddc.putExtra("name", personName)
-////        ddc.putExtra("nr_id", "0")
-////        ddc.putExtra("unitname", unitName)
-////        ddc.putExtra("memType", "Owner")
-//        sendBroadcast(ddc)
-        }catch (e:Exception){
-            e.printStackTrace()
-//            Toast.makeText(this@Dashboard, "VISITORLOG ERROR "+e.toString(), Toast.LENGTH_LONG)
-//                .show()
+        var memID = 410;
+        if (BASE_URL.contains("dev", true)) {
+            memID = 64;
+        } else if (BASE_URL.contains("uat", true)) {
+            memID = 64;
         }
+        loginReq.aSAssnID = LocalDb.getAssociation()!!.asAssnID
+        loginReq.mEMemID = memID
+        loginReq.rERgVisID = staffID
+        loginReq.uNUnitID = unitId
+        loginReq.vLFName = personName
+        loginReq.vLMobile = mobileNumb
+        loginReq.vLComName = desgn
+        loginReq.vLVisType = workerType
+        loginReq.uNUniName = unitName
+        loginReq.vLVisCnt = 1
+        loginReq.VLEntryImg = wkEntryImg
+        loginReq.VLENGName = Prefs.getString(ConstantUtils.GATE_NO, "")
+
+
+        Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
+
+
+        restClient.addHeader(OYE247KEY, OYE247TOKEN)
+        restClient.post<Any>(
+            this,
+            loginReq,
+            VisitorLogCreateResp::class.java,
+            this,
+            URLData.URL_VISITOR_LOG
+        )
+        t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
+        Prefs.putString(BIOMETRICPERSONNAME, personName)
+
+
+        var id: Long = dbh!!.insertVisitorData(
+            unitName, LocalDb.getAssociation()!!.asAssnID.toString(), personName, memID, staffID,
+            unitId, mobileNumb, "Staff", workerType, 1, getCurrentTimeLocal(), ""
+        )
+
+
+        val d = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+        d.putExtra(BSR_Action, VisitorEntryFCM)
+        d.putExtra("msg", "$personName $desgn " + " is coming to your home")
+        d.putExtra("mobNum", mobileNumb)
+        d.putExtra("name", personName)
+        d.putExtra("nr_id", "0")
+        d.putExtra("unitname", unitName)
+        d.putExtra("memType", "Owner")
+        d.putExtra(UNITID, unitId.toString())
+        d.putExtra(COMPANY_NAME, "Staff")
+        d.putExtra(UNIT_ACCOUNT_ID, "0")
+        d.putExtra("VLVisLgID", 0)
+        sendBroadcast(d);
+
+
+
+
+
 
 
     }
 
     fun VisitorExit(vlVisLgID: Int,vlfName:String) {
+        val restClient = RestClient.getInstance()
 
-        try {
-           // val total = realm.where(VisitorLog::class.java).count();
-//            Toast.makeText(this@Dashboard, "VISITORLOG BEFORE "+total, Toast.LENGTH_LONG)
-//                .show()
-            val visitor = realm.where(VisitorLog::class.java).equalTo("vlVisLgID", vlVisLgID).findFirst()
-            if (!realm.isInTransaction) {
-                realm.beginTransaction()
-            }
-            visitor!!.deleteFromRealm()
-            realm.commitTransaction()
-           // val _total = realm.where(VisitorLog::class.java).count();
-//            Toast.makeText(this@Dashboard, "VISITORLOG AFTER "+_total+" "+total, Toast.LENGTH_LONG)
-//                .show()
-           // vistorEntryListAdapter!!.notifyDataSetChanged()
-            reloadVisitorsList();
+        val loginReq = VisitorExitReqJv()
 
-            val restClient = RestClient.getInstance()
+        loginReq.VLVisLgID = vlVisLgID
+        loginReq.VLExitT = getCurrentTimeLocal()
+        loginReq.VLExitWID = LocalDb.getStaffList()!![0].wkWorkID.toInt()
 
-            val loginReq = VisitorExitReqJv()
+        Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
+        //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
 
-            loginReq.VLVisLgID = vlVisLgID
-            loginReq.VLExitT = getCurrentTimeLocal()
-            loginReq.VLExitWID = DataBaseHelper.getStaffs()!![0].wkWorkID.toInt()
+        restClient.addHeader(OYE247KEY, OYE247TOKEN)
+        restClient.post<Any>(
+            this,
+            loginReq,
+            VisitorLogCreateResp::class.java,
+            this,
+            URLData.URL_VISITOR_MAKE_EXIT
+        )
+        // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
 
-            Log.d("CreateVisitorLogResp", "StaffEntry ${loginReq.VLVisLgID}")
-            //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
 
-            restClient.addHeader(OYE247KEY, OYE247TOKEN)
-            restClient.post<Any>(this, loginReq, VisitorLogCreateResp::class.java, this, URLData.URL_VISITOR_MAKE_EXIT)
-            // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
-
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
 
     }
 
     public override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(receiver)
         super.onPause()
 
 
@@ -1340,14 +1003,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         Log.d("abcdef", "7172")
         if (bSecuGenDeviceOpened == true) {
-
             //DEBUG Log.d(TAG, "Clicked MATCH");
             if (mVerifyImage != null)
                 mVerifyImage = null
             mVerifyImage = ByteArray(mImageWidth * mImageHeight)
 
             try {
-
                 var result = sgfplib!!.GetImage(mVerifyImage)
                 Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
 
@@ -1376,9 +1037,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                 //                AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 //                am.setStreamVolume(AudioManager.STREAM_SYSTEM, am.getStreamMaxVolume(AudioManager.STREAM_SYSTEM), 0);
-                showProgressrefresh()
+
                 val tempNumber = checkFingerPrint(mVerifyTemplate!!)
-                dismissProgressrefresh()
                 Log.d("Biometric 953", " ")
                 if (tempNumber == 0) {
                     t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
@@ -1386,68 +1046,68 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                 } else if (tempNumber > 0 && tempNumber < 4) {
 
-                    val enteredStaff = ArrayList<VisitorLog>()
-                    Log.d("Biometric 973", " " + (DataBaseHelper.getVisitorEnteredLog() != null))
+                    val enteredStaff = ArrayList<VisitorEntryLog>()
+                    Log.d("Biometric 973", " " + (LocalDb.getVisitorEnteredLog() != null))
                     //looping through existing elements
-                    if (DataBaseHelper.getVisitorEnteredLog() != null) {
-                        Log.e("getVisitorEnteredLog","NOTNULL")
-                        for (s in DataBaseHelper.getVisitorEnteredLog()!!) {
+                    if (LocalDb.getVisitorEnteredLog() != null) {
+                        for (s in LocalDb.getVisitorEnteredLog()!!) {
                             //if the existing elements contains the search input
-                            Log.e("s.reRgVisID",""+s.reRgVisID);
                             if (s.reRgVisID == Integer.parseInt(memName)) {
                                 //adding the element to filtered list
-                                Log.e("Adding",""+s.reRgVisID+" - "+memName);
                                 enteredStaff.add(s)
                             } else {
 
                             }
                         }
-                    }else{
-                        Log.e("getVisitorEnteredLog","ISNULL")
                     }
-                    Log.e("Biometric 983", " ")
+                    Log.d("Biometric 983", " ")
 
                     if (enteredStaff.size > 0) {
-                        Log.e("enteredStaff", ""+enteredStaff.size)
+
                         t1?.speak("Thank You " + enteredStaff[0].vlfName, TextToSpeech.QUEUE_FLUSH, null)
 
-                        VisitorExit(enteredStaff[0].vlVisLgID,enteredStaff[0].vlfName)
+                        Log.d("check 79 ", "bio")
+                        // VisitorExit(enteredStaff[0].vlVisLgID,enteredStaff[0].vlfName)
+
+                        makeExitCall(enteredStaff[0].vlVisLgID)
 
                     } else {
 
                         //                                t1.speak("Welcome " + dbh.getMemName(Integer.parseInt(memName)), TextToSpeech.QUEUE_FLUSH, null);
 
-
-                        val filterdNames = ArrayList<Worker>()
+                        LocalDb.getStaffList()
+                        val filterdNames = ArrayList<WorkerDetails>()
 
                         //looping through existing elements
-                        for (s in DataBaseHelper.getStaffs()!!) {
+                        for (s in LocalDb.getStaffList()!!) {
                             //if the existing elements contains the search input
-                            if (s.wkWorkID.toInt() == Integer.parseInt(memName)) {
+                            //   if (s.wkWorkID == Integer.parseInt(memName)) {
+                            if (s.wkWorkID == Integer.parseInt(memName)) {
                                 //adding the element to filtered list
                                 filterdNames.add(s)
                             }
                         }
-                        Log.e("filterdNames",""+filterdNames.size)
-                        Log.e("filterdNames_List",""+filterdNames)
+
                         if (filterdNames.size > 0) {
 
 
-                        //    val (_, _, unUnitID, unUniName, _, wkDesgn, _, _, wkMobile, wkWorkID, wkWrkType, _, _, wkfName, _, _, wklName) = filterdNames[0]
-                            var worker:Worker = filterdNames[0];
+                            val (_, _, unUnitID, unUniName, _, wkDesgn, wkEntryImg, _, wkMobile, wkWorkID, wkWrkType, _, _, wkfName, _, _, wklName) = filterdNames[0]
 
-                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),worker.wkWorkID.toInt(),worker.unUnitID.toInt(),"${worker.wkfName} ${worker.wklName}",worker.wkMobile, worker.wkDesgn, worker.wkWrkType,worker.wkWorkID.toInt(), worker.unUniName, worker.wkEntryImg)
-                           // t1?.speak("Welcome $wkfName$wklName", TextToSpeech.QUEUE_FLUSH, null)
-                          // showToast(this@Dashboard,"came")
-//                            visitorLog(
-//                                unUnitID, "$wkfName $wklName",
-//                                wkMobile, wkDesgn, wkWrkType,
-//                                wkWorkID, unUniName
-//                            )
+
+                            getVisitorByWorkerId(
+                                Prefs.getInt(ASSOCIATION_ID, 0),
+                                wkWorkID,
+                                unUnitID.toString(),
+                                "$wkfName",
+                                wkMobile,
+                                wkDesgn,
+                                wkWrkType,
+                                wkWorkID,
+                                unUniName,
+                                wkEntryImg
+                            )
+
 //
-//                         //   showToast(this@Dashboard,wkWorkID.toString())
-//                            Log.d("check 78 ", "bio")
-                          // t1?.speak("Welcome $wkfName", TextToSpeech.QUEUE_FLUSH, null)
                         } else {
                             Toast.makeText(applicationContext, "No Data", Toast.LENGTH_SHORT).show()
 
@@ -1458,18 +1118,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 } else {
                     //                                Toast.makeText(getApplicationContext(), "" + tempNumber, Toast.LENGTH_LONG).show();
                 }
-                Log.e("Biometric 1030", " ")
+                Log.d("Biometric 1030", " ")
 
                 mVerifyImage = null
                 fpInfo = null
                 matched = null
                 this.sgfplib!!.SetBrightness(100)
-               // dismissProgressrefresh()
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
-                Log.e("Biometric 1035", " $ex")
-                ex.printStackTrace()
-                //dismissProgressrefresh()
+                Log.d("Biometric 1035", " $ex")
                 // Toast.makeText(applicationContext, "Biometric not attached correctly ", Toast.LENGTH_LONG).show()
             }
 
@@ -1484,80 +1141,110 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     fun checkFingerPrint(template: ByteArray): Int {
-
         nnnn++
         val exists = false
         var number = 0
         var itera = 0
+        //        curData=dbh.getRegularVisitorsFinger(GMT_YMD_CurrentTime());
+        curData = dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID, 0))
+        if (curData != null) {
+            curData!!.moveToFirst()
+        }
+        if (curData != null) {
+            if (curData!!.moveToFirst()) {
+                existInDB1 = BooleanArray(1)
+                existInDB2 = BooleanArray(1)
+                existInDB3 = BooleanArray(1)
+                memName = ""
+                do {
+                    itera++
+                    tempFP1 = ByteArray(mImageWidth * mImageHeight)
+                    for (j in tempFP1!!.indices)
+                        tempFP1!![j] = 0
 
-        fingerPrints = dbh?.getRegularVisitorsFingerPrint(Prefs.getInt(ASSOCIATION_ID,0))!!.toList()
-        Log.e("CHECK_FNGR",""+fingerPrints)
-
-        if(fingerPrints != null && fingerPrints.size > 0) {
 
 
-            existInDB1 = BooleanArray(1)
-            existInDB2 = BooleanArray(1)
-            existInDB3 = BooleanArray(1)
-            memName = ""
+                    if (curData!!.getBlob(3) != null) {
 
-            fingerPrints.forEach {
-                itera++
-                tempFP1 = ByteArray(mImageWidth * mImageHeight)
-                Log.e("BYTEARRAY",""+(mImageWidth * mImageHeight));
-                for (j in tempFP1!!.indices)
-                    tempFP1!![j] = 0
-                if (it.FPImg1 != null) {
-                    tempFP1 = it.FPImg1
-                    Log.e("CHECKING_FINGER1",""+template+" with "+tempFP1);
-                    val res: Long
-                    res = sgfplib!!.MatchTemplate(template, tempFP1, SGFDxSecurityLevel.SL_HIGH, existInDB1)
-                    if (existInDB1[0]) {
-                        number++
-                        memName = it.userName
+
+                        Log.d(
+                            "Dgddfdf hhjhj : ",
+                            "ff in entrybywalk " + autoooooo + " " + nnnn + " " + curData!!.getString(
+                                1
+                            ) + " " + itera + " " + memName
+                        )
+                        tempFP1 = curData!!.getBlob(3)
+                        val res: Long
+                        res = sgfplib!!.MatchTemplate(
+                            template,
+                            tempFP1,
+                            SGFDxSecurityLevel.SL_HIGH,
+                            existInDB1
+                        )
+                        if (existInDB1[0]) {
+                            number++
+                            //  Log.d("Dgddfdf string hhjhj", "ff  entrybywalk "+curData.getString(3).toString()+" "+" ");
+                            //                            Toast.makeText(getApplicationContext(), " MATCHED!! " + curData.getString(1) + " " + curData.getString(2), Toast.LENGTH_SHORT).show();
+                            memName = curData!!.getString(1)
+                        }
+                        Log.d("data", curData!!.getString(0) + " ")
+                    } else if (curData!!.getBlob(4) != null) {
+
+                        tempFP2 = ByteArray(mImageWidth * mImageHeight)
+                        for (j in tempFP2!!.indices)
+                            tempFP2!![j] = 0
+
+                        tempFP2 = curData!!.getBlob(4)
+                        val res2: Long
+                        res2 = sgfplib!!.MatchTemplate(
+                            template,
+                            tempFP2,
+                            SGFDxSecurityLevel.SL_HIGH,
+                            existInDB2
+                        )
+                        if (existInDB2[0]) {
+                            number++
+
+                            //                            Toast.makeText(getApplicationContext(), " MATCHED!! " + curData.getString(1) + " " + curData.getString(2), Toast.LENGTH_SHORT).show();
+                            memName = curData!!.getString(1)
+                        }
+                        Log.d("data", curData!!.getString(0) + " ")
+                    } else if (curData!!.getBlob(5) != null) {
+
+                        tempFP3 = ByteArray(mImageWidth * mImageHeight)
+                        for (j in tempFP3!!.indices)
+                            tempFP3!![j] = 0
+                        tempFP3 = curData!!.getBlob(5)
+                        val res3: Long
+                        res3 = sgfplib!!.MatchTemplate(
+                            template,
+                            tempFP3,
+                            SGFDxSecurityLevel.SL_HIGH,
+                            existInDB3
+                        )
+                        if (existInDB3[0]) {
+                            number++
+
+                            //                            Toast.makeText(getApplicationContext(), " MATCHED!! " + curData.getString(1) + " " + curData.getString(2), Toast.LENGTH_SHORT).show();
+                            memName = curData!!.getString(1)
+                        }
                     }
-                }
-                if (it.FPImg2 != null) {
-                    tempFP2 = ByteArray(mImageWidth * mImageHeight)
-                    for (j in tempFP2!!.indices)
-                        tempFP2!![j] = 0
-
-                    tempFP2 = it.FPImg2
-                    val res2: Long
-                    res2 = sgfplib!!.MatchTemplate(template, tempFP2, SGFDxSecurityLevel.SL_HIGH, existInDB2)
-                    if (existInDB2[0]) {
-                        number++
-                        memName = it.userName
+                    if (number > 0) {
+                        return number
                     }
 
-                }
-                if (it.FPImg3 != null) {
-                    tempFP3 = ByteArray(mImageWidth * mImageHeight)
-                    for (j in tempFP3!!.indices)
-                        tempFP3!![j] = 0
-                    tempFP3 = it.FPImg3
-                    val res3: Long
-                    res3 = sgfplib!!.MatchTemplate(template, tempFP3, SGFDxSecurityLevel.SL_HIGH, existInDB3)
-                    if (existInDB3[0]) {
-                        number++
-                        memName = it.userName
-                    }
-                }
-
-                if (number > 0) {
-                    return number
-                }
+                } while (curData!!.moveToNext())
             }
         }
-        Log.e("EXIST??",""+number);
-        //dismissProgressrefresh()
-        return number;
+        return number
+
     }
 
     override fun onStart() {
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         super.onStart()
+
 
     }
 
@@ -1569,9 +1256,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     fun sendExceptions(id: String, execeptionString: String) {
 
+
     }
 
     fun sendAnalyticsData(_Activity: String, id: String, execeptionString: String) {
+
 
 
     }
@@ -1581,35 +1270,28 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         onTabClicked(v)
         when (v.id) {
-            R.id.iv_settings -> if (clickable == 0) {
+            R.id.iv_settings ->
+
+                if (clickable == 0) {
+                    tv.setText("")
                 lyt_settings?.visibility = View.VISIBLE
                 iv_settings?.setBackgroundResource(R.drawable.cancel)
                 clickable = 1
             } else if (clickable == 1) {
+                    tv.setText("")
                 lyt_settings?.visibility = View.GONE
                 iv_settings?.setBackgroundResource(R.drawable.settings)
                 clickable = 0
             }
             R.id.tv_patrolling -> {
-                //PatrollingActivitynew
-                val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
+                val i_vehicle = Intent(this@Dashboard, PatrollingLocActivity::class.java)
                 startActivity(i_vehicle)
             }
             R.id.tv_emergency -> {
-//                val i_emer = Intent(this@Dashboard, TicketingDetailsActivity::class.java)
-//                startActivity(i_emer)
+                val i_emer = Intent(this@Dashboard, TicketingDetailsActivity::class.java)
+                startActivity(i_emer)
             }
-        }//            case R.id.tv_filter:
-        //                if (clickable1 == 0) {
-        //                    lyt_settings.setVisibility(View.VISIBLE);
-        //                    iv_settings.setBackgroundResource(R.drawable.cancel);
-        //                    clickable1 = 1;
-        //                } else if (clickable1 == 1) {
-        //                    lyt_settings.setVisibility(View.GONE);
-        //                    iv_settings.setBackgroundResource(R.drawable.settings);
-        //                    clickable1 = 0;
-        //                }
-        //                break;
+        }
 
     }
 
@@ -1618,126 +1300,80 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         when (v.id) {
 
             R.id.re_vehicle -> {
-//                re_vehicle!!.setEnabled(false)
-//                re_vehicle!!.setClickable(false)
 
 
-               val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
-               startActivity(i_vehicle)
-                //finish()
+                tv.setText("")
+                val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
+                startActivity(i_vehicle)
 
             }
 
             R.id.re_delivery -> {
-//                re_delivery!!.setEnabled(false)
-//                re_delivery!!.setClickable(false)
+                tv.setText("")
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
+                // finish()
 
             }
 
             R.id.re_guest -> {
-//                re_guest!!.setEnabled(false)
-//                re_guest!!.setClickable(false)
+                tv.setText("")
                 val i_guest = Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
+                //  finish()
 
             }
 
             R.id.re_staff -> {
-//                re_staff!!.setEnabled(false)
-//                re_staff!!.setClickable(false)
+                tv.setText("")
                 val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
                 startActivity(i_staff)
+                // finish()
 
             }
 
-            R.id.tv_subscriptiondate -> {
+            R.id.re_resident -> {
+                tv.setText("")
+                val i_staff = Intent(this@Dashboard, ResidentIdActivity::class.java)
+                startActivity(i_staff)
             }
             R.id.tv_languagesettings ->
 
                 showDialog()
-//            R.id.record -> {
-//
-//                val i = Intent(this@Dashboard, WalkieTalkieActivity::class.java)
-//                startActivity(i)
-//            }
-        }//                myAudioRecorder = new MediaRecorder();
-        //                myAudioRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        //                myAudioRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-        //                myAudioRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-        //                myAudioRecorder.setOutputFile(mFileName);
-        //
-        //
-        //                try {
-        //                    myAudioRecorder.prepare();
-        //                    myAudioRecorder.start();
-        //                } catch (IllegalStateException e) {
-        //                    e.printStackTrace();
-        //                } catch (IOException e) {
-        //                    e.printStackTrace();
-        //                }
-        //// Started to stop after 5 sec automatically
-        //                new Handler().postDelayed(new Runnable() {
-        //                    @Override
-        //                    public void run() {
-        //                        if(myAudioRecorder!= null)
-        //                        {
-        //                            myAudioRecorder.reset();
-        //                            myAudioRecorder.release();
-        //                            Toast.makeText(getApplicationContext(),"Recording Stopped",Toast.LENGTH_LONG).show();
-        //                            myAudioRecorder = null;
-        //                        }
-        //
-        //                        record.setEnabled(true);
-        //
-        //                    }
-        //                }, 5000);
-        //
-        //                // To stop after 5 sec automatically end
-        //
-        //                Toast.makeText(getApplicationContext(), "Recording Started", Toast.LENGTH_LONG).show();
+        }
+
     }
 
     fun downloadBiometricData_Loop() {
-        DataBaseHelper.getStaffs().forEach{
-            if(dbh!!.fingercount(it.wkWorkID) <= 3){
-                val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-                Log.d("btn_biometric", "af "+it.wkWorkID)
-                ddc.putExtra(BSR_Action, SYNC_STAFF_BIOMETRIC)
-                ddc.putExtra("ID", it.wkWorkID)
-                sendBroadcast(ddc)
-            }
-        }
+        for ((_, _, _, _, _, _, _, _, _, wkWorkID) in LocalDb.getStaffList()!!) {
+            //if the existing elements contains the search input
+            if (dbh!!.fingercount(wkWorkID.toInt()) > 3) {
 
-//        for ((_, _, _, _, _, _, _, _, _, wkWorkID) in DataBaseHelper.getStaffs()!!) {
-//            //if the existing elements contains the search input
-//            if (dbh!!.fingercount(wkWorkID) > 3) {
-//
-//            } else {
-//
-//
-//            }
-//
-//        }
+            } else {
+                val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                Log.d("btn_biometric", "af $wkWorkID")
+                ddc.putExtra(BSR_Action, SYNC_STAFF_BIOMETRIC)
+                ddc.putExtra("ID", wkWorkID)
+                sendBroadcast(ddc)
+
+            }
+
+        }
     }
 
     /// End Added by Rajesh
 
     internal fun init() {
-
-        Prefs.putBoolean("ACTIVE_SOS",false);
         startService(Intent(this@Dashboard, FRTDBService::class.java))
-
         showProgressrefresh()
-        initRealm()
-//        realm.executeTransaction { realm ->
-//            realm.deleteAll()
-//        }
         mHandlerr = Handler()
         //startRepeatingTask()
-
-
+        //database =  DBHelper(this);
+        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
+        sendBroadcast(intentAction1)
+        tv = findViewById<EditText>(R.id.edt_search_text1)
+        btn_mic = findViewById(R.id.btn_mic)
         btn_in=findViewById(R.id.btn_in)
         btn_out=findViewById(R.id.btn_out)
         btn_in.setBackgroundColor(resources.getColor(R.color.orange))
@@ -1745,6 +1381,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         walk1=findViewById(R.id.walky)
         walk2=findViewById(R.id.walky1)
+
+
         val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         try {
             audiofile = File.createTempFile("AudioRecording", ".3gp", dir)
@@ -1759,6 +1397,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         Log.d("uploadAudio 51",mFileName )
 
         mp = MediaPlayer.create(this@Dashboard, R.raw.walkietalkiestart);
+
+//        if(Prefs.getString(WALKIETALKIE,null).equals("ON")){
+//            walk1?.visibility=View.VISIBLE
+//        }
+//        else if(Prefs.getString(WALKIETALKIE,null).equals("OFF")){
+//            walk1?.visibility=View.GONE
+//        }
+
+
 
         walk1?.setOnTouchListener(View.OnTouchListener { v, event ->
             // TODO Auto-generated method stub
@@ -1802,9 +1449,18 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         })
 
 
+
         this.mHandler = Handler()
+        //   m_Runnable.run()
+
+
         tv_nodata = findViewById(R.id.tv_nodata)
-        swipeContainer = findViewById<View>(R.id.swipeContainer) as SwipeRefreshLayout
+        // record = findViewById(R.id.record)
+        // record?.setOnClickListener(this)
+        // spinner = findViewById<View>(R.id.spinner) as Spinner
+        // tv_filter=findViewById(R.id.tv_filter);
+        swipeContainer =
+            findViewById<View>(R.id.swipeContainer) as androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface::class.java)
         tv_languagesettings = findViewById(R.id.tv_languagesettings)
         tv_languagesettings?.setOnClickListener(this)
@@ -1823,43 +1479,47 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         re_guest = findViewById(R.id.re_guest)
         re_guest?.setOnClickListener(this)
         re_staff = findViewById(R.id.re_staff)
+        re_resident = findViewById(R.id.re_resident)
+        re_resident?.setOnClickListener(this)
         re_staff?.setOnClickListener(this)
         re_delivery = findViewById(R.id.re_delivery)
         re_delivery?.setOnClickListener(this)
         rv_dashboard = findViewById(R.id.rv_dashboard)
-        rv_dashboard?.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false))
+        rv_dashboard?.setLayoutManager(
+            androidx.recyclerview.widget.LinearLayoutManager(
+                this,
+                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                false
+            )
+        )
 
 
 
         swipeContainer!!.setOnRefreshListener {
-            // Your code to refresh the list here.
-            // Make sure you call swipeContainer.setRefreshing(false)
-            // once the network request has completed successfully.
+
 
             fetchTimelineAsync(0)
             swipeContainer!!.isRefreshing = false
         }
 
         FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + LocalDb.getAssociation()!!.asAssnID)
-            .addOnCompleteListener { task ->
-                var msg = "SUCCESS"
-                if (!task.isSuccessful) {
-                    msg = "FAILED"
-                }
-                Log.e("SUBSCRIPTION", msg)
 
-            }
+        btn_mic.setOnClickListener(View.OnClickListener {
+            Speak()
 
-
+        })
         btn_in.setOnClickListener{
+
+            tv.setText("")
+            Prefs.putString("BUTTON", "IN")
             btn_in.setBackgroundColor(resources.getColor(R.color.orange))
             btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
-            if (DataBaseHelper.getVisitorEnteredLog() != null) {
+            if (LocalDb.getVisitorEnteredLog() != null) {
 
-                newAl = DataBaseHelper.getVisitorEnteredLog()
+                newAl = LocalDb.getVisitorEnteredLog()
                 // LocalDb.saveAllVisitorLog(newAl);
-                if((newAl)!!.isEmpty()){
+                if ((newAl as ArrayList<VisitorEntryLog>?)!!.isEmpty()) {
                     rv_dashboard!!.setVisibility(View.GONE)
                     tv_nodata!!.setVisibility(View.VISIBLE)
                     dismissProgressrefresh()
@@ -1881,35 +1541,20 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 dismissProgress()
 
 
-                //                        AlertDialog.Builder builder = new AlertDialog.Builder(DashBoard.this);
-                //                        // builder.setTitle("Need Permissions");
-                //                        builder.setMessage("No data");
-                //                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                //                            @Override
-                //                            public void onClick(DialogInterface dialog, int which) {
-                //                                dialog.cancel();
-                //                                //openSettings();
-                //                            }
-                //                        });
-                ////                        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                ////                            @Override
-                ////                            public void onClick(DialogInterface dialog, int which) {
-                ////                                dialog.cancel();
-                ////                            }
-                ////                        });
-                //                        builder.show();
             }
 
         }
         btn_out.setOnClickListener{
 
             //refresh ( 1000 )
-
-
+            tv.setText("")
+            Prefs.putString("BUTTON", "OUT")
             btn_in.setBackgroundColor(resources.getColor(R.color.grey))
             btn_out.setBackgroundColor(resources.getColor(R.color.orange))
             getExitVisitorLog()
         }
+
+
 
 
         if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
@@ -1958,7 +1603,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     fun getExitVisitorLog() {
-        showProgress()
+
         val call = champApiInterface?.getVisitorLogExitList(LocalDb.getAssociation()!!.asAssnID.toString() + "")
         Log.d(
             "button_done ",
@@ -1967,7 +1612,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         call?.enqueue(object : Callback<VisitorLogExitResp> {
             override fun onResponse(call: Call<VisitorLogExitResp>, response: Response<VisitorLogExitResp>) {
-                dismissProgress()
+
                 if (response.body()!!.success == true) {
 
                     if (response.body()!!.data.visitorLog != null) {
@@ -1978,29 +1623,76 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         val nonExitedSort = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
                         val exitedSort = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
 
-                        val arrayList = response.body()!!.data.visitorLog
+                        arrayList = ArrayList()
+                        arrayList = response.body()!!.data.visitorLog
 
-                        for (s in arrayList) {
+                        for (s in arrayList!!) {
                             //if the existing elements contains the search input
                             Log.d(
                                 "button_done ",
                                 "visitorlogbydate " + s.vlExitT + " " + (s.vlExitT == "0001-01-01T00:00:00")
                             )
 
+                            //                        if (s.getVlExitT().equals("0001-01-01T00:00:00")) {
+                            //                            Log.d("vlExitT ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlfName() + " ");
+                            //                            nonExitedSort.add(s);
+                            //
+                            //                            //adding the element to filtered list
+                            //                        } else {
+                            //                            exitedSort.add(s);
+                            //                        }
                         }
 
                         LocalDb.saveEnteredVisitorLog_old(nonExitedSort)
+
+                        //                    Collections.sort(exitedSort, new Comparator<VisitorLogExitResp.Data.VisitorLog>() {
+                        //                        @Override
+                        //                        public int compare(VisitorLogExitResp.Data.VisitorLog lhs, VisitorLogExitResp.Data.VisitorLog rhs) {
+                        //                            // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
+                        //                            return rhs.getVlExitT().compareTo(lhs.getVlExitT());
+                        //
+                        //                        }
+                        //                    });
+
+
+
 
                         var newAl = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
 
                         newAl = RandomUtils.getSortedVisitorLog_old(response.body()!!.data.visitorLog)
                         LocalDb.saveAllVisitorLog(newAl)
 
+
+
+                        Collections.sort(
+                            arrayList,
+                            object : Comparator<VisitorLogExitResp.Data.VisitorLog> {
+                                override fun compare(
+                                    lhs: VisitorLogExitResp.Data.VisitorLog,
+                                    rhs: VisitorLogExitResp.Data.VisitorLog
+                                ): Int {
+
+
+                                    return (formatDateDMY(rhs.vldUpdated) + " " + (rhs.vlExitT).replace(
+                                        "1900-01-01T",
+                                        ""
+                                    )).compareTo(
+                                        formatDateDMY(lhs.vldUpdated) + " " + (lhs.vlExitT).replace(
+                                            "1900-01-01T",
+                                            ""
+                                        )
+                                    )
+
+                                }
+                            })
+
+
                         //  VistorListAdapter vistorListAdapter = new VistorListAdapter(newAl, DashBoard.this);
-                        val vistorListAdapter = VistorListAdapter(response.body()!!.data.visitorLog, this@Dashboard)
+                        vistorListAdapter =
+                            VistorListAdapter(response.body()!!.data.visitorLog, this@Dashboard)
                         rv_dashboard?.adapter = vistorListAdapter
 
-                        if (arrayList.size == 0) {
+                        if (arrayList!!.size == 0) {
                             Toast.makeText(this@Dashboard, "No items", Toast.LENGTH_SHORT).show()
                         }
                     } else {
@@ -2016,8 +1708,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
             override fun onFailure(call: Call<VisitorLogExitResp>, t: Throwable) {
                 call.cancel()
-                dismissProgress()
                 Log.d("button_done ", "visitorlogbydate " + t.message + " " + getCurrentTimeLocalYMD())
+
+                //   rv_dashboard.setEmptyAdapter(getString(R.string.some_wrng), false, 0);
 
             }
         })
@@ -2077,7 +1770,7 @@ try {
     }
 
     fun fetchTimelineAsync(page: Int) {
-        onResume()
+
 
     }
 
@@ -2235,6 +1928,7 @@ try {
         }
 
 
+
         dialogs?.show()
 
     }
@@ -2288,49 +1982,6 @@ try {
             }
         }
 
-        fun trimCache(context: Context) {
-            try {
-                val dir = context.cacheDir
-                if (dir != null && dir.isDirectory) {
-                    deleteDir1(dir)
-                }
-            } catch (e: Exception) {
-                // TODO: handle exception
-            }
-
-        }
-
-        fun deleteDir1(dir: File?): Boolean {
-            if (dir != null && dir.isDirectory) {
-                val children = dir.list()
-                for (i in children!!.indices) {
-                    val success = deleteDir(File(dir, children[i]))
-                    if (!success) {
-                        return false
-                    }
-                }
-            }
-
-            // The directory is now empty so delete it
-            return dir!!.delete()
-        }
-
-        fun deleteDir(dir: File?): Boolean {
-            if (dir != null && dir.isDirectory) {
-                val children = dir.list()
-                for (i in children!!.indices) {
-                    val success = deleteDir(File(dir, children[i]))
-                    if (!success) {
-                        return false
-                    }
-                }
-                return dir.delete()
-            } else return if (dir != null && dir.isFile) {
-                dir.delete()
-            } else {
-                false
-            }
-        }
     }
     fun uploadAudio() {
 
@@ -2370,14 +2021,7 @@ try {
 
     }
 
-//    fun setEmptyView(emptyView: View) {
-//        this.emptyView = emptyView
-//    }
-
     private fun startRecording() {
-
-
-
 
         myAudioRecorder = MediaRecorder()
         myAudioRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
@@ -2399,8 +2043,6 @@ try {
     }
     fun stopRecording() {
 
-
-
         //  Handler().postDelayed({
         if (myAudioRecorder != null) {
             myAudioRecorder!!.reset()
@@ -2411,226 +2053,509 @@ try {
             myAudioRecorder = null
         }
 
-                    //record.isEnabled = true
-               // }, 5000)
-                try {
-                    if (mp.isPlaying()) {
-                        mp.stop()
-                        mp.release()
-                        mp = MediaPlayer.create(this@Dashboard, R.raw.walkietalkiestop)
-                    }
-                    mp.start()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-                walk2?.visibility=View.GONE
-                walk1?.visibility=View.VISIBLE
-
-//        }
-    }
-
-    fun clearApplicationData(context: Context) {
-        val cache = context.cacheDir
-        val appDir = File(cache.parent)
-        if (appDir.exists()) {
-            val children = appDir.list()
-            for (s in children!!) {
-                if (s != "lib") {
-                    if (s == "cache") {
-                        deleteDir(File(appDir, s))
-                        Log.i(
-                            "EEEEEERRRRRROOOOOOORRRR",
-                            "**************** File /data/data/APP_PACKAGE/$s DELETED *******************"
-                        )
-                    }
-                }
+        //record.isEnabled = true
+        // }, 5000)
+        try {
+            if (mp.isPlaying()) {
+                mp.stop()
+                mp.release()
+                mp = MediaPlayer.create(this@Dashboard, R.raw.walkietalkiestop)
             }
+            mp.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-    }
-
-    fun deleteDir(dir: File?): Boolean {
-        if (dir != null && dir.isDirectory) {
-            val children = dir.list()
-            var i = 0
-            while (i < children!!.size) {
-                val success = deleteDir(File(dir, children[i]))
-                if (!success) {
-                    return false
-                }
-                i++
-            }
-        }
-
-        assert(dir != null)
-        return dir!!.delete()
-    }
-    fun openAlert() {
-        AlertDialog.Builder(this@Dashboard)
-            .setTitle("SignOut")
-            .setMessage("TYPE YOUR MESSAGE HERE")
-            .setPositiveButton(android.R.string.yes,
-                DialogInterface.OnClickListener() { dialogInterface: DialogInterface, i: Int ->
-                    fun onClick(dialog:DialogInterface , which:Int) {
-                        // do want you want to do here
-                        Toast.makeText(this@Dashboard,"Coming",Toast.LENGTH_LONG).show()
-                        onDestroy()
-
-                    }
-                })
-            .setNegativeButton(android.R.string.no,
-                DialogInterface.OnClickListener() { dialogInterface: DialogInterface, i: Int ->
-                    fun onClick(dialog:DialogInterface ,
-                                which:Int) {
-                    }
-                }).show();
+        walk2?.visibility = View.GONE
+        walk1?.visibility = View.VISIBLE
 
     }
 
-    var mStatusChecker: Runnable = object : Runnable {
-        override fun run() {
-            try {
-               // openAlert()
-              // clearApplicationData(this@Dashboard)
-                //trimCache(this@Dashboard)
-//                finish();
-//                startActivity(getIntent());
-              //  updateStatus() //this function can change value of mInterval.
-            } finally {
-                // 100% guarantee that this always happens, even if
-                // your update method throws an exception
-                mHandlerr!!.postDelayed(this, mInterval.toLong())
-            }
-        }
-    }
-//
-//    fun startRepeatingTask() {
-//        mStatusChecker.run()
-//    }
-//
-//    fun stopRepeatingTask() {
-//        mHandlerr!!.removeCallbacks(mStatusChecker)
-//    }
-//    private fun refresh( milliseconds:Long) {
-//        val handler: Handler  =  Handler()
-//        val runnable:Runnable = Runnable(){
-//            run(){
-//                content()
-//            }
-//        }
-//
-//        handler.postDelayed(runnable, milliseconds);
-//
-//    }
+    fun getVisitorByWorkerId(
+        assnID: Int,
+        workerID: Int,
+        unitId: String,
+        personName: String,
+        mobileNumb: String,
+        desgn: String,
+        workerType: String, staffID: Int, unitName: String, wkEntryImg:String){
 
-    //    private fun content() {
-//        refresh(1000)
-//    }
-    fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: Int, personName: String, mobileNumb: String, desgn: String,
-                             workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
-
-         Log.e("getVisitorByWorkerId",assnID.toString()+".."+workerID+"..."+personName)
+        // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
         RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
 
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
-                    Log.e("onSuccessResponse",""+getdata);
-                    if (getdata.success == true) {
-                        // showToast(this@Dashboard,"already entered")
-                        //  showToast(this@Dashboard,workerID.toString())
 
+                    if (getdata.success == true) {
                     }
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-
-                    // showToast(this@Dashboard,"false")
-                    //showToast(this@Dashboard,workerID.toString()+"-"+unitId+"-"+personName+"-"+mobileNumb+"-"+desgn+"-"+workerType+"-"+staffID+"-"+unitName)
-                    Log.e("onErrorResponse",""+personName);
-                    visitorLog(
-                        unitId, personName,
-                        mobileNumb, desgn, workerType,
-                        staffID, unitName,wkEntryImg
+                    // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+                    visitorLogBiometric(
+                        unitId,
+                        personName,
+                        mobileNumb,
+                        desgn,
+                        workerType,
+                        staffID,
+                        unitName,
+                        wkEntryImg
                     )
 
-                    // Log.d("check 78 ", "bio")
-                  //  t1?.speak("Welcome"+personName, TextToSpeech.QUEUE_FLUSH, null)
-//                    showToast(this@Dashboard,personName)
-                    //Log.d("Error WorkerList",e.toString())
 
                 }
 
                 override fun noNetowork() {
-//                    visitorLog(
-//                        unitId, personName,
-//                        mobileNumb, desgn, workerType,
-//                        staffID, unitName,wkEntryImg
-//                    )
-                    Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG)
-                        .show()
+                    Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG).show()
                 }
             })
     }
 
-//    override fun onUserInteraction() {
-//        super.onUserInteraction()
-//        stopHandler();//stop first and then start
-//        startHandler();
-//    }
-//   fun stopHandler() {
-//    handler!!.removeCallbacks(r);
-//}
-//    fun startHandler() {
-//    handler!!.postDelayed(r, 1*60*1000);
-//}
-//
-//
-//    val myHandler =  Handler();
-//   val myRunnable =  Runnable() {
-//
-//       Toast.makeText(this@Dashboard,"Hii",Toast.LENGTH_LONG).show()
-//       var i:Intent  = getBaseContext().getPackageManager()
-//                         .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-//            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(i);
-//       finish()
-//
-//
-//    };
-//
-//    override fun onUserInteraction() {
-//        super.onUserInteraction()
-//        myHandler.removeCallbacks(myRunnable);
-//        myHandler.postDelayed(myRunnable,2000);
-//    }
-//
-//    override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
-//        Toast.makeText(this@Dashboard,"gjgj",Toast.LENGTH_LONG).show()
-//  //  val timestamp = System.getCurrentTimeMilis();
-//    val timestamp = 2000;
-//    return super.dispatchTouchEvent(ev)
-//    }
+    private fun visitorLogBiometric(
+        unitId: String, personName: String, mobileNumb: String, desgn: String,
+        workerType: String, staffID: Int, unitName: String, wkEntryImg: String
+    ) {
+
+        val req = CreateVisitorLogReq(
+            Prefs.getInt(ASSOCIATION_ID, 0), staffID.toInt(), unitName,
+            unitId, desgn, personName,
+            LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb, "1", "", "", "",
+            1, "Staff Biometric Entry", "", "", "", "", ""
+            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, "")
+        )
+
+        Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())
+
+        compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
+                override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
+                    if (globalApiObject.success == true) {
+
+                        t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
 
 
-    class LogOutTimerTask : TimerTask() {
-        val context:Context?=null
+//                            if (unitName.toString().contains(",")) {
+//
+//                                var unitid_dataList: Array<String>
+//                                var unitname_dataList: Array<String>
+//
+//                                unitname_dataList = unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//
+//
+//                                unitid_dataList =
+//                                    unitId.toString().split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                        .toTypedArray()
+//                                if (unitname_dataList.size > 0) {
+//                                    for (i in 0 until unitid_dataList.size) {
+//                                        getUnitLog(
+//                                            unitid_dataList.get(i).replace(" ", "").toInt(),
+//                                            personName,
+//                                            mobileNumb,
+//                                            desgn,
+//                                            workerType,
+//                                            staffID,
+//                                            unitname_dataList.get(i).replace(" ",""),
+//                                            globalApiObject.data.visitorLog.vlVisLgID
+//                                        )
+//                                    }
+//                                }
+//                            } else {
+//                                getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
+//                            }
+//
 
-        override fun run() {
 
-Toast.makeText(context,"Hii",Toast.LENGTH_LONG).show()
-            var i:Intent  = context!!.getPackageManager()
-                .getLaunchIntentForPackage( context.getPackageName() );
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context!!.startActivity(i);
+                        //   getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
+                        visitorEntryLogBiometric(
+                            globalApiObject.data.visitorLog.vlVisLgID,
+                            unitId,
+                            personName,
+                            mobileNumb,
+                            desgn,
+                            workerType,
+                            staffID,
+                            unitName,
+                            wkEntryImg
+                        )
 
+//                        val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
+//                        d.putExtra(BSR_Action, VisitorEntryFCM)
+//                        d.putExtra("msg", "$personName $desgn "+" is coming to your home"+"("+unitName+")")
+//                        d.putExtra("mobNum", mobileNumb)
+//                        d.putExtra("name", personName)
+//                        d.putExtra("nr_id", "0")
+//                        d.putExtra("unitname",unitName)
+//                        d.putExtra("memType", "Owner")
+//                        d.putExtra(UNITID,unitId.toString())
+//                        d.putExtra(COMPANY_NAME,"Staff")
+//                        d.putExtra(UNIT_ACCOUNT_ID,"0")
+//                        d.putExtra("VLVisLgID",0)
+//                        sendBroadcast(d);
+                    } else {
+                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
+                    }
+                }
 
-       }
+                override fun onErrorResponse(e: Throwable) {
+                    Utils.showToast(
+                        applicationContext,
+                        getString(R.string.some_wrng) + e.toString()
+                    )
+                    Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
+
+                }
+
+                override fun noNetowork() {
+                    Utils.showToast(applicationContext, getString(R.string.no_internet))
+                }
+
+                override fun onShowProgress() {
+
+                }
+
+                override fun onDismissProgress() {
+
+                }
+            })
+        )
     }
 
+    private fun visitorEntryLogBiometric(
+        visitorLogID: Int, unitId: String, personName: String, mobileNumb: String, desgn: String,
+        workerType: String, staffID: Int, unitName: String, wkEntryImg: String
+    ) {
+
+        try {
+            val req = VisitorEntryReq(
+                getCurrentTimeLocal(),
+                LocalDb.getStaffList()!![0].wkWorkID.toInt(),
+                visitorLogID
+            )
+
+            Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
+
+            compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
+                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
+                        if (globalApiObject.success == true) {
+
+                            if (unitId.contains(",")) {
+
+                                var unitname_dataList: Array<String>
+                                var unitid_dataList: Array<String>
+
+                                unitname_dataList =
+                                    unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
+                                unitid_dataList =
+                                    unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
+                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                if (unitid_dataList.size > 0) {
+                                    for (i in 0 until unitid_dataList.size) {
+
+                                        val ddc = Intent(
+                                            this@Dashboard,
+                                            BackgroundSyncReceiver::class.java
+                                        )
+                                        ddc.putExtra(
+                                            ConstantUtils.BSR_Action,
+                                            ConstantUtils.VisitorEntryFCM
+                                        )
+                                        ddc.putExtra(
+                                            "msg",
+                                            "$personName $desgn " + " is coming to your home" + "(" + unitname_dataList.get(
+                                                i
+                                            ).replace(" ", "") + ")"
+                                        )
+                                        ddc.putExtra("mobNum", mobileNumb)
+                                        ddc.putExtra("name", personName)
+                                        ddc.putExtra("nr_id", visitorLogID.toString())
+                                        ddc.putExtra(
+                                            "unitname",
+                                            unitname_dataList.get(i).replace(" ", "")
+                                        )
+                                        ddc.putExtra("memType", "Owner")
+                                        ddc.putExtra(
+                                            UNITID,
+                                            unitid_dataList.get(i).replace(" ", "")
+                                        )
+                                        ddc.putExtra(COMPANY_NAME, "Staff")
+                                        ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                                        ddc.putExtra("VLVisLgID", visitorLogID)
+                                        ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                        sendBroadcast(ddc);
+                                    }
+                                }
+                            } else {
+                                val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+                                ddc.putExtra(
+                                    ConstantUtils.BSR_Action,
+                                    ConstantUtils.VisitorEntryFCM
+                                )
+                                ddc.putExtra(
+                                    "msg",
+                                    "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
+                                )
+                                ddc.putExtra("mobNum", mobileNumb)
+                                ddc.putExtra("name", personName)
+                                ddc.putExtra("nr_id", visitorLogID.toString())
+                                ddc.putExtra("unitname", unitName)
+                                ddc.putExtra("memType", "Owner")
+                                ddc.putExtra(UNITID, unitId)
+                                ddc.putExtra(COMPANY_NAME, "Staff")
+                                ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                                ddc.putExtra("VLVisLgID", visitorLogID)
+                                ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                sendBroadcast(ddc);
+                            }
 
 
+//                            if (unitName.toString().contains(",")) {
+//
+//                                var unitid_dataList: Array<String>
+//                                var unitname_dataList: Array<String>
+//
+//                                unitname_dataList = unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//
+//
+//                                unitid_dataList =
+//                                    unitId.toString().split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                        .toTypedArray()
+//                                if (unitname_dataList.size > 0) {
+//                                    for (i in 0 until unitid_dataList.size) {
+//                                        getUnitLog(
+//                                            unitid_dataList.get(i).replace(" ", "").toInt(),
+//                                            personName,
+//                                            mobileNumb,
+//                                            desgn,
+//                                            workerType,
+//                                            staffID,
+//                                            unitname_dataList.get(i).replace(" ",""),
+//                                            visitorLogID
+//                                        )
+//                                    }
+//                                }
+//                            } else {
+//                                getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,visitorLogID)
+//                            }
+
+
+                            val intentAction1 =
+                                Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                            intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
+                            sendBroadcast(intentAction1)
+
+                        } else {
+                            Utils.showToast(applicationContext, globalApiObject.apiVersion)
+                        }
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+                        Utils.showToast(applicationContext, getString(R.string.some_wrng))
+                    }
+
+                    override fun noNetowork() {
+                        Utils.showToast(applicationContext, getString(R.string.no_internet))
+                    }
+
+                    override fun onShowProgress() {
+
+                    }
+
+                    override fun onDismissProgress() {
+                    }
+                })
+            )
+        } catch (e: NullPointerException) {
+
+        }
+    }
+
+    private fun makeExitCall(visitorLogID: Int) {
+
+
+        val req = VisitorExitReq(
+            getCurrentTimeLocal(),
+            LocalDb.getStaffList()!![0].wkWorkID,
+            visitorLogID,
+            Prefs.getString(GATE_NO, "")
+        )
+        CompositeDisposable().add(
+            RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
+                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
+                        if (globalApiObject.success == true) {
+//                            Utils.showToast(mcontext, "Success")
+
+                            val intentAction1 =
+                                Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                            intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
+                            sendBroadcast(intentAction1)
+
+                        } else {
+                            Utils.showToast(this@Dashboard, "Failed")
+                        }
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+                        Utils.showToast(this@Dashboard, "Error visitor exit")
+                    }
+
+                    override fun noNetowork() {
+                        Utils.showToast(this@Dashboard, "no_internet visitor exit")
+                    }
+
+                    override fun onShowProgress() {
+                    }
+
+                    override fun onDismissProgress() {
+                    }
+                })
+        )
+
+    }
+
+    private fun getUnitLog(
+        unitId: Int, personName: String, mobileNumb: String, desgn: String,
+        workerType: String, staffID: Int, unitName: String, vlVisLgID: Int
+    ) {
+
+        RetrofitClinet.instance
+            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
+
+                override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
+
+                    if (UnitList.success == true) {
+
+                        if (UnitList.data.unit.unOcStat.equals("Sold Owner Occupied Unit")) {
+                            unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
+                        } else if (UnitList.data.unit.unOcStat.equals("Sold Tenant Occupied Unit ")) {
+
+                            unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
+
+                        } else if (UnitList.data.unit.unOcStat.equals("UnSold Tenant Occupied Unit")) {
+
+                            unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
+
+                        } else if (UnitList.data.unit.unOcStat.equals("UnSold Vacant Unit")) {
+                            unAccountID = "0"
+
+                        } else if (UnitList.data.unit.unOcStat.equals("Sold Vacant Unit")) {
+                            unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
+                        } else {
+
+                        }
+
+                        Toast.makeText(this@Dashboard, unAccountID, Toast.LENGTH_LONG).show()
+
+
+                        val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                        ddc.putExtra(
+                            "msg",
+                            "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
+                        )
+                        ddc.putExtra("mobNum", mobileNumb)
+                        ddc.putExtra("name", personName)
+                        ddc.putExtra("nr_id", vlVisLgID.toString())
+                        ddc.putExtra("unitname", unitName)
+                        ddc.putExtra("memType", "Owner")
+                        ddc.putExtra(UNITID, unitId.toString())
+                        ddc.putExtra(COMPANY_NAME, "Staff")
+                        ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                        ddc.putExtra("VLVisLgID", vlVisLgID)
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                        sendBroadcast(ddc);
+
+
+//                        val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
+//                        d.putExtra(BSR_Action, VisitorEntryFCM)
+//                        d.putExtra("msg", "$personName $desgn "+" is coming to your home"+"("+unitName+")")
+//                        d.putExtra("mobNum", mobileNumb)
+//                        d.putExtra("name", personName)
+//                        d.putExtra("nr_id", "0")
+//                        d.putExtra("unitname",unitName)
+//                        d.putExtra("memType", "Owner")
+//                        d.putExtra(UNITID,unitId.toString())
+//                        d.putExtra(COMPANY_NAME,"Staff")
+//                        d.putExtra(UNIT_ACCOUNT_ID,"0")
+//                        d.putExtra("VLVisLgID",0)
+//                        sendBroadcast(d);
+
+
+                    } else {
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("cdvd", e.message);
+
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+
+    }
+
+    fun Speak() {
+
+
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(
+            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
+        )
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
+
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+
+
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            REQUEST_CODE_SPEECH_INPUT -> {
+                if (resultCode == Activity.RESULT_OK && null != data) {
+                    val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    tv.setText(result[0] + "".replace(" ", ""))
+
+                    //tv.text.toString().replace(" ","")
+                }
+            }
+        }
+    }
 
 }
+
+
+
+

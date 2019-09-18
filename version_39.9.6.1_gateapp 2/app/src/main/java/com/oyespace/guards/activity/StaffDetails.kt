@@ -3,23 +3,18 @@ package com.oyespace.guards.activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.View
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.utils.*
-import kotlinx.android.synthetic.main.activity_final_registration.*
-import java.util.*
 import com.oyespace.guards.R
-import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
+import com.oyespace.guards.utils.ConstantUtils.WORKER_ID
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_final_registration.txt_assn_name
-import kotlinx.android.synthetic.main.activity_final_registration.txt_device_name
-import kotlinx.android.synthetic.main.activity_final_registration.txt_gate_name
-import kotlinx.android.synthetic.main.activity_unit_list.*
+import kotlinx.android.synthetic.main.activity_final_registration.*
+import java.util.*
 
 class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
 
@@ -115,7 +110,8 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
                 .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ConstantUtils.ASSOCIATION_ID,0)+"STAFF"+ intent.getIntExtra(WORKER_ID, 0)+".jpg")
                 .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(profile_image)
 
-            val mLayoutManager = GridLayoutManager(applicationContext, 2)
+            val mLayoutManager =
+                androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
             rv_image.layoutManager = mLayoutManager
 
         }
