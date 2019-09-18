@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<layout>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -25,30 +25,28 @@
             android:layout_height="wrap_content"/>
 
 
-
-
-
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
         <TextView
                 android:id="@+id/scaneddata"
                 android:layout_width="300dp"
                 android:layout_height="173dp"
                 android:visibility="gone"
                 android:layout_gravity="bottom"
-                android:text="bvmvvhv"
-                />
+                android:text="bvmvvhv" />
 
     </LinearLayout>
 
     <Button
-            android:id="@+id/button2"
+            android:id="@+id/missedCallBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="Missed Call"
-            android:layout_gravity="bottom"
-            />
+            android:onClick="onMissedCallPress"
+            android:layout_gravity="bottom" />
 </FrameLayout>
+</layout>

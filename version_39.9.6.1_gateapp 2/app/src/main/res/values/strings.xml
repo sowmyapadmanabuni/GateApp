@@ -136,5 +136,8 @@
     <string name="tvresident">Resident</string>
     <string name="tvmanualentry"> Full Manual Entry</string>
     <string name="tvverifyotp">Verify OTP</string>
+    <string name="scan_res_id_here">Scan Resident ID Here</string>
+    <string name="valid">valid</string>
+    <string name="invalid">invalid</string>
 
 </resources>

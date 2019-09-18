@@ -158,4 +158,7 @@ interface WebApi {
     @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
     fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq):Single<InviteCreateRes>
 
+    @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
+    fun checkIfResident(@Header(OYE247KEY) token: String, @Body residentCheckReq: ResidentCheckReq): Single<ResidentCheckResponse>
+
 }

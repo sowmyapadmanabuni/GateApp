@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="com.oyespace.guards"
-        >
-
-
-
+        package="com.oyespace.guards">
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -43,43 +39,35 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".resident.ResidentMissedCallActivity"></activity>
         <activity
-                android:name=".activity.ResidentIdActivity"
-                android:theme="@style/noActionBar"></activity>
-
-
-
-        <activity android:name=".staffManaualEntry.ManualStaffEntryRegistration"
+                android:name=".resident.ResidentIdActivity"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualStaffEntryRegistration"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualAddCarFragment"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualNameEntryScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualMobileNumberScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManulBlockSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualAddCarFragment"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".staffManaualEntry.ManualUnitSelectionActivity"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualNameEntryScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualMobileNumberScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManulBlockSelectionActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan"/>
-
-        <activity android:name=".staffManaualEntry.ManualUnitSelectionActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-              />
-
-
+                android:theme="@style/noActionBar" />
         <activity android:name=".activity.NewBiometric" />
         <activity
                 android:name=".activity.EditStaffActivity"
@@ -229,16 +217,15 @@
         <activity
                 android:name=".Dashboard"
                 android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan"
-                android:theme="@style/noActionBar" />
+                android:theme="@style/noActionBar"
+                android:windowSoftInputMode="adjustPan" />
 
         <meta-data
                 android:name="com.google.android.gms.vision.DEPENDENCIES"
                 android:value="@integer/google_play_services_version" />
         <meta-data
                 android:name="com.google.android.ocr.API_KEY"
-                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w" />
-        <!-- <activity -->
+                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w" /> <!-- <activity -->
         <!-- android:name=".activity.PatrollingActivity" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/noActionBar"> -->
