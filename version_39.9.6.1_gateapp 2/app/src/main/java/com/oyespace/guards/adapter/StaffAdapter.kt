@@ -1,16 +1,11 @@
 package com.oyespace.guards.adapter
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Handler
-import android.support.v4.app.ActivityCompat.startActivityForResult
-import android.support.v4.content.ContextCompat.startActivity
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,26 +13,25 @@ import android.view.ViewGroup
 import android.widget.*
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.Dashboard
+import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.Biometric
+import com.oyespace.guards.activity.EditStaffActivity
+import com.oyespace.guards.activity.MobileNumberforEntryScreen
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import com.oyespace.guards.DataBaseHelper
-import com.oyespace.guards.activity.*
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.*
-import kotlinx.android.synthetic.main.activity_img_view.*
-import kotlinx.android.synthetic.main.activity_mobile_number.*
 
 
-
-
-class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context) : RecyclerView.Adapter<StaffAdapter.StaffViewHolder>() ,Filterable{
+class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
+    androidx.recyclerview.widget.RecyclerView.Adapter<StaffAdapter.StaffViewHolder>(), Filterable {
 
     private var searchList: ArrayList<WorkerDetails>? = null
     val dbh:DataBaseHelper= DataBaseHelper(mcontext);
@@ -69,7 +63,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
         holder.lv_staff.setOnClickListener {
 
 
-            val alertadd = android.support.v7.app.AlertDialog.Builder(mcontext)
+            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
             val factory = LayoutInflater.from(mcontext)
             val view = factory.inflate(R.layout.dialog_big_image, null)
             var dialog_imageview: ImageView? = null
@@ -574,7 +568,7 @@ class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context)
         return position
     }
 
-    class StaffViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class StaffViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val tv_staff: TextView
         val iv_staff: ImageView
         val lv_staff: LinearLayout

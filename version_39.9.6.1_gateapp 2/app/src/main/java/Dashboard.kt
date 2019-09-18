@@ -19,11 +19,6 @@ import android.os.*
 import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
-import android.support.v4.content.LocalBroadcastManager
-import android.support.v4.widget.SwipeRefreshLayout
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
 import android.telephony.TelephonyManager
 import android.text.Editable
 import android.text.TextWatcher
@@ -31,6 +26,8 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.messaging.FirebaseMessaging
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -43,12 +40,14 @@ import com.oyespace.guards.activity.StaffListActivity
 import com.oyespace.guards.activity.TicketingDetailsActivity
 import com.oyespace.guards.adapter.VistorEntryListAdapter
 import com.oyespace.guards.adapter.VistorListAdapter
+import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.network.*
 import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pertroling.PatrollingActivitynew
+import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.request.VisitorExitReqJv
@@ -119,7 +118,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     var re_delivery: RelativeLayout?=null
     var lyt_settings: RelativeLayout?=null
     var champApiInterface: ChampApiInterface?=null
-    var rv_dashboard: RecyclerView?=null
+    var rv_dashboard: androidx.recyclerview.widget.RecyclerView? = null
     var tv_subscriptiondate: TextView?=null
     var tv_version: TextView?=null
     var tv_languagesettings: TextView?=null
@@ -146,7 +145,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     internal var memName = ""
     internal var nnnn = 0
     internal var autoooooo = 0
-    private var swipeContainer: SwipeRefreshLayout? = null
+    private var swipeContainer: androidx.swiperefreshlayout.widget.SwipeRefreshLayout? = null
     ///Start Added by Rajesh
     private val imageUri: Uri? = null
     private var mPermissionIntent: PendingIntent? = null
@@ -510,6 +509,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         try {
 
+            Prefs.putBoolean("ACTIVE_SOS", false);
+            //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
+            startService(Intent(this@Dashboard, FRTDBService::class.java))
+            //}
             downloadBiometricData_Loop()
         }catch (e:NullPointerException){
 
@@ -525,7 +528,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         updateHandler.postDelayed(runnable, 1000)
         //  stopRepeatingTask()
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(receiver, IntentFilter("SYNC"))//constant
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .registerReceiver(receiver, IntentFilter("SYNC"))//constant
         super.onResume()
 
 
@@ -568,7 +572,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         if (isTimeAutomatic(application)) {
 
         } else {
-            val alertDialogBuilder = android.support.v7.app.AlertDialog.Builder(this@Dashboard)
+            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this@Dashboard)
             alertDialogBuilder.setTitle("Time settings")
 
             // Setting Dialog Message
@@ -592,7 +596,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         if (isTimeZoneAutomatic(application)) {
 
         } else {
-            val alertDialogBuilder = android.support.v7.app.AlertDialog.Builder(this@Dashboard)
+            val alertDialogBuilder = androidx.appcompat.app.AlertDialog.Builder(this@Dashboard)
             alertDialogBuilder.setTitle("Time settings")
 
             // Setting Dialog Message
@@ -921,7 +925,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     public override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
+        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
+            .unregisterReceiver(receiver)
         super.onPause()
 
 
@@ -1219,6 +1224,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     override fun onStart() {
+        Prefs.putBoolean("ACTIVE_SOS", false);
+        //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
+        startService(Intent(this@Dashboard, FRTDBService::class.java))
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         super.onStart()
@@ -1263,7 +1271,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 clickable = 0
             }
             R.id.tv_patrolling -> {
-                val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
+                val i_vehicle = Intent(this@Dashboard, PatrollingLocActivity::class.java)
                 startActivity(i_vehicle)
             }
             R.id.tv_emergency -> {
@@ -1437,7 +1445,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         // record?.setOnClickListener(this)
         // spinner = findViewById<View>(R.id.spinner) as Spinner
         // tv_filter=findViewById(R.id.tv_filter);
-        swipeContainer = findViewById<View>(R.id.swipeContainer) as SwipeRefreshLayout
+        swipeContainer =
+            findViewById<View>(R.id.swipeContainer) as androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface::class.java)
         tv_languagesettings = findViewById(R.id.tv_languagesettings)
         tv_languagesettings?.setOnClickListener(this)
@@ -1462,7 +1471,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         re_delivery = findViewById(R.id.re_delivery)
         re_delivery?.setOnClickListener(this)
         rv_dashboard = findViewById(R.id.rv_dashboard)
-        rv_dashboard?.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false))
+        rv_dashboard?.setLayoutManager(
+            androidx.recyclerview.widget.LinearLayoutManager(
+                this,
+                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                false
+            )
+        )
 
 
 

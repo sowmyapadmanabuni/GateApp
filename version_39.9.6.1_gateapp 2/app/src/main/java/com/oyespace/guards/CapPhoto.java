@@ -1,7 +1,5 @@
 package com.oyespace.guards;
 
-import java.io.*;
-
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
@@ -12,26 +10,32 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.hardware.Camera;
-import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.Parameters;
-import android.media.AudioManager;
-import android.media.FaceDetector;
-import android.media.FaceDetector.Face;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.*;
-import android.support.v4.content.LocalBroadcastManager;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
-import com.oyespace.guards.camtest.AddCarFragment;
-import com.oyespace.guards.utils.ConstantUtils;
-import com.oyespace.guards.utils.Prefs;
 
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import static com.oyespace.guards.utils.ConstantUtils.BSR_Action;
+import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_GUARD_PHOTO;
 
 public class CapPhoto extends Service  implements
         SurfaceHolder.Callback {

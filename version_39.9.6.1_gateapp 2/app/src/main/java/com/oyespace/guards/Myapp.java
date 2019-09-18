@@ -2,15 +2,16 @@ package com.oyespace.guards;
 
 import android.content.Context;
 
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
 
-import android.content.Intent;
-import android.os.StrictMode;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
 import com.crashlytics.android.Crashlytics;
-import com.oyespace.guards.activity.SplashActivity;
+import com.crashlytics.android.core.CrashlyticsCore;
 import com.oyespace.guards.utils.Prefs;
+
 import io.fabric.sdk.android.Fabric;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import timber.log.Timber;
 
 /**
@@ -44,6 +45,16 @@ public class Myapp extends MultiDexApplication {
         Prefs.initPrefs(getApplicationContext());
 
 
+        CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
+                .disabled(BuildConfig.DEBUG)
+                .build();
+        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder().name("oysepace.realm")
+                .schemaVersion(2)
+                .migration(new RealmDataMigration())
+                .build();
+        Realm.setDefaultConfiguration(config);
 
         mInstance = this;
 

@@ -3,9 +3,6 @@ package com.oyespace.guards.broadcastreceiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.support.v4.content.LocalBroadcastManager
-import android.telephony.SmsMessage
-
 import com.oyespace.guards.listeners.Common
 
 

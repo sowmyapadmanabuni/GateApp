@@ -14,6 +14,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -26,6 +28,7 @@
 
     <permission android:name="android.permission.CLEAR_APP_CACHE" />
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
 
     <application
@@ -36,6 +39,7 @@
             android:networkSecurityConfig="@xml/network"
             android:roundIcon="@drawable/oyespace_launcher"
             android:supportsRtl="true"
+            android:hardwareAccelerated="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
@@ -93,9 +97,12 @@
                 android:name="org.apache.http.legacy"
                 android:required="false" />
 
+        <!--        <meta-data-->
+        <!--                android:name="com.google.android.geo.API_KEY"-->
+        <!--                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />-->
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />
+                android:value="@string/google_maps_key" />
 
         <activity
                 android:name=".DashboardActivity"
@@ -219,6 +226,20 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"
                 android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".activity.GalleryViewActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".pertroling.PatrollingLocActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
 
         <meta-data
                 android:name="com.google.android.gms.vision.DEPENDENCIES"
@@ -230,6 +251,10 @@
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/noActionBar"> -->
         <!-- </activity> -->
+        <service
+                android:name=".com.oyespace.guards.fcm.FRTDBService"
+                android:enabled="true" />
+
         <service
                 android:name=".SGPatrollingService"
                 android:enabled="true"

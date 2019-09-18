@@ -1,11 +1,11 @@
 package com.oyespace.guards.utils;
 
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import androidx.annotation.RequiresApi;
+
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

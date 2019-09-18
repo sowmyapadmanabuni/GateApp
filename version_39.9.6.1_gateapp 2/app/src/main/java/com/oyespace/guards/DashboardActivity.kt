@@ -8,13 +8,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.support.v4.app.ActivityCompat
-import android.support.v4.content.ContextCompat
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -23,17 +23,15 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.RegisterFingerPrint
 import com.oyespace.guards.activity.ServiceProviderListActivity
 import com.oyespace.guards.activity.StaffListActivity
-import com.oyespace.guards.adapter.UnitListAdapter
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
-import com.oyespace.guards.guest.GuestUnitScreen
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.GlobalApiObject
+import com.oyespace.guards.pojo.VisitorLog
+import com.oyespace.guards.pojo.Visitorlogbydate
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
 import com.oyespace.guards.utils.LocalDb
@@ -82,7 +80,13 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
         checkAndroidVersion()
 //        makeVisitorLog()
 //        makeUnitLog()
-        rv_dashboard.setLayoutManager(LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false))
+        rv_dashboard.setLayoutManager(
+            androidx.recyclerview.widget.LinearLayoutManager(
+                this,
+                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                false
+            )
+        )
 
         Dexter.withActivity(this)
             .withPermissions(

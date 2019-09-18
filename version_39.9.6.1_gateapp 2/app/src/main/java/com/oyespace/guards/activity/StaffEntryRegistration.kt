@@ -7,41 +7,43 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.provider.MediaStore
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import com.oyespace.guards.*
-import com.oyespace.guards.camtest.AddCarFragment
+import androidx.appcompat.app.AlertDialog
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
-import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.network.*
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
+import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.NumberUtils.toInteger
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
-import kotlinx.android.synthetic.main.activity_img_view.*
-import kotlinx.android.synthetic.main.activity_mobile_number.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import timber.log.Timber
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
@@ -280,8 +282,9 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             println(list[i])
         }
 
-        val mLayoutManager = GridLayoutManager(applicationContext, 2)
-        rv_image.layoutManager = mLayoutManager as RecyclerView.LayoutManager?
+        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
+        rv_image.layoutManager =
+            mLayoutManager as androidx.recyclerview.widget.RecyclerView.LayoutManager?
         imageAdapter = ImageAdapter(list, this@StaffEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
 

@@ -12,15 +12,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
@@ -30,16 +35,33 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 import com.oyespace.guards.Dashboard;
-import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.network.ChampApiInterface;
 import com.oyespace.guards.network.ResponseHandler;
 import com.oyespace.guards.network.RestClient;
 import com.oyespace.guards.network.URLData;
+import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.utils.Prefs;
 import com.oyespace.guards.vehicle_others.VehicleOthersServiceProviderListActivity;
 import com.yarolegovich.lovelydialog.LovelyStandardDialog;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
+import static com.oyespace.guards.utils.Utils.showToast;
+
 //import com.google.firebase.codelab.mlkit.R;
 //import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
 //import com.google.firebase.ml.custom.FirebaseModelInterpreter;
@@ -47,17 +69,6 @@ import com.yarolegovich.lovelydialog.LovelyStandardDialog;
 //import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 //import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 //import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.*;
-
-import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
-import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
-import static com.oyespace.guards.utils.Utils.showToast;
 
 public class  CaptureImageOcr extends Activity implements View.OnClickListener, ResponseHandler {
 

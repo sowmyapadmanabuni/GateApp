@@ -1,19 +1,19 @@
 package com.oyespace.guards.fcm
 
-import android.app.*
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.media.*
-import android.net.Uri
-import android.os.AsyncTask
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.SoundPool
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
-import android.support.annotation.RequiresApi
-import android.support.v4.app.NotificationCompat
 import android.util.Log
-import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -24,10 +24,7 @@ import com.oyespace.guards.activity.TicketingDetailsActivity
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON
 import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.ImageApiClient
-import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.CloudFunctionNotificationReq
 import com.oyespace.guards.pojo.GetTicketingResponsesRes
 import com.oyespace.guards.pojo.SendGateAppNotificationRequest
 import com.oyespace.guards.pojo.TicketingResponseData
@@ -36,16 +33,8 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.internal.util.HalfSerializer.onError
 import io.reactivex.schedulers.Schedulers
-import okhttp3.MediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
-import java.util.*
 
 class FCMMessagingService : FirebaseMessagingService(){
     internal var msg = ""

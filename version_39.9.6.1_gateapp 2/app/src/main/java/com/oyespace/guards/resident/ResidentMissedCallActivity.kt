@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.View
+import androidx.databinding.DataBindingUtil
 import com.oyespace.guards.BuildConfig
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -36,7 +36,10 @@ class ResidentMissedCallActivity : BaseKotlinActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        b = DataBindingUtil.setContentView(this, R.layout.activity_mobile_number);
+        b = DataBindingUtil.setContentView<ActivityMobileNumberBinding>(
+            this,
+            R.layout.activity_mobile_number
+        );
         setupUI();
 
         timer = object : CountDownTimer(60_000, 1000) {

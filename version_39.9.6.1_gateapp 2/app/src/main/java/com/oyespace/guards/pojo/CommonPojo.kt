@@ -1688,7 +1688,29 @@ data class ResidentCheckObject(
 )
 
 
+///Patrolling Checkpoint Detail Responses
+data class GetCheckPointResponse<T>(
+    val apiVersion: String,
+    val `data`: CheckPointKey,
+    val success: Boolean
+)
 
+data class CheckPointKey(
+    val checkPointListByChkPntID: CheckPointData
+)
+
+data class CheckPointData(
+    val asAssnID: Int,
+    val cpChkPntID: Int,
+    val cpCkPName: String,
+    val cpIsActive: Boolean,
+    val cpdCreated: String,
+    val cpdUpdated: String,
+    val cpgpsPnt: String,
+    val meMemID: Int,
+    val cpSurrName: String,
+    val cpcPntAt: String
+)
 
 
 

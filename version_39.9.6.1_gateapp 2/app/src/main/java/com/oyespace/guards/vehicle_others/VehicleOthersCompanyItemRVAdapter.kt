@@ -1,24 +1,21 @@
 package com.oyespace.guards.vehicle_others
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.oyespace.guards.R
-import com.oyespace.guards.utils.ConstantUtils.*
-import android.app.Activity
-import android.widget.ImageView
 import com.oyespace.guards.pojo.VendorPojo
-import com.oyespace.guards.vehicle_guest.Vehicle_Guest_BlockSelectionActivity
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
 
 class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
-    RecyclerView.Adapter<VehicleOthersCompanyItemRVAdapter.ItemViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<VehicleOthersCompanyItemRVAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder(
@@ -68,7 +65,8 @@ class VehicleOthersCompanyItemRVAdapter(private val mcontext: Context, private v
         return arrayList.size
     }
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
         val img_logo: ImageView

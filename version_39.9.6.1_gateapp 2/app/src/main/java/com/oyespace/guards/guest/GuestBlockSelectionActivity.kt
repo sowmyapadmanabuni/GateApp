@@ -4,41 +4,30 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.LinearLayoutManager
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.UnitSelectionActivity
 import com.oyespace.guards.adapter.BlockSelectionAdapter
 import com.oyespace.guards.adapter.SelectedUnitsAdapter
 import com.oyespace.guards.adapter.UnitSearchResultAdapter
-
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
-import kotlinx.android.synthetic.main.activity_block_selection.*
-import kotlinx.android.synthetic.main.title_bar.view.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_block_selection.*
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import kotlinx.android.synthetic.main.search_layout.*
-import java.lang.Exception
+import kotlinx.android.synthetic.main.title_bar.view.*
 
 class GuestBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
@@ -110,7 +99,7 @@ class GuestBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unit,index -> onSearchResultClick(unit,index)
             })
         rcv_searched_units.adapter = mSearchUnitsAdapter
-        rcv_searched_units.setLayoutManager(LinearLayoutManager(this@GuestBlockSelectionActivity));
+        rcv_searched_units.setLayoutManager(androidx.recyclerview.widget.LinearLayoutManager(this@GuestBlockSelectionActivity));
         mSearchUnitsAdapter!!.notifyDataSetChanged()
         rcv_searched_units.visibility = View.VISIBLE
     }
@@ -121,7 +110,12 @@ class GuestBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unit,index -> onUnitClose(unit,index)
             })
         rcv_selected_units.adapter = mUnitsAdapter
-        rcv_selected_units.setLayoutManager(GridLayoutManager(this@GuestBlockSelectionActivity,5));
+        rcv_selected_units.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@GuestBlockSelectionActivity,
+                5
+            )
+        );
         mUnitsAdapter!!.notifyDataSetChanged()
     }
 
@@ -131,7 +125,12 @@ class GuestBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     block,index -> onPageClick(block,index)
             })
         rcv_blocks.adapter = mBlocksAdapter
-        rcv_blocks.setLayoutManager(GridLayoutManager(this@GuestBlockSelectionActivity,5));
+        rcv_blocks.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@GuestBlockSelectionActivity,
+                5
+            )
+        );
         mBlocksAdapter!!.notifyDataSetChanged()
     }
 

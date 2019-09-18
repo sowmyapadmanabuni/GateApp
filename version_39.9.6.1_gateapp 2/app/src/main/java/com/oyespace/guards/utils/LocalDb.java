@@ -1,13 +1,21 @@
 package com.oyespace.guards.utils;
 
-import android.util.Log;
+import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.content.Context;
+import android.os.Build;
+import android.telecom.TelecomManager;
+
 import com.google.gson.reflect.TypeToken;
-import com.oyespace.guards.PojoClasses.DashboardPojo;
 import com.oyespace.guards.constants.PrefKeys;
-import com.oyespace.guards.pojo.*;
+import com.oyespace.guards.pojo.Association;
+import com.oyespace.guards.pojo.CheckPointByAssocID;
+import com.oyespace.guards.pojo.SearchResult;
+import com.oyespace.guards.pojo.UnitPojo;
+import com.oyespace.guards.pojo.VisitorEntryLog;
+import com.oyespace.guards.pojo.WorkerDetails;
 import com.oyespace.guards.responce.ResponseVisitorLog.Data.Visitorlogbydate;
 import com.oyespace.guards.responce.VisitorLogExitResp;
-
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -213,4 +221,34 @@ public class LocalDb {
         }
         Prefs.putString(PrefKeys.UnitList, tojson);
     }
+
+    @SuppressLint("MissingPermission")
+    public static void disconnectCall(Context context) {
+        try {
+
+            if (Build.VERSION.SDK_INT >= 28) {
+                TelecomManager tm = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
+
+                if (tm != null) {
+                    boolean success = tm.endCall();
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+
+        }
+    }
+
+    public static boolean isServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

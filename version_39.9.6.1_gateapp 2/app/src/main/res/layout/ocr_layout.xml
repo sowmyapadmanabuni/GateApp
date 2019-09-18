@@ -79,7 +79,7 @@ android:layout_margin="@dimen/_2sdp"
             android:paddingRight="@dimen/horizontal_padding_medium">
 
         <!--name-->
-        <android.support.design.widget.TextInputLayout
+        <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/input_vehical_number"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
@@ -114,7 +114,7 @@ android:layout_margin="@dimen/_2sdp"
                     android:textCursorDrawable="@null"
                     android:textSize="@dimen/font_size_xmedium"
             />
-        </android.support.design.widget.TextInputLayout>
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 

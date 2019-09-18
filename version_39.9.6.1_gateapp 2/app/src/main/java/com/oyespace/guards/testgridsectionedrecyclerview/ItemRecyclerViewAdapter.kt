@@ -1,19 +1,17 @@
 package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-
 import com.oyespace.guards.R
 
 
 class ItemRecyclerViewAdapter(private val context: Context, private val arrayList: ArrayList<String>) :
-    RecyclerView.Adapter<ItemRecyclerViewAdapter.ItemViewHolder>() {
+    androidx.recyclerview.widget.RecyclerView.Adapter<ItemRecyclerViewAdapter.ItemViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -39,7 +37,8 @@ class ItemRecyclerViewAdapter(private val context: Context, private val arrayLis
         return arrayList.size
     }
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
 

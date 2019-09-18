@@ -1,36 +1,31 @@
 package com.oyespace.guards.vehicle_others
 
-import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
-import android.provider.MediaStore
-import android.support.v7.app.AlertDialog
-import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.ImageBigView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.camtest.ImageAdapter
-import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.network.*
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
+import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.NumberUtils.toInteger
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
 import com.squareup.picasso.Picasso
@@ -43,7 +38,9 @@ import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import timber.log.Timber
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
@@ -250,7 +247,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             }
             println(list[i])
         }
-        val mLayoutManager = GridLayoutManager(applicationContext, 2)
+        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
         imageAdapter = VehicleOthersImageAdapter(list, this@VehicleOthersEntryRegistration)
         rv_image.adapter = imageAdapter
