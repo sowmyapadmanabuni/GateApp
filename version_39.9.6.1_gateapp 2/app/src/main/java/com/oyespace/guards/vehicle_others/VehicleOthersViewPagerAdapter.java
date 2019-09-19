@@ -1,12 +1,14 @@
 package com.oyespace.guards.vehicle_others;
 
 import android.content.Context;
-import androidx.viewpager.widget.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.viewpager.widget.PagerAdapter;
+
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.ImageHelper;
 

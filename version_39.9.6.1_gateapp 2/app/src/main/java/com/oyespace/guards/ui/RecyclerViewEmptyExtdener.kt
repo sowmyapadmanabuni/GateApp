@@ -1,12 +1,10 @@
 package com.oyespace.guards.ui
 
 import android.content.Context
-import androidx.annotation.Nullable
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
-import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import androidx.annotation.Nullable
 
 
 class RecyclerViewEmptyExtdener : androidx.recyclerview.widget.RecyclerView {

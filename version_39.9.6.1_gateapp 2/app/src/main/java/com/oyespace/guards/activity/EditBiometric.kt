@@ -7,28 +7,25 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
-import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.os.PowerManager
 import android.speech.tts.TextToSpeech
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import com.oyespace.guards.*
+import androidx.appcompat.app.AppCompatActivity
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.Dashboard
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RestClient
@@ -39,16 +36,10 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
-import kotlinx.android.synthetic.main.layout_viewpager_iem.*
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.net.URL
 import java.nio.ByteBuffer
-import java.sql.Blob
 import java.util.*
-import kotlin.math.absoluteValue
 
 
 class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {

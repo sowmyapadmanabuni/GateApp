@@ -8,15 +8,21 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.*;
-import android.widget.*;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,9 +30,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import com.oyespace.guards.*;
-import com.oyespace.guards.network.*;
+import com.oyespace.guards.BackgroundSyncReceiver;
+import com.oyespace.guards.BaseActivity;
+import com.oyespace.guards.DataBaseHelper;
+import com.oyespace.guards.R;
+import com.oyespace.guards.network.ChampApiClient;
+import com.oyespace.guards.network.ChampApiInterface;
+import com.oyespace.guards.network.ResponseHandler;
+import com.oyespace.guards.network.RestClient;
+import com.oyespace.guards.network.URLData;
 import com.oyespace.guards.pertroling.GPSTracker;
 import com.oyespace.guards.request.CreateTicketingActionReq;
 import com.oyespace.guards.responce.CreateTicketingActionResp;
@@ -37,14 +49,20 @@ import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.*;
-
 import static com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247KEY;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 public class TicketingDetailsActivity extends BaseActivity implements OnMapReadyCallback , ResponseHandler {

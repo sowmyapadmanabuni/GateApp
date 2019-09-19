@@ -1,6 +1,7 @@
 package com.oyespace.guards.activity;
 
 //For registering finger print. Wired
+
 import android.app.AlertDialog;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -15,14 +16,12 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -34,12 +33,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.oyespace.guards.BackgroundSyncReceiver;
 import com.oyespace.guards.DataBaseHelper;
 import com.oyespace.guards.R;
-
 import com.oyespace.guards.constants.PrefKeys;
-import com.oyespace.guards.network.*;
+import com.oyespace.guards.network.ResponseHandler;
+import com.oyespace.guards.network.RestClient;
+import com.oyespace.guards.network.URLData;
 import com.oyespace.guards.request.FingerPrintCreateReq;
 import com.oyespace.guards.responce.FingerPrintCreateResp;
 import com.oyespace.guards.utils.LocalDb;
@@ -58,7 +60,21 @@ import SecuGen.FDxSDKPro.SGFDxTemplateFormat;
 import SecuGen.FDxSDKPro.SGFingerInfo;
 import SecuGen.FDxSDKPro.SGFingerPresentEvent;
 
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.BSR_Action;
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247KEY;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.SYNC_STAFF_BIOMETRIC;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 

@@ -7,16 +7,19 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import androidx.appcompat.widget.*
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-
+import com.oyespace.guards.adapter.PaginationAdapter
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.pojo.PaginationData
 import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.pojo.UnitsList
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -25,12 +28,6 @@ import kotlinx.android.synthetic.main.activity_unit_list.*
 import kotlinx.android.synthetic.main.pager_view.*
 import kotlinx.android.synthetic.main.subtitle_bar.*
 import kotlinx.android.synthetic.main.title_bar.*
-import java.lang.Exception
-import kotlin.collections.ArrayList
-import android.widget.RadioButton
-import com.oyespace.guards.adapter.PaginationAdapter
-import com.oyespace.guards.pojo.PaginationData
-import com.oyespace.guards.pojo.UnitsList
 
 
 class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
@@ -789,7 +786,8 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) :
+            androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: CheckBox

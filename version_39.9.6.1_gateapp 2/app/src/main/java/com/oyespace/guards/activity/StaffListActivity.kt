@@ -1,45 +1,34 @@
 package com.oyespace.guards.activity
 
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.speech.RecognizerIntent
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.SearchView
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
-import android.view.Gravity
 import android.view.View
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
+import com.oyespace.guards.R
 import com.oyespace.guards.adapter.StaffAdapter
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.GetWorkerListbyAssnIDResp
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_staff_list.*
-import com.oyespace.guards.R
-import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.pojo.WorkerDetails
 import com.oyespace.guards.pojo.WorkerListbyAssnIDData
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.yarolegovich.lovelydialog.LovelyStandardDialog
-import kotlinx.android.synthetic.main.activity_name_entry.*
-import java.util.*
-import android.text.Editable
-import android.text.TextWatcher
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import com.oyespace.guards.utils.ConstantUtils
-import kotlinx.android.synthetic.main.activity_final_registration.*
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_staff_list.*
 import java.io.File
-import java.util.Locale.filter
+import java.util.*
 
 
 class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {

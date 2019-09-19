@@ -1,9 +1,11 @@
 package com.oyespace.guards.qrscanner;
 
+import android.view.MenuItem;
+
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.MenuItem;
+
 import com.oyespace.guards.R;
 
 public class BaseScannerActivity extends AppCompatActivity {

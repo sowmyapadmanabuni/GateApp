@@ -23,6 +23,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
 import com.oyespace.guards.network.ChampApiClient;
@@ -33,6 +34,8 @@ import com.oyespace.guards.request.InvitationUpdateReq;
 import com.oyespace.guards.responce.InvitationRequestResponse;
 import com.oyespace.guards.utils.Prefs;
 
+import java.util.Locale;
+
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -40,10 +43,24 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.Locale;
-
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.FROMDATE;
+import static com.oyespace.guards.utils.ConstantUtils.FROMTIME;
+import static com.oyespace.guards.utils.ConstantUtils.GUEST;
+import static com.oyespace.guards.utils.ConstantUtils.INVITATIONID;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.NUMBEROFPERSONS;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.TODATE;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_GUESTWITHQRCODE;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 import static com.oyespace.guards.utils.DateTimeUtils.compareDate;
 import static com.oyespace.guards.utils.RandomUtils.entryExists;
 
@@ -51,7 +68,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
     private ZXingScannerView mScannerView;
     private Button noQrcodeButton;
     private TextView dataTextView;
-     androidx.appcompat.app.AlertDialog alertDialog;
+    androidx.appcompat.app.AlertDialog alertDialog;
     ChampApiInterface champApiInterface;
 
     @Override

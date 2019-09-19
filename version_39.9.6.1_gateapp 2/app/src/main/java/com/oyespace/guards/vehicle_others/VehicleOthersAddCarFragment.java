@@ -17,20 +17,27 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.loader.content.CursorLoader;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
+
 import com.oyespace.guards.BackgroundSyncReceiver;
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.CarImages_Adapter;
@@ -52,7 +59,23 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ACCOUNT_ID;
+import static com.oyespace.guards.utils.ConstantUtils.BSR_Action;
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.ITEMS_PHOTO_LIST;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
+import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_OTHERS;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 
 public class VehicleOthersAddCarFragment extends Activity implements View.OnClickListener {

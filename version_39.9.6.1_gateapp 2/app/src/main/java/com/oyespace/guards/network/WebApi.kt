@@ -1,7 +1,6 @@
 package com.oyespace.guards.network
 
 
-
 import com.oyespace.guards.models.GetGuardsListResponse
 import com.oyespace.guards.models.GuardsList
 import com.oyespace.guards.pojo.*
@@ -32,7 +31,11 @@ interface WebApi {
             : Single<UnitList<ArrayList<UnitPojo>>>
 
     @GET("oye247/api/v1/GetWorkersListByWorkerTypeAndAssocID/{assnId}/{type}")
-    fun getGuardsList(@Header("X-OYE247-APIKey") token: String, @Path("assnId") assid: String, @Path("type") type: String)
+    fun getGuardsList(
+        @Header("X-OYE247-APIKey") token: String, @Path("assnId") assid: String, @Path(
+            "type"
+        ) type: String
+    )
             : Single<GetGuardsListResponse<GuardsList>>
 
     @GET("oyeliving/api/v1/Block/GetBlockListByAssocID/{id}")
@@ -167,5 +170,8 @@ interface WebApi {
 
     @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
     fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq):Single<InviteCreateRes>
+
+    @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
+    fun checkIfResident(@Header(OYE247KEY) token: String, @Body residentCheckReq: ResidentCheckReq): Single<ResidentCheckResponse>
 
 }

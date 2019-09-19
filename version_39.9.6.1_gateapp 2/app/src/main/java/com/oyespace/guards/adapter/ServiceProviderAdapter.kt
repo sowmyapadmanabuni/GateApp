@@ -1,15 +1,12 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.oyespace.guards.R
 import com.oyespace.guards.testgridsectionedrecyclerview.ItemRecyclerViewAdapter
-import com.oyespace.guards.testgridsectionedrecyclerview.RecyclerViewType
 import com.oyespace.guards.testgridsectionedrecyclerview.SectionModel
 
 class ServiceProviderAdapter  (private val context: Context, private val itemArrayList: ArrayList<SectionModel>
@@ -34,9 +31,7 @@ class ServiceProviderAdapter  (private val context: Context, private val itemArr
         holder.itemRecyclerView.isNestedScrollingEnabled = false
 
 
-
-
-                val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
+        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
                 holder.itemRecyclerView.layoutManager = gridLayoutManager
 
 
@@ -49,7 +44,8 @@ class ServiceProviderAdapter  (private val context: Context, private val itemArr
         return itemArrayList.size
     }
 
-    class ServiceProviderViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ServiceProviderViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
         val itemRecyclerView: androidx.recyclerview.widget.RecyclerView
         val section_label: TextView

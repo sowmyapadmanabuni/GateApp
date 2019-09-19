@@ -18,7 +18,7 @@ public class TimeSetter extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    final Intent mainIntent = new Intent(TimeSetter.this, ReciverTimmer.class );
+                    final Intent mainIntent = new Intent(TimeSetter.this, ReciverTimmer.class);
                     TimeSetter.this.startActivity(mainIntent);
                     TimeSetter.this.finish();
                 }

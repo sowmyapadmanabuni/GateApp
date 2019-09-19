@@ -1,30 +1,20 @@
 package com.oyespace.guards.activity
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.oyespace.guards.R
-import android.R.attr.country
 import android.app.Activity
-import android.graphics.Bitmap
-import android.provider.MediaStore
-import android.speech.RecognizerIntent
-import android.view.View
-import android.widget.*
-import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.Toast
-import android.widget.DatePicker
-import java.util.*
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.content.*
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.os.Environment
-import androidx.appcompat.app.AlertDialog
+import android.provider.MediaStore
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import com.oyespace.guards.Dashboard
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
@@ -36,7 +26,6 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
@@ -49,7 +38,7 @@ import timber.log.Timber
 import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import javax.xml.datatype.DatatypeConstants.MONTHS
+import java.util.*
 
 
 class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListener{

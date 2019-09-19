@@ -3,21 +3,20 @@ package com.oyespace.guards.adapter
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.LinearLayout
+import android.widget.TextView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BlockSelectionActivity
-import com.oyespace.guards.activity.UnitListActivity
 import com.oyespace.guards.staffManaualEntry.ManulBlockSelectionActivity
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 
 
-
-class WorkersTypeListAdapter (val items : ArrayList<String>, val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<WorkersTypeListAdapter.WorkerViewHolder>() {
+class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context) :
+    androidx.recyclerview.widget.RecyclerView.Adapter<WorkersTypeListAdapter.WorkerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): WorkerViewHolder {
         return WorkerViewHolder(LayoutInflater.from(mcontext).inflate(R.layout.layout_worker_adapter_row, parent, false))
@@ -67,7 +66,8 @@ class WorkersTypeListAdapter (val items : ArrayList<String>, val mcontext: Conte
         return items.size
     }
 
-    class WorkerViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    class WorkerViewHolder(view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val lv_staff : LinearLayout
         val tv_worktype : TextView
 

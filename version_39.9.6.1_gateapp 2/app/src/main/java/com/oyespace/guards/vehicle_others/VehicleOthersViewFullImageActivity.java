@@ -1,10 +1,12 @@
 package com.oyespace.guards.vehicle_others;
 
 import android.os.Bundle;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
 import com.oyespace.guards.R;
 
 public class VehicleOthersViewFullImageActivity extends AppCompatActivity {

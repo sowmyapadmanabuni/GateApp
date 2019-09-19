@@ -1,20 +1,20 @@
 package com.oyespace.guards.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.recyclerview.widget.RecyclerView
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.oyespace.guards.pojo.UnitPojo
-
+import android.widget.CheckBox
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.MobileNumberScreen
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.pojo.UnitPojo
 import com.oyespace.guards.utils.ConstantUtils.*
-import android.app.Activity
-import android.net.Uri
-import android.widget.*
 
 
 class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
@@ -71,7 +71,8 @@ class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val m
         return listVistor?.size ?: 0
     }
 
-    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 //        val entryTime: TextView
 //        val exitTime: TextView
         val iv_unit: ImageView

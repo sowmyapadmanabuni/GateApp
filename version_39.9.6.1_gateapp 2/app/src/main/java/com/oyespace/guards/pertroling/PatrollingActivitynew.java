@@ -67,16 +67,50 @@ import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 public class PatrollingActivitynew extends BaseScannerActivity implements ResponseHandler, ZXingScannerView.ResultHandler {
-        private ZXingScannerView mScannerView;
+    public ArrayList<String[]> pat = new ArrayList<>();
     private Button noQrcodeButton;
     private TextView dataTextView;
     public   String[] patrolingdataList;
-
-
-    public ArrayList<String[]> pat = new ArrayList<>();
     LocationManager mLocationManager;
     Location currentLocation;
+    private final LocationListener mLocationListener = new LocationListener() {
+        @Override
+        public void onLocationChanged(final Location location) {
+            currentLocation = location;
+            Double dis = haversine(currentLocation.getLatitude(), currentLocation.getLongitude(), 9.6143583, 76.3208816);
+
+            float[] results = new float[2];
+            Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), 9.6143583, 76.3208816, results);
+
+            ((TextView) findViewById(R.id.scaneddata)).setText("" + location.getLatitude() + " , " + location.getLongitude() + " -> " + dis + " " + results[0]);
+        }
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {
+
+        }
+
+        @Override
+        public void onProviderEnabled(String provider) {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {
+
+        }
+    };
     GPSTracker gpsTracker;
+    private ZXingScannerView mScannerView;
+
+    public static Double distanceBetween(LatLng point1, LatLng point2) {
+        if (point1 == null || point2 == null) {
+            return null;
+        }
+
+        return SphericalUtil.computeDistanceBetween(point1, point2);
+    }
+
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -128,7 +162,6 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         });
 
 
-
         // setupToolbar();
         ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         mScannerView = new ZXingScannerView(this) {
@@ -140,93 +173,57 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
 
         setCoordinates();
         startLocation();
-        Log.e("POINTS",""+ LocalDb.getCheckPointList());
+        Log.e("POINTS", "" + LocalDb.getCheckPointList());
         contentFrame.addView(mScannerView);
 
     }
 
     @SuppressLint("MissingPermission")
-    private void startLocation(){
+    private void startLocation() {
         mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000,
                 0.5f, mLocationListener);
     }
 
-    private final LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(final Location location) {
-            currentLocation = location;
-            Double dis = haversine(currentLocation.getLatitude(),currentLocation.getLongitude(),9.6143583,76.3208816);
-
-            float[] results = new float[2];
-            Location.distanceBetween(currentLocation.getLatitude(),currentLocation.getLongitude(),9.6143583,76.3208816,results);
-
-            ((TextView)findViewById(R.id.scaneddata)).setText(""+location.getLatitude()+" , "+location.getLongitude()+" -> "+dis+" "+results[0]);
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-    };
-
-    public static Double distanceBetween(LatLng point1, LatLng point2) {
-        if (point1 == null || point2 == null) {
-            return null;
-        }
-
-        return SphericalUtil.computeDistanceBetween(point1, point2);
-    }
-
-    private void req(String sLat, String sLong){
+    private void req(String sLat, String sLong) {
         RequestQueue queue;
         queue = Volley.newRequestQueue(this);
-        String url = "https://maps.google.com/maps/api/directions/json?origin="+sLat+","+sLong+"&destination=9.6143583,76.3208816&sensor=false&units=metric&key=AIzaSyAwa91FAG9CgKgrB3wuY0lIIpqfKOjKykE";
-        Log.e("URL",""+url);
+        String url = "https://maps.google.com/maps/api/directions/json?origin=" + sLat + "," + sLong + "&destination=9.6143583,76.3208816&sensor=false&units=metric&key=AIzaSyAwa91FAG9CgKgrB3wuY0lIIpqfKOjKykE";
+        Log.e("URL", "" + url);
         StringRequest reqs = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>()
-                {
+                new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e("onResponse",""+response);
+                        Log.e("onResponse", "" + response);
 
-                        try{
+                        try {
 
                             JSONObject disObj = new JSONObject(response);
                             JSONArray routesArray = disObj.getJSONArray("routes");
-                            if(routesArray.length() > 0){
+                            if (routesArray.length() > 0) {
                                 JSONObject routeObj = routesArray.getJSONObject(0);
                                 JSONArray legsArray = routeObj.getJSONArray("legs");
-                                if(legsArray.length() > 0){
+                                if (legsArray.length() > 0) {
                                     JSONObject legsObj = legsArray.getJSONObject(0);
                                     JSONObject distanceObj = legsObj.getJSONObject("distance");
                                     distanceObj.getString("text");
-                                    Log.e("SETPS>>",""+distanceObj.getString("text"));
-                                    ((TextView)findViewById(R.id.scaneddata)).setText(""+distanceObj.getString("text"));
+                                    Log.e("SETPS>>", "" + distanceObj.getString("text"));
+                                    ((TextView) findViewById(R.id.scaneddata)).setText("" + distanceObj.getString("text"));
                                 }
 
                             }
 
-                        }catch (Exception e){e.printStackTrace();}
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
                     }
                 },
-                new Response.ErrorListener()
-                {
+                new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         // handle error response
-                        Log.e("onErrorResponse",""+error);
+                        Log.e("onErrorResponse", "" + error);
                     }
                 }
         );
@@ -235,7 +232,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
     }
 
     public Double haversine(double lat1, double lon1, double lat2, double lon2) {
-        Log.e("CALCULA",""+lat1+" "+ lon1+" "+ lat2+" "+ lon2);
+        Log.e("CALCULA", "" + lat1 + " " + lon1 + " " + lat2 + " " + lon2);
         double Rad = 6372.8; //Earth's Radius In kilometers
         // TODO Auto-generated method stub
         double dLat = Math.toRadians(lat2 - lat1);
@@ -245,7 +242,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
         double c = 2 * Math.asin(Math.sqrt(a));
         Double haverdistanceKM = Rad * c;
-        Log.e("HAVERSIAN",""+haverdistanceKM);
+        Log.e("HAVERSIAN", "" + haverdistanceKM);
         return haverdistanceKM;
     }
 
@@ -287,28 +284,28 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
 //        return result_in_kms;
 //    }
 
-    public void setCoordinates(){
+    public void setCoordinates() {
         String[] point = new String[2];
-        point[0] = "9.6143583" ;
-        point[1] = "76.3208816" ;
+        point[0] = "9.6143583";
+        point[1] = "76.3208816";
 
         pat.add(point);
 
         point = new String[2];
-        point[0] = "9.614439" ;
-        point[1] = "76.3209044" ;
+        point[0] = "9.614439";
+        point[1] = "76.3209044";
 
         pat.add(point);
 
         point = new String[2];
-        point[0] = "9.6144913" ;
-        point[1] = "76.320928" ;
+        point[0] = "9.6144913";
+        point[1] = "76.320928";
 
         pat.add(point);
 
         point = new String[2];
-        point[0] = "9.6143699" ;
-        point[1] = "76.3208857" ;
+        point[0] = "9.6143699";
+        point[1] = "76.3208857";
 
         pat.add(point);
     }
@@ -518,18 +515,18 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
     public void handleResult(Result rawResult) {
         final String patrolingdata = rawResult.getText();
         patrolingdataList = patrolingdata.split(",");
-        if(patrolingdataList.length>4) {
+        if (patrolingdataList.length > 4) {
             System.out.println("Patroling Data " + patrolingdataList[0] + " " + patrolingdataList[1] + " " + patrolingdataList[2] + " " + patrolingdataList[3]);
             float[] results = new float[2];
             Double lat = Double.parseDouble(patrolingdataList[1]);
             Double lng = Double.parseDouble(patrolingdataList[2]);
-            Location.distanceBetween(currentLocation.getLatitude(),currentLocation.getLongitude(),lat,lng,results);
-            Toast.makeText(this,"Distance: "+results[0],Toast.LENGTH_LONG).show();
+            Location.distanceBetween(currentLocation.getLatitude(), currentLocation.getLongitude(), lat, lng, results);
+            Toast.makeText(this, "Distance: " + results[0], Toast.LENGTH_LONG).show();
         }
     }
 
 
-    public void calculateDistance(){
+    public void calculateDistance() {
 
     }
 
@@ -539,7 +536,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         PatrollingStartReq loginReq = new PatrollingStartReq();
 
         loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID,0) ;
-        loginReq.WKWorkID= LocalDb.getStaffList().get(0).getWkWorkID();
+        loginReq.WKWorkID = LocalDb.getStaffList().get(0).getWkWorkID();
         loginReq.wkfName = Prefs.getString(GATE_NO, "");//LocalDb.getStaffList().get(0).getWkfName()+LocalDb.getStaffList().get(0).getWklName();
         loginReq.PSPtrlSID =  1 ;
         //loginReq.PTSDateT=DateTimeUtils.getCurrentTimeLocal();
@@ -559,7 +556,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         PatrollingStopReq loginReq = new PatrollingStopReq();
 
         loginReq.PTPtrlID = Prefs.getInt(PATROLLING_ID,0) ;
-        loginReq.PTEDateT= DateTimeUtils.getCurrentTimeLocal();
+        loginReq.PTEDateT = DateTimeUtils.getCurrentTimeLocal();
 
         Log.d("patrollingStop","StaffEntry "+loginReq.toString()+" "+loginReq.PTPtrlID+" "+loginReq.PTEDateT );
 
@@ -574,12 +571,12 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
 
         SaveTrackingReq loginReq = new SaveTrackingReq();
 
-        loginReq.ASAssnID= Prefs.getInt(ASSOCIATION_ID,0);
+        loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
         loginReq.CPCkPName=checkPointName;
         loginReq.TRGPSPnt=gpsPoint;
-        loginReq.WKWorkID= LocalDb.getStaffList().get(0).getWkWorkID();
+        loginReq.WKWorkID = LocalDb.getStaffList().get(0).getWkWorkID();
         loginReq.PTPtrlID = Prefs.getInt(PATROLLING_ID,0) ;
-        loginReq.TRTDateT= DateTimeUtils.getCurrentTimeLocal();
+        loginReq.TRTDateT = DateTimeUtils.getCurrentTimeLocal();
 
         Log.d("saveCheckPoints","StaffEntry "+loginReq.ASAssnID+" "+loginReq.CPCkPName+" "
                 +loginReq.WKWorkID+" "+loginReq.PTPtrlID+" "+loginReq.TRTDateT );
@@ -700,15 +697,16 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         private List<GoogleRoutes> routes;
 
     }
-    class GoogleRoutes{
+
+    class GoogleRoutes {
         private List<GoogleLegs> legs;
     }
 
-    class GoogleLegs{
+    class GoogleLegs {
         private GoogleDistance distance;
     }
 
-    class GoogleDistance{
+    class GoogleDistance {
         private String text;
     }
 }

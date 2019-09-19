@@ -1,16 +1,11 @@
 package com.oyespace.guards.adapter
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Handler
-import androidx.core.app.ActivityCompat.startActivityForResult
-import androidx.core.content.ContextCompat.startActivity
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,26 +13,25 @@ import android.view.ViewGroup
 import android.widget.*
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.Dashboard
+import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.Biometric
+import com.oyespace.guards.activity.EditStaffActivity
+import com.oyespace.guards.activity.MobileNumberforEntryScreen
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import com.oyespace.guards.DataBaseHelper
-import com.oyespace.guards.activity.*
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.*
-import kotlinx.android.synthetic.main.activity_img_view.*
-import kotlinx.android.synthetic.main.activity_mobile_number.*
 
 
-
-
-class StaffAdapter (val items : ArrayList<WorkerDetails>, val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<StaffAdapter.StaffViewHolder>() ,Filterable{
+class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
+    androidx.recyclerview.widget.RecyclerView.Adapter<StaffAdapter.StaffViewHolder>(), Filterable {
 
     private var searchList: ArrayList<WorkerDetails>? = null
     val dbh:DataBaseHelper= DataBaseHelper(mcontext);

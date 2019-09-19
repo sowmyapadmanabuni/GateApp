@@ -138,4 +138,7 @@
     <string name="tvresident">निवासी</string>
     <string name="tvmanualentry">पूर्ण मैनुअल एंट्री</string>
     <string name="tvverifyotp">OTP को सत्यापित करें</string>
+    <string name="scan_res_id_here">"यहां पर रेजिडेंट आईडी स्कैन करें   "</string>
+    <string name="valid">वैध</string>
+    <string name="invalid">अमान्य</string>
 </resources>

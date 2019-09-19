@@ -1,7 +1,6 @@
 package com.oyespace.guards.ui
 
 import android.content.Context
-import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
 import com.oyespace.guards.utils.RecyclerViewEnum

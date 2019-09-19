@@ -1,8 +1,6 @@
 package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.content.Context
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -53,7 +51,8 @@ class SectionRecyclerViewAdapter(
         return sectionModelArrayList.size
     }
 
-    class SectionViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class SectionViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
 
         val itemRecyclerView: androidx.recyclerview.widget.RecyclerView
         val section_label: TextView

@@ -1,39 +1,28 @@
 package com.oyespace.guards.activity;
 //import static com.veinhorn.scrollgalleryview.loader.picasso.dsl.DSL.*;
-import android.os.Bundle;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
 import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.ViewPager;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.gson.Gson;
+import com.oyespace.guards.R;
+
+import java.util.ArrayList;
 
 //import com.denzcoskun.imageslider.ImageSlider;
 //import com.denzcoskun.imageslider.models.SlideModel;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.gson.Gson;
-import com.oyespace.guards.R;
-import com.veinhorn.scrollgalleryview.MediaInfo;
-import com.veinhorn.scrollgalleryview.ScrollGalleryView;
-import com.veinhorn.scrollgalleryview.builder.GallerySettings;
 //import com.veinhorn.scrollgalleryview.loader.picasso.PicassoImageLoader;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class GalleryViewActivity extends FragmentActivity {
 
+    DatabaseReference mSosReference;
     //private ScrollGalleryView galleryView;
     private ArrayList<String> images = new ArrayList<>();
     private int currentIndex = 0;
     private String mSOSImagePath = "";
-    DatabaseReference mSosReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +30,7 @@ public class GalleryViewActivity extends FragmentActivity {
         setContentView(R.layout.activity_gallery_view);
 
         String jsonImages = getIntent().getStringExtra("images");
-        images = new Gson().fromJson(jsonImages,ArrayList.class);
+        images = new Gson().fromJson(jsonImages, ArrayList.class);
 //        List<SlideModel> infos = new ArrayList<>(images.size());
 //        for (String url : images) infos.add(new SlideModel(url));
 
@@ -68,10 +57,9 @@ public class GalleryViewActivity extends FragmentActivity {
 //                .addMedia(infos);
 
 
-
     }
 
-    private void initFRTDB(){
+    private void initFRTDB() {
 
 //        DatabaseReference mDatabase =  FirebaseDatabase.getInstance().getReference();
 //        mSosReference = FirebaseDatabase.getInstance().getReference(mSOSImagePath);

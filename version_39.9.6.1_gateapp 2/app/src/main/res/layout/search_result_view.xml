@@ -4,6 +4,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="8dp">
+
     <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/search_result_text"
             android:layout_margin="8dp"

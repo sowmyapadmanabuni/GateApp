@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="com.oyespace.guards"
-        >
-
-
-
+        package="com.oyespace.guards">
 
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -18,8 +14,8 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -32,7 +28,7 @@
 
     <permission android:name="android.permission.CLEAR_APP_CACHE" />
 
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
 
     <application
@@ -47,43 +43,35 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".resident.ResidentMissedCallActivity"></activity>
         <activity
-                android:name=".activity.ResidentIdActivity"
-                android:theme="@style/noActionBar"></activity>
-
-
-
-        <activity android:name=".staffManaualEntry.ManualStaffEntryRegistration"
+                android:name=".resident.ResidentIdActivity"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualStaffEntryRegistration"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualAddCarFragment"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualNameEntryScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualMobileNumberScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManulBlockSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualAddCarFragment"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".staffManaualEntry.ManualUnitSelectionActivity"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualNameEntryScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualMobileNumberScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManulBlockSelectionActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan"/>
-
-        <activity android:name=".staffManaualEntry.ManualUnitSelectionActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-              />
-
-
+                android:theme="@style/noActionBar" />
         <activity android:name=".activity.NewBiometric" />
         <activity
                 android:name=".activity.EditStaffActivity"
@@ -109,12 +97,12 @@
                 android:name="org.apache.http.legacy"
                 android:required="false" />
 
-<!--        <meta-data-->
-<!--                android:name="com.google.android.geo.API_KEY"-->
-<!--                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />-->
+        <!--        <meta-data-->
+        <!--                android:name="com.google.android.geo.API_KEY"-->
+        <!--                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />-->
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="@string/google_maps_key"/>
+                android:value="@string/google_maps_key" />
 
         <activity
                 android:name=".DashboardActivity"
@@ -236,8 +224,8 @@
         <activity
                 android:name=".Dashboard"
                 android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan"
-                android:theme="@style/noActionBar" />
+                android:theme="@style/noActionBar"
+                android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".com.oyespace.guards.activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
@@ -258,15 +246,14 @@
                 android:value="@integer/google_play_services_version" />
         <meta-data
                 android:name="com.google.android.ocr.API_KEY"
-                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w" />
-        <!-- <activity -->
+                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w" /> <!-- <activity -->
         <!-- android:name=".activity.PatrollingActivity" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/noActionBar"> -->
         <!-- </activity> -->
         <service
                 android:name=".com.oyespace.guards.fcm.FRTDBService"
-                android:enabled="true"/>
+                android:enabled="true" />
 
         <service
                 android:name=".SGPatrollingService"

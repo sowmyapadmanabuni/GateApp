@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import androidx.viewpager.widget.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.viewpager.widget.PagerAdapter;
+
+import com.oyespace.guards.R;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import com.oyespace.guards.R;
 
 
 /**

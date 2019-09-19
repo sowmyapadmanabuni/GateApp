@@ -4,9 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.speech.tts.TextToSpeech
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,29 +11,27 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
-import com.oyespace.guards.activity.ImgView
+import androidx.appcompat.app.AlertDialog
+import com.oyespace.guards.R
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
-import com.oyespace.guards.responce.ResponseVisitorLog.Data.Visitorlogbydate
+import com.oyespace.guards.responce.VisitorLogExitResp
+import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.ConstantUtils.DELIVERY
+import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
-import com.oyespace.guards.R
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.pojo.VisitorEntryLog
-import com.oyespace.guards.responce.VisitorLogExitResp
-import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.*
-import java.text.SimpleDateFormat
 
 class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Data.VisitorLog>, private val mcontext: Context) :
 
-    androidx.recyclerview.widget.RecyclerView.Adapter<VistorListAdapter.MenuHolder>(),Filterable {
+    androidx.recyclerview.widget.RecyclerView.Adapter<VistorListAdapter.MenuHolder>(), Filterable {
     private var searchList: ArrayList<VisitorLogExitResp.Data.VisitorLog>? = null
 
     private val mInflater: LayoutInflater
@@ -349,7 +344,8 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         return searchList?.size ?: 0
     }
 
-    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val entryTime: TextView
         val exitTime: TextView
         val visitorName: TextView
