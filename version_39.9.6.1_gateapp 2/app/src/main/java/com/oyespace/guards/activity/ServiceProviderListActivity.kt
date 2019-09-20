@@ -1,37 +1,16 @@
 package com.oyespace.guards.activity
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.SeviceProviderListResponse
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-
+import com.oyespace.guards.R
 import com.oyespace.guards.adapter.CompanyItemRVAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.utils.Prefs
-
-import kotlinx.android.synthetic.main.activity_service_provider_list.*
-import java.util.*
-
-import com.oyespace.guards.R
 import com.oyespace.guards.pojo.VendorPojo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
-
-
-
-
-
-
-
+import com.oyespace.guards.utils.Prefs
+import java.util.*
 
 
 class ServiceProviderListActivity : BaseKotlinActivity() {
@@ -120,7 +99,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
         //  getServiceProviderList()
-        val rv_serviceProvider = findViewById(R.id.rv_serviceProvider) as androidx.recyclerview.widget.RecyclerView
+        val rv_serviceProvider =
+            findViewById(R.id.rv_serviceProvider) as androidx.recyclerview.widget.RecyclerView
         rv_serviceProvider!!.setHasFixedSize(true)
         val gridLayoutManager =
             androidx.recyclerview.widget.GridLayoutManager(this@ServiceProviderListActivity, 3)

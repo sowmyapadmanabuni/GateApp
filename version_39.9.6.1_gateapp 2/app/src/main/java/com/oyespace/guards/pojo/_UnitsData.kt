@@ -1,7 +1,5 @@
 package com.oyespace.guards.pojo
 
-import com.oyespace.guards.pojo.UnitPojo
-
 
 data class _UnitsData(
     var unUnitID: Int,
@@ -23,7 +21,7 @@ data class _UnitsData(
     var undCreated: String,
     var undUpdated: String,
     var unIsActive: String,
-    var isSelected:Boolean = false
+    var isSelected: Boolean = false
 )
 
 data class UnitsList<T>(
@@ -37,6 +35,6 @@ data class UnitsByBlock(
 )
 
 data class SearchUnitRequest(
-    var ASAssnID:Int,
-    var UNUniName:String
+    var ASAssnID: Int,
+    var UNUniName: String
 )

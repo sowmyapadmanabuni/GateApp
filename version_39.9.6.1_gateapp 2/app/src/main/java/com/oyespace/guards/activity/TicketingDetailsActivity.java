@@ -8,15 +8,21 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewFlipper;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.*;
-import android.widget.*;
+
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,9 +30,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
-
-import com.oyespace.guards.*;
-import com.oyespace.guards.network.*;
+import com.oyespace.guards.BackgroundSyncReceiver;
+import com.oyespace.guards.BaseActivity;
+import com.oyespace.guards.DataBaseHelper;
+import com.oyespace.guards.R;
+import com.oyespace.guards.network.ChampApiClient;
+import com.oyespace.guards.network.ChampApiInterface;
+import com.oyespace.guards.network.ResponseHandler;
+import com.oyespace.guards.network.RestClient;
+import com.oyespace.guards.network.URLData;
 import com.oyespace.guards.pertroling.GPSTracker;
 import com.oyespace.guards.request.CreateTicketingActionReq;
 import com.oyespace.guards.responce.CreateTicketingActionResp;
@@ -37,55 +49,61 @@ import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import java.util.*;
-
 import static com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247KEY;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
 import static com.oyespace.guards.utils.Utils.showToast;
 
-public class TicketingDetailsActivity extends BaseActivity implements OnMapReadyCallback , ResponseHandler {
+public class TicketingDetailsActivity extends BaseActivity implements OnMapReadyCallback, ResponseHandler {
+    public ImageView img_incident;
     ChampApiInterface champApiInterface;
-    private GoogleMap mMap;
     List<LatLng> patrollingRoute;
     Handler handler;
-    public ImageView img_incident;
-    Bitmap bitmapImage=null;
-    private List<ViewReportList> mySGList = new ArrayList<ViewReportList>();
+    Bitmap bitmapImage = null;
     //private IncidentReportAdapter mAdapter;
-    RecyclerView recyclerView ;
+    RecyclerView recyclerView;
     DataBaseHelper dbh;
     TelephonyManager telMgr;
     GPSTracker gps;
-    int EmergencyID=0;
+    int EmergencyID = 0;
     RelativeLayout resolve;
-    Bitmap[] incidentimages=new Bitmap[5];
-    int p=0;
+    Bitmap[] incidentimages = new Bitmap[5];
+    int p = 0;
     ViewFlipper viewFlipper;
     Cursor curImage;
-    int i=0;
-    int Nid=0;
-    String mobile_number=null;
-    TextView tv_name,tv_mobileno;
+    int i = 0;
+    int Nid = 0;
+    String mobile_number = null;
+    TextView tv_name, tv_mobileno;
+    private GoogleMap mMap;
+    private List<ViewReportList> mySGList = new ArrayList<ViewReportList>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_emergency_response);
-        tv_name=findViewById(R.id.tv_name);
-        tv_mobileno=findViewById(R.id.tv_mobileno);
+        tv_name = findViewById(R.id.tv_name);
+        tv_mobileno = findViewById(R.id.tv_mobileno);
         gps = new GPSTracker(getApplicationContext());
-        dbh=new DataBaseHelper(getApplicationContext());
+        dbh = new DataBaseHelper(getApplicationContext());
 
         telMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-        resolve=findViewById(R.id.rl_refresh);
+        resolve = findViewById(R.id.rl_refresh);
 
-        EmergencyID= 1063;
-        Cursor cursor=dbh.getEmergencyNotifications();
-        if(cursor.getCount()>0) {
+        EmergencyID = 1063;
+        Cursor cursor = dbh.getEmergencyNotifications();
+        if (cursor.getCount() > 0) {
             cursor.moveToFirst();
 
 //                            cursor.getInt(cursor.getColumnIndex("Nid"));
@@ -94,12 +112,12 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 //                            cursor.getString(cursor.getColumnIndex("sub_title")),
 //                            cursor.getString(cursor.getColumnIndex("notified")),
 //                            cursor.getString(cursor.getColumnIndex("noti_type")),
-            EmergencyID=  cursor.getInt(cursor.getColumnIndex("noti_id"));
-            mobile_number    =         cursor.getString(cursor.getColumnIndex("MobileNumber"));
-            Nid=cursor.getInt(cursor.getColumnIndex("Nid"));
+            EmergencyID = cursor.getInt(cursor.getColumnIndex("noti_id"));
+            mobile_number = cursor.getString(cursor.getColumnIndex("MobileNumber"));
+            Nid = cursor.getInt(cursor.getColumnIndex("Nid"));
 
-        }else{
-            Toast.makeText(getApplicationContext(), "FInish " , Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "FInish ", Toast.LENGTH_LONG).show();
 //            finish();
 
         }
@@ -112,7 +130,6 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
         mapFragment.getMapAsync(this);
 
 
-
         recyclerView = findViewById(R.id.incident_list);
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
         // mAdapter = new IncidentReportAdapter(getApplicationContext(), mySGList);
@@ -121,26 +138,25 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         //recyclerView.setAdapter(mAdapter);
 
-        viewFlipper=findViewById(R.id.flipperid);
+        viewFlipper = findViewById(R.id.flipperid);
         loadincidentimages();
-        Log.d("hello","155");
+        Log.d("hello", "155");
 
         //loadincidentimages();
 
-        patrollingRoute=new ArrayList<>();
+        patrollingRoute = new ArrayList<>();
         handler = new Handler();
 
-        Log.d("Dgddfdf emer gency","Dgddfdfeemer "+EmergencyID+ " ");
+        Log.d("Dgddfdf emer gency", "Dgddfdfeemer " + EmergencyID + " ");
 
         viewFlipper.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 viewFlipper.setFlipInterval(500);
-                Log.d("Dgddfdf","Hello");
-                if(viewFlipper.isFlipping())
-                {
+                Log.d("Dgddfdf", "Hello");
+                if (viewFlipper.isFlipping()) {
                     viewFlipper.stopFlipping();
-                }else
+                } else
                     viewFlipper.startFlipping();
                 //viewFlipper.stopFlipping();
                 return false;
@@ -150,13 +166,12 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
     }
 
     private void showincidentimages() {
-        Log.d("Dgddfd incid0ent", "A2"+incidentimages.length);
+        Log.d("Dgddfd incid0ent", "A2" + incidentimages.length);
         for (int i = 0; i < incidentimages.length; i++) {
-            if(incidentimages[i]!=null){
+            if (incidentimages[i] != null) {
                 Log.d("Dgddfd incid1ent", "B3");
                 setFlipperImage(incidentimages[i]);
-            }
-            else {
+            } else {
                 Log.d("Dgddfd incid1ent", "A3");
             }
         }
@@ -178,65 +193,55 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 
 
     private void loadincidentimages() {
-        for(i=0;i<5;i++)
-        {
+        for (i = 0; i < 5; i++) {
             try {
 
-                String imgName= "Images/"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"EMERGENCY"+"INCIDENT"+EmergencyID+"N"+0+".jpg";
+                String imgName = "Images/" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "EMERGENCY" + "INCIDENT" + EmergencyID + "N" + 0 + ".jpg";
 
-                Log.v("IMAGEURL",IMAGE_BASE_URL+"..."+imgName);
+                Log.v("IMAGEURL", IMAGE_BASE_URL + "..." + imgName);
                 Picasso.with(getApplicationContext())
-                        .load(IMAGE_BASE_URL+imgName)
+                        .load(IMAGE_BASE_URL + imgName)
 //                            .placeholder(R.drawable.mock_test)
                         .error(R.drawable.usericon)
 //                            .resize(60,60)
                         .into(new Target() {
                             @Override
                             public void onBitmapLoaded(Bitmap bm, Picasso.LoadedFrom from) {
-                                Log.d("Dgddfdf picas","3");
-                                if(i==0)
-                                {
-                                    if(bm!=null){
-                                        incidentimages[i]=bm;
+                                Log.d("Dgddfdf picas", "3");
+                                if (i == 0) {
+                                    if (bm != null) {
+                                        incidentimages[i] = bm;
                                         setFlipperImage(incidentimages[i]);
                                     }
-                                    bm=null;
-                                }else if(i==1)
-                                {
+                                    bm = null;
+                                } else if (i == 1) {
 
-                                    if(bm!=null)
-                                    {
-                                        incidentimages[i]=bm;
+                                    if (bm != null) {
+                                        incidentimages[i] = bm;
                                         setFlipperImage(incidentimages[i]);
                                     }
-                                    bm=null;
-                                } else if(i==2)
-                                {
+                                    bm = null;
+                                } else if (i == 2) {
 
-                                    if(bm!=null)
-                                    {
-                                        incidentimages[i]=bm;
+                                    if (bm != null) {
+                                        incidentimages[i] = bm;
                                         setFlipperImage(incidentimages[i]);
                                     }
-                                    bm=null;
-                                } else if(i==3)
-                                {
+                                    bm = null;
+                                } else if (i == 3) {
 
-                                    if(bm!=null)
-                                    {
-                                        incidentimages[i]=bm;
+                                    if (bm != null) {
+                                        incidentimages[i] = bm;
                                         setFlipperImage(incidentimages[i]);
                                     }
-                                    bm=null;
-                                }else if(i==4)
-                                {
+                                    bm = null;
+                                } else if (i == 4) {
 
-                                    if(bm!=null)
-                                    {
-                                        incidentimages[i]=bm;
+                                    if (bm != null) {
+                                        incidentimages[i] = bm;
                                         setFlipperImage(incidentimages[i]);
                                     }
-                                    bm=null;
+                                    bm = null;
                                 }
                             }
 
@@ -250,60 +255,46 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 
                             }
                         });
-                Log.d("photoid 3", " "  + " " + imgName);
+                Log.d("photoid 3", " " + " " + imgName);
 
             } catch (Exception ex) {
-                Log.d("photoid value img","  "+ex.toString()+" ");
+                Log.d("photoid value img", "  " + ex.toString() + " ");
 
             }
         }
 
     }
 
-    private class ViewReportList {
-        private Integer IncidentID, GuardID;
-        private String IncidentDetails,DateTime;
+    public void onButtonClicked(View view) {
 
-        public ViewReportList(Integer incidentID, Integer guardID, String incidentDetails,
-                              String dateTime) {
-            this.IncidentID = incidentID;
-            this.GuardID = guardID;
-            this.IncidentDetails = incidentDetails;
-            this.DateTime = dateTime;
+        switch (view.getId()) {
+
+            case R.id.rl_refresh:
+                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(intent, 7);
+                //  Toast.makeText(getBaseContext(),"You resolved the incident",Toast.LENGTH_SHORT).show();
+//                    Intent intent = new Intent(getBaseContext(), ViewIncidentReportActivity.class);
+//                    intent.putExtra("GuardName",uservalue);
+                //  updateResponse(Integer.valueOf(getIntent().getStringExtra("emergencyId")));
+//                mySGList.clear();
+//                getGPSPoints(IConstant.dateFormat_MDY.format(new Date()));
+//                getAssociationList();
+
+                break;
+            case R.id.rl_Attend:
+
+                saveGuardAction("Attended", gps.getLatitude() + "," + gps.getLongitude(), EmergencyID);
+                Log.v("LATLONG", gps.getLatitude() + "," + gps.getLongitude() + ", " + EmergencyID);
+                dbh.updatesecuritynotification_setNotified(Nid);
+                break;
+            case R.id.rl_pass:
+
+                saveGuardAction("Pass", gps.getLatitude() + "," + gps.getLongitude(), EmergencyID);
+                dbh.updatesecuritynotification_setNotified(Nid);
+                Prefs.putBoolean(EMERGENCY_SOUND_ON, false);
+                finish();
+                break;
         }
-
-        public Integer getIncidentID() {
-            return IncidentID;
-        }
-
-        public void setIncidentID(Integer incidentID) {
-            IncidentID = incidentID;
-        }
-
-        public Integer getGuardID() {
-            return GuardID;
-        }
-
-        public void setGuardID(Integer guardID) {
-            GuardID = guardID;
-        }
-
-        public String getIncidentDetails() {
-            return IncidentDetails;
-        }
-
-        public void setIncidentDetails(String incidentDetails) {
-            IncidentDetails = incidentDetails;
-        }
-
-        public String getDateTime() {
-            return DateTime;
-        }
-
-        public void setDateTime(String dateTime) {
-            DateTime = dateTime;
-        }
-
     }
 
 //    private class IncidentReportAdapter extends RecyclerView.Adapter<IncidentReportAdapter.MyViewHolder> {
@@ -457,64 +448,32 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 //        }
 //    }
 
-    public  void onButtonClicked(View view){
-
-        switch (view.getId()){
-
-            case R.id.rl_refresh:
-                Intent intent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, 7);
-                //  Toast.makeText(getBaseContext(),"You resolved the incident",Toast.LENGTH_SHORT).show();
-//                    Intent intent = new Intent(getBaseContext(), ViewIncidentReportActivity.class);
-//                    intent.putExtra("GuardName",uservalue);
-                //  updateResponse(Integer.valueOf(getIntent().getStringExtra("emergencyId")));
-//                mySGList.clear();
-//                getGPSPoints(IConstant.dateFormat_MDY.format(new Date()));
-//                getAssociationList();
-
-                break;
-            case R.id.rl_Attend:
-
-                saveGuardAction("Attended",gps.getLatitude()+","+gps.getLongitude(),EmergencyID);
-                Log.v("LATLONG",gps.getLatitude()+","+gps.getLongitude()+", "+EmergencyID);
-                dbh.updatesecuritynotification_setNotified(Nid);
-                break;
-            case R.id.rl_pass:
-
-                saveGuardAction("Pass",gps.getLatitude()+","+gps.getLongitude(),EmergencyID);
-                dbh.updatesecuritynotification_setNotified(Nid);
-                Prefs.putBoolean(EMERGENCY_SOUND_ON,false);
-                finish();
-                break;
-        }
-    }
-
-    private void saveGuardAction(String actionName,String gpsPoint,int emergencyId) {
+    private void saveGuardAction(String actionName, String gpsPoint, int emergencyId) {
 
         RestClient restClient = RestClient.getInstance();
 
         CreateTicketingActionReq loginReq = new CreateTicketingActionReq();
 
-        int memID=64;
-        if(!BASE_URL.equalsIgnoreCase("dev")){
-            memID=410;
+        int memID = 64;
+        if (!BASE_URL.equalsIgnoreCase("dev")) {
+            memID = 410;
         }
 
-        loginReq.ASAssnID= Prefs.getInt(ASSOCIATION_ID,0);
-        loginReq.MEMemID=memID+"";
-        loginReq.TRGPSPnt=gpsPoint;
-        loginReq.WKWorkID= LocalDb.getStaffList().get(0).getWkWorkID();
-        loginReq.TKTktID = emergencyId ;
-        loginReq.TRDateT= DateTimeUtils.getCurrentTimeLocal();
-        loginReq.TRDetails=actionName;
+        loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
+        loginReq.MEMemID = memID + "";
+        loginReq.TRGPSPnt = gpsPoint;
+        loginReq.WKWorkID = LocalDb.getStaffList().get(0).getWkWorkID();
+        loginReq.TKTktID = emergencyId;
+        loginReq.TRDateT = DateTimeUtils.getCurrentTimeLocal();
+        loginReq.TRDetails = actionName;
 
-        Log.d("saveCheckPoints","StaffEntry "+loginReq.ASAssnID+" "+loginReq.TRDateT+" "
-                +loginReq.WKWorkID+" "+loginReq.TKTktID+" "+loginReq.TRDetails );
+        Log.d("saveCheckPoints", "StaffEntry " + loginReq.ASAssnID + " " + loginReq.TRDateT + " "
+                + loginReq.WKWorkID + " " + loginReq.TKTktID + " " + loginReq.TRDetails);
 
         restClient.addHeader(OYE247KEY, OYE247TOKEN);
         restClient.post(this, loginReq, CreateTicketingActionResp.class, this, URLData.URL_CREATE_TICKETING_RESPONSE);
 
-        if(actionName.equals("Attended")){
+        if (actionName.equals("Attended")) {
 //            FCMApiInterface apiService = FCMApiClient.getClient().create(FCMApiInterface.class);
 //
 //            AttendEmergencyPayload payloadData=new AttendEmergencyPayload("emergencyResponse",
@@ -542,7 +501,7 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 //                }
 //            });
 
-            Intent intentAction1 =new Intent(getApplicationContext(), BackgroundSyncReceiver.class);
+            Intent intentAction1 = new Intent(getApplicationContext(), BackgroundSyncReceiver.class);
             intentAction1.putExtra(ConstantUtils.BSR_Action, "sendFCM_toStopEmergencyAlert");
             sendBroadcast(intentAction1);
 
@@ -553,7 +512,7 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
     @Override
     public void onFailure(Exception e, int urlId) {
 
-        showToast(this, e.getMessage()+" id "+urlId);
+        showToast(this, e.getMessage() + " id " + urlId);
     }
 
     @Override
@@ -563,11 +522,11 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 
             CreateTicketingActionResp loginDetailsResponce = (CreateTicketingActionResp) data;
             if (loginDetailsResponce != null) {
-                Log.d("str3 Service", "saveCheckPoints: " + urlId+" id "+position+" "+" "+" "+loginDetailsResponce.toString());
-                if(loginDetailsResponce.success.equalsIgnoreCase("true")) {
+                Log.d("str3 Service", "saveCheckPoints: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.toString());
+                if (loginDetailsResponce.success.equalsIgnoreCase("true")) {
                     showToast(this, "Saved");
                     finish();
-                }else{
+                } else {
                     showToast(this, " not saved ");
                 }
 
@@ -578,13 +537,14 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
         }
 
     }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        if(getIntent().getStringExtra("gps")==null) {
+        if (getIntent().getStringExtra("gps") == null) {
 
-        }else{
+        } else {
             try {
                 String[] loccc = null;
                 loccc = getIntent().getStringExtra("gps").split(",");
@@ -618,8 +578,7 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(patrollingRoute.get(i), 20));
 
                 }
-            }catch (Exception e)
-            {
+            } catch (Exception e) {
 
             }
 
@@ -645,7 +604,7 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
         getTicketList();
     }
 
-    void getTicketList(){
+    void getTicketList() {
 
         Call<TicketListingTesponse> call = champApiInterface.getTicketingListResponse(EmergencyID);
         call.enqueue(new Callback<TicketListingTesponse>() {
@@ -655,12 +614,12 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
 
                 if (response.body().getSuccess() == true) {
 
-                    if(response.body().getData()!=null) {
+                    if (response.body().getData() != null) {
 
                         Toast.makeText(TicketingDetailsActivity.this, response.body().toString(), Toast.LENGTH_LONG).show();
                         System.out.println("SSSSOS" + response.body().getData().toString());
 
-                         tv_name.setText(response.body().getData().getTicketing().getTkRaisdBy());
+                        tv_name.setText(response.body().getData().getTicketing().getTkRaisdBy());
 
                         tv_mobileno.setText(response.body().getData().getTicketing().getTkMobile());
 
@@ -677,6 +636,52 @@ public class TicketingDetailsActivity extends BaseActivity implements OnMapReady
             }
         });
 
+
+    }
+
+    private class ViewReportList {
+        private Integer IncidentID, GuardID;
+        private String IncidentDetails, DateTime;
+
+        public ViewReportList(Integer incidentID, Integer guardID, String incidentDetails,
+                              String dateTime) {
+            this.IncidentID = incidentID;
+            this.GuardID = guardID;
+            this.IncidentDetails = incidentDetails;
+            this.DateTime = dateTime;
+        }
+
+        public Integer getIncidentID() {
+            return IncidentID;
+        }
+
+        public void setIncidentID(Integer incidentID) {
+            IncidentID = incidentID;
+        }
+
+        public Integer getGuardID() {
+            return GuardID;
+        }
+
+        public void setGuardID(Integer guardID) {
+            GuardID = guardID;
+        }
+
+        public String getIncidentDetails() {
+            return IncidentDetails;
+        }
+
+        public void setIncidentDetails(String incidentDetails) {
+            IncidentDetails = incidentDetails;
+        }
+
+        public String getDateTime() {
+            return DateTime;
+        }
+
+        public void setDateTime(String dateTime) {
+            DateTime = dateTime;
+        }
 
     }
 

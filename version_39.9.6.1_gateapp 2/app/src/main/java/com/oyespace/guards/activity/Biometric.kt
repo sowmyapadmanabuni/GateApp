@@ -7,25 +7,26 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
-import android.content.res.Resources
 import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.os.*
+import android.os.Bundle
+import android.os.Environment
+import android.os.Handler
+import android.os.Message
 import android.speech.tts.TextToSpeech
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
-import com.oyespace.guards.*
+import androidx.appcompat.app.AppCompatActivity
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.Dashboard
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RestClient
@@ -36,17 +37,11 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
-import kotlinx.android.synthetic.main.layout_viewpager_iem.*
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.IOException
-import java.net.URL
 import java.nio.ByteBuffer
-import java.sql.Blob
 import java.util.*
-import kotlin.math.absoluteValue
 
 
 class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
@@ -242,7 +237,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         setContentView(R.layout.activity_register_finger_print)
 
-        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+        val dir =
+            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
         if (dir.isDirectory()) {
             val children = dir.list()
             for (i in children!!.indices) {
@@ -763,7 +759,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
                 if (mRegisterImage != null) {
                     mRegisterImage = null
-                        //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
+                    //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
                 }
 
                 mRegisterImage = ByteArray(mImageWidth * mImageHeight)
@@ -890,7 +886,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
 
 
-                 // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
 
                 if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
                 {
@@ -927,7 +923,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     if (existInDB1[0]) {
                         t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
                     } else {
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -1015,7 +1012,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     } else {
 
 
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         relLayout3!!.visibility = View.VISIBLE

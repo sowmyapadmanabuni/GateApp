@@ -27,15 +27,15 @@ class OTPbyCallRetrofitClinet {
             val okHttpClient = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build()
 
             val gson = GsonBuilder()
-                    .setDateFormat("yyyy-MM-dd HH:mm:ss")
-                    .create()
+                .setDateFormat("yyyy-MM-dd HH:mm:ss")
+                .create()
 
             val builder = Retrofit.Builder()
             val retrofit = builder.baseUrl(FCM_BASE_URL)
-                    .client(okHttpClient)
-                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .build()
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create(gson))
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
             retrofit.create(GetOTPbyCallApi::class.java)
         }
 

@@ -3,17 +3,16 @@ package com.oyespace.guards.activity
 import android.app.ProgressDialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.speech.RecognizerIntent
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.airbnb.lottie.LottieAnimationView
 import com.oyespace.guards.R
 import com.oyespace.guards.listeners.PermissionCallback
@@ -35,7 +34,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
     private var callback: PermissionCallback? = null
     private var requestcode: Int = 0
     lateinit var realm: Realm
-    var alertDialog:AlertDialog?=null;
+    var alertDialog: AlertDialog? = null;
 
     companion object {
         val TAG: String = javaClass.name
@@ -233,22 +232,22 @@ open class BaseKotlinActivity : AppCompatActivity(){
     }
 
 
-    fun showAnimatedDialog(desc:String, json:Int, isCancellable:Boolean, btnText:String){
+    fun showAnimatedDialog(desc: String, json: Int, isCancellable: Boolean, btnText: String) {
         val dialogBuilder = AlertDialog.Builder(this)
 
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.animated_dialog, null)
-        val text:TextView = dialogView.findViewById(R.id.animdlg_text)
+        val text: TextView = dialogView.findViewById(R.id.animdlg_text)
         val animView: LottieAnimationView = dialogView.findViewById(R.id.animdlg_lottie)
         val btn: Button = dialogView.findViewById(R.id.animdlg_btn);
-        if(!btnText.equals("") && btnText != null){
+        if (!btnText.equals("") && btnText != null) {
 
             btn.visibility = View.VISIBLE
             btn.text = btnText
             btn.setOnClickListener {
                 alertDialog?.dismiss()
             }
-        }else{
+        } else {
             btn.visibility = View.GONE
         }
         animView.setAnimation(json)
@@ -261,8 +260,8 @@ open class BaseKotlinActivity : AppCompatActivity(){
         alertDialog?.show()
     }
 
-    fun hideAnimatedDialog(){
-        if(alertDialog != null){
+    fun hideAnimatedDialog() {
+        if (alertDialog != null) {
             alertDialog?.dismiss()
         }
     }

@@ -1,17 +1,13 @@
 package com.oyespace.guards
 
 import android.content.BroadcastReceiver
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Environment
-import android.provider.MediaStore
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import android.util.Base64
 import android.util.Log
-import android.widget.Toast
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.network.CommonDisposable
@@ -19,7 +15,6 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.responce.VisitorLogExitResp
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -34,15 +29,16 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
-import retrofit2.Response
 import timber.log.Timber
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class
 
 BackgroundSyncReceiver : BroadcastReceiver() {
-    var unAccountID:String?=null
+    var unAccountID: String? = null
     lateinit var mcontext: Context
     override fun onReceive(context: Context, intent: Intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
@@ -51,34 +47,34 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         mcontext=context
         if(intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)){
 
-            if(intent.getStringExtra("unitname").contains(",")){
+            if (intent.getStringExtra("unitname").contains(",")) {
 
                 var unitname_dataList: Array<String>
                 var unitid_dataList: Array<String>
                 var unitAccountId_dataList: Array<String>
                 unitname_dataList = intent.getStringExtra("unitname").split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-               // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                if(unitid_dataList.size>0) {
+                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                if (unitid_dataList.size > 0) {
                     for (i in 0 until unitid_dataList.size) {
 
-try {
+                        try {
 
-    getUnitLog(
-        unitid_dataList.get(i).replace(" ", "").toInt(),
-        intent.getStringExtra("name"),
-        "",
-        intent.getStringExtra(VISITOR_TYPE),
-        "Staff",
-        0,
-        unitname_dataList.get(i).replace(" ", ""),
-        intent.getIntExtra("VLVisLgID", 0),
-        intent.getStringExtra("msg"),
-        intent.getStringExtra("nr_id")
-    )
-}catch (e:Exception){
+                            getUnitLog(
+                                unitid_dataList.get(i).replace(" ", "").toInt(),
+                                intent.getStringExtra("name"),
+                                "",
+                                intent.getStringExtra(VISITOR_TYPE),
+                                "Staff",
+                                0,
+                                unitname_dataList.get(i).replace(" ", ""),
+                                intent.getIntExtra("VLVisLgID", 0),
+                                intent.getStringExtra("msg"),
+                                intent.getStringExtra("nr_id")
+                            )
+                        } catch (e: Exception) {
 
-}
+                        }
 //                        sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
 //                            intent.getStringExtra("name"), intent.getStringExtra("nr_id"),
 //                            unitname_dataList.get(i).replace(" ",""), intent.getStringExtra("memType"));
@@ -95,12 +91,23 @@ try {
                 }
             }else{
 
-                try{
-                getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
+                try {
+                    getUnitLog(
+                        intent.getStringExtra(UNITID).toInt(),
+                        intent.getStringExtra("name"),
+                        "",
+                        intent.getStringExtra(VISITOR_TYPE),
+                        "Staff",
+                        0,
+                        intent.getStringExtra("name"),
+                        intent.getIntExtra("VLVisLgID", 0),
+                        intent.getStringExtra("msg"),
+                        intent.getStringExtra("nr_id")
+                    )
 
-            }catch (e:Exception){
+                } catch (e: Exception) {
 
-            }
+                }
 //                sendFCM(intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                    intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                    intent.getStringExtra("unitname").replace(" ",""),intent.getStringExtra("memType"));
@@ -144,7 +151,7 @@ try {
             getCheckPointList()
         }
         else if(intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)){
-            Log.d("SYCNCHECK","in 86")
+            Log.d("SYCNCHECK", "in 86")
             getVisitorLogEntryList()
         }
 
@@ -182,7 +189,7 @@ try {
                 override fun onSuccessResponse(staffBiometricResp: StaffBiometricResp<StaffBiometricData>) {
 
                     if (staffBiometricResp.success == true) {
-                        Log.d("getStaffBiometric",staffBiometricResp.data.toString())
+                        Log.d("getStaffBiometric", staffBiometricResp.data.toString())
                         try {
                             var dbh: DataBaseHelper= DataBaseHelper(mcontext);
 
@@ -201,7 +208,8 @@ try {
                                     ba_fp2 = Base64.decode(fp2, Base64.DEFAULT)
                                     ba_fp3 = Base64.decode(fp3, Base64.DEFAULT)
 
-                                    dbh.insertUserDetails(intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
+                                    dbh.insertUserDetails(
+                                        intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
                                         staffBiometricResp.data.fingerPrint.get(i).fpFngName,
                                         ba_fp1,
                                         ba_fp2,
@@ -339,7 +347,7 @@ try {
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 Log.d("uploadImage", t.toString())
-               // Toast.makeText(mcontext, "Not Uploaded", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(mcontext, "Not Uploaded", Toast.LENGTH_SHORT).show()
 
             }
         })
@@ -349,21 +357,22 @@ try {
     private fun getStaffList() {
 
         RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
+            .workerList(OYE247TOKEN, intToString(LocalDb.getAssociation().asAssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+            .subscribeWith(object :
+                CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
 
                 override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
-                    if (workerListResponse.data.worker !=null) {
-                        Log.d("WorkerList success",workerListResponse.data.toString())
+                    if (workerListResponse.data.worker != null) {
+                        Log.d("WorkerList success", workerListResponse.data.toString())
                         var arrayList: ArrayList<WorkerDetails>? = null
-                        arrayList=ArrayList()
+                        arrayList = ArrayList()
                         arrayList = workerListResponse.data.worker
 
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {
+                            override fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
                                 return lhs.wkfName.compareTo(rhs.wkfName)
                             }
                         })
@@ -376,7 +385,7 @@ try {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
                 }
 
                 override fun noNetowork() {
@@ -457,16 +466,17 @@ try {
 //    }
 
     private fun getVisitorLogEntryList() {
-        Log.d("SYCNCHECK","in 408")
+        Log.d("SYCNCHECK", "in 408")
         RetrofitClinet.instance
             .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
+            .subscribeWith(object :
+                CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
 
                 override fun onSuccessResponse(visitorList: VisitorLogEntryResp<ArrayList<VisitorEntryLog>>) {
-                    Log.d("SYCNCHECK","in 416")
-                    Log.d("SYCNCHECK","in 417"+visitorList.toString())
+                    Log.d("SYCNCHECK", "in 416")
+                    Log.d("SYCNCHECK", "in 417" + visitorList.toString())
 
                     if (visitorList.success == true) {
                         Log.d("SYCNCHECK", "in 421")
@@ -478,21 +488,35 @@ try {
 
 
 
-                        if(visitorList.data.visitorLog!=null) {
+                        if (visitorList.data.visitorLog != null) {
 
-                            Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
-                                override fun compare(lhs:  VisitorEntryLog, rhs:VisitorEntryLog): Int {
-                                    return (DateTimeUtils.formatDateDMY(rhs.vldCreated) +" "+(rhs.vlEntryT).replace("1900-01-01T","")).compareTo(
-                                        DateTimeUtils.formatDateDMY(lhs.vldCreated) +" "+(lhs.vlEntryT).replace("1900-01-01T",""))
+                            Collections.sort(
+                                arrayListVisitors,
+                                object : Comparator<VisitorEntryLog> {
+                                    override fun compare(
+                                        lhs: VisitorEntryLog,
+                                        rhs: VisitorEntryLog
+                                    ): Int {
+                                        return (DateTimeUtils.formatDateDMY(rhs.vldCreated) + " " + (rhs.vlEntryT).replace(
+                                            "1900-01-01T",
+                                            ""
+                                        )).compareTo(
+                                            DateTimeUtils.formatDateDMY(lhs.vldCreated) + " " + (lhs.vlEntryT).replace(
+                                                "1900-01-01T",
+                                                ""
+                                            )
+                                        )
 
-                                }
-                            })
+                                    }
+                                })
                         }
                         LocalDb.saveEnteredVisitorLog(arrayListVisitors);
 
                         val smsIntent = Intent(ConstantUtils.SYNC)
                         smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
+                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(
+                            mcontext
+                        ).sendBroadcast(smsIntent)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")
@@ -535,7 +559,7 @@ try {
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
                         Log.d("sendFCM","onErrorResponse  "+e.toString())
-                        Log.d("SYCNCHECK","in 473")
+                        Log.d("SYCNCHECK", "in 473")
                     }
 
                     override fun noNetowork() {
@@ -736,7 +760,23 @@ try {
     private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {
 
 
-        val dataReq = NotificationCreateReq(ACAccntID,ASAssnID,NTType,NTDesc,SBUnitID,SBMemID,SBSubID,SBRoleID ,ASAsnName,MRRolName,NTDUpdated,NTDCreated,VLVisLgID,"","")
+        val dataReq = NotificationCreateReq(
+            ACAccntID,
+            ASAssnID,
+            NTType,
+            NTDesc,
+            SBUnitID,
+            SBMemID,
+            SBSubID,
+            SBRoleID,
+            ASAsnName,
+            MRRolName,
+            NTDUpdated,
+            NTDCreated,
+            VLVisLgID,
+            "",
+            ""
+        )
 
 
         RetrofitClinet.instance
@@ -760,8 +800,18 @@ try {
             })
     }
 
-    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int,msg:String,nrId:String) {
+    private fun getUnitLog(
+        unitId: Int,
+        personName: String,
+        mobileNumb: String,
+        desgn: String,
+        workerType: String,
+        staffID: Int,
+        unitName: String,
+        vlVisLgID: Int,
+        msg: String,
+        nrId: String
+    ) {
 
 
         RetrofitClinet.instance
@@ -773,66 +823,76 @@ try {
                 override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
                     if (UnitList.success == true) {
 
-                        if(UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")){
+                        if (UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")) {
 
-                            if(!UnitList.data.unit.owner.isEmpty()){
-                                unAccountID= UnitList.data.unit.owner[0].acAccntID.toString()
+                            if (!UnitList.data.unit.owner.isEmpty()) {
+                                unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
+                            } else {
+                                unAccountID = "0"
                             }
-                            else{
-                                unAccountID="0"
-                            }
 
 
-                        }
-                        else if(UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")){
-                            if(!UnitList.data.unit.tenant.isEmpty()) {
+                        } else if (UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")) {
+                            if (!UnitList.data.unit.tenant.isEmpty()) {
                                 unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
+                            } else {
+                                unAccountID = "0"
                             }
-                                else{
-                                    unAccountID="0"
-                                }
 
-                        }
-                        else if(UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")){
+                        } else if (UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")) {
 
-                                if(!UnitList.data.unit.tenant.isEmpty()) {
-                                    unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-                                } else{
-                                    unAccountID="0"
-                                }
+                            if (!UnitList.data.unit.tenant.isEmpty()) {
+                                unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
+                            } else {
+                                unAccountID = "0"
+                            }
 
-                        }else if(UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")){
+                        } else if (UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")) {
 //                                    if(!UnitList.data.unit.owner.isEmpty()) {
 //                                        unAccountID = "0"
 //                                    } else{
-                                        unAccountID="0"
-                                   // }
+                            unAccountID = "0"
+                            // }
 
-                        }else if(UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")){
-                                        if(!UnitList.data.unit.owner.isEmpty()) {
-                                            unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                                        } else{
-                                            unAccountID="0"
-                                        }
-                        }else{
-                            unAccountID="0"
+                        } else if (UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")) {
+                            if (!UnitList.data.unit.owner.isEmpty()) {
+                                unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
+                            } else {
+                                unAccountID = "0"
+                            }
+                        } else {
+                            unAccountID = "0"
                         }
 
 
-                        try {      sendFCM(msg, mobileNumb,
-                            personName, nrId,
-                           unitName, "Owner");
+                        try {
+                            sendFCM(
+                                msg, mobileNumb,
+                                personName, nrId,
+                                unitName, "Owner"
+                            );
 
-                    }catch (e:KotlinNullPointerException){
+                        } catch (e: KotlinNullPointerException) {
 
-                    }
+                        }
 
-                        try {     getNotificationCreate(unAccountID.toString(),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",msg,unitId.toString(),vlVisLgID.toString(),unitId.toString()+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
-                            DateTimeUtils.getCurrentTimeLocal(),
-                            DateTimeUtils.getCurrentTimeLocal(),
-                            vlVisLgID.toString()
-                        )
-                        }catch (e:KotlinNullPointerException){
+                        try {
+                            getNotificationCreate(
+                                unAccountID.toString(),
+                                Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                                "gate_app",
+                                msg,
+                                unitId.toString(),
+                                vlVisLgID.toString(),
+                                unitId.toString() + "admin",
+                                "gate_app",
+                                LocalDb.getAssociation()!!.asAsnName,
+                                "gate_app",
+                                DateTimeUtils.getCurrentTimeLocal(),
+                                DateTimeUtils.getCurrentTimeLocal(),
+                                vlVisLgID.toString()
+                            )
+                        } catch (e: KotlinNullPointerException) {
 
                         }
 //                        sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,msg,desgn,"gate_app",
@@ -849,7 +909,7 @@ try {
                                 unAccountID!!.toInt(),
                                 unAccountID.toString()
                             )
-                        }catch (e:KotlinNullPointerException){
+                        } catch (e: KotlinNullPointerException) {
 
                         }
 

@@ -75,8 +75,6 @@ android:layout_margin="@dimen/_2sdp"
              />
 
 
-
-
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_serviceProvider"
             android:layout_width="match_parent"

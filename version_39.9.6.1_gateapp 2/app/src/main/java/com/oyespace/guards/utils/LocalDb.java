@@ -1,3 +1,4 @@
+
 package com.oyespace.guards.utils;
 
 import android.annotation.SuppressLint;
@@ -5,14 +6,17 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Build;
 import android.telecom.TelecomManager;
-import android.util.Log;
+
 import com.google.gson.reflect.TypeToken;
-import com.oyespace.guards.PojoClasses.DashboardPojo;
 import com.oyespace.guards.constants.PrefKeys;
-import com.oyespace.guards.pojo.*;
+import com.oyespace.guards.pojo.Association;
+import com.oyespace.guards.pojo.CheckPointByAssocID;
+import com.oyespace.guards.pojo.SearchResult;
+import com.oyespace.guards.pojo.UnitPojo;
+import com.oyespace.guards.pojo.VisitorEntryLog;
+import com.oyespace.guards.pojo.WorkerDetails;
 import com.oyespace.guards.responce.ResponseVisitorLog.Data.Visitorlogbydate;
 import com.oyespace.guards.responce.VisitorLogExitResp;
-
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -61,7 +65,7 @@ public class LocalDb {
     public static void saveSearchData(ArrayList<SearchResult> menuItems) {
         String tojson;
         if (menuItems == null || menuItems.size() == 0) {
-           // saveHotelId("");
+            // saveHotelId("");
             tojson = "";
         } else {
             tojson = ParseUtils.tojson(menuItems, "LocalDb");
@@ -121,7 +125,7 @@ public class LocalDb {
             Type type = new TypeToken<ArrayList<VisitorEntryLog>>() {
             }.getType();
             ArrayList<VisitorEntryLog> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
-           // Log.d("SYCNCHECK","in 99"+menuList.size());
+            // Log.d("SYCNCHECK","in 99"+menuList.size());
 
             return menuList;
         }
@@ -220,10 +224,10 @@ public class LocalDb {
     }
 
     @SuppressLint("MissingPermission")
-    public static void disconnectCall(Context context){
+    public static void disconnectCall(Context context) {
         try {
 
-            if(Build.VERSION.SDK_INT>=28){
+            if (Build.VERSION.SDK_INT >= 28) {
                 TelecomManager tm = (TelecomManager) context.getSystemService(Context.TELECOM_SERVICE);
 
                 if (tm != null) {

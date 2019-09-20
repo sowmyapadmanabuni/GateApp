@@ -1,10 +1,8 @@
 package com.oyespace.guards.fragment
 
 import android.content.pm.PackageManager
-import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat
-
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.oyespace.guards.listeners.PermissionCallback
 import io.reactivex.disposables.CompositeDisposable
 import java.util.*

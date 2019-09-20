@@ -536,7 +536,6 @@
                 </RelativeLayout>
 
 
-
                 <Button
                         android:id="@+id/buttonRegister2"
                         android:layout_width="wrap_content"

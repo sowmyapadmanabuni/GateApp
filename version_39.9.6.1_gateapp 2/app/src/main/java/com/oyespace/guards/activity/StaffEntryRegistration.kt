@@ -7,41 +7,43 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
-import android.os.Handler
 import android.provider.MediaStore
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import com.oyespace.guards.*
-import com.oyespace.guards.camtest.AddCarFragment
+import androidx.appcompat.app.AlertDialog
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
-import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.network.*
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
+import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.NumberUtils.toInteger
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
-import kotlinx.android.synthetic.main.activity_img_view.*
-import kotlinx.android.synthetic.main.activity_mobile_number.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
 import timber.log.Timber
-import java.io.*
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 
 class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
@@ -88,13 +90,21 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             Log.v("UNITS@@@..",unitname_dataList.size.toString()+" ..."+unitname_dataList.get(i).replace(" ",""))
 
                             showProgress()
-                   visitorLog(unitname_dataList.get(i).replace(" ",""),unitid_dataList.get(i).replace(" ",""),unitAccountId_dataList.get(i).replace(" ",""));
+                            visitorLog(
+                                unitname_dataList.get(i).replace(" ", ""),
+                                unitid_dataList.get(i).replace(" ", ""),
+                                unitAccountId_dataList.get(i).replace(" ", "")
+                            );
 
                         }
                     }
                 }else{
                     showProgress()
-                    visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID),intent.getStringExtra(UNIT_ACCOUNT_ID));
+                    visitorLog(
+                        intent.getStringExtra(UNITNAME),
+                        intent.getStringExtra(UNITID),
+                        intent.getStringExtra(UNIT_ACCOUNT_ID)
+                    );
                 }
 
             }
@@ -234,7 +244,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             itemLyt.setVisibility(View.GONE)
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
-               // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
                 singUp(intent.getStringExtra(PERSONNAME),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(MOBILENUMBER))
 
             }
@@ -281,17 +291,15 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         }
 
         val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
-        rv_image.layoutManager = mLayoutManager as androidx.recyclerview.widget.RecyclerView.LayoutManager?
+        rv_image.layoutManager =
+            mLayoutManager as androidx.recyclerview.widget.RecyclerView.LayoutManager?
         imageAdapter = ImageAdapter(list, this@StaffEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
 
     }
 
 
-
-
-
-    private fun visitorLog(UNUniName: String,UNUnitID: String,Unit_ACCOUNT_ID:String) {
+    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
       //  var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
 
         var imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
@@ -336,26 +344,37 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                       // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
+                        // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
 
 
-                       var id: Long  = dbh!!.insertVisitorData(intent.getStringExtra(UNITNAME),Prefs.getInt(ASSOCIATION_ID,0).toString(),intent.getStringExtra(PERSONNAME),memID,globalApiObject.data.visitorLog.vlVisLgID, toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(VISITOR_TYPE),1,"","" )
+                        var id: Long = dbh!!.insertVisitorData(
+                            intent.getStringExtra(UNITNAME),
+                            Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                            intent.getStringExtra(PERSONNAME),
+                            memID,
+                            globalApiObject.data.visitorLog.vlVisLgID,
+                            toInteger(intent.getStringExtra(UNITID)),
+                            intent.getStringExtra(MOBILENUMBER),
+                            intent.getStringExtra(COMPANY_NAME),
+                            intent.getStringExtra(VISITOR_TYPE),
+                            1,
+                            "",
+                            ""
+                        )
 
 
 
 
-                        if(id<=0)
-            {
-              // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-            } else
-            {
-               // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
+                        if (id <= 0) {
+                            // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+                        } else {
+                            // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
 
-            }
+                        }
 
                         for (i in list.indices) {
-                            val fileName = list[i].substring(list[i].lastIndexOf("/")+1);
-                            val dir =Environment.getExternalStorageDirectory().getPath()
+                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
+                            val dir = Environment.getExternalStorageDirectory().getPath()
                             val file = File(dir, fileName)
                             file.delete()
                         }
@@ -374,7 +393,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
-                        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -457,7 +476,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val imageFile = File(mPath)
 
-      //  Log.v("FILENamen vmxc vmc11",imageFile)
+        //  Log.v("FILENamen vmxc vmc11",imageFile)
 
         try {
             val outputStream = FileOutputStream(imageFile)
@@ -522,7 +541,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 } catch (ex: Exception) {
                     Log.d("uploadImage", "errr:" + ex.toString())
 
-                  //  Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
+                    //  Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
                 }
 
 
@@ -538,7 +557,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 // Log error here since request failed
                 Log.d("uploadImage", t.toString())
-              //  Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
+                //  Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
 //                finish()
             }
         })
@@ -665,7 +684,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        val dir =
+                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
                         if (dir.isDirectory) {
                             val children = dir.list()
                             for (i in children!!.indices) {
@@ -712,7 +732,10 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val req = StaffRegistrationReq(Prefs.getInt(ASSOCIATION_ID,0), 0, "", 0,0,0,0,
             intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(PERSONNAME),"","",
-            "", intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(UNITID),
+            "",
+            intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
+            intent.getStringExtra(VISITOR_TYPE),
+            intent.getStringExtra(UNITID),
             intent.getStringExtra(UNITNAME),imgName)
         Log.d("staffRegistration ","StaffEntry "+req.toString())
 
@@ -722,7 +745,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateStaffResponse<WorkerData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateStaffResponse<WorkerData>) {
                     if (globalApiObject.success == true) {
-                     //   Utils.showToast(applicationContext, intToString(globalApiObject.data.worker.wkWorkID))
+                        //   Utils.showToast(applicationContext, intToString(globalApiObject.data.worker.wkWorkID))
                         val d  =  Intent(this@StaffEntryRegistration,Biometric::class.java)
                         d.putExtra(WORKER_ID, globalApiObject.data.worker.wkWorkID)
                         d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))

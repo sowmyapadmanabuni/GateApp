@@ -7,41 +7,36 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
-import androidx.appcompat.widget.*
-import android.util.Log
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.widget.AppCompatCheckBox
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.PaginationAdapter
-
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.PaginationData
-import com.oyespace.guards.pojo.UnitList
 import com.oyespace.guards.pojo.UnitPojo
 import com.oyespace.guards.pojo.UnitsList
-import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_unit_list.*
 import kotlinx.android.synthetic.main.pager_view.*
 import kotlinx.android.synthetic.main.subtitle_bar.*
 import kotlinx.android.synthetic.main.title_bar.*
-import java.lang.Exception
-import java.util.function.Predicate
-import kotlin.collections.ArrayList
 
 class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter: PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter? = null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -298,7 +293,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
             try {
                 arrayList = ArrayList(arrayFullList.subList(start, end + 1))
-            }catch (e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
 
             }
             rv_unit.showProgress()
@@ -344,8 +339,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
-        }
-        else{
+        } else {
             selectedUnits.add(checked);
         }
         //orderListAdapter!!.notifyDataSetChanged();
@@ -731,7 +725,8 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) :
+            androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: AppCompatCheckBox

@@ -17,20 +17,25 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.FragmentManager;
+import androidx.loader.content.CursorLoader;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.CarImages_Adapter;
@@ -53,7 +58,22 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.ACCOUNT_ID;
+import static com.oyespace.guards.utils.ConstantUtils.BLOCK_ID;
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
+import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
+import static com.oyespace.guards.utils.ConstantUtils.ITEMS_PHOTO_LIST;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_GUESTWITHOUTINVITATION;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 
 public class VehicleGuestAddCarFragment extends Activity implements View.OnClickListener {
@@ -67,7 +87,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
     RecyclerView rv_image;
     ImageView iv_delete,imageView1,iv_edit;
     int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    Bitmap photo = null ;
+    Bitmap photo = null;
     TextView txt_assn_name,txt_device_name,txt_gate_name ;
     private View view;
     private EditText notes, Regno, kms, exp_date, exp_price ,car_id;
@@ -104,6 +124,30 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
         setContentView(R.layout.add_car_fragment);
         initViews();
     }
+
+    private Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+
+
+            photo = bitmap;
+            imageView1.setImageBitmap(photo);
+            Log.d("target picas", "onBitmapLoaded");
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            Log.d("target picas", "7onBitmapFailed " + IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getIntExtra(ACCOUNT_ID, 0) + ".jpg");
+
+        }
+
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            Log.d("target picas", "7 onPrepareLoad ");
+
+        }
+    };
 
     private void initViews() {
 
@@ -164,7 +208,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 dialog_imageview.setImageBitmap(photo);
 
-                Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+                Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 
 //                Picasso.with(VehicleGuestAddCarFragment.this)
@@ -186,7 +230,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
        // iamgeLyt.removeAllViews();
         list.clear();
 
-        Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+        Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
 
 //        Picasso.with(this)
@@ -202,7 +246,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
             ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
         }else{
             if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
-              //  Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
+                //  Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
                 imageView1.setImageBitmap(photo);
 
                 //Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
@@ -237,7 +281,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 i.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                 i.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                 i.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
-                i.putExtra(BLOCK_ID,getIntent().getStringExtra(BLOCK_ID));
+                i.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
                 startActivity(i);
                 finish();
             }
@@ -292,30 +336,6 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
             }
         });
     }
-
-    private Target target = new Target() {
-        @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-
-
-            photo=bitmap;
-            imageView1.setImageBitmap(photo);
-            Log.d("target picas","onBitmapLoaded");
-        }
-
-        @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
-            Log.d("target picas","7onBitmapFailed "+IMAGE_BASE_URL+"Images/"+"PERSON"+getIntent().getIntExtra(ACCOUNT_ID,0)+".jpg");
-
-        }
-
-
-        @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
-            Log.d("target picas","7 onPrepareLoad ");
-
-        }
-    };
 
     @Override
     public void onDestroy() {  // could be in onPause or onStop
@@ -488,7 +508,6 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
 
     }*/
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -499,9 +518,9 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 showViewPager();
 
         } else  if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-             photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             imageView1.setImageBitmap(photo);
-           // personPhoto=photo;
+            // personPhoto=photo;
             SaveImage(photo);
             Log.d("Activity", "CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE ");
         }
@@ -521,7 +540,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
         res.updateConfiguration(conf, dm);
     }
 
-    public void SaveImage(Bitmap showedImgae){
+    public void SaveImage(Bitmap showedImgae) {
 
         String root = Environment.getExternalStorageDirectory().toString();
         File myDir = new File(root + "/DCIM/myCapturedImages");
@@ -529,9 +548,9 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
         Random generator = new Random();
         int n = 10000;
         n = generator.nextInt(n);
-        String fname = "FILENAME-"+ n +".jpg";
-        file = new File (myDir, fname);
-        if (file.exists ()) file.delete ();
+        String fname = "FILENAME-" + n + ".jpg";
+        file = new File(myDir, fname);
+        if (file.exists()) file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
             showedImgae.compress(Bitmap.CompressFormat.JPEG, 100, out);

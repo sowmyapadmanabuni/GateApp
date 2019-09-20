@@ -1,3 +1,4 @@
+
 package com.oyespace.guards.activity
 
 import android.content.Context
@@ -40,6 +41,7 @@ class MyRoleScreen : BaseKotlinActivity() {
 
     }
 
+    @SuppressWarnings("MissingPermission")
     private fun getDeviceRegistrationInfo() {
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         var Mobile_IMEI_NO = tm.deviceId

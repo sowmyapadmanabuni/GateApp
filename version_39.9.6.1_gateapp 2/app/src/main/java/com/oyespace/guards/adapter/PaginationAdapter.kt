@@ -1,20 +1,17 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.malinskiy.superrecyclerview.swipe.SwipeLayout
+import androidx.appcompat.widget.AppCompatTextView
 import com.oyespace.guards.R
 import com.oyespace.guards.pojo.PaginationData
 
 var activePage:Int = 0;
 
 class PaginationAdapter(private val mcontext: Context, private val arrayList: ArrayList<PaginationData>, val clickListener:(PaginationData, Int) -> Unit):
-    androidx.recyclerview.widget.RecyclerView.Adapter<PaginationAdapter.ItemViewHolder>(){
+    androidx.recyclerview.widget.RecyclerView.Adapter<PaginationAdapter.ItemViewHolder>() {
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
@@ -48,7 +45,8 @@ class PaginationAdapter(private val mcontext: Context, private val arrayList: Ar
     }
 
 
-    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val mPageNumber: AppCompatTextView
         val mPageCard: androidx.cardview.widget.CardView
 

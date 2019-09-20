@@ -2,8 +2,8 @@ package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.oyespace.guards.R
 
 

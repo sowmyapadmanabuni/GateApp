@@ -48,7 +48,7 @@
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
         <activity
-                android:name=".activity.ResidentIdActivity"
+                android:name=".residentidcard.ResidentIdActivity"
                 android:theme="@style/noActionBar"></activity>
 
 
@@ -239,7 +239,7 @@
                 android:windowSoftInputMode="adjustPan"
                 android:theme="@style/noActionBar" />
         <activity
-                android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                android:name=".activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
 

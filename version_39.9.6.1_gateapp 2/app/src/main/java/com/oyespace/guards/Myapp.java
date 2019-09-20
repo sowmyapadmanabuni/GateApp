@@ -2,12 +2,13 @@ package com.oyespace.guards;
 
 import android.content.Context;
 
-
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
+
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.oyespace.guards.utils.Prefs;
+
 import io.fabric.sdk.android.Fabric;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;

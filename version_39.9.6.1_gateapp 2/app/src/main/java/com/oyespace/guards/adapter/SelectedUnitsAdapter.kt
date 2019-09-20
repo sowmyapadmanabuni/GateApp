@@ -1,22 +1,17 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.cardview.widget.CardView
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.RelativeLayout
-import com.malinskiy.superrecyclerview.swipe.SwipeLayout
+import androidx.appcompat.widget.AppCompatTextView
 import com.oyespace.guards.R
-
 import com.oyespace.guards.pojo.UnitPojo
 
 
 class SelectedUnitsAdapter(private val mcontext: Context, private val arrayList: ArrayList<UnitPojo>, val clickListener:(UnitPojo, Int) -> Unit):
-    androidx.recyclerview.widget.RecyclerView.Adapter<SelectedUnitsAdapter.ItemViewHolder>(){
+    androidx.recyclerview.widget.RecyclerView.Adapter<SelectedUnitsAdapter.ItemViewHolder>() {
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
@@ -63,7 +58,8 @@ class SelectedUnitsAdapter(private val mcontext: Context, private val arrayList:
     }
 
 
-    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val mUnitName: AppCompatTextView
         val mChipClose: ImageView
 

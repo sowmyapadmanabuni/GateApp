@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.speech.tts.TextToSpeech
-import androidx.recyclerview.widget.RecyclerView
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,38 +12,31 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
-import com.oyespace.guards.BGService
+import androidx.appcompat.app.AlertDialog
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.activity.ImgView
+import com.oyespace.guards.R
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.pojo.VisitorEntryLog
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
+import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
-import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.util.*
-import com.oyespace.guards.constants.PrefKeys.BG_NOTIFICATION_ON
-import com.oyespace.guards.pojo.VisitorEntryLog
-import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.*
-import android.content.DialogInterface
-import android.os.Handler
-import androidx.appcompat.app.AlertDialog
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.oyespace.guards.R
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.pojo.WorkerDetails
-import com.squareup.picasso.MemoryPolicy
-import com.squareup.picasso.NetworkPolicy
-import kotlinx.android.synthetic.main.activity_emergency_response.view.*
-import kotlinx.android.synthetic.main.activity_img_view.*
 
 
-class VistorEntryListAdapter( var listVistor: ArrayList<VisitorEntryLog>, private val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>(),Filterable {
+class VistorEntryListAdapter(
+    var listVistor: ArrayList<VisitorEntryLog>,
+    private val mcontext: Context
+) : androidx.recyclerview.widget.RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>(),
+    Filterable {
 
     private var searchList: ArrayList<VisitorEntryLog>? = null
     private val mInflater: LayoutInflater
@@ -78,24 +70,34 @@ class VistorEntryListAdapter( var listVistor: ArrayList<VisitorEntryLog>, privat
         val orderData = searchList!!.get(position)
         val vistordate = orderData?.asAssnID
         holder.apartmentNamee.text = orderData?.unUniName
-        holder.entryTime.text =formatDateHM(orderData?.vlEntryT)+" "
+        holder.entryTime.text = formatDateHM(orderData?.vlEntryT) + " "
         Log.d("ddd", formatDateHM(orderData?.vlEntryT))
         holder.entrydate.text = formatDateDMY(orderData?.vldCreated)
-        if(orderData?.vlExitT.equals("0001-01-01T00:00:00",true)) {
+        if (orderData?.vlExitT.equals("0001-01-01T00:00:00", true)) {
             holder.exitTime.text = ""
             holder.exitdate.text = ""
-            holder.btn_makeexit.visibility=View.VISIBLE
-            Log.d("dddh", " u "+(orderData?.vlVisType.equals(DELIVERY)) +" "+ deliveryTimeUp(orderData?.vlEntryT,getCurrentTimeLocal(),1))
+            holder.btn_makeexit.visibility = View.VISIBLE
+            Log.d(
+                "dddh",
+                " u " + (orderData?.vlVisType.equals(DELIVERY)) + " " + deliveryTimeUp(
+                    orderData?.vlEntryT,
+                    getCurrentTimeLocal(),
+                    1
+                )
+            )
 
-            Log.v("TTTTIMEEE",orderData?.vlEntryT+"...."+getCurrentTimeLocal())
+            Log.v("TTTTIMEEE", orderData?.vlEntryT + "...." + getCurrentTimeLocal())
 
-            if(orderData?.vlVisType.equals(DELIVERY) && deliveryTimeUp(orderData?.vlEntryT,getCurrentTimeLocal(),1)) {
+            if (orderData?.vlVisType.equals(DELIVERY) && deliveryTimeUp(
+                    orderData?.vlEntryT,
+                    getCurrentTimeLocal(),
+                    1
+                )
+            ) {
                 holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
-                 holder.ll_card.startAnimation(animBlink)
+                holder.ll_card.startAnimation(animBlink)
 
-                refresh ( 1000 )
-
-
+                refresh(1000)
 
 
                 // mTTS!!.speak("Overstaying "+orderData.vlfName+orderData.vllName, TextToSpeech.QUEUE_FLUSH, null)
@@ -104,25 +106,25 @@ class VistorEntryListAdapter( var listVistor: ArrayList<VisitorEntryLog>, privat
 //                    mcontext.startService(Intent(mcontext, BGService::class.java))
 //                }
 
-            }else{
+            } else {
                 holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
-                holder.ll_card.animation=null
+                holder.ll_card.animation = null
 
             }
 
-        }else{
+        } else {
             holder.exitTime.text = formatDateHM(orderData?.vlExitT)
             holder.exitdate.text = formatDateDMY(orderData?.vldUpdated)
-            holder.btn_makeexit.visibility=View.INVISIBLE
+            holder.btn_makeexit.visibility = View.INVISIBLE
             holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
-            holder.ll_card.animation=null
+            holder.ll_card.animation = null
 
         }
 
-        holder.serviceProvider.text = orderData.vlComName +", Visitors: "+orderData.vlVisCnt
+        holder.serviceProvider.text = orderData.vlComName + ", Visitors: " + orderData.vlVisCnt
         holder.visitorName.text = orderData?.vlfName
         holder.btn_makeexit.setOnClickListener {
-            searchList!!.get(position).vlExitT=DateTimeUtils.getCurrentTimeLocal();
+            searchList!!.get(position).vlExitT = DateTimeUtils.getCurrentTimeLocal();
 
             makeExitCall(orderData.vlVisLgID);
             //  listVistor.removeAt(position)
@@ -131,29 +133,28 @@ class VistorEntryListAdapter( var listVistor: ArrayList<VisitorEntryLog>, privat
 
         }
 
-        if(orderData.vlMobile.length > 5){
+        if (orderData.vlMobile.length > 5) {
             holder.iv_call.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             holder.iv_call.setVisibility(View.INVISIBLE);
         }
-try {
+        try {
 
 
-     number = orderData.vlMobile.substring(3)
+            number = orderData.vlMobile.substring(3)
 
 
-}
-    catch (e:StringIndexOutOfBoundsException ) {
-    }
+        } catch (e: StringIndexOutOfBoundsException) {
+        }
 
-        if(orderData?.vlVisType.equals("STAFF",true)){
+        if (orderData?.vlVisType.equals("STAFF", true)) {
 
 
-            if(orderData?.vlEntryImg.equals("")){
+            if (orderData?.vlEntryImg.equals("")) {
 
 
                 Glide.with(mcontext)
-                    .load(Uri.parse(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg"))
+                    .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData?.reRgVisID + ".jpg"))
                     .placeholder(R.drawable.user_icon_black)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(false)
@@ -162,8 +163,7 @@ try {
 //                Picasso.with(mcontext)
 //               .load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg")
 //                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
-            }
-            else {
+            } else {
 
 
                 Glide.with(mcontext)
@@ -179,24 +179,21 @@ try {
 //                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
             }
 
-        }else{
+        } else {
 
 
-
-
-            if(orderData?.vlEntryImg.equals("")){
+            if (orderData?.vlEntryImg.equals("")) {
                 Glide.with(mcontext)
-                    .load(Uri.parse(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg"))
+                    .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"))
                     .placeholder(R.drawable.user_icon_black)
                     .diskCacheStrategy(DiskCacheStrategy.NONE)
                     .skipMemoryCache(false)
                     .into(holder.iv_user);
 
-               // Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.iv_user);
+                // Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.iv_user);
 
 
-            }
-            else {
+            } else {
                 Glide.with(mcontext)
                     .load(Uri.parse(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg))
                     .placeholder(R.drawable.user_icon_black)
@@ -204,8 +201,7 @@ try {
                     .skipMemoryCache(false)
                     .into(holder.iv_user);
 
-              //  Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.iv_user);
-
+                //  Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.iv_user);
 
 
             }
@@ -218,8 +214,7 @@ try {
                 mobnumber = orderData.vlMobile.substring(3)
 
 
-            }
-            catch (e:StringIndexOutOfBoundsException ) {
+            } catch (e: StringIndexOutOfBoundsException) {
             }
 
 
@@ -230,31 +225,30 @@ try {
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
 
-          //  if (orderData.vlVisType.equals("STAFF", true)) {
+            //  if (orderData.vlVisType.equals("STAFF", true)) {
 
-               // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
+            // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
                 if (orderData.vlVisType.equals("STAFF", true)) {
 
-                    if(orderData?.vlEntryImg.equals("")){
+                    if (orderData?.vlEntryImg.equals("")) {
 
 //                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg");
 //                        Picasso.with(mcontext).load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg").networkPolicy(NetworkPolicy.NO_CACHE).memoryPolicy(MemoryPolicy.NO_CACHE);
 
                         Glide.with(mcontext)
-                            .load(Uri.parse(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg"))
+                            .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData?.reRgVisID + ".jpg"))
                             .placeholder(R.drawable.user_icon_black)
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .skipMemoryCache(false)
                             .into(dialog_imageview);
-                      //  Picasso.with(mcontext).load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+                        //  Picasso.with(mcontext).load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 //                        Picasso.with(mcontext)
 //                            .load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg")
 //                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
-                    }
-                    else {
+                    } else {
                         Glide.with(mcontext)
                             .load(Uri.parse(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg))
                             .placeholder(R.drawable.user_icon_black)
@@ -283,15 +277,15 @@ try {
                 } else {
 
 
-                    if(orderData?.vlEntryImg.equals("")){
+                    if (orderData?.vlEntryImg.equals("")) {
                         Glide.with(mcontext)
-                            .load(Uri.parse(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg"))
+                            .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"))
                             .placeholder(R.drawable.user_icon_black)
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .skipMemoryCache(false)
                             .into(dialog_imageview);
 
-                      //  Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+                        //  Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 //                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg");
 //                        Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").networkPolicy(NetworkPolicy.NO_CACHE).memoryPolicy(MemoryPolicy.NO_CACHE);
@@ -299,8 +293,7 @@ try {
 //                        Picasso.with(mcontext)
 //                            .load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg")
 //                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
-                    }
-                    else {
+                    } else {
                         Glide.with(mcontext)
                             .load(Uri.parse(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg))
                             .placeholder(R.drawable.user_icon_black)
@@ -308,7 +301,7 @@ try {
                             .skipMemoryCache(false)
                             .into(dialog_imageview);
 
-                       // Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+                        // Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 
 //                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg);
@@ -321,8 +314,7 @@ try {
                     }
 
 
-
-            }
+                }
 
             alertadd.setView(view)
             alertadd.show()
@@ -330,21 +322,21 @@ try {
         holder.iv_call.setOnClickListener {
 
             val intent = Intent(Intent.ACTION_CALL);
-            intent.data = Uri.parse("tel:"+orderData?.vlMobile)
+            intent.data = Uri.parse("tel:" + orderData?.vlMobile)
             mcontext.startActivity(intent)
         }
-        holder.expanded_view.visibility=View.GONE
+        holder.expanded_view.visibility = View.GONE
 
         holder.lyt_text.setOnClickListener {
 
-            if(holder.expanded_view.visibility==View.GONE){
-                holder.expanded_view.visibility=View.VISIBLE
-            }else{
-                holder.expanded_view.visibility=View.GONE
+            if (holder.expanded_view.visibility == View.GONE) {
+                holder.expanded_view.visibility = View.VISIBLE
+            } else {
+                holder.expanded_view.visibility = View.GONE
             }
         }
 
-       // holder.tv_purpose.text=orderData?.vlMobile
+        // holder.tv_purpose.text=orderData?.vlMobile
 
     }
 
@@ -434,7 +426,8 @@ try {
         refresh(1000)
     }
 
-    inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
         val entryTime: TextView
         val exitTime: TextView
         val visitorName: TextView
@@ -493,8 +486,11 @@ try {
                     val filteredList = ArrayList<VisitorEntryLog>()
                     for (row in listVistor) {
                         // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-                        if (row.vlfName!!.toLowerCase().contains(charString.toLowerCase())||row.vlComName!!.toLowerCase().contains(charString.toLowerCase())||row.vlMobile!!.toLowerCase().contains(charString.toLowerCase())||row.vlpOfVis
-                            !!.toLowerCase().contains(charString.toLowerCase())) {
+                        if (row.vlfName!!.toLowerCase().contains(charString.toLowerCase()) || row.vlComName!!.toLowerCase().contains(
+                                charString.toLowerCase()
+                            ) || row.vlMobile!!.toLowerCase().contains(charString.toLowerCase()) || row.vlpOfVis
+                            !!.toLowerCase().contains(charString.toLowerCase())
+                        ) {
                             filteredList.add(row)
                         }
                     }

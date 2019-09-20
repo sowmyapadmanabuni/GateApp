@@ -1,52 +1,41 @@
 package com.oyespace.guards.vehicle_guest
 
+
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import android.widget.Toast
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.UnitSelectionActivity
 import com.oyespace.guards.adapter.BlockSelectionAdapter
 import com.oyespace.guards.adapter.SelectedUnitsAdapter
 import com.oyespace.guards.adapter.UnitSearchResultAdapter
-
-
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
-import kotlinx.android.synthetic.main.activity_block_selection.*
-import kotlinx.android.synthetic.main.title_bar.view.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_block_selection.*
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import kotlinx.android.synthetic.main.search_layout.*
-import java.lang.Exception
+import kotlinx.android.synthetic.main.title_bar.view.*
 
 class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter: BlockSelectionAdapter?=null
-    var mUnitsAdapter: SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter: UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter? = null
+    var mUnitsAdapter: SelectedUnitsAdapter? = null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter? = null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""
@@ -57,7 +46,7 @@ class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickL
     internal var unitNames = ""
     internal var unitId = ""
     internal var acAccntID=""
-    internal var blockID=""
+    internal var blockID = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -203,7 +192,7 @@ class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickL
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
                 acAccntID += selected.get(j).acAccntID
-                blockID +=selected.get(j).blBlockID
+                blockID += selected.get(j).blBlockID
 
 //                if (selected.get(j).tenant.size != 0) {
 //                    try {
@@ -246,7 +235,7 @@ class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickL
                 d.putExtra(VISITOR_TYPE,ConstantUtils.GUEST)
                 d.putExtra(COMPANY_NAME,"Guest")
                 d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                d.putExtra(BLOCK_ID,blockID)
+                d.putExtra(BLOCK_ID, blockID)
                 startActivity(d);
                 finish();
                 }

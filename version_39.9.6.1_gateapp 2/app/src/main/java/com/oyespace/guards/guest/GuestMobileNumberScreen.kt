@@ -13,7 +13,6 @@ import android.os.CountDownTimer
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import androidx.appcompat.app.AlertDialog
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -23,6 +22,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -33,7 +33,6 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
@@ -48,9 +47,6 @@ import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import java.util.*
 
 class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCodePicker.OnCountryChangeListener {
@@ -105,7 +101,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 d.putExtra(MOBILENUMBER, "")
                 d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
+                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
 
@@ -133,7 +129,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)
-                      //  builder.setTitle("Guest Entry already done")
+                        //  builder.setTitle("Guest Entry already done")
                         builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
                             dialog.cancel()
@@ -202,9 +198,6 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                                ccd= number.substring(0,3)
 
                                mobileNumber=number.substring(3,13)
-
-
-
 
 
                             }
@@ -532,7 +525,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                             )
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                            d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
+                            d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
 
                             startActivity(d);
                             finish();
@@ -573,7 +566,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         d.putExtra(MOBILENUMBER, mobileNumber)
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-        d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
+        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
         startActivity(d);
         finish();
     }

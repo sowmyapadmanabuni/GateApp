@@ -1,23 +1,19 @@
 package com.oyespace.guards.adapter
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.recyclerview.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.UnitListActivity
-import com.oyespace.guards.pojo.ServiceProvider
-import com.oyespace.guards.utils.ConstantUtils.*
-import android.app.Activity
-import android.util.Log
-import android.widget.ImageView
 import com.oyespace.guards.activity.BlockSelectionActivity
 import com.oyespace.guards.pojo.VendorPojo
-import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
 
 class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
@@ -64,7 +60,8 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
         return arrayList.size
     }
 
-    class ItemViewHolder(itemView: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) :
+        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
         val img_logo:ImageView

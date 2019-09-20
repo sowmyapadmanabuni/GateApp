@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.activity
+package com.oyespace.guards.activity
 
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -9,13 +9,11 @@ import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
-import androidx.core.app.ActivityCompat
-import androidx.appcompat.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.widget.*
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -26,8 +24,8 @@ import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.kodmap.app.library.PopopDialogBuilder
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.GalleryViewActivity
+import com.oyespace.guards.com.oyespace.guards.activity.EmergencyModel
+import com.oyespace.guards.com.oyespace.guards.activity.EmrgencyContactAdapter
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.pojo.GoogleMapDTO
 import com.oyespace.guards.services.SOSSirenService
@@ -67,10 +65,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     lateinit var edittext1: EditText
     lateinit var edittext2: EditText
     lateinit var save: Button
-    var currentSOS:SOSModel = SOSModel()
-    var sosLocation : LatLng = LatLng(0.0,0.0)
-    var guardLocation : LatLng = LatLng(0.0,0.0)
-    var totalGuards:Int = Prefs.getInt("TOTAL_GUARDS",1)
+    var currentSOS: SOSModel = SOSModel()
+    var sosLocation: LatLng = LatLng(0.0, 0.0)
+    var guardLocation: LatLng = LatLng(0.0, 0.0)
+    var totalGuards: Int = Prefs.getInt("TOTAL_GUARDS", 1)
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var lastLocation: Location
@@ -88,10 +86,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     lateinit var mPolyline:Polyline
     private var lineoption = PolylineOptions()
     private var isResolving = false
-    var userId:Int = 0
-    var emergencyImages:ArrayList<String> = ArrayList();
-    internal var t1: TextToSpeech?=null
-    var mSosPath:String = "";
+    var userId: Int = 0
+    var emergencyImages: ArrayList<String> = ArrayList();
+    internal var t1: TextToSpeech? = null
+    var mSosPath: String = "";
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -111,7 +109,6 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         super.onStart()
         Prefs.putBoolean("ACTIVE_SOS",true);
         startSiren()
-
     }
 
     override fun onDestroy() {
@@ -123,17 +120,17 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     override fun onPause() {
         super.onPause()
-        Prefs.putBoolean("ACTIVE_SOS",false);
+        Prefs.putBoolean("ACTIVE_SOS", false);
     }
 
     override fun onResume() {
         super.onResume()
-        if(currentSOS != null && currentSOS.isValid) {
+        if (currentSOS != null && currentSOS.isValid) {
             var lng: Double = currentSOS.longitude.toDouble();
             var lat: Double = currentSOS.latitude.toDouble();
             sosLocation = LatLng(lat, lng)
             getDirections()
-        }else{
+        } else {
             getSOS()
         }
     }
@@ -148,16 +145,16 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         setEmergencyContacts()
 
 
-        btn_dismiss_sos.setOnClickListener {dismissSOS()}
+        btn_dismiss_sos.setOnClickListener { dismissSOS() }
         btn_attend_sos.setOnClickListener({ attendSOS() })
 
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
             if (status != TextToSpeech.ERROR)
-                t1?.language=Locale.getDefault()
+                t1?.language = Locale.getDefault()
         })
 
         sos_image.setOnClickListener({
-            if(emergencyImages.size > 0) {
+            if (emergencyImages.size > 0) {
 //                val galleryIntent = Intent(this@SosGateAppActivity, GalleryViewActivity::class.java)
 //                var emergencyImagesJson = Gson().toJson(emergencyImages)
 //                galleryIntent.putExtra("images", emergencyImagesJson)
@@ -170,7 +167,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
 
-    private fun showImages(){
+    private fun showImages() {
         val urlList = ArrayList<String>()
         urlList.addAll(emergencyImages);
         val dialog = PopopDialogBuilder(this@SosGateAppActivity).setList(urlList).build();
@@ -178,10 +175,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
 
-
-    private fun initFRTDB(){
-        mSosPath = "SOS/"+ LocalDb.getAssociation()!!.asAssnID+"/"+currentSOS.userId
-        Log.e(TAG,""+mSosPath)
+    private fun initFRTDB() {
+        mSosPath = "SOS/" + LocalDb.getAssociation()!!.asAssnID + "/" + currentSOS.userId
+        Log.e(TAG, "" + mSosPath)
         mDatabase = FirebaseDatabase.getInstance().reference
         mSosReference = FirebaseDatabase.getInstance().getReference(mSosPath)
         initSOSListener()
@@ -233,7 +229,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     }
 
-    private fun initSOSListener(){
+    private fun initSOSListener() {
         sosListener = object : ValueEventListener {
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -368,6 +364,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                     realm.executeTransaction {
                                         sosObj.deleteFromRealm()
                                     }
+
                                 }
                                 checkNextSOS()
                             }catch (e:Exception){
@@ -430,31 +427,31 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         }
     }
 
-    private fun checkNextSOS(){
+    private fun checkNextSOS() {
         val nextSos = realm.where<SOSModel>().findFirst()
-        if(nextSos != null){
+        if (nextSos != null) {
 
 
             if (::sosMarker.isInitialized) {
                 sosMarker.remove()
             }
-            if(::sosListener.isInitialized && mSosReference!=null){
+            if (::sosListener.isInitialized && mSosReference != null) {
                 mSosReference!!.removeEventListener(sosListener)
             }
-            if(::mPolyline.isInitialized){
+            if (::mPolyline.isInitialized) {
                 mPolyline.remove()
             }
             getSOS()
             updateSOSLocation()
-        }else{
+        } else {
             isBackEnabled = true
             onBackPressed()
         }
     }
 
-    private fun initMap(){
+    private fun initMap() {
         val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -470,10 +467,16 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     private fun setUpMap() {
-        if (ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
 
@@ -492,15 +495,16 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
     }
 
-    private fun updateSOSLocation(){
-        if(currentSOS!=null && currentSOS.latitude != "" && currentSOS.longitude != "") {
-            var lng:Double = currentSOS.longitude.toDouble();
-            var lat:Double = currentSOS.latitude.toDouble();
+    private fun updateSOSLocation() {
+        if (currentSOS != null && currentSOS.latitude != "" && currentSOS.longitude != "") {
+            var lng: Double = currentSOS.longitude.toDouble();
+            var lat: Double = currentSOS.latitude.toDouble();
 
             sosLocation = LatLng(lat, lng)
-            val markerOption:MarkerOptions = MarkerOptions().position(sosLocation).title("SOS Location")
-            sosMarker =  mMap.addMarker(markerOption)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosLocation,15.0f))
+            val markerOption: MarkerOptions =
+                MarkerOptions().position(sosLocation).title("SOS Location")
+            sosMarker = mMap.addMarker(markerOption)
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosLocation, 15.0f))
         }
     }
 
@@ -513,33 +517,34 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         getDirections()
     }
 
-    private fun getDirections(){
-        val URL = getDirectionURL(guardLocation,sosLocation)
+    private fun getDirections() {
+        val URL = getDirectionURL(guardLocation, sosLocation)
         GetDirection(URL).execute()
     }
 
-    private fun getSOS(){
+    private fun getSOS() {
         val sosObj = realm.where<SOSModel>().findFirst()
-        Log.e("getSOS",""+sosObj);
-        if(sosObj != null){
+        Log.e("getSOS", "" + sosObj);
+        if (sosObj != null) {
             currentSOS = sosObj
-            val currentGate:String = Prefs.getString("GATE_NO",null)
+            val currentGate: String = Prefs.getString("GATE_NO", null)
 
-            if(currentSOS.userMobile != "" && currentSOS.userMobile != null){
+            if (currentSOS.userMobile != "" && currentSOS.userMobile != null) {
                 sos_usermobile.text = currentSOS.userMobile
             }
-            if(currentSOS.userName != "" && currentSOS.userName != null){
+            if (currentSOS.userName != "" && currentSOS.userName != null) {
                 sos_username.text = currentSOS.userName
             }
-            if(currentSOS.sosImage != "" && currentSOS.sosImage != null){
+            if (currentSOS.sosImage != "" && currentSOS.sosImage != null) {
                 Picasso.with(applicationContext)
                     .load(currentSOS.sosImage)
-                    .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera).into(sos_image)
-            }else{
+                    .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera)
+                    .into(sos_image)
+            } else {
                 Picasso.with(applicationContext)
                     .load(R.drawable.newicons_camera).into(sos_image)
             }
-            if(currentGate!=null && currentGate != "" && currentSOS.attendedBy.equals(currentGate)){
+            if (currentGate != null && currentGate != "" && currentSOS.attendedBy.equals(currentGate)) {
                 btn_dismiss_sos.visibility = View.GONE
                 btn_attend_sos.text = "Resolved"
                 isResolving = true
@@ -548,7 +553,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         }
     }
 
-    private fun dismissSOS(){
+    private fun dismissSOS() {
         val builder = AlertDialog.Builder(this)
         val dview = layoutInflater.inflate(R.layout.activity_custom_alert, null)
         val alert = builder.create()
@@ -566,7 +571,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         })
     }
 
-    private fun removeCurrentSOSRealm(){
+    private fun removeCurrentSOSRealm() {
         try {
             val userId = currentSOS.userId
             if (userId != 0 && userId != null) {
@@ -578,16 +583,16 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
                 }
             }
-        }catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
 
         }
     }
 
-    private fun updatePassedSOS(){
+    private fun updatePassedSOS() {
 
         //val key = mSosReference!!.child("passedby").push().key
-       // val key = Prefs.getString("GATE_NO","")
-        var passedReference:DatabaseReference = mSosReference!!.child("passedby")
+        // val key = Prefs.getString("GATE_NO","")
+        var passedReference: DatabaseReference = mSosReference!!.child("passedby")
         //passedReference.addListenerForSingleValueEvent(n)
 
         val passedListener = object : ValueEventListener {
@@ -597,24 +602,26 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 if (dataSnapshot.exists()) {
 
                     try {
-                        Log.e("PASSEDCOUNT",""+dataSnapshot.childrenCount)
+                        Log.e("PASSEDCOUNT", "" + dataSnapshot.childrenCount)
                     } catch (e: Exception) {
                     }
                 }
             }
+
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("passedListener","Error")
+                Log.e("passedListener", "Error")
             }
         }
         passedReference!!.addValueEventListener(passedListener)
         val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
         val currentDate = sdf.format(Date())
 
-        mSosReference!!.child("passedby").child(Prefs.getString("GATE_NO","")).setValue(""+currentDate)
+        mSosReference!!.child("passedby").child(Prefs.getString("GATE_NO", ""))
+            .setValue("" + currentDate)
 
     }
 
-    private fun setEmergencyContacts(){
+    private fun setEmergencyContacts() {
 
         val contacts = ArrayList<EmergencyModel>()
         contacts.add(
@@ -695,12 +702,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     override fun onBackPressed() {
-        if(isBackEnabled) {
+        if (isBackEnabled) {
 //            super.onBackPressed()
             finish()
         }
     }
-
 
 
     override fun onMapReady(p0: GoogleMap) {
@@ -714,24 +720,27 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         return true
     }
 
-    private fun getDirectionURL(origin:LatLng,dest:LatLng) : String{
-        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=true&mode=walking&key="+resources.getString(R.string.google_maps_key)
+    private fun getDirectionURL(origin: LatLng, dest: LatLng): String {
+        return "https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${dest.latitude},${dest.longitude}&sensor=true&mode=walking&key=" + resources.getString(
+            R.string.google_maps_key
+        )
     }
 
-    private inner class GetDirection(val url : String) : AsyncTask<Void, Void, List<List<LatLng>>>(){
+    private inner class GetDirection(val url: String) :
+        AsyncTask<Void, Void, List<List<LatLng>>>() {
         override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
             val client = OkHttpClient()
             val request = Request.Builder().url(url).build()
             val response = client.newCall(request).execute()
             val data = response.body()!!.string()
-            Log.e("GoogleMap" , " data : $data")
-            val result =  ArrayList<List<LatLng>>()
-            try{
+            Log.e("GoogleMap", " data : $data")
+            val result = ArrayList<List<LatLng>>()
+            try {
                 val respObj = Gson().fromJson(data, GoogleMapDTO::class.java)
 
-                val path =  ArrayList<LatLng>()
+                val path = ArrayList<LatLng>()
 
-                for (i in 0..(respObj.routes[0].legs[0].steps.size-1)){
+                for (i in 0..(respObj.routes[0].legs[0].steps.size - 1)) {
 //                    val startLatLng = LatLng(respObj.routes[0].legs[0].steps[i].start_location.lat.toDouble()
 //                            ,respObj.routes[0].legs[0].steps[i].start_location.lng.toDouble())
 //                    path.add(startLatLng)
@@ -740,7 +749,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                     path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
                 }
                 result.add(path)
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
             return result
@@ -748,7 +757,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
         override fun onPostExecute(result: List<List<LatLng>>) {
             lineoption = PolylineOptions()
-            for (i in result.indices){
+            for (i in result.indices) {
                 lineoption.addAll(result[i])
                 lineoption.width(10f)
                 lineoption.color(Color.BLACK)
@@ -788,13 +797,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
             lng += dlng
 
-            val latLng = LatLng((lat.toDouble() / 1E5),(lng.toDouble() / 1E5))
+            val latLng = LatLng((lat.toDouble() / 1E5), (lng.toDouble() / 1E5))
             poly.add(latLng)
         }
 
         return poly
     }
 }
-
-
 

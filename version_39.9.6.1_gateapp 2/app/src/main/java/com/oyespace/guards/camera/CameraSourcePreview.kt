@@ -5,16 +5,13 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import androidx.core.app.ActivityCompat
 import android.util.AttributeSet
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.ViewGroup
-
-import com.google.android.gms.common.images.Size
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.vision.CameraSource
-
 import java.io.IOException
 
 class CameraSourcePreview(private val mContext: Context, attrs: AttributeSet) : ViewGroup(mContext, attrs) {

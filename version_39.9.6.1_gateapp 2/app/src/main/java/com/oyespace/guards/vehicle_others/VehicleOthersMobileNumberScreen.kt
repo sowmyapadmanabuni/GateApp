@@ -10,10 +10,8 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import androidx.appcompat.app.AlertDialog
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -23,6 +21,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -30,28 +29,23 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.Dashboard
+import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-
+import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
 import java.util.*
-import com.oyespace.guards.R
-import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 
 class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListener, CountryCodePicker.OnCountryChangeListener{
 
@@ -116,7 +110,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                     if(entryExists(ccd,mobileNumber)) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@VehicleOthersMobileNumberScreen)
-                      //  builder.setTitle("Vendor Entry already done")
+                        //  builder.setTitle("Vendor Entry already done")
                         builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
 

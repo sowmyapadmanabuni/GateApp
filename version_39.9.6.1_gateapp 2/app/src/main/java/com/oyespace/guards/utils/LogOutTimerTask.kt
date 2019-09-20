@@ -1,7 +1,5 @@
 package com.oyespace.guards.utils
 
-import android.content.Intent
-import androidx.core.content.ContextCompat.startActivity
 import java.util.*
 
 

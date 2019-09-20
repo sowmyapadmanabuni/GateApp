@@ -80,6 +80,7 @@
 
             </LinearLayout>
         </LinearLayout>
+
         <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/verifyBtn"
                 android:layout_width="fill_parent"

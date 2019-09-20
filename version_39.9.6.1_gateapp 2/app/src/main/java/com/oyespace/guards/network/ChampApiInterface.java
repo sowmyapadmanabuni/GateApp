@@ -1,12 +1,19 @@
 package com.oyespace.guards.network;
 
-import com.oyespace.guards.request.FingerPrintCreateReq;
 import com.oyespace.guards.request.InvitationUpdateReq;
 import com.oyespace.guards.request.SendStaffImageReq;
-import com.oyespace.guards.responce.*;
-import okhttp3.MultipartBody;
+import com.oyespace.guards.responce.InvitationRequestResponse;
+import com.oyespace.guards.responce.StaffImageRes;
+import com.oyespace.guards.responce.SubscriptionResponse;
+import com.oyespace.guards.responce.TicketListingTesponse;
+import com.oyespace.guards.responce.VisitorLogExitResp;
+
 import retrofit2.Call;
-import retrofit2.http.*;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.Headers;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 
 /**
  * Created by Basavarajesh Koni on 4/2/2018.
@@ -34,11 +41,11 @@ public interface ChampApiInterface {
 
     @GET("oye247/api/v1/Invitation/GetInvitationByInvitationID/{id}")
     @Headers("X-OYE247-APIKey:7470AD35-D51C-42AC-BC21-F45685805BBE")
-    Call<InvitationRequestResponse> getInvitationResponse( @Path("id") int invitationID);
+    Call<InvitationRequestResponse> getInvitationResponse(@Path("id") int invitationID);
 
     @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
     @Headers("X-OYE247-APIKey:7470AD35-D51C-42AC-BC21-F45685805BBE")
-    Call<InvitationRequestResponse>updateInvitation(@Body InvitationUpdateReq invitationUpdateReq);
+    Call<InvitationRequestResponse> updateInvitation(@Body InvitationUpdateReq invitationUpdateReq);
 
 //
 //    @GET("oyesafe/api/v1/GetVisitorLogEntryListByMobileNumber/{}")

@@ -1,35 +1,39 @@
+
 package com.oyespace.guards.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.location.Location
 import android.os.Bundle
+import android.telephony.TelephonyManager
 import android.util.Log
+import android.view.Gravity
 import android.widget.Toast
 import com.oyespace.guards.Dashboard
+import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.fragment.BaseKotlinFragment
 import com.oyespace.guards.listeners.LocationCallback
 import com.oyespace.guards.listeners.PermissionCallback
-import com.oyespace.guards.pojo.SearchResult
-import timber.log.Timber
-import android.telephony.TelephonyManager
-import android.content.Context
-import android.view.Gravity
-import com.oyespace.guards.Myapp
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.Device
 import com.oyespace.guards.pojo.GetDeviceInfobyMobImeiReq
 import com.oyespace.guards.pojo.GetDeviceInfobyMobImeiResp
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.pojo.SearchResult
+import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.LocationUtils
+import com.oyespace.guards.utils.Prefs
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.util.ArrayList
+import timber.log.Timber
+import java.util.*
 
 
 class SplashActivity : BaseLocationActivity() {
@@ -41,7 +45,7 @@ class SplashActivity : BaseLocationActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
-
+        Prefs.putBoolean("ACTIVE_SOS", false);
        // app = getApplication() as Myapp?;
         val searchData = LocalDb.getSearchData()
 
@@ -54,7 +58,12 @@ class SplashActivity : BaseLocationActivity() {
 
     private fun handleLocation() {
         requestPermission(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.READ_PHONE_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA, Manifest.permission.MODIFY_PHONE_STATE, Manifest.permission.ANSWER_PHONE_CALLS), 1, PermissionCallback { isGranted ->
+            Manifest.permission.READ_PHONE_STATE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,
+            Manifest.permission.MODIFY_PHONE_STATE,
+            Manifest.permission.ANSWER_PHONE_CALLS
+        ), 1, PermissionCallback { isGranted ->
             if (isGranted) {
                 checkForLocationStatus()
             } else {
@@ -97,13 +106,13 @@ class SplashActivity : BaseLocationActivity() {
 
     @SuppressLint("MissingPermission")
     private fun launchMainActivity() {
-       // val mainIntent = Intent(this@SplashActivity, DashboardActivity::class.java)
+        // val mainIntent = Intent(this@SplashActivity, DashboardActivity::class.java)
 
 
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-         Mobile_IMEI_NO = tm.deviceId
+        Mobile_IMEI_NO = tm.deviceId
         //   Mobile_IMEI_NO=""
-         getSimNumber = tm.getLine1Number()
+        getSimNumber = tm.getLine1Number()
         val modelno=android.os.Build.MODEL
         Prefs.putString(PrefKeys.MODEL_NUMBER,modelno)
 
@@ -134,16 +143,11 @@ class SplashActivity : BaseLocationActivity() {
             }
 
 
-
-
-        }
-        else{
+        } else{
             Prefs.putString(PrefKeys.MOBILE_NUMBER, getSimNumber)
 
             getDeviceRegistrationInfo()
         }
-
-
 
 
     }

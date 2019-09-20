@@ -1,30 +1,20 @@
 package com.oyespace.guards.activity
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.oyespace.guards.R
-import android.R.attr.country
 import android.app.Activity
-import android.graphics.Bitmap
-import android.provider.MediaStore
-import android.speech.RecognizerIntent
-import android.view.View
-import android.widget.*
-import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.Toast
-import android.widget.DatePicker
-import java.util.*
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.content.*
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.os.Environment
-import androidx.appcompat.app.AlertDialog
+import android.provider.MediaStore
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import com.oyespace.guards.Dashboard
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
@@ -36,7 +26,6 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
@@ -49,7 +38,7 @@ import timber.log.Timber
 import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import javax.xml.datatype.DatatypeConstants.MONTHS
+import java.util.*
 
 
 class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListener{
@@ -76,10 +65,10 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
     internal var personPhoto: Bitmap? = null
     var tv_name:TextView?=null
     var designation = arrayOf("Assistant Manager", "Assistant Security Officer", "CareTaker", "Cook", "Driver","Electrician","Gardener","Gym Trainer","Head Guard","Health Instructor","Lady Head Guard","Lady Supervisor","Lady Senior Security Guard","Lady Security Guard","Maid","Manager","Nurse","Others","Plumber","Stay at Home Maid","Security Guard","Security Officer","Senior Security","Security Supervisor","Senior Supervisor","Sweeper","Tuition Teacher")
-    var tv_designation:TextView?=null
+    var tv_designation: TextView? = null
     var overlapImage:ImageView?=null
     internal val CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034
-    var iv_personphoto:ImageView?=null
+    var iv_personphoto: ImageView? = null
     var calender:ImageView?=null
     private val datePicker: DatePicker? = null
     private var cal: Calendar? = null
@@ -301,11 +290,31 @@ System.out.println("Day = " + out[1]);
                         showProgress()
 
                         if(imgName!=null) {
-                            editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), imgName!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID,0))
+                            editStaff(
+                                tv_name!!.text.toString(),
+                                tv_mobilenumber!!.text.toString(),
+                                imgName!!,
+                                "Staff",
+                                tv_designation!!.text.toString(),
+                                "",
+                                s_dob.toString(),
+                                true,
+                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0)
+                            )
 
                         }
                         else{
-                            editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID,0))
+                            editStaff(
+                                tv_name!!.text.toString(),
+                                tv_mobilenumber!!.text.toString(),
+                                intent.getStringExtra("IMAGE"),
+                                "Staff",
+                                tv_designation!!.text.toString(),
+                                "",
+                                s_dob.toString(),
+                                true,
+                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0)
+                            )
 
                         }
 //                    }else {
@@ -530,10 +539,20 @@ System.out.println("Day = " + out[1]);
 
                     if (imgName != null) {
 
-                        updateStaffImage(imgName.toString(), "", intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("FIRSTNAME"))
+                        updateStaffImage(
+                            imgName.toString(),
+                            "",
+                            intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                            intent.getStringExtra("FIRSTNAME")
+                        )
 
                     }else{
-                        updateStaffImage(intent.getStringExtra("IMAGE"), "", intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("FIRSTNAME"))
+                        updateStaffImage(
+                            intent.getStringExtra("IMAGE"),
+                            "",
+                            intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                            intent.getStringExtra("FIRSTNAME")
+                        )
 
                     }
                     file.delete()

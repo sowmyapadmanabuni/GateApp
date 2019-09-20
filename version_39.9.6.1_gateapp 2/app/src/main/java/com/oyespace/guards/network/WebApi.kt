@@ -1,7 +1,6 @@
 package com.oyespace.guards.network
 
 
-
 import com.oyespace.guards.models.GetGuardsListResponse
 import com.oyespace.guards.models.GuardsList
 import com.oyespace.guards.pojo.*
@@ -148,7 +147,7 @@ interface WebApi {
     fun getNotificationCreate(@Header(OYE247KEY) token: String,@Body notificationCreateReq:NotificationCreateReq):Single<NotificationCreateResponse>
 
     @GET("oyeliving/api/v1/Unit/GetUnitListByUnitID/{id}")
-    fun getUnitListbyUnitId(@Header(CHAMPKEY) token: String, @Path("id") unitId: Int):Single<UnitlistbyUnitID>
+    fun getUnitListbyUnitId(@Header(CHAMPKEY) token: String, @Path("id") unitId: Int): Single<UnitlistbyUnitID>
 
     @POST("oyeliving/api/v1/Unit/UnitNameSearchByAssociationID")
     fun searchUnits(@Body unitSearch: SearchUnitRequest, @Header("X-Champ-APIKey") token: String)
@@ -163,9 +162,9 @@ interface WebApi {
             : Single<InviteCreateRes>
 
     @GET("oye247/api/v1/Invitation/GetInvitationByInvitationID/{id}")
-    fun getInvitationByInvitationID(@Header(CHAMPKEY) token: String, @Path("id") invitationId: String):Single<InviteCreateRes>
+    fun getInvitationByInvitationID(@Header(CHAMPKEY) token: String, @Path("id") invitationId: String): Single<InviteCreateRes>
 
     @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
-    fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq):Single<InviteCreateRes>
+    fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq): Single<InviteCreateRes>
 
 }

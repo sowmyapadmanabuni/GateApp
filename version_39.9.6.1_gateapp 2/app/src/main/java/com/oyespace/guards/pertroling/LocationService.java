@@ -37,7 +37,6 @@ public class LocationService extends Service implements LocationListener, GpsSta
     boolean isLocationManagerUpdatingLocation;
 
 
-
     ArrayList<Location> locationList;
 
     ArrayList<Location> oldLocationList;
@@ -57,7 +56,21 @@ public class LocationService extends Service implements LocationListener, GpsSta
     ArrayList<Float> batteryLevelScaledArray;
     int batteryScale;
     int gpsCount;
+    /* Battery Consumption */
+    private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context ctxt, Intent intent) {
+            int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
 
+            float batteryLevelScaled = batteryLevel / (float) scale;
+
+
+            batteryLevelArray.add(Integer.valueOf(batteryLevel));
+            batteryLevelScaledArray.add(Float.valueOf(batteryLevelScaled));
+            batteryScale = scale;
+        }
+    };
 
     public LocationService() {
 
@@ -80,20 +93,16 @@ public class LocationService extends Service implements LocationListener, GpsSta
         registerReceiver(this.batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
-
-
     @Override
     public int onStartCommand(Intent i, int flags, int startId) {
         super.onStartCommand(i, flags, startId);
         return Service.START_STICKY;
     }
 
-
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
     }
-
 
     @Override
     public void onRebind(Intent intent) {
@@ -114,7 +123,6 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
     }
 
-
     //This is where we detect the app is being killed, thus stop service.
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -123,23 +131,6 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         stopSelf();
     }
-
-
-
-
-    /**
-     * Binder class
-     *
-     * @author Takamitsu Mizutori
-     *
-     */
-    public class LocationServiceBinder extends Binder {
-        public LocationService getService() {
-            return LocationService.this;
-        }
-    }
-
-
 
     /* LocationListener implemenation */
     @Override
@@ -178,17 +169,17 @@ public class LocationService extends Service implements LocationListener, GpsSta
         //Broadcast location provider status change here
     }
 
-    public void startLogging(){
+    public void startLogging() {
         isLogging = true;
     }
 
-    public void stopLogging(){
-        if (locationList.size() > 1 && batteryLevelArray.size() > 1){
-            long currentTimeInMillis = (long)(SystemClock.elapsedRealtimeNanos() / 1000000);
+    public void stopLogging() {
+        if (locationList.size() > 1 && batteryLevelArray.size() > 1) {
+            long currentTimeInMillis = (long) (SystemClock.elapsedRealtimeNanos() / 1000000);
             long elapsedTimeInSeconds = (currentTimeInMillis - runStartTimeInMillis) / 1000;
             float totalDistanceInMeters = 0;
-            for(int i = 0; i < locationList.size() - 1; i++){
-                totalDistanceInMeters +=  locationList.get(i).distanceTo(locationList.get(i + 1));
+            for (int i = 0; i < locationList.size() - 1; i++) {
+                totalDistanceInMeters += locationList.get(i).distanceTo(locationList.get(i + 1));
             }
             int batteryLevelStart = batteryLevelArray.get(0).intValue();
             int batteryLevelEnd = batteryLevelArray.get(batteryLevelArray.size() - 1).intValue();
@@ -202,11 +193,10 @@ public class LocationService extends Service implements LocationListener, GpsSta
     }
 
 
-
     public void startUpdatingLocation() {
-        if(this.isLocationManagerUpdatingLocation == false){
+        if (this.isLocationManagerUpdatingLocation == false) {
             isLocationManagerUpdatingLocation = true;
-            runStartTimeInMillis = (long)(SystemClock.elapsedRealtimeNanos() / 1000000);
+            runStartTimeInMillis = (long) (SystemClock.elapsedRealtimeNanos() / 1000000);
 
 
             locationList.clear();
@@ -222,7 +212,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
             try {
                 Criteria criteria = new Criteria();
                 criteria.setAccuracy(Criteria.ACCURACY_FINE); //setAccuracyは内部では、https://stackoverflow.com/a/17874592/1709287の用にHorizontalAccuracyの設定に変換されている。
-                    criteria.setPowerRequirement(Criteria.POWER_HIGH);
+                criteria.setPowerRequirement(Criteria.POWER_HIGH);
                 criteria.setAltitudeRequired(false);
                 criteria.setSpeedRequired(true);
                 criteria.setCostAllowed(true);
@@ -257,8 +247,8 @@ public class LocationService extends Service implements LocationListener, GpsSta
     }
 
 
-    public void stopUpdatingLocation(){
-        if(this.isLocationManagerUpdatingLocation == true){
+    public void stopUpdatingLocation() {
+        if (this.isLocationManagerUpdatingLocation == true) {
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             locationManager.removeUpdates(this);
             isLocationManagerUpdatingLocation = false;
@@ -271,7 +261,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         gpsCount++;
 
-        if(isLogging){
+        if (isLogging) {
             //locationList.add(newLocation);
             filterAndAddLocation(newLocation);
         }
@@ -283,30 +273,30 @@ public class LocationService extends Service implements LocationListener, GpsSta
     }
 
     @SuppressLint("NewApi")
-    private long getLocationAge(Location newLocation){
+    private long getLocationAge(Location newLocation) {
         long locationAge;
-        if(Build.VERSION.SDK_INT >= 17) {
-            long currentTimeInMilli = (long)(SystemClock.elapsedRealtimeNanos() / 1000000);
-            long locationTimeInMilli = (long)(newLocation.getElapsedRealtimeNanos() / 1000000);
+        if (Build.VERSION.SDK_INT >= 17) {
+            long currentTimeInMilli = (long) (SystemClock.elapsedRealtimeNanos() / 1000000);
+            long locationTimeInMilli = (long) (newLocation.getElapsedRealtimeNanos() / 1000000);
             locationAge = currentTimeInMilli - locationTimeInMilli;
-        }else{
+        } else {
             locationAge = System.currentTimeMillis() - newLocation.getTime();
         }
         return locationAge;
     }
 
 
-    private boolean filterAndAddLocation(Location location){
+    private boolean filterAndAddLocation(Location location) {
 
         long age = getLocationAge(location);
 
-        if(age > 5 * 1000){ //more than 5 seconds
+        if (age > 5 * 1000) { //more than 5 seconds
             Log.d(TAG, "Location is old");
             oldLocationList.add(location);
             return false;
         }
 
-        if(location.getAccuracy() <= 0){
+        if (location.getAccuracy() <= 0) {
             Log.d(TAG, "Latitidue and longitude values are invalid.");
             noAccuracyLocationList.add(location);
             return false;
@@ -314,7 +304,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         //setAccuracy(newLocation.getAccuracy());
         float horizontalAccuracy = location.getAccuracy();
-        if(horizontalAccuracy > 10){ //10meter filter
+        if (horizontalAccuracy > 10) { //10meter filter
             Log.d(TAG, "Accuracy is too low.");
             inaccurateLocationList.add(location);
             return false;
@@ -324,12 +314,12 @@ public class LocationService extends Service implements LocationListener, GpsSta
         /* Kalman Filter */
         float Qvalue;
 
-        long locationTimeInMillis = (long)(location.getElapsedRealtimeNanos() / 1000000);
+        long locationTimeInMillis = (long) (location.getElapsedRealtimeNanos() / 1000000);
         long elapsedTimeInMillis = locationTimeInMillis - runStartTimeInMillis;
 
-        if(currentSpeed == 0.0f){
+        if (currentSpeed == 0.0f) {
             Qvalue = 3.0f; //3 meters per second
-        }else{
+        } else {
             Qvalue = currentSpeed; // meters per second
         }
 
@@ -340,19 +330,19 @@ public class LocationService extends Service implements LocationListener, GpsSta
         Location predictedLocation = new Location("");//provider name is unecessary
         predictedLocation.setLatitude(predictedLat);//your coords of course
         predictedLocation.setLongitude(predictedLng);
-        float predictedDeltaInMeters =  predictedLocation.distanceTo(location);
+        float predictedDeltaInMeters = predictedLocation.distanceTo(location);
 
-        if(predictedDeltaInMeters > 60){
+        if (predictedDeltaInMeters > 60) {
             Log.d(TAG, "Kalman Filter detects mal GPS, we should probably remove this from track");
             kalmanFilter.consecutiveRejectCount += 1;
 
-            if(kalmanFilter.consecutiveRejectCount > 3){
+            if (kalmanFilter.consecutiveRejectCount > 3) {
                 kalmanFilter = new KalmanLatLong(3); //reset Kalman Filter if it rejects more than 3 times in raw.
             }
 
             kalmanNGLocationList.add(location);
             return false;
-        }else{
+        } else {
             kalmanFilter.consecutiveRejectCount = 0;
         }
 
@@ -368,25 +358,6 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         return true;
     }
-
-
-
-    /* Battery Consumption */
-    private BroadcastReceiver batteryInfoReceiver = new BroadcastReceiver(){
-        @Override
-        public void onReceive(Context ctxt, Intent intent) {
-            int batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-            int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
-
-            float batteryLevelScaled = batteryLevel / (float)scale;
-
-
-
-            batteryLevelArray.add(Integer.valueOf(batteryLevel));
-            batteryLevelScaledArray.add(Float.valueOf(batteryLevelScaled));
-            batteryScale = scale;
-        }
-    };
 
     /* Data Logging */
     public synchronized void saveLog(long timeInSeconds, double distanceInMeters, int gpsCount, int batteryLevelStart, int batteryLevelEnd, float batteryLevelScaledStart, float batteryLevelScaledEnd) {
@@ -415,6 +386,16 @@ public class LocationService extends Service implements LocationListener, GpsSta
         }
     }
 
+    /**
+     * Binder class
+     *
+     * @author Takamitsu Mizutori
+     */
+    public class LocationServiceBinder extends Binder {
+        public LocationService getService() {
+            return LocationService.this;
+        }
+    }
 
 
 }
