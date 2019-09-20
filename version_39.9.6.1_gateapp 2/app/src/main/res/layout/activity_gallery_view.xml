@@ -7,32 +7,21 @@
 
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-
-        <com.veinhorn.scrollgalleryview.ScrollGalleryView
-                android:id="@+id/scroll_gallery_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#000" />
-
-                  android:layout_width="match_parent"
-                  android:layout_height="match_parent">
-<!--        <com.veinhorn.scrollgalleryview.ScrollGalleryView-->
-<!--                android:id="@+id/scroll_gallery_view"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                android:background="#000"/>-->
-<!--        <com.denzcoskun.imageslider.ImageSlider-->
-<!--                android:id="@+id/scroll_gallery_view"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="match_parent"-->
-<!--                app:auto_cycle="true"-->
-<!--                app:corner_radius="0"-->
-<!--                app:period="1000"-->
-<!--                app:delay="0"/>-->
-
+        <!--        <com.veinhorn.scrollgalleryview.ScrollGalleryView-->
+        <!--                android:id="@+id/scroll_gallery_view"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                android:background="#000"/>-->
+        <!--        <com.denzcoskun.imageslider.ImageSlider-->
+        <!--                android:id="@+id/scroll_gallery_view"-->
+        <!--                android:layout_width="match_parent"-->
+        <!--                android:layout_height="match_parent"-->
+        <!--                app:auto_cycle="true"-->
+        <!--                app:corner_radius="0"-->
+        <!--                app:period="1000"-->
+        <!--                app:delay="0"/>-->
     </LinearLayout>
 
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.oyespace.guards.activity;
 //import static com.veinhorn.scrollgalleryview.loader.picasso.dsl.DSL.*;
+
 import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
