@@ -4,113 +4,267 @@
         xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-<RelativeLayout android:layout_width="match_parent"
-                                             android:layout_height="match_parent">
-    <!-- Oyespace toolbar-->
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+    <!--<RelativeLayout android:layout_width="match_parent"-->
+    <!--                                             android:layout_height="match_parent">-->
+    <!--    &lt;!&ndash; Oyespace toolbar&ndash;&gt;-->
+    <!--    <RelativeLayout android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
 
-                    android:layout_weight="1.2"
-                    android:padding="2dp"
-                    android:layout_margin="0dp"
-                    android:id="@+id/rl_header"
-                    android:background="@color/white">
-        <ImageView android:layout_width="60dp" android:layout_height="25dp"
-                   android:layout_marginLeft="0dp" android:id="@+id/img_back"
-                   android:visibility="gone"
-android:layout_marginTop="4.00dp"
-                  />
-    <ImageView android:layout_width="150dp"
-               android:layout_height="40dp"
-               android:id="@+id/rl_header1"
-               android:layout_centerHorizontal="true"
-               android:layout_margin="@dimen/_2sdp"
-               android:src="@drawable/oyespace_toolbar"/>
+    <!--                    android:layout_weight="1.2"-->
+    <!--                    android:padding="2dp"-->
+    <!--                    android:layout_margin="0dp"-->
+    <!--                    android:id="@+id/rl_header"-->
+    <!--                    android:background="@color/white">-->
+    <!--        <ImageView android:layout_width="60dp" android:layout_height="25dp"-->
+    <!--                   android:layout_marginLeft="0dp" android:id="@+id/img_back"-->
+    <!--                   android:visibility="gone"-->
+    <!--                   android:src="@mipmap/back_button_new"-->
+    <!--android:layout_marginTop="4.00dp"-->
+    <!--                  />-->
+    <!--    <ImageView android:layout_width="150dp"-->
+    <!--               android:layout_height="40dp"-->
+    <!--               android:id="@+id/rl_header1"-->
+    <!--               android:layout_centerHorizontal="true"-->
+    <!--               android:layout_margin="@dimen/_2sdp"-->
+    <!--               android:src="@drawable/oyespace_toolbar"/>-->
 
-    </RelativeLayout>
-    <!--Divider line-->
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_below="@+id/rl_header"
-                    android:layout_height="2dp"
-                    android:background="@color/orange" android:id="@+id/r1">
+    <!--    </RelativeLayout>-->
+    <!--    &lt;!&ndash;Divider line&ndash;&gt;-->
+    <!--    <RelativeLayout android:layout_width="match_parent"-->
+    <!--                    android:layout_below="@+id/rl_header"-->
+    <!--                    android:layout_height="2dp"-->
+    <!--                    android:background="@color/orange" android:id="@+id/r1">-->
 
-    </RelativeLayout>
-    <!--SOS View-->
-    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/r_sos">
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:textAlignment="center" android:textSize="20dp" android:text="SOS Alerts"
-                  android:layout_marginTop="53dp" android:textColor="@color/orangedark"/>
-    </RelativeLayout>
-    <!--Map view-->
-    <RelativeLayout android:layout_width="match_parent" android:layout_height="170dp" android:layout_marginLeft="10dp"  android:layout_marginTop="@dimen/_10sdp" android:layout_marginRight="10dp"
-                    android:id="@+id/r1_imap" android:layout_below="@id/r_sos" android:background="@drawable/border">
+    <!--    </RelativeLayout>-->
+    <!--    &lt;!&ndash;SOS View&ndash;&gt;-->
+    <!--    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/r_sos">-->
+    <!--        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"-->
+    <!--                  android:textAlignment="center" android:textSize="20dp" android:text="SOS Alerts"-->
+    <!--                  android:layout_marginTop="53dp" android:textColor="@color/orangedark"/>-->
+    <!--    </RelativeLayout>-->
+    <!--    &lt;!&ndash;Map view&ndash;&gt;-->
+    <!--    <RelativeLayout android:layout_width="match_parent" android:layout_height="170dp" android:layout_marginLeft="10dp"  android:layout_marginTop="@dimen/_10sdp" android:layout_marginRight="10dp"-->
+    <!--                    android:id="@+id/r1_imap" android:layout_below="@id/r_sos" android:background="@drawable/border">-->
 
-        <fragment
-                android:id="@+id/map"
-                class="com.google.android.gms.maps.SupportMapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-
-
-    </RelativeLayout>
-<!--Image to be loaded-->
-
-    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:id="@+id/r2" android:layout_below="@id/r1_imap" android:layout_marginTop="@dimen/_45sdp">
-        <ImageView android:layout_width="140dp" android:layout_height="140dp" android:layout_marginLeft="10dp"
-                   android:layout_marginTop="0dp" android:layout_alignParentTop="true"
-                   android:id="@+id/sos_image"
-                   android:scaleType="fitXY"
-                   android:background="@drawable/border"
-                   android:src="@drawable/newicons_camera"/>
-
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:layout_alignRight="@id/sos_image" android:text="Resident Details"
-                  android:textColor="@color/orangedark" android:layout_alignParentEnd="true"
-                  android:layout_marginLeft="180dp" android:id="@+id/g1" android:paddingBottom="@dimen/_10sdp">
-
-        </TextView>
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/g1"
-                  android:layout_marginLeft="180dp" android:text="Resident Name:" android:textColor="@color/black"
-                  android:id="@+id/sos_username" android:paddingBottom="@dimen/_10sdp"/>
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_below="@id/sos_username"
-                  android:layout_marginLeft="180dp"
-                  android:text="Resident Mobile No:"
-                  android:id="@+id/sos_usermobile"
-                  android:textColor="@color/black" />
-
-    </RelativeLayout>
+    <!--        <fragment-->
+    <!--                android:id="@+id/map"-->
+    <!--                class="com.google.android.gms.maps.SupportMapFragment"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="match_parent"/>-->
 
 
-    <!--Emergency text-->
+    <!--    </RelativeLayout>-->
+    <!--&lt;!&ndash;Image to be loaded&ndash;&gt;-->
 
-    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/r_emer" android:layout_below="@id/r2" android:layout_marginTop="30dp"  >
-        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:textAlignment="center" android:textSize="18sp" android:text="Emergency Contacts"
-                  android:textColor="@color/orangedark" android:paddingTop="@dimen/_5sdp" />
-    </RelativeLayout>
+    <!--    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content"-->
+    <!--                    android:id="@+id/r2" android:layout_below="@id/r1_imap" android:layout_marginTop="@dimen/_45sdp">-->
+    <!--        <ImageView android:layout_width="100dp" android:layout_height="100dp" android:layout_marginLeft="10dp"-->
+    <!--                   android:layout_marginTop="0dp" android:layout_alignParentTop="true"-->
+    <!--                   android:id="@+id/sos_image"-->
+    <!--                   android:scaleType="fitXY"-->
+    <!--                   android:background="@drawable/border"-->
+    <!--                   android:src="@drawable/newicons_camera"/>-->
+
+    <!--        <TextView android:layout_width="match_parent" -->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                  android:layout_alignRight="@id/sos_image" android:text="Resident Details"-->
+    <!--                  android:textColor="@color/orangedark" android:layout_alignParentEnd="true"-->
+    <!--                  android:layout_marginLeft="180dp" android:id="@+id/g1" android:paddingBottom="@dimen/_10sdp">-->
+
+    <!--        </TextView>-->
+    <!--        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@id/g1"-->
+    <!--                  android:layout_marginLeft="180dp" android:text="Resident Name:" android:textColor="@color/black"-->
+    <!--                  android:id="@+id/sos_username" android:paddingBottom="@dimen/_10sdp"/>-->
+    <!--        <TextView android:layout_width="wrap_content"-->
+    <!--                  android:layout_height="wrap_content"-->
+    <!--                  android:layout_below="@id/sos_username"-->
+    <!--                  android:layout_marginLeft="180dp"-->
+    <!--                  android:text="Resident Mobile No:"-->
+    <!--                  android:id="@+id/sos_usermobile"-->
+    <!--                  android:textColor="@color/black" />-->
+
+    <!--    </RelativeLayout>-->
 
 
-    <include layout="@layout/activity_sos_recycle"  android:layout_height="132dp"
-             android:layout_width="match_parent" android:id="@+id/id1" android:layout_below="@id/r_emer" android:layout_marginTop="@dimen/_20sdp"   ></include>
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+    <!--    &lt;!&ndash;Emergency text&ndash;&gt;-->
+
+    <!--    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/r_emer" android:layout_below="@id/r2" android:layout_marginTop="30dp"  >-->
+    <!--        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"-->
+    <!--                  android:textAlignment="center" android:textSize="18sp" android:text="Emergency Contacts"-->
+    <!--                  android:textColor="@color/orangedark" android:paddingTop="@dimen/_5sdp" />-->
+    <!--    </RelativeLayout>-->
+
+
+    <!--    <include layout="@layout/activity_sos_recycle"  android:layout_height="132dp"-->
+    <!--             android:layout_width="match_parent" android:id="@+id/id1" android:layout_below="@id/r_emer" android:layout_marginTop="@dimen/_20sdp"   ></include>-->
+    <!--    <RelativeLayout android:layout_width="match_parent"-->
+    <!--                    android:layout_height="wrap_content"-->
+    <!--                    android:layout_centerHorizontal="true"-->
+    <!--                    android:orientation="horizontal"-->
+    <!--                    android:padding="10dp"-->
+    <!--                    android:layout_marginTop="@dimen/_15sdp"-->
+    <!--                    android:layout_marginBottom="25dp"-->
+    <!--                    android:layout_below="@id/id1"-->
+    <!--    android:gravity="center">-->
+    <!--        <Button android:layout_width="130dp" android:layout_height="35dp"-->
+    <!--                android:id="@+id/btn_dismiss_sos"-->
+    <!--                android:layout_marginRight="@dimen/_60sdp"-->
+    <!--                android:text="Pass"  android:background="@drawable/round_button_color_red" android:textColor="@color/white"/>-->
+    <!--        <Button android:layout_width="130dp" android:layout_height="35dp"-->
+    <!--                android:layout_toRightOf="@id/btn_dismiss_sos"-->
+    <!--                android:id="@+id/btn_attend_sos"  android:text="Attend"  android:background="@drawable/round_button_color_orange"   android:textColor="@color/white"/>-->
+    <!--    </RelativeLayout>-->
+
+    <!--</RelativeLayout>-->
+
+
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+        <!-- HEADER START -->
+        <RelativeLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:padding="2dp"
+                android:layout_margin="0dp"
+                android:id="@+id/rl_header"
+                android:background="@color/white">
+            <ImageView android:layout_width="150dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/rl_header1"
                     android:layout_centerHorizontal="true"
-                    android:orientation="horizontal"
-                    android:padding="10dp"
-                    android:layout_marginTop="@dimen/_15sdp"
-                    android:layout_marginBottom="25dp"
-                    android:layout_below="@id/id1"
-    android:gravity="center">
-        <Button android:layout_width="130dp" android:layout_height="35dp"
-                android:id="@+id/btn_dismiss_sos"
-                android:layout_marginRight="@dimen/_60sdp"
-                android:text="Pass"  android:background="@drawable/round_button_color_red" android:textColor="@color/white"/>
-        <Button android:layout_width="130dp" android:layout_height="35dp"
-                android:layout_toRightOf="@id/btn_dismiss_sos"
-                android:id="@+id/btn_attend_sos"  android:text="Attend"  android:background="@drawable/round_button_color_orange"   android:textColor="@color/white"/>
-    </RelativeLayout>
+                    android:layout_margin="@dimen/_2sdp"
+                    android:src="@drawable/oyespace_toolbar"/>
+        </RelativeLayout>
+        <RelativeLayout android:layout_width="match_parent" android:layout_below="@+id/rl_header" android:layout_height="2dp" android:background="@color/orange" android:id="@+id/r1" />
+        <!-- HEADER END -->
 
-</RelativeLayout></ScrollView>
+
+        <!-- MAP START -->
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginRight="10dp"
+                android:id="@+id/r1_imap"
+                android:background="@drawable/border">
+            <fragment
+                    android:id="@+id/map"
+                    class="com.google.android.gms.maps.SupportMapFragment"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+        </RelativeLayout>
+        <!-- MAP END -->
+
+        <!-- PHOTO & SOS DETAILS START -->
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="10dp"
+                android:orientation="horizontal">
+
+            <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
+                    android:id="@+id/sos_image"
+                    android:scaleType="fitXY"
+                    android:background="@drawable/border"
+                    android:src="@drawable/newicons_camera"/>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="15dp"
+                    android:orientation="vertical">
+
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Resident Details"
+                        android:textColor="@color/orangedark"
+                        android:layout_marginBottom="8dp"
+                        android:id="@+id/g1" />
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resident Name:"
+                        android:textColor="@color/black"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/sos_username"
+                        />
+                <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resident Mobile No:"
+                        android:id="@+id/sos_usermobile"
+                        android:textColor="@color/black" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <!-- PHOTO & SOS DETAILS END -->
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="18dp">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:text="Emergency Contacts"
+                    android:textColor="@color/orangedark"
+                     />
+
+<!--            <include layout="@layout/activity_sos_recycle"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_gravity="center_horizontal"-->
+<!--                    android:id="@+id/id1"-->
+<!--                    android:layout_marginTop="16dp"></include>-->
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="3"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+                <include android:id="@+id/call_ambulance" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+                <include android:id="@+id/call_police" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+                <include android:id="@+id/call_fire" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal">
+
+            <Button android:layout_width="120dp"
+                    android:layout_height="35dp"
+                    android:id="@+id/btn_dismiss_sos"
+                    android:layout_marginRight="30dp"
+                    android:text="Pass"
+                    android:background="@drawable/round_button_color_red" android:textColor="@color/white"/>
+
+            <Button android:layout_width="120dp"
+                    android:layout_height="35dp"
+                    android:id="@+id/btn_attend_sos"  android:text="Attend"  android:background="@drawable/round_button_color_orange"   android:textColor="@color/white"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</ScrollView>

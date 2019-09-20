@@ -4,10 +4,11 @@
               android:orientation="vertical"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:paddingHorizontal="@dimen/_3sdp">
+                android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+             >
     <androidx.cardview.widget.CardView
             android:layout_width="115dp"
-            android:layout_margin="5dp"
             android:layout_height="110dp"
             android:background="@drawable/bordercolor"
             app:cardCornerRadius="15dp">
@@ -20,7 +21,7 @@
                     android:id="@+id/imageview"
                     android:layout_width="38dp"
                     android:layout_height="38dp"
-android:padding="@dimen/_2sdp"
+                    android:padding="@dimen/_2sdp"
 
 
             android:layout_centerHorizontal="true"/>

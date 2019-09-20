@@ -272,6 +272,11 @@
                 android:name=".SGPatrollingService"
                 android:enabled="true"
                 android:exported="true" />
+
+        <service
+                android:name=".services.SOSSirenService"
+                android:enabled="true"
+                android:exported="true" />
         <service
                 android:name=".BGService"
                 android:enabled="true"

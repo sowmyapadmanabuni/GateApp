@@ -1238,6 +1238,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         startService(Intent(this@Dashboard, FRTDBService::class.java))
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
+        getDeviceList(LocalDb.getAssociation()!!.asAssnID)
         super.onStart()
 
 
@@ -1496,6 +1497,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             swipeContainer!!.isRefreshing = false
         }
 
+        Log.e("NOTIFICATION_SUB",""+"AllGuards" + LocalDb.getAssociation()!!.asAssnID);
         FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + LocalDb.getAssociation()!!.asAssnID)
 
         btn_mic.setOnClickListener(View.OnClickListener {
@@ -1891,6 +1893,52 @@ try {
 
             }
         }
+    }
+
+
+    fun getDeviceList(AssnID: Int){
+        RetrofitClinet.instance.getDeviceListResponse(OYE247TOKEN, AppUtils.intToString(AssnID))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<getDeviceList>() {
+
+                override fun onSuccessResponse(deviceListResponse: getDeviceList) {
+
+
+                    Log.e("WORKEESS",deviceListResponse.data.toString())
+                    if (deviceListResponse.data.deviceListByAssocID!= null) {
+                        Prefs.putInt("TOTAL_GUARDS",deviceListResponse.data.deviceListByAssocID.size)
+
+
+                        val arrayList = deviceListResponse.data.deviceListByAssocID
+
+                        if(arrayList.size ==1 || arrayList.size == 0){
+                            Prefs.putString(WALKIETALKIE,"OFF")
+                            Log.e("Device List",arrayList.size.toString())
+                        }
+                        else{
+                            Prefs.putString(WALKIETALKIE,"ON")
+                            Log.e("Device List",arrayList.size.toString())
+                        }
+
+
+                    } else {
+                        Prefs.putInt("TOTAL_GUARDS",1)
+
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+
+                    Log.d("Error WorkerList",e.toString())
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
     }
 
     private fun showDialog() {

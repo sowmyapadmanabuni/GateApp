@@ -100,9 +100,9 @@ class MyRoleScreen : BaseKotlinActivity() {
                                 exitedSort.add(s)
                             }
                         }
+                        getDeviceList(globalApiObject.data.device[0].asAssnID)
                         if(exitedSort!=null) {
                             getAssnInfo(globalApiObject.data.device[0].asAssnID)
-                            getDeviceList(globalApiObject.data.device[0].asAssnID)
 
                         //    LocalDb.saveDeviceInfo(globalApiObject.data.workers)
                         }else{
@@ -325,8 +325,11 @@ fun getDeviceList(AssnID: Int){
 
             override fun onSuccessResponse(deviceListResponse: getDeviceList) {
 
+
+
                 if (deviceListResponse.data.deviceListByAssocID!= null) {
-                    Log.d("WorkerList success",deviceListResponse.data.toString())
+                    Prefs.putInt("TOTAL_GUARDS",deviceListResponse.data.deviceListByAssocID.size)
+                    Log.e("WorkerListsuccess",deviceListResponse.data.toString())
 
                     val arrayList = deviceListResponse.data.deviceListByAssocID
 
@@ -351,7 +354,7 @@ fun getDeviceList(AssnID: Int){
 //                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
 //                    finish()
                 } else {
-
+                    Prefs.putInt("TOTAL_GUARDS",1)
 //                    val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
 //                    startActivity(mainIntent)
 //                    finish()
