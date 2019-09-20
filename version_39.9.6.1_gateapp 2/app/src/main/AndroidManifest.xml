@@ -43,10 +43,14 @@
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning">
+
         <activity
-                android:name=".activity.ResidentIdActivity"
+                android:name=".residentidcard.ResidentIdActivity"
                 android:theme="@style/noActionBar"></activity>
 
+        <activity
+                android:name=".residentidcard.ResidentIdCardMobileNumberActivity"
+                android:theme="@style/noActionBar"></activity>
 
         <activity
                 android:name=".staffManaualEntry.ManualStaffEntryRegistration"
@@ -235,7 +239,7 @@
                 android:theme="@style/noActionBar"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                android:name="com.oyespace.guards.activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
         <activity
