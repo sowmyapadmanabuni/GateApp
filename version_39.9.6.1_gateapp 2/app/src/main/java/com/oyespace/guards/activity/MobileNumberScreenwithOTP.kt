@@ -351,8 +351,8 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
 
                         dialog.cancel()
-                        val d = Intent(this@MobileNumberScreenwithOTP, Dashboard::class.java)
-                        startActivity(d)
+//                        val d = Intent(this@MobileNumberScreenwithOTP, Dashboard::class.java)
+//                        startActivity(d)
                         finish()
                     }
                     builder.setCancelable(false);

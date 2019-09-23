@@ -133,8 +133,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                         builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
                             dialog.cancel()
-                            val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
-                            startActivity(d)
+//                            val d = Intent(this@GuestMobileNumberScreen, Dashboard::class.java)
+//                            startActivity(d)
                             finish()
                         }
                         builder.setCancelable(false)
