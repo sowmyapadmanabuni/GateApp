@@ -1,20 +1,18 @@
 package com.oyespace.guards.residentidcard
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.*
-import android.provider.CallLog
+import android.os.Bundle
+import android.os.CountDownTimer
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import android.telecom.TelecomManager
+
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -25,6 +23,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+
+
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -32,29 +32,22 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.guest.GuestUnitScreen
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.request.ResidentValidationRequest
-import com.oyespace.guards.responce.ResidentValidationResponse
-import com.oyespace.guards.responce.VisitorLogExitResp
-import com.oyespace.guards.utils.*
+
+
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.RandomUtils.entryExists
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
-import java.lang.reflect.Method
 import java.util.*
 
 
@@ -74,7 +67,7 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
     var ccd:String?=null
     lateinit var btn_nobalance: Button
     var mobileNumber:String?=null
-    //internal lateinit var alertDialog: android.support.v7.app.AlertDialog
+     var alertdialog: AlertDialog? = null;
     // private var Ed_phoneNum:String?=null
 
     private val REQUEST_CODE_SPEECH_INPUT = 100;
@@ -108,7 +101,7 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                 if (textview.text.length == 13) {
 
                          //  getAccountDetails(ccd.toString(), mobileNumber.toString());
-                   // getResidentValidation(ccd.toString(),mobileNumber.toString())
+                    getResidentValidation(ccd.toString(),mobileNumber.toString())
 
                 }
 
@@ -494,72 +487,96 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
         registerReceiver(receiver, IntentFilter(action))
     }
 
-//
-//
-//    private fun getResidentValidation(ccd:String,mobilenumber: String) {
-//
-//        val req = ResidentValidationRequest(ccd+mobilenumber.toString(), LocalDb.getAssociation()!!.asAssnID
-//        )
-//        CompositeDisposable().add(
-//            RetrofitClinet.instance.residentValidation("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(object : CommonDisposable<ResidentValidationResponse>() {
-//                    override fun onSuccessResponse(globalApiObject: ResidentValidationResponse) {
-//                        if (globalApiObject.success == true) {
-//                            val viewGroup = findViewById<ViewGroup>(android.R.id.content)
-//
-//                            val dialogView = LayoutInflater.from(this@ResidentIdCardMobileNumberActivity)
-//                                .inflate(R.layout.layout_qrcodedailog, viewGroup, false)
-//
-//
-//                            val builder =
-//                                android.support.v7.app.AlertDialog.Builder(this@ResidentIdCardMobileNumberActivity)
-//
-//                            val dialog_imageview = dialogView.findViewById<ImageView>(R.id.dialog_imageview)
-//                            val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
-//                            tv_msg.setText("Valid")
-//                            val drawable = resources.getDrawable(R.drawable.valid_invi)
-//                            dialog_imageview.setImageDrawable(drawable)
-//                            val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)
-//                            btn_ok.setOnClickListener(View.OnClickListener {
-//                                alertDialog.dismiss()
-//
-//                                finish()
-//                            })
-//
-//                            builder.setView(dialogView)
-//
-//                            //finally creating the alert dialog and displaying it
-//                            alertDialog = builder.create()
-//
-//                            alertDialog.show()                        } else {
-//                            Utils.showToast(this@ResidentIdCardMobileNumberActivity, "Failed")
-//                        }
-//                    }
-//
-//                    override fun onErrorResponse(e: Throwable) {
-//                        Utils.showToast(this@ResidentIdCardMobileNumberActivity, "Not a resident")
-//                        Utils.showToast(this@ResidentIdCardMobileNumberActivity, "Error visitor exit")
-//                    }
-//
-//                    override fun noNetowork() {
-//                        Utils.showToast(this@ResidentIdCardMobileNumberActivity, "no_internet visitor exit")
-//                    }
-//
-//                    override fun onShowProgress() {
-////                        showProgress()
-//                    }
-//
-//                    override fun onDismissProgress() {
-////                        dismissProgress()
-//                    }
-//                })
-//        )
-//
-//
-//    }
-//
+
+
+    private fun getResidentValidation(ccd:String,mobilenumber: String) {
+
+        val req = ResidentValidationRequest(ccd+mobilenumber, LocalDb.getAssociation()!!.asAssnID)
+        CompositeDisposable().add(
+            RetrofitClinet.instance.residentValidation("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<ResidentValidationResponse>() {
+                    override fun onSuccessResponse(globalApiObject: ResidentValidationResponse) {
+                        if (globalApiObject.success == true) {
+                            val viewGroup = findViewById<ViewGroup>(android.R.id.content)
+
+                            val dialogView = LayoutInflater.from(this@ResidentIdCardMobileNumberActivity)
+                                .inflate(R.layout.layout_qrcodedailog, viewGroup, false)
+
+
+                            val builder =
+                                androidx.appcompat.app.AlertDialog.Builder(this@ResidentIdCardMobileNumberActivity)
+
+                            val dialog_imageview = dialogView.findViewById<ImageView>(R.id.dialog_imageview)
+                            val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
+                            tv_msg.setText("Valid")
+                            val drawable = resources.getDrawable(R.drawable.valid_invi)
+                            dialog_imageview.setImageDrawable(drawable)
+                            val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)
+                            btn_ok.setOnClickListener(View.OnClickListener {
+                                alertdialog!!.dismiss()
+
+                                finish()
+                            })
+
+                            builder.setView(dialogView)
+
+                            //finally creating the alert dialog and displaying it
+                            alertdialog = builder.create()
+
+                            alertdialog!!.show()                        } else {
+                            Utils.showToast(this@ResidentIdCardMobileNumberActivity, "Failed")
+                        }
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+                        val viewGroup = findViewById<ViewGroup>(android.R.id.content)
+
+                        val dialogView = LayoutInflater.from(this@ResidentIdCardMobileNumberActivity)
+                            .inflate(R.layout.layout_qrcodedailog, viewGroup, false)
+
+
+                        val builder =
+                            androidx.appcompat.app.AlertDialog.Builder(this@ResidentIdCardMobileNumberActivity)
+
+                        val dialog_imageview = dialogView.findViewById<ImageView>(R.id.dialog_imageview)
+                        val drawable = resources.getDrawable(R.drawable.invalid_invi)
+                        dialog_imageview.setImageDrawable(drawable)
+                        val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
+                        tv_msg.setText("Invalid")
+                        val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)
+                        btn_ok.setOnClickListener(View.OnClickListener {
+                            alertDialog!!.dismiss()
+
+                            finish()
+                        })
+
+                        builder.setView(dialogView)
+
+                        //finally creating the alert dialog and displaying it
+                        alertDialog = builder.create()
+
+                        alertDialog!!.show()
+                    }
+
+                    override fun noNetowork() {
+                        Utils.showToast(this@ResidentIdCardMobileNumberActivity, "no_internet visitor exit")
+                    }
+
+                    override fun onShowProgress() {
+//                        showProgress()
+                    }
+
+                    override fun onDismissProgress() {
+//                        dismissProgress()
+                    }
+                })
+        )
+
+
+    }
+
 
 
 }
