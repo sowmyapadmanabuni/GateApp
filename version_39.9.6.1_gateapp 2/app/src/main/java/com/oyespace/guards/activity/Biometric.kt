@@ -458,8 +458,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 //
 //        }
 
-        val d = Intent(this@Biometric, Dashboard::class.java)
-        startActivity(d)
+//        val d = Intent(this@Biometric, Dashboard::class.java)
+//        startActivity(d)
         finish()
 
         /*}

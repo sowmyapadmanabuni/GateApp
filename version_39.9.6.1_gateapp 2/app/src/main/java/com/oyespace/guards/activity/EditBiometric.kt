@@ -445,9 +445,9 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 //            mImageFingerprint3!!.setImageBitmap(grayBitmap)
 //
 //        }
-
-        val d = Intent(this@EditBiometric, Dashboard::class.java)
-        startActivity(d)
+//
+//        val d = Intent(this@EditBiometric, Dashboard::class.java)
+//        startActivity(d)
         finish()
 
         /*}

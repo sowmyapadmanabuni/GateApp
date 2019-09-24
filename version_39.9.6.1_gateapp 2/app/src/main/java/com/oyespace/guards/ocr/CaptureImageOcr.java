@@ -296,8 +296,8 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
                             .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent intent = new Intent(CaptureImageOcr.this, Dashboard.class);
-                                    startActivity(intent);
+//                                    Intent intent = new Intent(CaptureImageOcr.this, Dashboard.class);
+//                                    startActivity(intent);
                                     finish();
                                 }
                             })

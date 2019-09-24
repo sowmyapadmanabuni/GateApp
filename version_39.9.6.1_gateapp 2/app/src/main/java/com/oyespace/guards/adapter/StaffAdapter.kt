@@ -561,9 +561,9 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
                         //(mcontext as Activity).finish()
-                        val d = Intent(mcontext, Dashboard::class.java)
-                        d.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        mcontext.startActivity(d)
+//                        val d = Intent(mcontext, Dashboard::class.java)
+//                        d.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//                        mcontext.startActivity(d)
                         (mcontext as Activity).finish()
                     } else {
                         Utils.showToast(mcontext, globalApiObject.apiVersion)

@@ -208,7 +208,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 dialog_imageview.setImageBitmap(photo);
 
-                Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+               // Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 
 //                Picasso.with(VehicleGuestAddCarFragment.this)

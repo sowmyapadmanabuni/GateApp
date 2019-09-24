@@ -63,131 +63,131 @@ import static com.oyespace.guards.utils.RandomUtils.entryExists;
 
 public class ResidentIdActivity extends BaseScannerActivity implements ZXingScannerView.ResultHandler {
 
-//    private ZXingScannerView mScannerView;
-//    private Button btn_missedcall;
+    private ZXingScannerView mScannerView;
+    private Button btn_missedcall;
     AlertDialog alertDialog;
-//    ChampApiInterface champApiInterface;
+    ChampApiInterface champApiInterface;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_resident_id);
 
-//        champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
-//
-//        btn_missedcall=findViewById(R.id.btn_missedcall);
-//
-//        btn_missedcall.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                Intent i = new Intent(ResidentIdActivity.this, ResidentIdCardMobileNumberActivity.class);
-//                startActivity(i);
-//                finish();
-//
-//            }
-//        });
-//        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
-//        mScannerView = new ZXingScannerView(this) {
-//            @Override
-//            protected IViewFinder createViewFinderView(Context context) {
-//                return new CustomViewFinderView(context);
-//            }
-//        };
-//        contentFrame.addView(mScannerView);
+        champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
+
+        btn_missedcall=findViewById(R.id.btn_missedcall);
+
+        btn_missedcall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent i = new Intent(ResidentIdActivity.this, ResidentIdCardMobileNumberActivity.class);
+                startActivity(i);
+                finish();
+
+            }
+        });
+        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
+        mScannerView = new ZXingScannerView(this) {
+            @Override
+            protected IViewFinder createViewFinderView(Context context) {
+                return new CustomViewFinderView(context);
+            }
+        };
+        contentFrame.addView(mScannerView);
     }
     @Override
     public void onResume() {
         super.onResume();
-        //mScannerView.setResultHandler(this);
-        //mScannerView.startCamera();
+        mScannerView.setResultHandler(this);
+        mScannerView.startCamera();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        //mScannerView.stopCamera();
+        mScannerView.stopCamera();
     }
 
     @Override
     public void handleResult(Result result) {
 
-//        String residentdata = result.getText();
+        String residentdata = result.getText();
+
+
+        if(residentdata.contains(";")) {
+            final String[] residentdataList = residentdata.split(";");
+            //       System.out.println("Guest Data CustomViewFinderScannerActivity " + guestdataList[0] + " " + " " + guestdataList[1] + " " + guestdataList[2] + " " + guestdataList[3] + " " + guestdataList[5]);
+
+
+            if(residentdataList.length>1) {
+
+                if(residentdataList[1].equalsIgnoreCase( Prefs.getInt(ASSOCIATION_ID,0)+"")) {
+
+                    getResidentValidation(residentdataList[0].toString(), Prefs.getInt(ASSOCIATION_ID, 0));
+                }else {
+                    ViewGroup viewGroup = findViewById(android.R.id.content);
+
+                    View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+
+
+                   AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+
+                    ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                    Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                    dialog_imageview.setImageDrawable(drawable);
+                    TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                    tv_msg.setText("Invalid ");
+                    Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                    btn_ok.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            alertDialog.dismiss();
 //
+                            finish();
+
+                        }
+                    });
+
+                    builder.setView(dialogView);
+
+                    //finally creating the alert dialog and displaying it
+                    alertDialog = builder.create();
+
+                    alertDialog.show();
+                }
+            }
+            }else{
+                ViewGroup viewGroup = findViewById(android.R.id.content);
+
+                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+
+                ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                dialog_imageview.setImageDrawable(drawable);
+                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                tv_msg.setText("Invalid");
+                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                btn_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
 //
-//        if(residentdata.contains(";")) {
-//            final String[] residentdataList = residentdata.split(";");
-//            //       System.out.println("Guest Data CustomViewFinderScannerActivity " + guestdataList[0] + " " + " " + guestdataList[1] + " " + guestdataList[2] + " " + guestdataList[3] + " " + guestdataList[5]);
-//
-//
-//            if(residentdataList.length>1) {
-//
-//                if(residentdataList[1].equalsIgnoreCase( Prefs.getInt(ASSOCIATION_ID,0)+"")) {
-//
-//                    getResidentValidation(residentdataList[0].toString(), Prefs.getInt(ASSOCIATION_ID, 0));
-//                }else {
-//                    ViewGroup viewGroup = findViewById(android.R.id.content);
-//
-//                    View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
-//
-//
-//                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ResidentIdActivity.this);
-//
-//                    ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-//                    Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
-//                    dialog_imageview.setImageDrawable(drawable);
-//                    TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
-//                    tv_msg.setText("Invalid ");
-//                    Button btn_ok=dialogView.findViewById(R.id.btn_ok);
-//                    btn_ok.setOnClickListener(new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            alertDialog.dismiss();
-////
-//                            finish();
-//
-//                        }
-//                    });
-//
-//                    builder.setView(dialogView);
-//
-//                    //finally creating the alert dialog and displaying it
-//                    alertDialog = builder.create();
-//
-//                    alertDialog.show();
-//                }
-//            }
-//            }else{
-//                ViewGroup viewGroup = findViewById(android.R.id.content);
-//
-//                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
-//
-//
-//                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ResidentIdActivity.this);
-//
-//                ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-//                Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
-//                dialog_imageview.setImageDrawable(drawable);
-//                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
-//                tv_msg.setText("Invalid");
-//                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
-//                btn_ok.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        alertDialog.dismiss();
-////
-//                        finish();
-//
-//                    }
-//                });
-//
-//                builder.setView(dialogView);
-//
-//                //finally creating the alert dialog and displaying it
-//                alertDialog = builder.create();
-//
-//                alertDialog.show();
-//
-//            }
+                        finish();
+
+                    }
+                });
+
+                builder.setView(dialogView);
+
+                //finally creating the alert dialog and displaying it
+                alertDialog = builder.create();
+
+                alertDialog.show();
+
+            }
 
 
 
@@ -227,85 +227,85 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
     void getResidentValidation( String mobileNumber,int associationId) {
 
-//        ResidentValidationRequest residentValidationRequest = new ResidentValidationRequest();
+        ResidentValidationRequest residentValidationRequest = new ResidentValidationRequest();
+
+        residentValidationRequest.FMMobile = mobileNumber;
+        residentValidationRequest.ASAssnID =associationId;
+
+        Call<ResidentValidationResponse> call = champApiInterface.residentValidation(residentValidationRequest);
+        call.enqueue(new Callback<ResidentValidationResponse>() {
+            @Override
+            public void onResponse(Call<ResidentValidationResponse> call, Response<ResidentValidationResponse> response) {
+
+                ViewGroup viewGroup = findViewById(android.R.id.content);
+
+                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+
+                ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                tv_msg.setText("Valid");
+                Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
+                dialog_imageview.setImageDrawable(drawable);
+                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                btn_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
+
+                        finish();
+
+                    }
+                });
+
+                builder.setView(dialogView);
+
+                //finally creating the alert dialog and displaying it
+                alertDialog = builder.create();
+
+                alertDialog.show();
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ResidentValidationResponse> call, Throwable t) {
+              //  Toast.makeText(ResidentIdActivity.this,t.toString(),Toast.LENGTH_LONG).show();
+
+                ViewGroup viewGroup = findViewById(android.R.id.content);
+
+                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+
+                ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                dialog_imageview.setImageDrawable(drawable);
+                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                tv_msg.setText("Invalid");
+                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                btn_ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        alertDialog.dismiss();
 //
-//        residentValidationRequest.FMMobile = mobileNumber;
-//        residentValidationRequest.ASAssnID =associationId;
-//
-//        Call<ResidentValidationResponse> call = champApiInterface.residentValidation(residentValidationRequest);
-//        call.enqueue(new Callback<ResidentValidationResponse>() {
-//            @Override
-//            public void onResponse(Call<ResidentValidationResponse> call, Response<ResidentValidationResponse> response) {
-//
-//                ViewGroup viewGroup = findViewById(android.R.id.content);
-//
-//                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
-//
-//
-//                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ResidentIdActivity.this);
-//
-//                ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-//                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
-//                tv_msg.setText("Valid");
-//                Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
-//                dialog_imageview.setImageDrawable(drawable);
-//                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
-//                btn_ok.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        alertDialog.dismiss();
-//
-//                        finish();
-//
-//                    }
-//                });
-//
-//                builder.setView(dialogView);
-//
-//                //finally creating the alert dialog and displaying it
-//                alertDialog = builder.create();
-//
-//                alertDialog.show();
-//
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResidentValidationResponse> call, Throwable t) {
-//              //  Toast.makeText(ResidentIdActivity.this,t.toString(),Toast.LENGTH_LONG).show();
-//
-//                ViewGroup viewGroup = findViewById(android.R.id.content);
-//
-//                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
-//
-//
-//                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(ResidentIdActivity.this);
-//
-//                ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-//                Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
-//                dialog_imageview.setImageDrawable(drawable);
-//                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
-//                tv_msg.setText("Invalid");
-//                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
-//                btn_ok.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        alertDialog.dismiss();
-////
-//                        finish();
-//
-//                    }
-//                });
-//
-//                builder.setView(dialogView);
-//
-//                //finally creating the alert dialog and displaying it
-//                alertDialog = builder.create();
-//
-//                alertDialog.show();
-//                call.cancel();
-//            }
-//        });
+                        finish();
+
+                    }
+                });
+
+                builder.setView(dialogView);
+
+                //finally creating the alert dialog and displaying it
+                alertDialog = builder.create();
+
+                alertDialog.show();
+                call.cancel();
+            }
+        });
 
     }
 }

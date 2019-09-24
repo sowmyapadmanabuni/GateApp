@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory
 import android.os.Environment
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.network.CommonDisposable
@@ -38,7 +40,7 @@ import java.util.*
 class
 
 BackgroundSyncReceiver : BroadcastReceiver() {
-    var unAccountID: String? = null
+    var unAccountID:String?=null
     lateinit var mcontext: Context
     override fun onReceive(context: Context, intent: Intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
@@ -47,7 +49,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         mcontext=context
         if(intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)){
 
-            if (intent.getStringExtra("unitname").contains(",")) {
+            if(intent.getStringExtra("unitname").contains(",")){
 
                 var unitname_dataList: Array<String>
                 var unitid_dataList: Array<String>
@@ -55,7 +57,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 unitname_dataList = intent.getStringExtra("unitname").split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                if (unitid_dataList.size > 0) {
+                if(unitid_dataList.size>0) {
                     for (i in 0 until unitid_dataList.size) {
 
                         try {
@@ -72,7 +74,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 intent.getStringExtra("msg"),
                                 intent.getStringExtra("nr_id")
                             )
-                        } catch (e: Exception) {
+                        }catch (e:Exception){
 
                         }
 //                        sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
@@ -91,21 +93,10 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
             }else{
 
-                try {
-                    getUnitLog(
-                        intent.getStringExtra(UNITID).toInt(),
-                        intent.getStringExtra("name"),
-                        "",
-                        intent.getStringExtra(VISITOR_TYPE),
-                        "Staff",
-                        0,
-                        intent.getStringExtra("name"),
-                        intent.getIntExtra("VLVisLgID", 0),
-                        intent.getStringExtra("msg"),
-                        intent.getStringExtra("nr_id")
-                    )
+                try{
+                    getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
 
-                } catch (e: Exception) {
+                }catch (e:Exception){
 
                 }
 //                sendFCM(intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
@@ -151,7 +142,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             getCheckPointList()
         }
         else if(intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)){
-            Log.d("SYCNCHECK", "in 86")
+            Log.d("SYCNCHECK","in 86")
             getVisitorLogEntryList()
         }
 
@@ -189,7 +180,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(staffBiometricResp: StaffBiometricResp<StaffBiometricData>) {
 
                     if (staffBiometricResp.success == true) {
-                        Log.d("getStaffBiometric", staffBiometricResp.data.toString())
+                        Log.d("getStaffBiometric",staffBiometricResp.data.toString())
                         try {
                             var dbh: DataBaseHelper= DataBaseHelper(mcontext);
 
@@ -208,8 +199,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     ba_fp2 = Base64.decode(fp2, Base64.DEFAULT)
                                     ba_fp3 = Base64.decode(fp3, Base64.DEFAULT)
 
-                                    dbh.insertUserDetails(
-                                        intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
+                                    dbh.insertUserDetails(intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
                                         staffBiometricResp.data.fingerPrint.get(i).fpFngName,
                                         ba_fp1,
                                         ba_fp2,
@@ -357,22 +347,21 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun getStaffList() {
 
         RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString(LocalDb.getAssociation().asAssnID))
+            .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object :
-                CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
 
                 override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
-                    if (workerListResponse.data.worker != null) {
-                        Log.d("WorkerList success", workerListResponse.data.toString())
+                    if (workerListResponse.data.worker !=null) {
+                        Log.d("WorkerList success",workerListResponse.data.toString())
                         var arrayList: ArrayList<WorkerDetails>? = null
-                        arrayList = ArrayList()
+                        arrayList=ArrayList()
                         arrayList = workerListResponse.data.worker
 
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {
-                            override fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
+                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
                                 return lhs.wkfName.compareTo(rhs.wkfName)
                             }
                         })
@@ -385,7 +374,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList", e.toString())
+                    Log.d("Error WorkerList",e.toString())
                 }
 
                 override fun noNetowork() {
@@ -466,17 +455,16 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //    }
 
     private fun getVisitorLogEntryList() {
-        Log.d("SYCNCHECK", "in 408")
+        Log.d("SYCNCHECK","in 408")
         RetrofitClinet.instance
             .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object :
-                CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
+            .subscribeWith(object : CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
 
                 override fun onSuccessResponse(visitorList: VisitorLogEntryResp<ArrayList<VisitorEntryLog>>) {
-                    Log.d("SYCNCHECK", "in 416")
-                    Log.d("SYCNCHECK", "in 417" + visitorList.toString())
+                    Log.d("SYCNCHECK","in 416")
+                    Log.d("SYCNCHECK","in 417"+visitorList.toString())
 
                     if (visitorList.success == true) {
                         Log.d("SYCNCHECK", "in 421")
@@ -488,35 +476,21 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
 
 
-                        if (visitorList.data.visitorLog != null) {
+                        if(visitorList.data.visitorLog!=null) {
 
-                            Collections.sort(
-                                arrayListVisitors,
-                                object : Comparator<VisitorEntryLog> {
-                                    override fun compare(
-                                        lhs: VisitorEntryLog,
-                                        rhs: VisitorEntryLog
-                                    ): Int {
-                                        return (DateTimeUtils.formatDateDMY(rhs.vldCreated) + " " + (rhs.vlEntryT).replace(
-                                            "1900-01-01T",
-                                            ""
-                                        )).compareTo(
-                                            DateTimeUtils.formatDateDMY(lhs.vldCreated) + " " + (lhs.vlEntryT).replace(
-                                                "1900-01-01T",
-                                                ""
-                                            )
-                                        )
+                            Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
+                                override fun compare(lhs:  VisitorEntryLog, rhs:VisitorEntryLog): Int {
+                                    return (DateTimeUtils.formatDateDMY(rhs.vldCreated) +" "+(rhs.vlEntryT).replace("1900-01-01T","")).compareTo(
+                                        DateTimeUtils.formatDateDMY(lhs.vldCreated) +" "+(lhs.vlEntryT).replace("1900-01-01T",""))
 
-                                    }
-                                })
+                                }
+                            })
                         }
                         LocalDb.saveEnteredVisitorLog(arrayListVisitors);
 
                         val smsIntent = Intent(ConstantUtils.SYNC)
                         smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(
-                            mcontext
-                        ).sendBroadcast(smsIntent)
+                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")
@@ -559,7 +533,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
                         Log.d("sendFCM","onErrorResponse  "+e.toString())
-                        Log.d("SYCNCHECK", "in 473")
+                        Log.d("SYCNCHECK","in 473")
                     }
 
                     override fun noNetowork() {
@@ -760,23 +734,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {
 
 
-        val dataReq = NotificationCreateReq(
-            ACAccntID,
-            ASAssnID,
-            NTType,
-            NTDesc,
-            SBUnitID,
-            SBMemID,
-            SBSubID,
-            SBRoleID,
-            ASAsnName,
-            MRRolName,
-            NTDUpdated,
-            NTDCreated,
-            VLVisLgID,
-            "",
-            ""
-        )
+        val dataReq = NotificationCreateReq(ACAccntID,ASAssnID,NTType,NTDesc,SBUnitID,SBMemID,SBSubID,SBRoleID ,ASAsnName,MRRolName,NTDUpdated,NTDCreated,VLVisLgID,"","")
 
 
         RetrofitClinet.instance
@@ -800,18 +758,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
-    private fun getUnitLog(
-        unitId: Int,
-        personName: String,
-        mobileNumb: String,
-        desgn: String,
-        workerType: String,
-        staffID: Int,
-        unitName: String,
-        vlVisLgID: Int,
-        msg: String,
-        nrId: String
-    ) {
+    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
+                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int,msg:String,nrId:String) {
 
 
         RetrofitClinet.instance
@@ -823,76 +771,115 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
                     if (UnitList.success == true) {
 
-                        if (UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")) {
+                        if(UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")){
 
-                            if (!UnitList.data.unit.owner.isEmpty()) {
-                                unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                            } else {
-                                unAccountID = "0"
+                            if(!UnitList.data.unit.owner.isEmpty()){
+
+                                try{
+                                    for (i in 0..UnitList.data.unit.owner.size) {
+                                        unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
+                                }
+                            }
+                            else{
+                                unAccountID="0"
                             }
 
 
-                        } else if (UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")) {
-                            if (!UnitList.data.unit.tenant.isEmpty()) {
-                                unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-                            } else {
-                                unAccountID = "0"
+                        }
+                        else if(UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")){
+                            if(!UnitList.data.unit.tenant.isEmpty()) {
+                                try{
+                                    for (i in 0..UnitList.data.unit.tenant.size) {
+
+                                        unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
+                                }
+                            }
+                            else{
+                                unAccountID="0"
                             }
 
-                        } else if (UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")) {
+                        }
+                        else if(UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")){
 
-                            if (!UnitList.data.unit.tenant.isEmpty()) {
-                                unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-                            } else {
-                                unAccountID = "0"
+                            if(!UnitList.data.unit.tenant.isEmpty()) {
+
+                                try{
+                                    for (i in 0..UnitList.data.unit.tenant.size) {
+
+                                        unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
+                                }
+
+                            } else{
+                                unAccountID="0"
                             }
 
-                        } else if (UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")) {
+                        }else if(UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")){
 //                                    if(!UnitList.data.unit.owner.isEmpty()) {
 //                                        unAccountID = "0"
 //                                    } else{
-                            unAccountID = "0"
+                            unAccountID="0"
                             // }
 
-                        } else if (UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")) {
-                            if (!UnitList.data.unit.owner.isEmpty()) {
-                                unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                            } else {
-                                unAccountID = "0"
+                        }else if(UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")){
+                            if(!UnitList.data.unit.owner.isEmpty()) {
+                                try{
+
+                                    for (i in 0..UnitList.data.unit.owner.size) {
+                                        unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
+                                }
+
+                            } else{
+                                unAccountID="0"
                             }
-                        } else {
-                            unAccountID = "0"
+                        }else{
+                            unAccountID="0"
                         }
 
 
-                        try {
-                            sendFCM(
-                                msg, mobileNumb,
-                                personName, nrId,
-                                unitName, "Owner"
-                            );
+                        try {      sendFCM(msg, mobileNumb,
+                            personName, nrId,
+                            unitName, "Owner");
 
-                        } catch (e: KotlinNullPointerException) {
+                        }catch (e:KotlinNullPointerException){
 
                         }
 
-                        try {
-                            getNotificationCreate(
-                                unAccountID.toString(),
-                                Prefs.getInt(ASSOCIATION_ID, 0).toString(),
-                                "gate_app",
-                                msg,
-                                unitId.toString(),
-                                vlVisLgID.toString(),
-                                unitId.toString() + "admin",
-                                "gate_app",
-                                LocalDb.getAssociation()!!.asAsnName,
-                                "gate_app",
-                                DateTimeUtils.getCurrentTimeLocal(),
-                                DateTimeUtils.getCurrentTimeLocal(),
-                                vlVisLgID.toString()
-                            )
-                        } catch (e: KotlinNullPointerException) {
+                        try {     getNotificationCreate(unAccountID.toString(),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",msg,unitId.toString(),vlVisLgID.toString(),unitId.toString()+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
+                            DateTimeUtils.getCurrentTimeLocal(),
+                            DateTimeUtils.getCurrentTimeLocal(),
+                            vlVisLgID.toString()
+                        )
+                        }catch (e:KotlinNullPointerException){
 
                         }
 //                        sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,msg,desgn,"gate_app",
@@ -909,7 +896,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 unAccountID!!.toInt(),
                                 unAccountID.toString()
                             )
-                        } catch (e: KotlinNullPointerException) {
+                        }catch (e:KotlinNullPointerException){
 
                         }
 
@@ -945,6 +932,73 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 }
             })
+
+    }
+
+
+    fun getFamilyMemberData(unitId: String,assnID: Int,accountId:Int,desgn:String,msg:String,vlVisLgID:Int){
+        RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId,assnID.toString(),accountId.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<GetFamilyMemberResponse>() {
+
+                override fun onSuccessResponse(getdata: GetFamilyMemberResponse) {
+
+                    try{
+
+                        for (i in 0..getdata.data.familyMembers.size) {
+                            try {
+                                getNotificationCreate(
+                                    getdata.data.familyMembers[i].acAccntID.toString(),
+                                    Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                                    "gate_app",
+                                    msg,
+                                    unitId.toString(),
+                                    vlVisLgID.toString(),
+                                    unitId.toString() + "admin",
+                                    "gate_app",
+                                    LocalDb.getAssociation()!!.asAsnName,
+                                    "gate_app",
+                                    DateTimeUtils.getCurrentTimeLocal(),
+                                    DateTimeUtils.getCurrentTimeLocal(),
+                                    vlVisLgID.toString()
+                                )
+                            } catch (e: KotlinNullPointerException) {
+
+                            }
+                            sendCloudFunctionNotification(
+                                Prefs.getInt(ASSOCIATION_ID, 0),
+                                LocalDb.getAssociation()!!.asAsnName,
+                                msg,
+                                desgn,
+                                "gate_app",
+                                unitId.toString() + "admin",
+                                getdata.data.familyMembers[i].acAccntID,
+                                getdata.data.familyMembers[i].acAccntID.toString()
+                            )
+
+                        }
+                    }catch(e:IndexOutOfBoundsException){
+
+                    }
+
+
+
+
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+                    //  visitorLogBiometric(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+
+
+                }
+                override fun noNetowork() {
+                    Toast.makeText(mcontext, "No network call ", Toast.LENGTH_LONG).show()
+                }
+            })
+
 
     }
 

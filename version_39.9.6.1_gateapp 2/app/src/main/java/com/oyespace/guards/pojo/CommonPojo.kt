@@ -1674,6 +1674,69 @@ data class CheckPointData(
     val cpcPntAt: String
 )
 
+data class GetFamilyMemberResponse(
+
+    val apiVersion: String,
+    val `data`: FamilyMembersData,
+    val success: Boolean
+)
+
+data class FamilyMembersData(
+    val familyMembers: ArrayList<FamilyMember>
+)
+data class FamilyMember (
+    val  fmid:Int,
+    val  fmName:String,
+    val  fmMobile:String,
+    val  meMemID:Int,
+    val  unUnitID:Int,
+    val  fmRltn:String,
+    val  fmisdCode:String,
+    val  asAssnID:Int,
+    val  acAccntID:Int,
+    val  fmImgName:String,
+    val  fmlName:String,
+    val  fmGurName:String,
+    val  fmMinor:Boolean,
+    val  fmdCreated:String,
+    val  fmdUpdated:String,
+    val  fmIsActive:Boolean,
+    val  pAccntID:Int
+
+)
+
+
+data class ResidentValidationRequest(
+
+    val MobileNumber:String,
+    val AssociationID:Int
+
+)
+
+data class ResidentValidationResponse(
+
+    val apiVersion: String,
+    val `data`: ResidentData,
+    val success: Boolean
+
+)
+
+data class ResidentData(
+
+
+    val `object`: ResidentObject
+
+
+)
+
+data class ResidentObject(
+
+
+    val code: Int,
+    val message:String
+
+
+)
 
 
 

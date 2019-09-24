@@ -167,4 +167,10 @@ interface WebApi {
     @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
     fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq): Single<InviteCreateRes>
 
+    @GET("oyesafe/api/v1/GetFamilyMemberListByAssocAndUnitID/{uid}/{aid}/{accid}")
+    fun getFamilyMemberList(@Header("X-OYE247-APIKey") token: String, @Path("uid") unUnitID: String, @Path("aid")asAssnID: String,@Path("accid") accountID:String):Single<GetFamilyMemberResponse>
+
+    @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
+    fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
+            : Single<ResidentValidationResponse>
 }

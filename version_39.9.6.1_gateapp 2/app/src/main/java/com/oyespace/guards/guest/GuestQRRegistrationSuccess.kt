@@ -203,8 +203,10 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                         sendBroadcast(d);
 
-                        val intentdata = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
-                        startActivity(intentdata)
+//                        val intentdata = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
+//                        startActivity(intentdata)
+
+                        finish()
 
 
                         Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())

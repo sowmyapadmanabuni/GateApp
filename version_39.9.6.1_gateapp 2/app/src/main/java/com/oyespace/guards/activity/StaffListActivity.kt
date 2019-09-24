@@ -75,9 +75,6 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
 
-
-
-
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
         try {
@@ -282,12 +279,12 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
 
       //  clearApplicationData(this@StaffListActivity)
       //  deleteAppData()
-        val intent=Intent(this@StaffListActivity, StaffListActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
-
-
-        startActivity(intent)
-        this.finish();
+//        val intent=Intent(this@StaffListActivity, StaffListActivity::class.java)
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
+//
+//
+//        startActivity(intent)
+//        this.finish();
     }
 
  fun deleteAppData() {

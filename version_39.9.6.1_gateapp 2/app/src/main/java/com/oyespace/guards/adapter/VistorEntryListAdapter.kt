@@ -181,19 +181,6 @@ class VistorEntryListAdapter(
 
         } else {
 
-
-            if (orderData?.vlEntryImg.equals("")) {
-                Glide.with(mcontext)
-                    .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"))
-                    .placeholder(R.drawable.user_icon_black)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(false)
-                    .into(holder.iv_user);
-
-                // Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.iv_user);
-
-
-            } else {
                 Glide.with(mcontext)
                     .load(Uri.parse(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg))
                     .placeholder(R.drawable.user_icon_black)
@@ -201,10 +188,9 @@ class VistorEntryListAdapter(
                     .skipMemoryCache(false)
                     .into(holder.iv_user);
 
-                //  Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.iv_user);
 
 
-            }
+
         }
 
         holder.iv_user.setOnClickListener {
@@ -234,8 +220,6 @@ class VistorEntryListAdapter(
 
                     if (orderData?.vlEntryImg.equals("")) {
 
-//                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg");
-//                        Picasso.with(mcontext).load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg").networkPolicy(NetworkPolicy.NO_CACHE).memoryPolicy(MemoryPolicy.NO_CACHE);
 
                         Glide.with(mcontext)
                             .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData?.reRgVisID + ".jpg"))
@@ -243,11 +227,8 @@ class VistorEntryListAdapter(
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .skipMemoryCache(false)
                             .into(dialog_imageview);
-                        //  Picasso.with(mcontext).load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
-//                        Picasso.with(mcontext)
-//                            .load(IMAGE_BASE_URL +"Images/PERSON"+"STAFF"+orderData?.reRgVisID+".jpg")
-//                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
+
                     } else {
                         Glide.with(mcontext)
                             .load(Uri.parse(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg))
@@ -256,62 +237,16 @@ class VistorEntryListAdapter(
                             .skipMemoryCache(false)
                             .into(dialog_imageview);
 
-                        //Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+
+                } }else {
 
 
-//                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg);
-//                        Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).networkPolicy(NetworkPolicy.NO_CACHE).memoryPolicy(MemoryPolicy.NO_CACHE);
-//                        Picasso.with(mcontext)
-//                            .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
-//                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
-                    }
-
-
-//                val intent1 = Intent(mcontext, ImgView::class.java)
-//                intent1.putExtra(
-//                    "URL_IMAGE",
-//                    IMAGE_BASE_URL + "Images/PERSONAssociation" + Prefs.getInt(ASSOCIATION_ID,0) + "STAFF" + orderData?.reRgVisID + ".jpg"
-//                )
-//                mcontext.startActivity(intent1)
-
-                } else {
-
-
-                    if (orderData?.vlEntryImg.equals("")) {
-                        Glide.with(mcontext)
-                            .load(Uri.parse(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"))
-                            .placeholder(R.drawable.user_icon_black)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(false)
-                            .into(dialog_imageview);
-
-                        //  Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
-
-//                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg");
-//                        Picasso.with(mcontext).load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg").networkPolicy(NetworkPolicy.NO_CACHE).memoryPolicy(MemoryPolicy.NO_CACHE);
-
-//                        Picasso.with(mcontext)
-//                            .load(IMAGE_BASE_URL+"Images/PERSON"+"NONREGULAR"+number+".jpg")
-//                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
-                    } else {
                         Glide.with(mcontext)
                             .load(Uri.parse(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg))
                             .placeholder(R.drawable.user_icon_black)
                             .diskCacheStrategy(DiskCacheStrategy.NONE)
                             .skipMemoryCache(false)
                             .into(dialog_imageview);
-
-                        // Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
-
-
-//                        Picasso.with(mcontext).invalidate(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg);
-//                        Picasso.with(mcontext).load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg).networkPolicy(NetworkPolicy.NO_CACHE).memoryPolicy(MemoryPolicy.NO_CACHE);
-
-//                        Picasso.with(mcontext)
-//                            .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
-//                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview)
-
-                    }
 
 
                 }

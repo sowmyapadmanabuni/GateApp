@@ -207,7 +207,7 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
 
-                Picasso.with(GuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+                //Picasso.with(GuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 
 //                Picasso.with(GuestAddCarFragment.this)
