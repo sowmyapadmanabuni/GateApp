@@ -65,7 +65,7 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
 //    private ZXingScannerView mScannerView;
 //    private Button btn_missedcall;
-//    android.support.v7.app.AlertDialog alertDialog;
+    AlertDialog alertDialog;
 //    ChampApiInterface champApiInterface;
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -7,6 +7,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.google.firebase.database.FirebaseDatabase;
 import com.oyespace.guards.utils.Prefs;
 
 import io.fabric.sdk.android.Fabric;
@@ -38,6 +39,9 @@ public class Myapp extends MultiDexApplication {
 
 
         super.onCreate();
+
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
        // Fabric.with(this, new Crashlytics());
         Fabric.with(this, new Crashlytics());
         Timber.plant(new Timber.DebugTree());

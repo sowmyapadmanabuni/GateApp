@@ -112,6 +112,7 @@ class FRTDBService : Service() {
                             var passedBy: HashMap<String, String> = HashMap()
                             var passedGuards: RealmList<PassesSOSGuards> = RealmList()
                             var attendedBy: String = ""
+                            var isValidSOS:Boolean = true;
 
                             if (it.hasChild("unitName") && it.hasChild("unitName") != null) {
                                 unitName = it.child("unitName").getValue(String::class.java)!!
@@ -139,6 +140,12 @@ class FRTDBService : Service() {
                             }
                             if (it.hasChild("userId")) {
                                 userId = it.child("userId").getValue(Int::class.java)!!
+                            }else{
+                                isValidSOS = false
+                            }
+
+                            if (it.hasChild("id")) {
+                                id = it.child("id").getValue(Int::class.java)!!
                             }
 
                             if (it.hasChild("attendedBy")) {
@@ -148,7 +155,8 @@ class FRTDBService : Service() {
 
                             val currentGate = Prefs.getString(ConstantUtils.GATE_NO, "");
 
-                            if (isActive != null && isActive && userId != 0) {
+
+                            if (isActive != null && isActive && userId != 0 && isValidSOS) {
 
                                 if (it.hasChild("passedby")) {
                                     val type =
@@ -186,22 +194,30 @@ class FRTDBService : Service() {
                                 );
                                 if (!isGuardPassed) {
                                     Log.e("INSIDE", "GUARDPASSED")
-                                    if (attendedBy == "" || attendedBy.trim().equals(currentGate.trim())) {
+                                    Log.e("INSIDE", "GUARDPASSED")
+                                    if (attendedBy.equals("") || attendedBy.trim().equals(currentGate.trim())) {
                                         Log.e("INSIDE", "attendedBy")
                                         realm.executeTransaction {
 
-                                            val sosObj =
-                                                it.createObject(SOSModel::class.java, userId)
-                                            sosObj.isActive = isActive
-                                            sosObj.unitName = unitName
-                                            sosObj.unitId = unitId
-                                            sosObj.userName = userName
-                                            sosObj.userMobile = userMobile
-                                            sosObj.latitude = latitude
-                                            sosObj.longitude = longitude
-                                            sosObj.sosImage = sosImage
-                                            sosObj.passedBY = passedGuards
-                                            sosObj.attendedBy = attendedBy
+                                            var sosObj = it.where(SOSModel::class.java).equalTo("userId",userId).findFirst()
+                                            Log.e("SOS_CHECK", ""+sosObj)
+                                            if(sosObj==null || !sosObj.isValid) {
+                                                Log.e("SOS_ISVALI", "INVALID..Creating")
+                                                 sosObj =
+                                                    it.createObject(SOSModel::class.java, userId)
+                                            }
+
+                                            sosObj?.isActive = isActive
+                                            sosObj?.unitName = unitName
+                                            sosObj?.unitId = unitId
+                                            sosObj?.userName = userName
+                                            sosObj?.userMobile = userMobile
+                                            sosObj?.latitude = latitude
+                                            sosObj?.longitude = longitude
+                                            sosObj?.sosImage = sosImage
+                                            sosObj?.passedBY = passedGuards
+                                            sosObj?.attendedBy = attendedBy
+                                            sosObj?.id = id
                                         }
                                     }
                                 }
@@ -226,8 +242,11 @@ class FRTDBService : Service() {
                                 Intent(applicationContext, SosGateAppActivity::class.java)
                             i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             startActivity(i_vehicle)
+                        }else{
+                            Log.e("CLOSING", "SOS");
                         }
                     } catch (e: Exception) {
+                        Log.e("ERROR",""+e)
                         e.printStackTrace()
                     }
                 }
