@@ -67,6 +67,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     lateinit var edittext2: EditText
     lateinit var save: Button
     var currentSOS: SOSModel = SOSModel()
+    var sosId:Int = 0
     var sosLocation: LatLng = LatLng(0.0, 0.0)
     var guardLocation: LatLng = LatLng(0.0, 0.0)
     var totalGuards: Int = Prefs.getInt("TOTAL_GUARDS", 1)
@@ -192,20 +193,21 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     private fun sendSOSStatus(status:String){
-//        try {
-//            if (currentSOS != null && currentSOS.isValid && currentSOS.isActive && currentSOS.id !=0) {
-//                val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-//                intentAction1.putExtra(
-//                    ConstantUtils.BSR_Action,
-//                    ConstantUtils.BGS_SOS_STATUS
-//                )
-//                intentAction1.putExtra("sos_id", ""+currentSOS.id)
-//                intentAction1.putExtra("sos_status", ""+status)
-//                sendBroadcast(intentAction1)
-//            }
-//        }catch (e:java.lang.Exception){
-//            e.printStackTrace()
-//        }
+        try {
+            if (sosId !=0) {
+                val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                intentAction1.putExtra(
+                    ConstantUtils.BSR_Action,
+                    ConstantUtils.BGS_SOS_STATUS
+                )
+                intentAction1.putExtra("sos_id", sosId)
+                intentAction1.putExtra("sos_status", ""+status)
+                sendBroadcast(intentAction1)
+            }
+        }catch (e:java.lang.Exception){
+            Log.e("sendSOSStatus",""+status);
+            e.printStackTrace()
+        }
     }
 
 
@@ -214,11 +216,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             if (isResolving) {
                 sendSOSStatus(ConstantUtils.SOS_STATUS_COMPLETED)
             }
-//        val postListener = object : ValueEventListener {
-//            override fun onDataChange(dataSnapshot: DataSnapshot) {
-//                try {
-//
-//                    if (dataSnapshot.exists()) {
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                try {
+
+                    if (dataSnapshot.exists()) {
             if (isResolving) {
                 removeCurrentSOSRealm()
                 mSosReference!!.removeValue()
@@ -241,25 +243,25 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                     e.printStackTrace()
                 }
             }
-//                    } else {
-//                        removeCurrentSOSRealm()
-//                        mSosReference!!.removeValue()
-//                        isResolving = false
-//                        checkNextSOS()
-//                    }
-//                }catch (e:java.lang.Exception){
-//                    e.printStackTrace()
-//                }
-//
-//            }
-//
-//            override fun onCancelled(databaseError: DatabaseError) {
-//                // Getting Post failed, log a message
-//                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-//
-//            }
-            //}
-            // mSosReference!!.addListenerForSingleValueEvent(postListener)
+                    } else {
+                        removeCurrentSOSRealm()
+                        mSosReference!!.removeValue()
+                        isResolving = false
+                        checkNextSOS()
+                    }
+                }catch (e:java.lang.Exception){
+                    e.printStackTrace()
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+
+            }
+            }
+             mSosReference!!.addListenerForSingleValueEvent(postListener)
         }catch (e:Exception){
             Log.e("ATTENDERROR",""+e)
             e.printStackTrace()
@@ -317,6 +319,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 if(it.hasChild("userName") && it.hasChild("userName")!=null){
                     userName = it.child("userName").getValue(String::class.java)!!
                 }
+
+
                 if(it.hasChild("userMobile") && it.hasChild("userMobile")!=null){
                     userMobile = it.child("userMobile").getValue(String::class.java)!!
                 }
@@ -334,6 +338,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 }
                 if(it.hasChild("id")){
                     id = it.child("id").getValue(Int::class.java)!!
+                    sosId = id;
                 }
                 if(it.hasChild("userId")){
                     userId = it.child("userId").getValue(Int::class.java)!!
@@ -358,7 +363,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 }
 
                 Log.e("EMER_G",""+emergencyImages);
-                if (isActive != null && isActive && userId != 0) {
+                if (isActive != null && isActive && userId != 0 && isValidSOS) {
                     runOnUiThread {
 
                         val currentGate = Prefs.getString(ConstantUtils.GATE_NO,"");
@@ -370,6 +375,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             }
                             if (userName != "" && userName != null) {
                                 sos_username.text = userName
+                            }
+                            if (unitName != "" && unitName != null && !unitName.equals("")) {
+                                sos_unitname.text = "Unit: "+unitName
                             }
                             if (emergencyImages != null && emergencyImages.size > 0) {
 
@@ -456,6 +464,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             try {
 
                 Log.e("DEleted",""+currentSOS);
+                Log.e("DEleted_USR",""+userId);
+                if(userId == 0 && currentSOS.isValid && currentSOS!=null && currentSOS.userId != 0){
+                    userId = currentSOS.userId
+                }
                 val sosObj = realm.where<SOSModel>().equalTo("userId",userId).findFirst()
                 if(sosObj!= null){
                     realm.executeTransaction {
@@ -569,10 +581,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     private fun getSOS() {
+        sosId = 0
         val sosObj = realm.where<SOSModel>().findFirst()
         Log.e("getSOS", "" + sosObj);
         if (sosObj != null) {
             currentSOS = sosObj
+            sosId = currentSOS.id
             val currentGate: String = Prefs.getString("GATE_NO", null)
 
             if (currentSOS.userMobile != "" && currentSOS.userMobile != null) {

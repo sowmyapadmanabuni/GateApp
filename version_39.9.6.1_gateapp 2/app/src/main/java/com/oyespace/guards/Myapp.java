@@ -1,6 +1,7 @@
 package com.oyespace.guards;
 
 import android.content.Context;
+import android.content.IntentFilter;
 
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
@@ -8,6 +9,8 @@ import androidx.multidex.MultiDexApplication;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.firebase.database.FirebaseDatabase;
+import com.oyespace.guards.broadcastreceiver.NetworkChangeReceiver;
+import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel;
 import com.oyespace.guards.utils.Prefs;
 
 import io.fabric.sdk.android.Fabric;
@@ -40,6 +43,9 @@ public class Myapp extends MultiDexApplication {
 
         super.onCreate();
 
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        this.registerReceiver(new NetworkChangeReceiver(), intentFilter);
+
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
        // Fabric.with(this, new Crashlytics());
@@ -59,7 +65,10 @@ public class Myapp extends MultiDexApplication {
                 .migration(new RealmDataMigration())
                 .build();
         Realm.setDefaultConfiguration(config);
-
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.where(SOSModel.class).findAll().deleteAllFromRealm();
+        realm.commitTransaction();
         mInstance = this;
 
 //        Thread.setDefaultUncaughtExceptionHandler (new Thread.UncaughtExceptionHandler()
