@@ -4,9 +4,6 @@
         package="com.oyespace.guards"
         >
 
-
-
-
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Dangerous Permissions -->
