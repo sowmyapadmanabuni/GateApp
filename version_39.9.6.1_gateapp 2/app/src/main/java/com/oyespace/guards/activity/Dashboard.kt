@@ -53,6 +53,7 @@ import com.oyespace.guards.responce.RequestDTO
 import com.oyespace.guards.responce.SubscriptionResponse
 import com.oyespace.guards.responce.VisitorLogCreateResp
 import com.oyespace.guards.responce.VisitorLogExitResp
+import com.oyespace.guards.services.SOSSirenService
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
@@ -496,11 +497,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     }
 
+    fun stopSiren(){
+        val intent = Intent(this, SOSSirenService::class.java)
+        this.stopService(intent)
+    }
     override fun onResume() {
 
         try {
 
             Prefs.putBoolean("ACTIVE_SOS",false);
+            stopSiren()
             //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
                 startService(Intent(this@Dashboard, FRTDBService::class.java))
             //}

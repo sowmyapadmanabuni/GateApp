@@ -23,6 +23,7 @@ import com.google.android.gms.maps.model.*
 import com.google.firebase.database.*
 import com.google.gson.Gson
 import com.kodmap.app.library.PopopDialogBuilder
+import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.com.oyespace.guards.activity.EmergencyModel
 import com.oyespace.guards.com.oyespace.guards.activity.EmrgencyContactAdapter
@@ -66,6 +67,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     lateinit var edittext2: EditText
     lateinit var save: Button
     var currentSOS: SOSModel = SOSModel()
+    var sosId:Int = 0
     var sosLocation: LatLng = LatLng(0.0, 0.0)
     var guardLocation: LatLng = LatLng(0.0, 0.0)
     var totalGuards: Int = Prefs.getInt("TOTAL_GUARDS", 1)
@@ -112,27 +114,33 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     override fun onDestroy() {
+        stopSiren()
         mSosReference!!.removeEventListener(sosListener)
         Prefs.putBoolean("ACTIVE_SOS",false);
-        stopSiren()
         super.onDestroy()
     }
 
     override fun onPause() {
+        stopSiren()
         super.onPause()
         Prefs.putBoolean("ACTIVE_SOS", false);
     }
 
     override fun onResume() {
-        super.onResume()
-        if (currentSOS != null && currentSOS.isValid) {
-            var lng: Double = currentSOS.longitude.toDouble();
-            var lat: Double = currentSOS.latitude.toDouble();
-            sosLocation = LatLng(lat, lng)
-            getDirections()
-        } else {
-            getSOS()
+
+        try {
+            if (currentSOS != null && currentSOS.isValid) {
+                var lng: Double = currentSOS.longitude.toDouble();
+                var lat: Double = currentSOS.latitude.toDouble();
+                sosLocation = LatLng(lat, lng)
+                getDirections()
+            } else {
+                getSOS()
+            }
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
         }
+        super.onResume()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -180,32 +188,61 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         Log.e(TAG, "" + mSosPath)
         mDatabase = FirebaseDatabase.getInstance().reference
         mSosReference = FirebaseDatabase.getInstance().getReference(mSosPath)
+        mSosReference!!.keepSynced(true)
         initSOSListener()
+    }
+
+    private fun sendSOSStatus(status:String){
+        try {
+            if (sosId !=0) {
+                val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                intentAction1.putExtra(
+                    ConstantUtils.BSR_Action,
+                    ConstantUtils.BGS_SOS_STATUS
+                )
+                intentAction1.putExtra("sos_id", sosId)
+                intentAction1.putExtra("sos_status", ""+status)
+                sendBroadcast(intentAction1)
+            }
+        }catch (e:java.lang.Exception){
+            Log.e("sendSOSStatus",""+status);
+            e.printStackTrace()
+        }
     }
 
 
     private fun attendSOS(){
+        try {
+            if (isResolving) {
+                sendSOSStatus(ConstantUtils.SOS_STATUS_COMPLETED)
+            }
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 try {
 
                     if (dataSnapshot.exists()) {
-                        if (isResolving) {
-                            removeCurrentSOSRealm()
-                            mSosReference!!.removeValue()
-                            isResolving = false
-                            checkNextSOS()
+            if (isResolving) {
+                removeCurrentSOSRealm()
+                mSosReference!!.removeValue()
+                isResolving = false
+                checkNextSOS()
 
-                        } else {
-                            //mSosReference
-                            btn_dismiss_sos.setVisibility(View.GONE)
-                            btn_attend_sos.text = "Resolved"
-                            mSosReference!!.child("attendedBy")
-                                .setValue(Prefs.getString(ConstantUtils.GATE_NO, ""))
-                            mSosReference!!.child("attendedByMobile")
-                                .setValue(Prefs.getString(ConstantUtils.GATE_MOB, ""))
-                            isResolving = true
-                        }
+            } else {
+                //mSosReference
+                btn_dismiss_sos.setVisibility(View.GONE)
+                btn_attend_sos.text = "Resolved"
+                isResolving = true
+                try{
+                    var gate = Prefs.getString(ConstantUtils.GATE_NO, "")
+                    if(gate.equals("")){
+                        gate = "Gate 1"
+                    }
+                    mSosReference?.child("attendedBy")?.setValue(Prefs.getString(ConstantUtils.GATE_NO, ""))
+                    mSosReference?.child("attendedByMobile")?.setValue(Prefs.getString(ConstantUtils.GATE_MOB, ""))
+                }catch (e:Exception){
+                    e.printStackTrace()
+                }
+            }
                     } else {
                         removeCurrentSOSRealm()
                         mSosReference!!.removeValue()
@@ -223,9 +260,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
 
             }
+            }
+             mSosReference!!.addListenerForSingleValueEvent(postListener)
+        }catch (e:Exception){
+            Log.e("ATTENDERROR",""+e)
+            e.printStackTrace()
         }
-        mSosReference!!.addListenerForSingleValueEvent(postListener)
-
 
     }
 
@@ -252,7 +292,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 val it = dataSnapshot;
                 val user_id = it.key;
                 //val sos = it.getValue()
-                val isActive = it.child("isActive").getValue(Boolean::class.java)
+                var isActive:Boolean = true;//it.child("isActive").getValue(Boolean::class.java)
                 var unitName = ""
                 var unitId: Int = 0
                 var userName:String = ""
@@ -265,8 +305,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 //var userId: Int = 0
                 var totalPassed:Int = 0
                 var passedBy:HashMap<String,String> = HashMap()
+                var isValidSOS:Boolean = true;
 
-
+                if(it.hasChild("isActive") && it.hasChild("isActive")!=null){
+                    isActive = it.child("isActive").getValue(Boolean::class.java)!!
+                }
                 if(it.hasChild("unitName") && it.hasChild("unitName")!=null){
                     unitName = it.child("unitName").getValue(String::class.java)!!
                 }
@@ -276,6 +319,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 if(it.hasChild("userName") && it.hasChild("userName")!=null){
                     userName = it.child("userName").getValue(String::class.java)!!
                 }
+
+
                 if(it.hasChild("userMobile") && it.hasChild("userMobile")!=null){
                     userMobile = it.child("userMobile").getValue(String::class.java)!!
                 }
@@ -291,8 +336,14 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 if(it.hasChild("sosImage")){
                     sosImage = it.child("sosImage").getValue(String::class.java)!!
                 }
+                if(it.hasChild("id")){
+                    id = it.child("id").getValue(Int::class.java)!!
+                    sosId = id;
+                }
                 if(it.hasChild("userId")){
                     userId = it.child("userId").getValue(Int::class.java)!!
+                }else{
+                    isValidSOS  = false
                 }
 //                            if(it.hasChild("totalpassed")){
 //                                totalPassed = it.child("totalpassed").getValue(Int::class.java)!!
@@ -312,7 +363,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 }
 
                 Log.e("EMER_G",""+emergencyImages);
-                if (isActive != null && isActive && userId != 0) {
+                if (isActive != null && isActive && userId != 0 && isValidSOS) {
                     runOnUiThread {
 
                         val currentGate = Prefs.getString(ConstantUtils.GATE_NO,"");
@@ -324,6 +375,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                             }
                             if (userName != "" && userName != null) {
                                 sos_username.text = userName
+                            }
+                            if (unitName != "" && unitName != null && !unitName.equals("")) {
+                                sos_unitname.text = "Unit: "+unitName
                             }
                             if (emergencyImages != null && emergencyImages.size > 0) {
 
@@ -339,7 +393,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                                 val lat = latitude.toDouble()
                                 val lon = longitude.toDouble()
                                 sosLocation = LatLng(lat, lon)
-                                getDirections()
+                                //getDirections()
                             }
 
                             if ((totalGuards - totalPassed) <= 1) {
@@ -410,6 +464,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             try {
 
                 Log.e("DEleted",""+currentSOS);
+                Log.e("DEleted_USR",""+userId);
+                if(userId == 0 && currentSOS.isValid && currentSOS!=null && currentSOS.userId != 0){
+                    userId = currentSOS.userId
+                }
                 val sosObj = realm.where<SOSModel>().equalTo("userId",userId).findFirst()
                 if(sosObj!= null){
                     realm.executeTransaction {
@@ -523,10 +581,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     private fun getSOS() {
+        sosId = 0
         val sosObj = realm.where<SOSModel>().findFirst()
         Log.e("getSOS", "" + sosObj);
         if (sosObj != null) {
             currentSOS = sosObj
+            sosId = currentSOS.id
             val currentGate: String = Prefs.getString("GATE_NO", null)
 
             if (currentSOS.userMobile != "" && currentSOS.userMobile != null) {
@@ -554,6 +614,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     private fun dismissSOS() {
+
         val builder = AlertDialog.Builder(this)
         val dview = layoutInflater.inflate(R.layout.activity_custom_alert, null)
         val alert = builder.create()
@@ -729,6 +790,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     private inner class GetDirection(val url: String) :
         AsyncTask<Void, Void, List<List<LatLng>>>() {
         override fun doInBackground(vararg params: Void?): List<List<LatLng>> {
+
             val client = OkHttpClient()
             val request = Request.Builder().url(url).build()
             val response = client.newCall(request).execute()
@@ -756,52 +818,61 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         }
 
         override fun onPostExecute(result: List<List<LatLng>>) {
-            lineoption = PolylineOptions()
-            for (i in result.indices) {
-                lineoption.addAll(result[i])
-                lineoption.width(10f)
-                lineoption.color(Color.BLACK)
-                lineoption.geodesic(true)
+            try {
+                lineoption = PolylineOptions()
+                for (i in result.indices) {
+                    lineoption.addAll(result[i])
+                    lineoption.width(10f)
+                    lineoption.color(Color.BLACK)
+                    lineoption.geodesic(true)
+                }
+                mPolyline = mMap.addPolyline(lineoption)
+            }catch (e:Exception){
+                e.printStackTrace()
             }
-            mPolyline = mMap.addPolyline(lineoption)
         }
     }
 
     private fun decodePolyline(encoded: String): List<LatLng> {
 
-        val poly = ArrayList<LatLng>()
-        var index = 0
-        val len = encoded.length
-        var lat = 0
-        var lng = 0
+        var poly = ArrayList<LatLng>()
+        try {
+            var index = 0
+            val len = encoded.length
+            var lat = 0
+            var lng = 0
 
-        while (index < len) {
-            var b: Int
-            var shift = 0
-            var result = 0
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lat += dlat
+            while (index < len) {
+                var b: Int
+                var shift = 0
+                var result = 0
+                do {
+                    b = encoded[index++].toInt() - 63
+                    result = result or (b and 0x1f shl shift)
+                    shift += 5
+                } while (b >= 0x20)
+                val dlat = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+                lat += dlat
 
-            shift = 0
-            result = 0
-            do {
-                b = encoded[index++].toInt() - 63
-                result = result or (b and 0x1f shl shift)
-                shift += 5
-            } while (b >= 0x20)
-            val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
-            lng += dlng
+                shift = 0
+                result = 0
+                do {
+                    b = encoded[index++].toInt() - 63
+                    result = result or (b and 0x1f shl shift)
+                    shift += 5
+                } while (b >= 0x20)
+                val dlng = if (result and 1 != 0) (result shr 1).inv() else result shr 1
+                lng += dlng
 
-            val latLng = LatLng((lat.toDouble() / 1E5), (lng.toDouble() / 1E5))
-            poly.add(latLng)
+                val latLng = LatLng((lat.toDouble() / 1E5), (lng.toDouble() / 1E5))
+                poly.add(latLng)
+            }
+            return poly
+        }catch (e:java.lang.Exception){
+            return poly
         }
 
-        return poly
+
     }
 }
 

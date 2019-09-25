@@ -1738,8 +1738,20 @@ data class ResidentObject(
 
 )
 
+//SOS update request
+data class SOSUpdateReq(
+    val SOSID: Int,
+    val DEGate: String,
+    val DEMobileNo: String,
+    val SOStatus:String
+)
 
 
+data class SOSUpdateResp(
+    val apiVersion: String,
+    val data: String,
+    val success: Boolean
+)
 
 
 

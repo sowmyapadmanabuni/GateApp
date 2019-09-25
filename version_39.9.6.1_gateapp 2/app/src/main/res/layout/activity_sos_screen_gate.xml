@@ -86,6 +86,13 @@
                         android:layout_height="wrap_content"
                         android:text="Resident Mobile No:"
                         android:id="@+id/sos_usermobile"
+                        android:layout_marginBottom="4dp"
+                        android:textColor="@color/black" />
+
+                <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/sos_unitname"
                         android:textColor="@color/black" />
 
             </LinearLayout>

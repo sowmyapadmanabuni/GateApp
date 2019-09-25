@@ -70,6 +70,10 @@ interface WebApi {
     fun workerList(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String)
             : Single<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>
 
+    @POST("oyesafe/api/v1/SOS/SOSStopUpdate")
+    fun updateSOS(@Header("X-OYE247-APIKey") token: String, @Body sosUpdateReq: SOSUpdateReq)
+            : Single<SOSUpdateResp>
+
     @POST("oyesafe/api/v1/FingerPrint/Create")
     fun createFingerPrintCall(@Header(OYE247KEY) token: String, @Body fingerPrintCreateReq: FingerPrintCreateReq)
             : Single<FingerPrintCreateResp>

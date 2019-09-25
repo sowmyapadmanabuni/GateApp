@@ -71,6 +71,7 @@ public class ConstantUtils {
     public static final String VEHICLE_GUESTWITHQRCODE = "VEHICLE_GUESTWITHQRCODE";
     public static final String VISITOR_ENTRY_SYNC="VISITOR_ENTRY_SYNC";
     public static final String SENDFCM_toSYNC_VISITORENTRY="SENDFCM_toSYNC_VISITORENTRY";
+    public static final String BGS_SOS_STATUS="BGS_SOS_STATUS";
 
     //http://mediaupload.oyespace.com/Images/
     public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
@@ -101,5 +102,9 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
     public static final float CHECKPOINT_DISTANCE_THRESHOLD = 15.0f;
+
+    public static final String SOS_STATUS_COMPLETED = "COMPLETED";
+    public static final String SOS_STATUS_PASSED = "PASS";
+    public static final String SOS_STATUS_CANCELLED = "Cancelled";
 
 }

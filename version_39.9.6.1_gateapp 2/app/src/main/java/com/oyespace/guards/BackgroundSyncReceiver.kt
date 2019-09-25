@@ -10,6 +10,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.network.CommonDisposable
@@ -162,6 +163,18 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         else if(intent.getStringExtra(BSR_Action).equals(SENDAUDIO)){
             //Toast.makeText(context,"coming",Toast.LENGTH_LONG).show()
             sendFCM_forAudioMessage(intent.getStringExtra("FILENAME"))
+        }
+        else if(intent.getStringExtra(BSR_Action).equals(BGS_SOS_STATUS)){
+            Log.e("BGS_SOS_STATUS","BGS_SOS_STATUS");
+            val sosId = intent.getIntExtra("sos_id",0)
+            val sosStatus = intent.getStringExtra("sos_status")
+            val gateNumber = Prefs.getString(ConstantUtils.GATE_NO, "")
+            val gateMob = Prefs.getString(ConstantUtils.GATE_MOB, "")
+            if(sosId != 0 && !sosStatus.equals("")) {
+                Log.e("BGS_SOS_STATUS",""+sosId+" "+gateNumber+" "+ gateMob+" "+ sosStatus);
+                val sosObj: SOSUpdateReq = SOSUpdateReq(sosId, gateNumber, gateMob, sosStatus)
+                updateSOS(sosObj)
+            }
         }
 
     }
@@ -382,6 +395,36 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
             })
     }
+
+
+    private fun updateSOS(sosUpdateReq: SOSUpdateReq) {
+
+        RetrofitClinet.instance
+            .updateSOS(CHAMPTOKEN,sosUpdateReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<SOSUpdateResp>() {
+                override fun onSuccessResponse(t: SOSUpdateResp) {
+                    Log.e("updateSOS","SUCCESS "+t)
+                    Prefs.remove("PENDING_SOS")
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.e("updateSOS","ERROR "+e)
+                    val json:String =  Gson().toJson(sosUpdateReq)
+                    Prefs.putString("PENDING_SOS",json);
+                }
+
+                override fun noNetowork() {
+                    Log.e("updateSOS","NONETWROK ")
+                    val json:String =  Gson().toJson(sosUpdateReq)
+                    Prefs.putString("PENDING_SOS",json);
+                }
+
+            })
+
+    }
+
 
     private fun getUnitList() {
 
