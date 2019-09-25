@@ -249,6 +249,10 @@
                 android:theme="@style/noActionBar" />
 
         <activity
+                android:name=".residentidcard.ResidentIdCardMobileNumberActivity"
+                android:theme="@style/noActionBar"></activity>
+
+        <activity
                 android:name=".pertroling.PatrollingLocActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />

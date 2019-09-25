@@ -199,7 +199,7 @@
                             android:layout_gravity="center_vertical"
                             android:hint="@string/textphonenumber"
                             android:inputType="phone"
-                            android:maxLength="12"
+                            android:maxLength="10"
                             android:paddingLeft="2dp"
                             android:paddingRight="2dp"
                             android:singleLine="true"
