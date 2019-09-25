@@ -330,6 +330,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         Btn_SendOtp.setOnClickListener {
 
             mobilenumber= phone
+            phone = Ed_phoneNum.text.toString().replace(" ", "")
 
             if (phone != null) {
 

@@ -249,7 +249,10 @@
                         </com.hbb20.CountryCodePicker>
                     </LinearLayout>
 
-                    <TextView
+
+
+
+                    <EditText
                             android:id="@+id/Ed_phoneNum"
                             style="@style/EditTextCustomHolo"
                             android:layout_width="0dp"
@@ -261,7 +264,7 @@
                             android:layout_gravity="center_vertical"
                             android:hint="@string/textphonenumber"
                             android:inputType="phone"
-                            android:maxLength="13"
+                            android:maxLength="10"
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp"
                             android:singleLine="true"
