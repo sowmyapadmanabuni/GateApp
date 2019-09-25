@@ -222,7 +222,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
 
                     if (dataSnapshot.exists()) {
             if (isResolving) {
-                removeCurrentSOSRealm()
+                removeCurrentSOSRealm(false)
                 mSosReference!!.removeValue()
                 isResolving = false
                 checkNextSOS()
@@ -244,7 +244,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 }
             }
                     } else {
-                        removeCurrentSOSRealm()
+                        removeCurrentSOSRealm(false)
                         mSosReference!!.removeValue()
                         isResolving = false
                         checkNextSOS()
@@ -554,15 +554,19 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
     }
 
     private fun updateSOSLocation() {
-        if (currentSOS != null && currentSOS.latitude != "" && currentSOS.longitude != "") {
-            var lng: Double = currentSOS.longitude.toDouble();
-            var lat: Double = currentSOS.latitude.toDouble();
+        try {
+            if (currentSOS != null && currentSOS.latitude != "" && currentSOS.longitude != "") {
+                var lng: Double = currentSOS.longitude.toDouble();
+                var lat: Double = currentSOS.latitude.toDouble();
 
-            sosLocation = LatLng(lat, lng)
-            val markerOption: MarkerOptions =
-                MarkerOptions().position(sosLocation).title("SOS Location")
-            sosMarker = mMap.addMarker(markerOption)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosLocation, 15.0f))
+                sosLocation = LatLng(lat, lng)
+                val markerOption: MarkerOptions =
+                    MarkerOptions().position(sosLocation).title("SOS Location")
+                sosMarker = mMap.addMarker(markerOption)
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sosLocation, 15.0f))
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
         }
     }
 
@@ -625,18 +629,21 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
         button.setOnClickListener({
             updatePassedSOS()
             alert.dismiss()
-            removeCurrentSOSRealm()
+            removeCurrentSOSRealm(true)
             checkNextSOS()
             //isBackEnabled = true
             //onBackPressed()
         })
     }
 
-    private fun removeCurrentSOSRealm() {
+    private fun removeCurrentSOSRealm(isdismiss:Boolean) {
         try {
-            val userId = currentSOS.userId
-            if (userId != 0 && userId != null) {
-                val sosObj = realm.where<SOSModel>().equalTo("userId", userId).findFirst()
+            var _userId = userId
+            if(currentSOS.isValid && currentSOS !=null) {
+                 _userId = currentSOS.userId
+            }
+            if (_userId != 0 && _userId != null) {
+                val sosObj = realm.where<SOSModel>().equalTo("userId", _userId).findFirst()
                 if (sosObj != null) {
                     realm.executeTransaction {
                         sosObj.deleteFromRealm()
@@ -645,11 +652,15 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 }
             }
         } catch (e: java.lang.Exception) {
-
+            Log.e("ERRRRR",""+e);
+            if(isdismiss){
+                checkNextSOS()
+            }
         }
     }
 
     private fun updatePassedSOS() {
+        sendSOSStatus(ConstantUtils.SOS_STATUS_PASSED)
 
         //val key = mSosReference!!.child("passedby").push().key
         // val key = Prefs.getString("GATE_NO","")

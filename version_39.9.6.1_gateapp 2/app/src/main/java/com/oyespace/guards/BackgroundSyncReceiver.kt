@@ -400,7 +400,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun updateSOS(sosUpdateReq: SOSUpdateReq) {
 
         RetrofitClinet.instance
-            .updateSOS(CHAMPTOKEN,sosUpdateReq)
+            .updateSOS(OYE247TOKEN,sosUpdateReq)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<SOSUpdateResp>() {
