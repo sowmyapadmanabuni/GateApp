@@ -1,6 +1,7 @@
 package com.oyespace.guards
 import SecuGen.FDxSDKPro.*
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
@@ -15,11 +16,13 @@ import android.hardware.usb.UsbManager
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
+import android.net.wifi.ScanResult
+import android.net.wifi.WifiManager
 import android.os.*
 import android.provider.Settings
 import android.speech.RecognizerIntent
 import android.speech.tts.TextToSpeech
-import android.telephony.TelephonyManager
+import android.telephony.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -27,7 +30,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.messaging.FirebaseMessaging
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -501,12 +503,59 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         val intent = Intent(this, SOSSirenService::class.java)
         this.stopService(intent)
     }
+
+    @SuppressLint("MissingPermission")
+    fun getCellAndWifiInfo(){
+        val wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager;
+        val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        val cellLocation = telephonyManager.allCellInfo
+        if (cellLocation != null && cellLocation.size>0) {  //verify if is'nt null
+            var lac = 0;
+            var cid=0
+            var mcc=0
+            var mnc = 0
+            var str = 0
+            var tim = 0
+
+            var info = cellLocation[0]
+            //for (info in cellLocation) {    // Loop for go through Muteablelist
+
+                if(info is CellInfoLte){       //verify if Network is LTE type
+                    val identityLte = (info as CellInfoLte).cellIdentity     //get the cellIdentity data
+                    lac = identityLte.tac    //get the CI(CellIdentity) string
+                    cid = identityLte.ci
+                    mcc = identityLte.mcc
+                    mnc = identityLte.mnc
+                    str = (info as CellInfoLte).cellSignalStrength.dbm
+                    tim = (info as CellInfoLte).cellSignalStrength.timingAdvance
+
+                }
+            //}
+             val wifircvr = object : BroadcastReceiver() {
+                override fun onReceive(context: Context, intent: Intent) {
+                    val wifiList:List<ScanResult> = wifiManager.scanResults
+                    if(wifiList.size > 0){
+                        val scanResult:ScanResult = wifiList[0] as ScanResult
+
+                    }
+                    Log.e("WIFILIST", "" + wifiList);
+                    Log.e("CELLINFO","LAC: "+lac+" - SID: "+cid+" - MCC: "+mcc+" - MNC: "+mnc+" - STRENGTH: "+str+" - TIMIN: "+tim)
+                }
+            }
+            registerReceiver(wifircvr, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+            wifiManager.startScan()
+
+
+        }
+    }
+
     override fun onResume() {
 
         try {
 
             Prefs.putBoolean("ACTIVE_SOS",false);
             stopSiren()
+            getCellAndWifiInfo()
             //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
                 startService(Intent(this@Dashboard, FRTDBService::class.java))
             //}
