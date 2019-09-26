@@ -507,6 +507,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     @SuppressLint("MissingPermission")
     fun getCellAndWifiInfo(){
         val wifiManager = getSystemService(Context.WIFI_SERVICE) as WifiManager;
+        wifiManager.setWifiEnabled(true)
         val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         val cellLocation = telephonyManager.allCellInfo
         if (cellLocation != null && cellLocation.size>0) {  //verify if is'nt null
@@ -542,8 +543,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     Log.e("CELLINFO","LAC: "+lac+" - SID: "+cid+" - MCC: "+mcc+" - MNC: "+mnc+" - STRENGTH: "+str+" - TIMIN: "+tim)
                 }
             }
-            registerReceiver(wifircvr, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
-            wifiManager.startScan()
+//            registerReceiver(wifircvr, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
+//            wifiManager.startScan()
 
 
         }

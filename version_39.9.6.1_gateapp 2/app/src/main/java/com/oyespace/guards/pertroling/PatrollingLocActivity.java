@@ -20,6 +20,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -86,6 +87,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_scanner_point);
 
+        //@Todo: Remove these two lines
         Prefs.remove(ACTIVE_PATROLLING_SCHEDULE);
         Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
 
@@ -327,7 +329,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         float[] results = new float[2];
         //calculateWifiSignalWeightage();
         Location.distanceBetween(mPredictedLocation.getLatitude(), mPredictedLocation.getLongitude(), mCPLatitude, mCPLongitude, results);
-        //Toast.makeText(PatrollingLocActivity.this, "Distance: " + results[0], Toast.LENGTH_LONG).show();
+        Toast.makeText(PatrollingLocActivity.this, "Distance: " + results[0], Toast.LENGTH_LONG).show();
         return results[0];
     }
 
