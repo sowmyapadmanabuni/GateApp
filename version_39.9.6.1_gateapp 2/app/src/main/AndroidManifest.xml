@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- SYSTEM & STORAGE -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
@@ -404,6 +405,17 @@
                 android:name=".BackgroundSyncReceiver"
                 android:enabled="true"
                 android:exported="true" />
+
+        <receiver
+                android:name=".broadcastreceiver.GeofenceBroadcastReceiver"
+                android:enabled="true"
+                android:exported="true" />
+
+        <service
+                android:name=".broadcastreceiver.GeofenceTransitionsJobIntentService"
+                android:exported="true"
+                android:permission="android.permission.BIND_JOB_SERVICE" />
+
         <receiver
                 android:name=".broadcastreceiver.NetworkChangeReceiver"
                 android:label="NetworkChangeReceiver" >

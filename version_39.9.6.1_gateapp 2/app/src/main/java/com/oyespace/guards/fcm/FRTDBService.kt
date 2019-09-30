@@ -125,6 +125,11 @@ class FRTDBService : Service() {
                                 }
                                 if (it.hasChild("userName") && it.hasChild("userName") != null) {
                                     userName = it.child("userName").getValue(String::class.java)!!
+                                    if(userName.equals("") || userName == null){
+                                        isValidSOS = false
+                                    }
+                                }else{
+                                    isValidSOS = false
                                 }
                                 if (it.hasChild("userMobile") && it.hasChild("userMobile") != null) {
                                     userMobile =

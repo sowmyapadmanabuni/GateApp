@@ -234,8 +234,6 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                     if (dataSnapshot.exists()) {
             if (isResolving) {
                 removeCurrentSOSRealm(false)
-                mSosReference!!.removeValue()
-                isResolving = false
                 checkNextSOS()
 
             } else {
@@ -526,6 +524,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                 onBackPressed()
             }
         }catch (e:java.lang.Exception){
+            isBackEnabled = true
+            onBackPressed()
             e.printStackTrace()
         }
     }
@@ -629,7 +629,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             sosId = 0
             val sosObj = realm.where<SOSModel>().findFirst()
             Log.e("getSOS", "" + sosObj);
-            if (sosObj != null) {
+            if (sosObj != null && sosObj.userName!=null && !sosObj.userName.equals("")) {
                 currentSOS = sosObj
                 sosId = currentSOS.id
                 val currentGate: String = Prefs.getString("GATE_NO", null)
@@ -658,8 +658,13 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                     isResolving = true
                 }
                 initFRTDB()
+            }else{
+                isBackEnabled = true
+                onBackPressed()
             }
         }catch (e:java.lang.Exception){
+            isBackEnabled = true
+            onBackPressed()
             e.printStackTrace()
         }
     }
@@ -677,7 +682,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
             updatePassedSOS()
             alert.dismiss()
             removeCurrentSOSRealm(true)
-            checkNextSOS()
+
             //isBackEnabled = true
             //onBackPressed()
         })
@@ -697,6 +702,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback, Google
                     }
 
                 }
+            }
+            if(isdismiss){
+                checkNextSOS()
             }
         } catch (e: java.lang.Exception) {
             Log.e("ERRRRR",""+e);

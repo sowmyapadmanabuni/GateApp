@@ -1,5 +1,6 @@
 package com.oyespace.guards.pertroling;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,6 +16,7 @@ import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -22,11 +24,19 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.BaseKotlinActivity;
+import com.oyespace.guards.broadcastreceiver.GeofenceBroadcastReceiver;
 import com.oyespace.guards.network.CommonDisposable;
 import com.oyespace.guards.network.RetrofitClinet;
 import com.oyespace.guards.pojo.CheckPointData;
@@ -37,6 +47,7 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -54,7 +65,7 @@ import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
 
-public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler {
+public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void> {
 
     public LocationService locationService;
     public Location mLocation, mPredictedLocation;
@@ -63,6 +74,27 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private BroadcastReceiver locationUpdateReceiver;
     private BroadcastReceiver predictedLocationReceiver;
     private ZXingScannerView mScannerView;
+
+
+
+
+    private enum PendingGeofenceTask {
+        ADD, REMOVE, NONE
+    }
+
+    private static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
+
+    static final String GEOFENCES_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
+    private GeofencingClient mGeofencingClient;
+    private ArrayList<Geofence> mGeofenceList=new ArrayList<>();
+    private PendingIntent mGeofencePendingIntent;
+    private PendingGeofenceTask mPendingGeofenceTask = PendingGeofenceTask.NONE;
+
+    private static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
+    static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
+            GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
+    static final float GEOFENCE_RADIUS_IN_METERS = 40;
+
     //TextView loc;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -95,8 +127,100 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         initScanner();
         initSpeech();
 
-
+        mGeofencePendingIntent = null;
+        mGeofencingClient = LocationServices.getGeofencingClient(this);
+        populateGeofenceList();
+        addGeofences();
     }
+
+
+
+    private void populateGeofenceList(){
+        mGeofenceList.add(new Geofence.Builder()
+                // Set the request ID of the geofence. This is a string to identify this
+                // geofence.
+                .setRequestId("0")
+
+                // Set the circular region of this geofence.
+                .setCircularRegion(
+                        9.6146591,
+                        76.3209412,
+                        GEOFENCE_RADIUS_IN_METERS
+                )
+
+                // Set the expiration duration of the geofence. This geofence gets automatically
+                // removed after this period of time.
+                .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+
+                // Set the transition types of interest. Alerts are only generated for these
+                // transition. We track entry and exit transitions in this sample.
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+                        Geofence.GEOFENCE_TRANSITION_EXIT)
+
+                // Create the geofence.
+                .build());
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void addGeofences() {
+
+        mGeofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+                .addOnCompleteListener(this);
+    }
+
+    @SuppressWarnings("MissingPermission")
+    private void removeGeofences() {
+
+        mGeofencingClient.removeGeofences(getGeofencePendingIntent()).addOnCompleteListener(this);
+    }
+
+    private GeofencingRequest getGeofencingRequest(){
+        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL);
+        builder.addGeofences(mGeofenceList);
+        return builder.build();
+    }
+
+    private PendingIntent getGeofencePendingIntent() {
+        // Reuse the PendingIntent if we already have it.
+        if (mGeofencePendingIntent != null) {
+            return mGeofencePendingIntent;
+        }
+        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when calling
+        // addGeofences() and removeGeofences().
+        mGeofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return mGeofencePendingIntent;
+    }
+
+    @Override
+    public void onComplete(@NonNull Task<Void> task) {
+        mPendingGeofenceTask = PendingGeofenceTask.NONE;
+        if (task.isSuccessful()) {
+            updateGeofencesAdded(!getGeofencesAdded());
+            //setButtonsEnabledState();
+
+            String messageId = getGeofencesAdded() ? "geofences_added" :
+                    "geofences_removed";
+            Toast.makeText(this, (messageId), Toast.LENGTH_SHORT).show();
+        } else {
+            // Get the status code for the error and log it using a user-friendly message.
+           // String errorMessage = GeofenceErrorMessages.getErrorString(this, task.getException());
+            Log.w("GEOFENCING", ""+task.getException());
+        }
+    }
+
+    private void updateGeofencesAdded(boolean added) {
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .edit()
+                .putBoolean(GEOFENCES_ADDED_KEY, added)
+                .apply();
+    }
+    private boolean getGeofencesAdded() {
+        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+                GEOFENCES_ADDED_KEY, false);
+    }
+
 
     private void startLocationListener() {
         final Intent serviceStart = new Intent(this.getApplication(), LocationService.class);
@@ -482,7 +606,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             ex.printStackTrace();
         }
 
-
+        removeGeofences();
         super.onDestroy();
     }
 
