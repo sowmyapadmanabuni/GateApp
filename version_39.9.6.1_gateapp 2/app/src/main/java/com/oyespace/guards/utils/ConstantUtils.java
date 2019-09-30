@@ -24,7 +24,6 @@ public class ConstantUtils {
     public static final String TYPE = "Type";
 
 
-
     public static final String PERSON_PHOTO = "person_photo";
     public static final String ITEMS_PHOTO_LIST = "items_photo_list";
 
