@@ -119,8 +119,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
             listVistor.get(position).vlExitT = DateTimeUtils.getCurrentTimeLocal();
 
             makeExitCall(orderData.vlVisLgID);
-            //  listVistor.removeAt(position)
-//            listVistor.remove(listVistor.get(position))
+
             notifyDataSetChanged()
 
         }
@@ -135,9 +134,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
             //  number = orderData.vlMobile
         } catch (e: StringIndexOutOfBoundsException) {
         }
-        // Log.v("Image URL",IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+orderData?.vlVisLgID+".jpg")
 
-//        ImageHelper.loadImage(mcontext, IMAGE_BASE_URL+"Images/PERSONAssociation"+ASSOCIATIONID+"NONREGULAR"+orderData?.vlVisLgID+".jpg", holder.iv_user)
         if (orderData?.vlVisType.equals("STAFF", true)) {
 
             if (orderData?.vlEntryImg.equals("")) {
@@ -157,18 +154,13 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
 
         } else {
 
-            if (orderData?.vlEntryImg.equals("")) {
-                Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
-                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                    .into(holder.iv_user)
-            } else {
+
                 Picasso.with(mcontext)
                     .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
                     .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                     .into(holder.iv_user)
 
-            }
+
 
         }
         holder.iv_user.setOnClickListener {
@@ -187,9 +179,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
 
-            //  if (orderData.vlVisType.equals("STAFF", true)) {
 
-            // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
             if (orderData.vlVisType.equals("STAFF", true)) {
@@ -211,41 +201,20 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
 
             } else {
 
-                if (orderData?.vlEntryImg.equals("")) {
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
-                } else {
+
                     Picasso.with(mcontext)
                         .load(IMAGE_BASE_URL + "Images/" + orderData?.vlEntryImg)
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                         .into(dialog_imageview)
 
-                }
+
 
 
             }
 
             alertadd.setView(view)
             alertadd.show()
-//            if (orderData.vlVisType.equals("STAFF", true)) {
-//                val intent1 = Intent(mcontext, ImgView::class.java)
-//                intent1.putExtra(
-//                    "URL_IMAGE",
-//                    IMAGE_BASE_URL + "Images/PERSONAssociation" + Prefs.getInt(ASSOCIATION_ID,0) + "STAFF" + orderData?.reRgVisID+ ".jpg"
-//                )
-//                mcontext.startActivity(intent1)
-//
-//            } else {
-//                val intent2 = Intent(mcontext, ImgView::class.java)
-//                intent2.putExtra(
-//                    "URL_IMAGE",
-//                    IMAGE_BASE_URL + "Images/PERSONAssociation" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + number + ".jpg"
-//                )
-//                mcontext.startActivity(intent2)
-//
-//            }
+
         }
 
         holder.iv_call.setOnClickListener {
@@ -402,7 +371,8 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
                     for (row in listVistor) {
                         // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
                         if (row.vlfName!!.toLowerCase().contains(charString.toLowerCase()) || row.vlComName!!.toLowerCase().contains(
-                                charString.toLowerCase())||row.vlMobile!!.toLowerCase().contains(charString.toLowerCase())||row.vlpOfVis
+                                charString.toLowerCase()
+                            ) || row.vlMobile!!.toLowerCase().contains(charString.toLowerCase()) || row.vlpOfVis
                             !!.toLowerCase().contains(charString.toLowerCase())
                         ) {
                             filteredList.add(row)

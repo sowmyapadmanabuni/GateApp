@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -17,18 +18,15 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
-import androidx.databinding.DataBindingUtil;
 
 import com.oyespace.guards.Myapp;
 import com.oyespace.guards.R;
-import com.oyespace.guards.databinding.LayoutQrcodedailogBinding;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -243,28 +241,36 @@ public class Utils {
         toast.show();
     }
 
-    public static AlertDialog getAlertDialog(Context context, String text, int drawable, View.OnClickListener onClickListener) {
+    public static void showOkAlertDialog(Activity activity, String titletext, String posBtnTxt, String description) {
+        try {
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
 
-        LayoutQrcodedailogBinding b = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.layout_qrcodedailog, null, false);
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setView(b.getRoot());
-        b.tvMsg.setText(text);
-        if (drawable == -1) {
-            b.dialogImageview.setImageDrawable(context.getResources().getDrawable(R.drawable.valid_invi));
-        } else {
-            b.dialogImageview.setImageDrawable(context.getResources().getDrawable(drawable));
-        }
-        final AlertDialog alertDialog = builder.create();
-        b.btnOk.setOnClickListener(v -> {
-            alertDialog.dismiss();
-            if (onClickListener != null) {
-                onClickListener.onClick(v);
+            if (!TextUtils.isEmpty(titletext)) {
+                alertDialogBuilder.setTitle(titletext);
             }
-        });
 
-        return alertDialog;
+            if (!TextUtils.isEmpty(description)) {
+                alertDialogBuilder.setMessage(description);
+            }
 
+            if (!TextUtils.isEmpty(posBtnTxt)) {
+                alertDialogBuilder.setPositiveButton(posBtnTxt, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+
+                    }
+                });
+            }
+
+            final AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialogBuilder.setCancelable(false);
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -408,6 +414,10 @@ public class Utils {
 //            }
 //        }, URLData.URL_ADD_DEVICEID);
 //    }
+
+
+
+
 
 
 }

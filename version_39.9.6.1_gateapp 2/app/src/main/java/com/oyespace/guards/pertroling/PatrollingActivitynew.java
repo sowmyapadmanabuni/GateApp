@@ -67,12 +67,16 @@ import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 public class PatrollingActivitynew extends BaseScannerActivity implements ResponseHandler, ZXingScannerView.ResultHandler {
-    public ArrayList<String[]> pat = new ArrayList<>();
+        private ZXingScannerView mScannerView;
     private Button noQrcodeButton;
     private TextView dataTextView;
     public   String[] patrolingdataList;
+
+
+    public ArrayList<String[]> pat = new ArrayList<>();
     LocationManager mLocationManager;
     Location currentLocation;
+    GPSTracker gpsTracker;
     private final LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(final Location location) {
@@ -100,8 +104,6 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
 
         }
     };
-    GPSTracker gpsTracker;
-    private ZXingScannerView mScannerView;
 
     public static Double distanceBetween(LatLng point1, LatLng point2) {
         if (point1 == null || point2 == null) {
@@ -515,7 +517,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
     public void handleResult(Result rawResult) {
         final String patrolingdata = rawResult.getText();
         patrolingdataList = patrolingdata.split(",");
-        if (patrolingdataList.length > 4) {
+        if(patrolingdataList.length>4) {
             System.out.println("Patroling Data " + patrolingdataList[0] + " " + patrolingdataList[1] + " " + patrolingdataList[2] + " " + patrolingdataList[3]);
             float[] results = new float[2];
             Double lat = Double.parseDouble(patrolingdataList[1]);

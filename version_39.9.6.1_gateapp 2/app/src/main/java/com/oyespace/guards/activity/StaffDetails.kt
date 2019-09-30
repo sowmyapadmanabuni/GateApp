@@ -29,8 +29,8 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
                     button_done.setClickable(false)
                     Log.d("button_done ","StaffEntry "+ ConstantUtils.FLOW_TYPE +" "+ ConstantUtils.STAFF_REGISTRATION +" "+ ConstantUtils.FLOW_TYPE.equals(ConstantUtils.STAFF_REGISTRATION,true))
                     //finish();
-                    val i_staff = Intent(this@StaffDetails, StaffListActivity::class.java)
-                    startActivity(i_staff)
+//                    val i_staff = Intent(this@StaffDetails, StaffListActivity::class.java)
+//                    startActivity(i_staff)
                     finish()
                 }
 

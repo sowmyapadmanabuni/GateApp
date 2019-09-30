@@ -296,8 +296,8 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
                             .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent intent = new Intent(CaptureImageOcr.this, Dashboard.class);
-                                    startActivity(intent);
+//                                    Intent intent = new Intent(CaptureImageOcr.this, Dashboard.class);
+//                                    startActivity(intent);
                                     finish();
                                 }
                             })
@@ -378,7 +378,7 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
         runCloudTextRecognition(thumbnail);
-         imgNamee=System.currentTimeMillis() + ".jpg";
+        imgNamee = System.currentTimeMillis() + ".jpg";
 
         File destination = new File(Environment.getExternalStorageDirectory().getPath(),
                 imgNamee);
@@ -514,7 +514,7 @@ final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.l
         finish();
     }
 
-    public void deleteImage(){
+    public void deleteImage() {
         File dir = new File(Environment.getExternalStorageDirectory().getPath());
         File file = new File(dir, imgNamee);
         file.delete();

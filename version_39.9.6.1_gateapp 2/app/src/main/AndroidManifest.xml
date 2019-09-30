@@ -1,39 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="com.oyespace.guards">
+        package="com.oyespace.guards"
+        >
 
-    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <!-- NETWORK & WIFI -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- Dangerous Permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+
+    <!-- LOCATION -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+
+    <!-- CALL & PHONE -->
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- SYSTEM & STORAGE -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.ANSWER_PHONE_CALLS" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <permission android:name="android.permission.CLEAR_APP_CACHE" />
 
+    <!-- CAMERA & RECORDING -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
-    <uses-permission android:name="android.permission.INTERNAL_SYSTEM_WINDOW" />
-    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" /> <!-- <uses-permission android:name="android.permission.CAPTURE_AUDIO_OUTPUT"/> -->
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
 
-    <permission android:name="android.permission.CLEAR_APP_CACHE" />
-
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CLEAR_APP_CACHE" />
 
     <application
             android:name=".Myapp"
-            android:allowBackup="true"
+            android:allowBackup="false"
             android:icon="@drawable/oyespace_launcher"
             android:label="@string/app_name"
             android:networkSecurityConfig="@xml/network"
@@ -42,36 +52,45 @@
             android:hardwareAccelerated="true"
             android:theme="@style/AppTheme"
             android:usesCleartextTraffic="true"
+            tools:replace="android:allowBackup"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".resident.ResidentMissedCallActivity"></activity>
         <activity
-                android:name=".resident.ResidentIdActivity"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualStaffEntryRegistration"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualAddCarFragment"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualNameEntryScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualMobileNumberScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManulBlockSelectionActivity"
+                android:name=".residentidcard.ResidentIdActivity"
+                android:theme="@style/noActionBar"></activity>
+
+
+
+        <activity android:name=".staffManaualEntry.ManualStaffEntryRegistration"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".staffManaualEntry.ManualUnitSelectionActivity"
+                />
+
+        <activity android:name=".staffManaualEntry.ManualAddCarFragment"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
+                android:theme="@style/noActionBar"
+                />
+
+        <activity android:name=".staffManaualEntry.ManualNameEntryScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                />
+
+        <activity android:name=".staffManaualEntry.ManualMobileNumberScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                />
+
+        <activity android:name=".staffManaualEntry.ManulBlockSelectionActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                android:windowSoftInputMode="adjustPan"/>
+
+        <activity android:name=".staffManaualEntry.ManualUnitSelectionActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+              />
+
+
         <activity android:name=".activity.NewBiometric" />
         <activity
                 android:name=".activity.EditStaffActivity"
@@ -97,12 +116,12 @@
                 android:name="org.apache.http.legacy"
                 android:required="false" />
 
-        <!--        <meta-data-->
-        <!--                android:name="com.google.android.geo.API_KEY"-->
-        <!--                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />-->
+<!--        <meta-data-->
+<!--                android:name="com.google.android.geo.API_KEY"-->
+<!--                android:value="AIzaSyDKTVz6Ks7o0gdSZA75xXOJxUWjVFEKV68" />-->
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="@string/google_maps_key" />
+                android:value="@string/google_maps_key"/>
 
         <activity
                 android:name=".DashboardActivity"
@@ -224,10 +243,10 @@
         <activity
                 android:name=".Dashboard"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan" />
+                android:windowSoftInputMode="adjustPan"
+                android:theme="@style/noActionBar" />
         <activity
-                android:name=".com.oyespace.guards.activity.SosGateAppActivity"
+                android:name=".activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
 
@@ -235,6 +254,10 @@
                 android:name=".activity.GalleryViewActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".residentidcard.ResidentIdCardMobileNumberActivity"
+                android:theme="@style/noActionBar"></activity>
 
         <activity
                 android:name=".pertroling.PatrollingLocActivity"
@@ -246,17 +269,23 @@
                 android:value="@integer/google_play_services_version" />
         <meta-data
                 android:name="com.google.android.ocr.API_KEY"
-                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w" /> <!-- <activity -->
+                android:value="AIzaSyBnhrFUuGO3_Pr3TzZAXG-_C5fBpZhxj9w" />
+        <!-- <activity -->
         <!-- android:name=".activity.PatrollingActivity" -->
         <!-- android:screenOrientation="portrait" -->
         <!-- android:theme="@style/noActionBar"> -->
         <!-- </activity> -->
         <service
                 android:name=".com.oyespace.guards.fcm.FRTDBService"
-                android:enabled="true" />
+                android:enabled="true"/>
 
         <service
                 android:name=".SGPatrollingService"
+                android:enabled="true"
+                android:exported="true" />
+
+        <service
+                android:name=".services.SOSSirenService"
                 android:enabled="true"
                 android:exported="true" />
         <service
@@ -376,6 +405,25 @@
                 android:name=".BackgroundSyncReceiver"
                 android:enabled="true"
                 android:exported="true" />
+
+        <receiver
+                android:name=".broadcastreceiver.GeofenceBroadcastReceiver"
+                android:enabled="true"
+                android:exported="true" />
+
+        <service
+                android:name=".broadcastreceiver.GeofenceTransitionsJobIntentService"
+                android:exported="true"
+                android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <receiver
+                android:name=".broadcastreceiver.NetworkChangeReceiver"
+                android:label="NetworkChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
 
         <service
                 android:name=".fcm.FCMMessagingService"

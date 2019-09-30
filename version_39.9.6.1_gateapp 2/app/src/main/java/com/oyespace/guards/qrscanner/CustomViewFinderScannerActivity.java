@@ -151,14 +151,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         });
                             builder.setCancelable(false);
                             builder.show();
-                    }
-                    else if((guestdataList[12].equalsIgnoreCase( "false"))){
+                    } else if ((guestdataList[12].equalsIgnoreCase("false"))) {
 
-                        getInviation(Integer.parseInt(guestdataList[3]),guestdataList[0],guestdataList[1],guestdataList[2],guestdataList[4],guestdataList[5],guestdataList[6],guestdataList[7],guestdataList[8],guestdataList[9],guestdataList[10],guestdataList[11]);
-                    }
-
-                    else {
-                      //  Toast.makeText(CustomViewFinderScannerActivity.this, "Valid Invitation", Toast.LENGTH_LONG).show();
+                        getInviation(Integer.parseInt(guestdataList[3]), guestdataList[0], guestdataList[1], guestdataList[2], guestdataList[4], guestdataList[5], guestdataList[6], guestdataList[7], guestdataList[8], guestdataList[9], guestdataList[10], guestdataList[11]);
+                    } else {
+                        //  Toast.makeText(CustomViewFinderScannerActivity.this, "Valid Invitation", Toast.LENGTH_LONG).show();
 
                         ViewGroup viewGroup = findViewById(android.R.id.content);
 
@@ -168,11 +165,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                        TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                         tv_msg.setText("Valid Invitation");
-                        Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
+                        Drawable drawable = getResources().getDrawable(R.drawable.valid_invi);
                         dialog_imageview.setImageDrawable(drawable);
-                        Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                         btn_ok.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -207,7 +204,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         alertDialog.show();
                     }
                 }else{
-                  //  Toast.makeText(CustomViewFinderScannerActivity.this,"Not Invited for this Association/Society",Toast.LENGTH_LONG).show();
+                    //  Toast.makeText(CustomViewFinderScannerActivity.this,"Not Invited for this Association/Society",Toast.LENGTH_LONG).show();
 
                     ViewGroup viewGroup = findViewById(android.R.id.content);
 
@@ -217,11 +214,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                     androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                     ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                    Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                    Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
                     dialog_imageview.setImageDrawable(drawable);
-                    TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                    TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                     tv_msg.setText("Invalid invitation for this location");
-                    Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                    Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                     btn_ok.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -250,11 +247,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
                 dialog_imageview.setImageDrawable(drawable);
-                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                 tv_msg.setText("Invalid QR Code");
-                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                 btn_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -271,7 +268,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                 alertDialog = builder.create();
 
                 alertDialog.show();
-              //  Toast.makeText(CustomViewFinderScannerActivity.this,"Invalid QR Code",Toast.LENGTH_LONG).show();
+                //  Toast.makeText(CustomViewFinderScannerActivity.this,"Invalid QR Code",Toast.LENGTH_LONG).show();
             }
         }else{
 
@@ -283,11 +280,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
             ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-            Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+            Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
             dialog_imageview.setImageDrawable(drawable);
-            TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+            TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
             tv_msg.setText("Invalid QR Code Data");
-            Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+            Button btn_ok = dialogView.findViewById(R.id.btn_ok);
             btn_ok.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -304,7 +301,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
             alertDialog = builder.create();
 
             alertDialog.show();
-         //   Toast.makeText(CustomViewFinderScannerActivity.this,"Invalid QR Code Data",Toast.LENGTH_LONG).show();
+            //   Toast.makeText(CustomViewFinderScannerActivity.this,"Invalid QR Code Data",Toast.LENGTH_LONG).show();
         }
         Log.e("SCANNER",rawResult.getText());
 
@@ -378,8 +375,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
 
     }
 
-    void getInviation(final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId){
-
+    void getInviation(final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
 
 
         Call<InvitationRequestResponse> call = champApiInterface.getInvitationResponse(invitationId);
@@ -390,11 +386,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                 // Toast.makeText(GuestCustomViewFinderScannerActivity.this, "shalini", Toast.LENGTH_LONG).show();
                 // if (response.body().getSuccess() == true) {
 
-                if(response.body().getData()!=null) {
-                    Boolean val=response.body().getData().getInvitation().getInIsUsed();
+                if (response.body().getData() != null) {
+                    Boolean val = response.body().getData().getInvitation().getInIsUsed();
 
 
-                    if(response.body().getData().getInvitation().getInIsUsed()==false) {
+                    if (response.body().getData().getInvitation().getInIsUsed() == false) {
 
                         ViewGroup viewGroup = findViewById(android.R.id.content);
 
@@ -404,11 +400,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                        TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                         tv_msg.setText("Valid Invitation");
-                        Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
+                        Drawable drawable = getResources().getDrawable(R.drawable.valid_invi);
                         dialog_imageview.setImageDrawable(drawable);
-                        Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                         btn_ok.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -418,7 +414,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                                 intent.putExtra(VISITOR_TYPE, GUEST);
                                 intent.putExtra(COMPANY_NAME, GUEST);
                                 intent.putExtra(PERSONNAME, personname);
-                                intent.putExtra(COUNTRYCODE,countryCode);
+                                intent.putExtra(COUNTRYCODE, countryCode);
                                 intent.putExtra(MOBILENUMBER, mobileNumber);
                                 intent.putExtra(INVITATIONID, invitationId);
                                 intent.putExtra(UNITID, unitID);
@@ -441,8 +437,8 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         alertDialog = builder.create();
 
                         alertDialog.show();
-                      //  invitationUpdate(invitationId, "True",personname,countryCode,mobileNumber,unitID,unitName,fromDate,fromTime,vehicleNumber,numberofPersons,toDate,associationId);
-                    }else {
+                        //  invitationUpdate(invitationId, "True",personname,countryCode,mobileNumber,unitID,unitName,fromDate,fromTime,vehicleNumber,numberofPersons,toDate,associationId);
+                    } else {
                         ViewGroup viewGroup = findViewById(android.R.id.content);
 
                         View dialogView = LayoutInflater.from(CustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
@@ -451,11 +447,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                        Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                        Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
                         dialog_imageview.setImageDrawable(drawable);
-                        TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                         tv_msg.setText("Invalid QR Code");
-                        Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                         btn_ok.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -490,12 +486,12 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
 
     }
 
-    void invitationUpdate(final int inviteID , String value, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
+    void invitationUpdate(final int inviteID, String value, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
 
         InvitationUpdateReq invitationUpdateReq = new InvitationUpdateReq();
 
         invitationUpdateReq.iNInvtID = inviteID;
-        invitationUpdateReq.iNIsUsed=value;
+        invitationUpdateReq.iNIsUsed = value;
 
         Call<InvitationRequestResponse> call = champApiInterface.updateInvitation(invitationUpdateReq);
         call.enqueue(new Callback<InvitationRequestResponse>() {
@@ -511,11 +507,11 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(CustomViewFinderScannerActivity.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                 tv_msg.setText("Valid Invitation");
-                Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
+                Drawable drawable = getResources().getDrawable(R.drawable.valid_invi);
                 dialog_imageview.setImageDrawable(drawable);
-                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                 btn_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -525,7 +521,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                         intent.putExtra(VISITOR_TYPE, GUEST);
                         intent.putExtra(COMPANY_NAME, GUEST);
                         intent.putExtra(PERSONNAME, personname);
-                        intent.putExtra(COUNTRYCODE,countryCode);
+                        intent.putExtra(COUNTRYCODE, countryCode);
                         intent.putExtra(MOBILENUMBER, mobileNumber);
                         intent.putExtra(INVITATIONID, inviteID);
                         intent.putExtra(UNITID, unitID);
@@ -553,7 +549,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
 
             @Override
             public void onFailure(Call<InvitationRequestResponse> call, Throwable t) {
-                Toast.makeText(CustomViewFinderScannerActivity.this,t.toString(),Toast.LENGTH_LONG).show();
+                Toast.makeText(CustomViewFinderScannerActivity.this, t.toString(), Toast.LENGTH_LONG).show();
                 call.cancel();
             }
         });

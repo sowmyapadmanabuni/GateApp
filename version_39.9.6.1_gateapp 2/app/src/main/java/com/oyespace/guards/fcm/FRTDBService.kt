@@ -5,9 +5,10 @@ import android.content.Intent
 import android.os.IBinder
 import android.util.Log
 import com.google.firebase.database.*
-import com.oyespace.guards.com.oyespace.guards.activity.SosGateAppActivity
+import com.oyespace.guards.activity.SosGateAppActivity
 import com.oyespace.guards.com.oyespace.guards.pojo.PassesSOSGuards
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.GetGuardsListResponse
 import com.oyespace.guards.models.GuardsList
 import com.oyespace.guards.network.CommonDisposable
@@ -80,156 +81,200 @@ class FRTDBService : Service() {
 
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 Log.e("SOS_LISTEN", "" + dataSnapshot)
-                if (dataSnapshot.exists()) {
+                try {
+                    if (dataSnapshot.exists()) {
 
-                    var realm: Realm = Realm.getDefaultInstance()
-                    if (!realm.isInTransaction) {
-                        realm.beginTransaction()
-                    }
-                    realm.delete(SOSModel::class.java)
-                    realm.delete(PassesSOSGuards::class.java)
-                    realm.commitTransaction()
+                        var realm: Realm = Realm.getDefaultInstance()
+                        if (!realm.isInTransaction) {
+                            realm.beginTransaction()
+                        }
+                        realm.delete(SOSModel::class.java)
+                        realm.delete(PassesSOSGuards::class.java)
+                        realm.commitTransaction()
 
-                    var isGuardPassed: Boolean = false
+                        var isGuardPassed: Boolean = false
 
-                    try {
-                        dataSnapshot.children.forEach {
+                        try {
+                            dataSnapshot.children.forEach {
 
-                            isGuardPassed = false
+                                isGuardPassed = false
 
-                            val user_id = it.key;
-                            //val sos = it.getValue()
-                            val isActive = it.child("isActive").getValue(Boolean::class.java)
-                            var unitName = ""
-                            var unitId: Int = 0
-                            var userName: String = ""
-                            var userMobile: String = ""
-                            var sosImage: String = ""
-                            var latitude: String = ""
-                            var longitude: String = ""
-                            var id: Int = 0
-                            var userId: Int = 0
-                            var passedBy: HashMap<String, String> = HashMap()
-                            var passedGuards: RealmList<PassesSOSGuards> = RealmList()
-                            var attendedBy: String = ""
+                                val user_id = it.key;
+                                //val sos = it.getValue()
+                                val isActive = it.child("isActive").getValue(Boolean::class.java)
+                                var unitName = ""
+                                var unitId: Int = 0
+                                var userName: String = ""
+                                var userMobile: String = ""
+                                var sosImage: String = ""
+                                var latitude: String = ""
+                                var longitude: String = ""
+                                var id: Int = 0
+                                var userId: Int = 0
+                                var passedBy: HashMap<String, String> = HashMap()
+                                var passedGuards: RealmList<PassesSOSGuards> = RealmList()
+                                var attendedBy: String = ""
+                                var attendedByMob: String = ""
+                                var isValidSOS: Boolean = true;
 
-                            if (it.hasChild("unitName") && it.hasChild("unitName") != null) {
-                                unitName = it.child("unitName").getValue(String::class.java)!!
-                            }
-                            if (it.hasChild("unitId") && it.hasChild("unitId") != null) {
-                                unitId = it.child("unitId").getValue(Int::class.java)!!
-                            }
-                            if (it.hasChild("userName") && it.hasChild("userName") != null) {
-                                userName = it.child("userName").getValue(String::class.java)!!
-                            }
-                            if (it.hasChild("userMobile") && it.hasChild("userMobile") != null) {
-                                userMobile = it.child("userMobile").getValue(String::class.java)!!
-                            }
+                                if (it.hasChild("unitName") && it.hasChild("unitName") != null) {
+                                    unitName = it.child("unitName").getValue(String::class.java)!!
+                                }
+                                if (it.hasChild("unitId") && it.hasChild("unitId") != null) {
+                                    unitId = it.child("unitId").getValue(Int::class.java)!!
+                                }
+                                if (it.hasChild("userName") && it.hasChild("userName") != null) {
+                                    userName = it.child("userName").getValue(String::class.java)!!
+                                    if(userName.equals("") || userName == null){
+                                        isValidSOS = false
+                                    }
+                                }else{
+                                    isValidSOS = false
+                                }
+                                if (it.hasChild("userMobile") && it.hasChild("userMobile") != null) {
+                                    userMobile =
+                                        it.child("userMobile").getValue(String::class.java)!!
+                                }
 
-                            Log.e("LATITUDE", "" + it.child("latitude").getValue())
+                                Log.e("LATITUDE", "" + it.child("latitude").getValue())
 
-                            if (it.hasChild("latitude")) {
-                                latitude = it.child("latitude").getValue().toString()
-                            }
-                            if (it.hasChild("longitude")) {
-                                longitude = it.child("longitude").getValue().toString()
-                            }
-                            if (it.hasChild("sosImage")) {
-                                sosImage = it.child("sosImage").getValue(String::class.java)!!
-                            }
-                            if (it.hasChild("userId")) {
-                                userId = it.child("userId").getValue(Int::class.java)!!
-                            }
+                                if (it.hasChild("latitude")) {
+                                    latitude = it.child("latitude").getValue().toString()
+                                }
+                                if (it.hasChild("longitude")) {
+                                    longitude = it.child("longitude").getValue().toString()
+                                }
+                                if (it.hasChild("sosImage")) {
+                                    sosImage = it.child("sosImage").getValue(String::class.java)!!
+                                }
+                                if (it.hasChild("userId")) {
+                                    userId = it.child("userId").getValue(Int::class.java)!!
+                                } else {
+                                    isValidSOS = false
+                                }
 
-                            if (it.hasChild("attendedBy")) {
-                                attendedBy = it.child("attendedBy").getValue(String::class.java)!!
-                            }
+                                if (it.hasChild("id")) {
+                                    id = it.child("id").getValue(Int::class.java)!!
+                                }
+
+                                if (it.hasChild("attendedBy")) {
+                                    attendedBy =
+                                        it.child("attendedBy").getValue(String::class.java)!!
+                                }
+
+                                if (it.hasChild("attendedByMobile")) {
+                                    attendedByMob =
+                                        it.child("attendedByMobile").getValue(String::class.java)!!
+                                }
 
 
-                            val currentGate = Prefs.getString(ConstantUtils.GATE_NO, "");
+                                val currentGate = Prefs.getString(PrefKeys.MOBILE_NUMBER, "");
+                                Log.e("CURRENT_GATE_M",""+currentGate)
 
-                            if (isActive != null && isActive && userId != 0) {
+                                if (isActive != null && isActive && userId != 0 && isValidSOS) {
 
-                                if (it.hasChild("passedby")) {
-                                    val type =
-                                        object : GenericTypeIndicator<HashMap<String, String>?>() {}
-                                    passedBy = HashMap()
-                                    passedBy = it.child("passedby").getValue(type)!!
+                                    if (it.hasChild("passedby")) {
+                                        val type =
+                                            object :
+                                                GenericTypeIndicator<HashMap<String, String>?>() {}
+                                        passedBy = HashMap()
+                                        passedBy = it.child("passedby").getValue(type)!!
 
 
-                                    var gates = passedBy.keys;
-                                    for (gate in gates) {
-                                        realm.executeTransaction {
-                                            val passedGuard =
-                                                it.createObject(PassesSOSGuards::class.java)
+                                        var gates = passedBy.keys;
+                                        for (gate in gates) {
+                                            realm.executeTransaction {
+                                                val passedGuard =
+                                                    it.createObject(PassesSOSGuards::class.java)
 
-                                            // var passedGuard:PassesSOSGuards = PassesSOSGuards()
-                                            passedGuard.gateName = gate
-                                            passedGuard.passedTime = passedBy[gate]!!
-                                            passedGuards.add(passedGuard)
+                                                // var passedGuard:PassesSOSGuards = PassesSOSGuards()
+                                                passedGuard.gateName = gate
+                                                passedGuard.passedTime = passedBy[gate]!!
+                                                passedGuards.add(passedGuard)
 
-                                            if (currentGate.equals(gate)) {
-                                                isGuardPassed = true
+                                                if (currentGate.equals(gate)) {
+                                                    isGuardPassed = true
+                                                }
+                                            }
+                                        }
+
+                                        Log.e("passedby", "" + passedBy);
+                                    }
+
+                                    Log.e(
+                                        "ISACTIVE_",
+                                        "" + isGuardPassed + " " + attendedBy + " " + currentGate + " - " + attendedBy.equals(
+                                            currentGate,
+                                            true
+                                        ) + " " + attendedBy.trim().length + " " + currentGate.trim().length
+                                    );
+                                    if (!isGuardPassed) {
+                                        Log.e("INSIDE", "GUARDPASSED")
+                                        Log.e("INSIDE", "GUARDPASSED")
+                                        if (attendedByMob.equals("") || attendedByMob.trim().equals(
+                                                currentGate.trim()
+                                            )
+                                        ) {
+                                            Log.e("INSIDE", "attendedBy")
+                                            realm.executeTransaction {
+
+                                                var sosObj = it.where(SOSModel::class.java)
+                                                    .equalTo("userId", userId).findFirst()
+                                                Log.e("SOS_CHECK", "" + sosObj)
+                                                if (sosObj == null || !sosObj.isValid) {
+                                                    Log.e("SOS_ISVALI", "INVALID..Creating")
+                                                    sosObj =
+                                                        it.createObject(
+                                                            SOSModel::class.java,
+                                                            userId
+                                                        )
+                                                }
+
+                                                sosObj?.isActive = isActive
+                                                sosObj?.unitName = unitName
+                                                sosObj?.unitId = unitId
+                                                sosObj?.userName = userName
+                                                sosObj?.userMobile = userMobile
+                                                sosObj?.latitude = latitude
+                                                sosObj?.longitude = longitude
+                                                sosObj?.sosImage = sosImage
+                                                sosObj?.passedBY = passedGuards
+                                                sosObj?.attendedBy = attendedBy
+                                                sosObj?.id = id
                                             }
                                         }
                                     }
 
-                                    Log.e("passedby", "" + passedBy);
+
                                 }
 
-                                Log.e(
-                                    "ISACTIVE_",
-                                    "" + isGuardPassed + " " + attendedBy + " " + currentGate + " - " + attendedBy.equals(
-                                        currentGate,
-                                        true
-                                    ) + " " + attendedBy.trim().length + " " + currentGate.trim().length
-                                );
-                                if (!isGuardPassed) {
-                                    Log.e("INSIDE", "GUARDPASSED")
-                                    if (attendedBy == "" || attendedBy.trim().equals(currentGate.trim())) {
-                                        Log.e("INSIDE", "attendedBy")
-                                        realm.executeTransaction {
-
-                                            val sosObj =
-                                                it.createObject(SOSModel::class.java, userId)
-                                            sosObj.isActive = isActive
-                                            sosObj.unitName = unitName
-                                            sosObj.unitId = unitId
-                                            sosObj.userName = userName
-                                            sosObj.userMobile = userMobile
-                                            sosObj.latitude = latitude
-                                            sosObj.longitude = longitude
-                                            sosObj.sosImage = sosImage
-                                            sosObj.passedBY = passedGuards
-                                            sosObj.attendedBy = attendedBy
-                                        }
-                                    }
-                                }
-
-
+                                Log.e("CHILD", "" + isActive);
                             }
 
-                            Log.e("CHILD", "" + isActive);
+                            val totalSOS = realm.where<SOSModel>().count()
+                            Log.e("totalSOS", "" + totalSOS);
+                            val isSOSActive = Prefs.getBoolean("ACTIVE_SOS", false);
+
+                            Log.e("ANY_SOS?", "" + isSOSActive)
+
+
+
+                            if (totalSOS > 0 && !isSOSActive) {
+                                Log.e("STARTING", "SOS>STSRTSTS");
+                                val i_vehicle =
+                                    Intent(applicationContext, SosGateAppActivity::class.java)
+                                i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(i_vehicle)
+                            } else {
+                                Log.e("CLOSING", "SOS");
+                            }
+                        } catch (e: Exception) {
+                            Log.e("ERROR", "" + e)
+                            e.printStackTrace()
                         }
-
-                        val totalSOS = realm.where<SOSModel>().count()
-                        Log.e("totalSOS", "" + totalSOS);
-                        val isSOSActive = Prefs.getBoolean("ACTIVE_SOS", false);
-
-                        Log.e("ANY_SOS?", "" + isSOSActive)
-
-
-
-                        if (totalSOS > 0 && !isSOSActive) {
-                            Log.e("STARTING", "SOS>STSRTSTS");
-                            val i_vehicle =
-                                Intent(applicationContext, SosGateAppActivity::class.java)
-                            i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i_vehicle)
-                        }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
                     }
+                }catch (e:java.lang.Exception){
+                    e.printStackTrace()
                 }
             }
 

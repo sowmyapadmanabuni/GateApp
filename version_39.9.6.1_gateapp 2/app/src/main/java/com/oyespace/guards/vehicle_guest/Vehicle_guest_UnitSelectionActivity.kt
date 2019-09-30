@@ -33,7 +33,7 @@ import kotlinx.android.synthetic.main.title_bar.*
 class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter: PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter? = null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -331,8 +331,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
-        }
-        else{
+        } else {
             selectedUnits.add(checked);
         }
         //orderListAdapter!!.notifyDataSetChanged();

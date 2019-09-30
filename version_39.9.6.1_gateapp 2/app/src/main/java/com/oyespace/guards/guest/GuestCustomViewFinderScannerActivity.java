@@ -119,11 +119,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
     public void handleResult(Result rawResult) {
 //        Toast.makeText(this, "Contents = " + rawResult.getText() +
 //                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
-        Log.d("Contents resident",rawResult.getText());
+        Log.d("Contents resident", rawResult.getText());
 
         String guestdata = rawResult.getText();
         if(guestdata.contains(",")) {
-             final String[] guestdataList = guestdata.split(",");
+            final String[] guestdataList = guestdata.split(",");
           //  System.out.println("Guest Data " + guestdataList[0] + " " + " " + guestdataList[1] + " " + guestdataList[2] + " " + guestdataList[3] + " " + guestdataList[5]);
 
             dataTextView.setText(rawResult.getText());
@@ -139,7 +139,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         AlertDialog.Builder builder =new  AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
-                       // builder.setTitle("Entry already done");
+                        // builder.setTitle("Entry already done");
                         builder.setMessage("This number is being used by a person already in");
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
@@ -149,13 +149,10 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                         });
                         builder.setCancelable(false);
                         builder.show();
-                    }
+                    } else if ((guestdataList[12].equalsIgnoreCase("false"))) {
 
-                    else if((guestdataList[12].equalsIgnoreCase( "false"))){
-
-                        getInviation(Integer.parseInt(guestdataList[3]),guestdataList[0],guestdataList[1],guestdataList[2],guestdataList[4],guestdataList[5],guestdataList[6],guestdataList[7],guestdataList[8],guestdataList[9],guestdataList[10],guestdataList[11]);
-                    }
-                    else {
+                        getInviation(Integer.parseInt(guestdataList[3]), guestdataList[0], guestdataList[1], guestdataList[2], guestdataList[4], guestdataList[5], guestdataList[6], guestdataList[7], guestdataList[8], guestdataList[9], guestdataList[10], guestdataList[11]);
+                    } else {
                         //Toast.makeText(GuestCustomViewFinderScannerActivity.this, "Valid Invitation", Toast.LENGTH_LONG).show();
 
                         ViewGroup viewGroup = findViewById(android.R.id.content);
@@ -166,11 +163,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                         androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
 
                         ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                        TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                         tv_msg.setText("Valid Invitation");
-                        Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
+                        Drawable drawable = getResources().getDrawable(R.drawable.valid_invi);
                         dialog_imageview.setImageDrawable(drawable);
-                        Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                         btn_ok.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -215,11 +212,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                     androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
 
                     ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                    Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                    Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
                     dialog_imageview.setImageDrawable(drawable);
-                    TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                    TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                     tv_msg.setText("Invalid invitation for this location");
-                    Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                    Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                     btn_ok.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -237,7 +234,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
                     alertDialog.show();
 
-                   // Toast.makeText(GuestCustomViewFinderScannerActivity.this,"Not Invited for this Association/Society",Toast.LENGTH_LONG).show();
+                    // Toast.makeText(GuestCustomViewFinderScannerActivity.this,"Not Invited for this Association/Society",Toast.LENGTH_LONG).show();
                 }
             }else{
 
@@ -249,11 +246,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+                Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
                 dialog_imageview.setImageDrawable(drawable);
-                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                 tv_msg.setText("Invalid QR Code");
-                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                 btn_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -283,11 +280,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
 
             ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-            Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
+            Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
             dialog_imageview.setImageDrawable(drawable);
-            TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+            TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
             tv_msg.setText("Invalid QR Code Data");
-            Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+            Button btn_ok = dialogView.findViewById(R.id.btn_ok);
             btn_ok.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -419,8 +416,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 //        alertDialog.show();
 //    }
 
-    void getInviation(final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId){
-
+    void getInviation(final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
 
 
         Call<InvitationRequestResponse> call = champApiInterface.getInvitationResponse(invitationId);
@@ -428,96 +424,96 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             @Override
             public void onResponse(Call<InvitationRequestResponse> call, Response<InvitationRequestResponse> response) {
 
-               // if (response.body().getSuccess() == true) {
+                // if (response.body().getSuccess() == true) {
 
-                    if(response.body().getData()!=null) {
-                        Boolean val=response.body().getData().getInvitation().getInIsUsed();
-
-
-                        if(response.body().getData().getInvitation().getInIsUsed()==false) {
+                if (response.body().getData() != null) {
+                    Boolean val = response.body().getData().getInvitation().getInIsUsed();
 
 
-                            ViewGroup viewGroup = findViewById(android.R.id.content);
-
-                            View dialogView = LayoutInflater.from(GuestCustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+                    if (response.body().getData().getInvitation().getInIsUsed() == false) {
 
 
-                            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
+                        ViewGroup viewGroup = findViewById(android.R.id.content);
 
-                            ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                            TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
-                            tv_msg.setText("Valid Invitation");
-                            Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
-                            dialog_imageview.setImageDrawable(drawable);
-                            Button btn_ok=dialogView.findViewById(R.id.btn_ok);
-                            btn_ok.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dismiss();
-                                    Intent intent = new Intent(GuestCustomViewFinderScannerActivity.this, VehicleGuestQRRegistration.class);
-                                    intent.putExtra(FLOW_TYPE, VEHICLE_GUESTWITHQRCODE);
-                                    intent.putExtra(VISITOR_TYPE, GUEST);
-                                    intent.putExtra(COMPANY_NAME, GUEST);
-                                    intent.putExtra(PERSONNAME, personname);
-                                    intent.putExtra(COUNTRYCODE,countryCode);
-                                    intent.putExtra(MOBILENUMBER, mobileNumber);
-                                    intent.putExtra(INVITATIONID, invitationId);
-                                    intent.putExtra(UNITID, unitID);
-                                    intent.putExtra(UNITNAME, unitName);
-                                    intent.putExtra(FROMDATE, fromDate);
-                                    intent.putExtra(FROMTIME, fromTime);
-                                    intent.putExtra(VEHICLENUMBER, vehicleNumber);
-                                    intent.putExtra(NUMBEROFPERSONS, numberofPersons);
-                                    intent.putExtra(TODATE, toDate);
-                                    intent.putExtra("Association Id", associationId);
-                                    startActivity(intent);
-                                    finish();
-
-                                }
-                            });
-
-                            builder.setView(dialogView);
-
-                            //finally creating the alert dialog and displaying it
-                            alertDialog = builder.create();
-
-                            alertDialog.show();
-                          //  invitationUpdate(invitationId, "True",personname,countryCode,mobileNumber,unitID,unitName,fromDate,fromTime,vehicleNumber,numberofPersons,toDate,associationId);
-                        }else {
-                            ViewGroup viewGroup = findViewById(android.R.id.content);
-
-                            View dialogView = LayoutInflater.from(GuestCustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+                        View dialogView = LayoutInflater.from(GuestCustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
 
-                            ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                            Drawable drawable  = getResources().getDrawable(R.drawable.invalid_invi);
-                            dialog_imageview.setImageDrawable(drawable);
-                            TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
-                            tv_msg.setText("Invalid QR Code");
-                            Button btn_ok=dialogView.findViewById(R.id.btn_ok);
-                            btn_ok.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    alertDialog.dismiss();
+                        ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
+                        tv_msg.setText("Valid Invitation");
+                        Drawable drawable = getResources().getDrawable(R.drawable.valid_invi);
+                        dialog_imageview.setImageDrawable(drawable);
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
+                        btn_ok.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+                                Intent intent = new Intent(GuestCustomViewFinderScannerActivity.this, VehicleGuestQRRegistration.class);
+                                intent.putExtra(FLOW_TYPE, VEHICLE_GUESTWITHQRCODE);
+                                intent.putExtra(VISITOR_TYPE, GUEST);
+                                intent.putExtra(COMPANY_NAME, GUEST);
+                                intent.putExtra(PERSONNAME, personname);
+                                intent.putExtra(COUNTRYCODE, countryCode);
+                                intent.putExtra(MOBILENUMBER, mobileNumber);
+                                intent.putExtra(INVITATIONID, invitationId);
+                                intent.putExtra(UNITID, unitID);
+                                intent.putExtra(UNITNAME, unitName);
+                                intent.putExtra(FROMDATE, fromDate);
+                                intent.putExtra(FROMTIME, fromTime);
+                                intent.putExtra(VEHICLENUMBER, vehicleNumber);
+                                intent.putExtra(NUMBEROFPERSONS, numberofPersons);
+                                intent.putExtra(TODATE, toDate);
+                                intent.putExtra("Association Id", associationId);
+                                startActivity(intent);
+                                finish();
 
-                                    finish();
+                            }
+                        });
 
-                                }
-                            });
+                        builder.setView(dialogView);
 
-                            builder.setView(dialogView);
+                        //finally creating the alert dialog and displaying it
+                        alertDialog = builder.create();
 
-                            //finally creating the alert dialog and displaying it
-                            alertDialog = builder.create();
+                        alertDialog.show();
+                        //  invitationUpdate(invitationId, "True",personname,countryCode,mobileNumber,unitID,unitName,fromDate,fromTime,vehicleNumber,numberofPersons,toDate,associationId);
+                    } else {
+                        ViewGroup viewGroup = findViewById(android.R.id.content);
 
-                            alertDialog.show();
-                        }
+                        View dialogView = LayoutInflater.from(GuestCustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
-                  //  }
+
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
+
+                        ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                        Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
+                        dialog_imageview.setImageDrawable(drawable);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
+                        tv_msg.setText("Invalid QR Code");
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
+                        btn_ok.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+
+                                finish();
+
+                            }
+                        });
+
+                        builder.setView(dialogView);
+
+                        //finally creating the alert dialog and displaying it
+                        alertDialog = builder.create();
+
+                        alertDialog.show();
+                    }
+
+                    //  }
                 } else {
-                   // Toast.makeText(GuestCustomViewFinderScannerActivity.this, "NoData", Toast.LENGTH_LONG).show();
+                    // Toast.makeText(GuestCustomViewFinderScannerActivity.this, "NoData", Toast.LENGTH_LONG).show();
 
                 }
             }
@@ -531,12 +527,12 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
     }
 
-    void invitationUpdate(final int inviteID , String value, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
+    void invitationUpdate(final int inviteID, String value, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
 
         InvitationUpdateReq invitationUpdateReq = new InvitationUpdateReq();
 
         invitationUpdateReq.iNInvtID = inviteID;
-        invitationUpdateReq.iNIsUsed=value;
+        invitationUpdateReq.iNIsUsed = value;
 
         Call<InvitationRequestResponse> call = champApiInterface.updateInvitation(invitationUpdateReq);
         call.enqueue(new Callback<InvitationRequestResponse>() {
@@ -552,11 +548,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                 androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
-                TextView tv_msg=dialogView.findViewById(R.id.tv_msg);
+                TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
                 tv_msg.setText("Valid Invitation");
-                Drawable drawable  = getResources().getDrawable(R.drawable.valid_invi);
+                Drawable drawable = getResources().getDrawable(R.drawable.valid_invi);
                 dialog_imageview.setImageDrawable(drawable);
-                Button btn_ok=dialogView.findViewById(R.id.btn_ok);
+                Button btn_ok = dialogView.findViewById(R.id.btn_ok);
                 btn_ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -566,7 +562,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                         intent.putExtra(VISITOR_TYPE, GUEST);
                         intent.putExtra(COMPANY_NAME, GUEST);
                         intent.putExtra(PERSONNAME, personname);
-                        intent.putExtra(COUNTRYCODE,countryCode);
+                        intent.putExtra(COUNTRYCODE, countryCode);
                         intent.putExtra(MOBILENUMBER, mobileNumber);
                         intent.putExtra(INVITATIONID, inviteID);
                         intent.putExtra(UNITID, unitID);
@@ -594,7 +590,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
             @Override
             public void onFailure(Call<InvitationRequestResponse> call, Throwable t) {
-                Toast.makeText(GuestCustomViewFinderScannerActivity.this,t.toString(),Toast.LENGTH_LONG).show();
+                Toast.makeText(GuestCustomViewFinderScannerActivity.this, t.toString(), Toast.LENGTH_LONG).show();
                 call.cancel();
             }
         });

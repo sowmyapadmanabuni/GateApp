@@ -8,18 +8,14 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
-import kotlinx.android.synthetic.main.activity_purpose.*
-import java.util.*
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.vehicle_others.VehicleOthersAddCarFragment
-import com.oyespace.guards.vehicle_others.VehicleOthersUnitScreen
-import kotlinx.android.synthetic.main.activity_unit_list.*
+import kotlinx.android.synthetic.main.activity_purpose.*
+import java.util.*
 
 
 class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
@@ -56,8 +52,8 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                     d.putExtra(ConstantUtils.MOBILENUMBER, intent.getStringExtra(ConstantUtils.MOBILENUMBER))
                     d.putExtra(ConstantUtils.COUNTRYCODE, intent.getStringExtra(ConstantUtils.COUNTRYCODE))
                     d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(UNIT_ACCOUNT_ID))
-                    d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
-                    d.putExtra(VISITOR_PURPOSE,Ed_Name_purp.text.toString())
+                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                    d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
                     startActivity(d)
                     finish()
                 } else {

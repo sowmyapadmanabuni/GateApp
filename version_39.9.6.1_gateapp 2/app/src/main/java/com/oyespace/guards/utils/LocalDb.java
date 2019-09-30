@@ -1,3 +1,4 @@
+
 package com.oyespace.guards.utils;
 
 import android.annotation.SuppressLint;
@@ -64,7 +65,7 @@ public class LocalDb {
     public static void saveSearchData(ArrayList<SearchResult> menuItems) {
         String tojson;
         if (menuItems == null || menuItems.size() == 0) {
-           // saveHotelId("");
+            // saveHotelId("");
             tojson = "";
         } else {
             tojson = ParseUtils.tojson(menuItems, "LocalDb");
@@ -124,7 +125,7 @@ public class LocalDb {
             Type type = new TypeToken<ArrayList<VisitorEntryLog>>() {
             }.getType();
             ArrayList<VisitorEntryLog> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
-           // Log.d("SYCNCHECK","in 99"+menuList.size());
+            // Log.d("SYCNCHECK","in 99"+menuList.size());
 
             return menuList;
         }

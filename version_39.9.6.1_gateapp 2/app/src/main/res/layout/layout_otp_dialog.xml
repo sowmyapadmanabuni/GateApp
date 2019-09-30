@@ -63,30 +63,30 @@
     />
 
 
-<!--    <Button android:id="@+id/btn_otpbycall"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:text="get otp by call"-->
-<!--            android:textAllCaps="true"-->
-<!--            android:layout_below="@+id/btn_verifyotp"-->
+    <!--    <Button android:id="@+id/btn_otpbycall"-->
+    <!--            android:layout_width="wrap_content"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:text="get otp by call"-->
+    <!--            android:textAllCaps="true"-->
+    <!--            android:layout_below="@+id/btn_verifyotp"-->
 
-<!--            android:textSize="18sp"-->
-<!--            android:padding="10dp"-->
-<!--            android:layout_marginRight="10dp"-->
-<!--            android:background="@color/white"-->
-<!--            android:textColor="@color/colorPrimaryDark"-->
-<!--            android:layout_alignParentRight="true"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            android:layout_marginBottom="15dp"-->
-<!--            />-->
+    <!--            android:textSize="18sp"-->
+    <!--            android:padding="10dp"-->
+    <!--            android:layout_marginRight="10dp"-->
+    <!--            android:background="@color/white"-->
+    <!--            android:textColor="@color/colorPrimaryDark"-->
+    <!--            android:layout_alignParentRight="true"-->
+    <!--            android:layout_marginTop="10dp"-->
+    <!--            android:layout_marginBottom="15dp"-->
+    <!--            />-->
 
     <Button
             android:id="@+id/btn_otpbycall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_verifyotp"
             android:onClick="onClick"
-            android:visibility="gone"
-        android:text="get otp by call"
-        android:layout_below="@+id/btn_verifyotp"/>
+            android:text="get otp by call"
+            android:visibility="gone" />
 
 </RelativeLayout>

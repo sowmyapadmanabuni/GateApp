@@ -84,12 +84,20 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         for (i in 0 until unitname_dataList.size) {
 
                             showProgress()
-                            visitorLog(unitname_dataList.get(i).replace(" ",""),unitid_dataList.get(i).replace(" ",""),unitAccountId_dataList.get(i).replace(" ",""));
+                            visitorLog(
+                                unitname_dataList.get(i).replace(" ", ""),
+                                unitid_dataList.get(i).replace(" ", ""),
+                                unitAccountId_dataList.get(i).replace(" ", "")
+                            );
                         }
                     }
                 }else{
                     showProgress()
-                    visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID),intent.getStringExtra(UNIT_ACCOUNT_ID));                }
+                    visitorLog(
+                        intent.getStringExtra(UNITNAME),
+                        intent.getStringExtra(UNITID),
+                        intent.getStringExtra(UNIT_ACCOUNT_ID)
+                    ); }
 
                // visitorLog()
             }
@@ -254,7 +262,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
     }
 
-    private fun visitorLog(UNUniName: String,UNUnitID: String,Unit_ACCOUNT_ID:String) {
+    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
    //      imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
         imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
@@ -289,8 +297,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
 
                         for (i in list.indices) {
-                            val fileName = list[i].substring(list[i].lastIndexOf("/")+1);
-                            val dir =Environment.getExternalStorageDirectory().getPath()
+                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
+                            val dir = Environment.getExternalStorageDirectory().getPath()
                             val file = File(dir, fileName)
                             file.delete()
                         }
@@ -312,7 +320,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
-                        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -350,9 +358,9 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
     private fun singUp(name :String, isdCode: String, mobNum : String) {
 
         val req = SignUpReq("", "", "", "", "",
-            name ,isdCode, "","","","",
+            name, isdCode, "", "", "", "",
             "",mobNum,"","", "","",imgName.toString())
-         Log.d("singUp","StaffEntry "+req.toString())
+        Log.d("singUp", "StaffEntry " + req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
             .subscribeOn(Schedulers.io())
@@ -594,7 +602,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
 
 
-                        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        val dir =
+                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
                         if (dir.isDirectory) {
                             val children = dir.list()
                             for (i in children!!.indices) {

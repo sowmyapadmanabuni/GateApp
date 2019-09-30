@@ -485,7 +485,7 @@ private Camera openFrontFacingCameraGingerbread() {
 
 
         File imagesFolder = new File(
-        Environment.getExternalStorageDirectory(), "/DCIM/myCapturedImages");
+                Environment.getExternalStorageDirectory(), "/DCIM/myCapturedImages");
         if (!imagesFolder.exists())
         imagesFolder.mkdirs(); // <----
         File image = new File(imagesFolder, System.currentTimeMillis()

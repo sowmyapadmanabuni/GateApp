@@ -26,7 +26,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
 
         holder.tv_worktype.text=items[position]
 
-        if(Prefs.getString(TYPE,"").equals("Create")){
+        if (Prefs.getString(TYPE, "").equals("Create")) {
             holder.lv_staff.setOnClickListener {
                 val intent = Intent(mcontext, BlockSelectionActivity::class.java)
                 intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
@@ -35,7 +35,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
                 mcontext.startActivity(intent)
                 (mcontext as Activity).finish()
             }
-        }else{
+        } else {
 
 
             holder.lv_staff.setOnClickListener {
@@ -44,11 +44,14 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
                 d.putExtra("FIRSTNAME", (mcontext as Activity).intent.getStringExtra("FIRSTNAME"))
                 d.putExtra("LASTNAME", (mcontext as Activity).intent.getStringExtra("LASTNAME"))
                 d.putExtra(MOBILENUMBER, (mcontext as Activity).intent.getStringExtra(MOBILENUMBER))
-                d.putExtra("DESIGNATION", (mcontext as Activity).intent.getStringExtra("DESIGNATION"))
+                d.putExtra(
+                    "DESIGNATION",
+                    (mcontext as Activity).intent.getStringExtra("DESIGNATION")
+                )
                 d.putExtra("WORKTYPE", (mcontext as Activity).intent.getStringExtra("WORKTYPE"))
-                d.putExtra(WORKER_ID, (mcontext as Activity) .intent.getIntExtra(WORKER_ID,0))
-                d.putExtra("UNITNAME",(mcontext as Activity). intent.getStringExtra("UNITNAME"))
-                d.putExtra("BIRTHDAY",(mcontext as Activity).intent.getStringExtra("BIRTHDAY"))
+                d.putExtra(WORKER_ID, (mcontext as Activity).intent.getIntExtra(WORKER_ID, 0))
+                d.putExtra("UNITNAME", (mcontext as Activity).intent.getStringExtra("UNITNAME"))
+                d.putExtra("BIRTHDAY", (mcontext as Activity).intent.getStringExtra("BIRTHDAY"))
                 d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
                 d.putExtra(VISITOR_TYPE, "STAFF")
                 d.putExtra(COMPANY_NAME, items[position])

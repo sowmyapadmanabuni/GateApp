@@ -13,7 +13,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.hardware.usb.UsbDevice;
@@ -123,7 +122,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
     boolean[] existInDB = new boolean[1];
     byte[] tempFP;
 
-    Cursor curData;
+
 
     TextView fingerDetails;//080 42074082
     ImageView left_thumb,left_index,left_middle,left_ring,left_small,right_thumb,right_index,right_middle,right_ring,right_small;
@@ -275,10 +274,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
         previous=findViewById(R.id.buttonPrevious);
         buttonDone=findViewById(R.id.buttonDone);
 
-        curData=dbh.getRegularVisitorsFinger();
-        if(curData!=null){
-            curData.moveToFirst();
-        }
+
         t1=new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
@@ -723,7 +719,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                 long res;
                 res=sgfplib.MatchTemplate(mFingerprint1Template, mFingerprint2Template, SGFDxSecurityLevel.SL_NORMAL, existInDB1);
                 if (existInDB1[0]) {
-                    mTextViewResult.setText("MATCHED!!\n");//+curData.getString(1)+" "+curData.getString(2));
+                    mTextViewResult.setText("MATCHED!!\n");
 //                    this.mCheckBoxMatched.setChecked(true);
                     mImageFingerprint2.setImageBitmap(this.toGrayscale(mRegisterImage));
 //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -753,7 +749,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                 res=sgfplib.MatchTemplate(mFingerprint1Template, mFingerprint3Template, SGFDxSecurityLevel.SL_NORMAL, existInDB1);
                 if (existInDB1[0]) {
 
-                    mTextViewResult.setText("MATCHED!!\n");//+curData.getString(1)+" "+curData.getString(2));
+                    mTextViewResult.setText("MATCHED!!\n");
 //                    this.mCheckBoxMatched.setChecked(true);
                     mImageFingerprint3.setImageBitmap(this.toGrayscale(mRegisterImage));
                     relLayout3.setVisibility(View.VISIBLE);
@@ -858,7 +854,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                 long res;
                 res=sgfplib.MatchTemplate(mFingerprint1Template, mFingerprint2Template, SGFDxSecurityLevel.SL_NORMAL, existInDB1);
                 if (existInDB1[0]) {
-                    mTextViewResult.setText("MATCHED!!\n");//+curData.getString(1)+" "+curData.getString(2));
+                    mTextViewResult.setText("MATCHED!!\n");
 //                    this.mCheckBoxMatched.setChecked(true);
                     mImageFingerprint2.setImageBitmap(this.toGrayscale(mRegisterImage));
 //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -917,7 +913,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                 res=sgfplib.MatchTemplate(mFingerprint1Template, mFingerprint3Template, SGFDxSecurityLevel.SL_NORMAL, existInDB1);
                 if (existInDB1[0]) {
 
-                    mTextViewResult.setText("MATCHED!!\n");//+curData.getString(1)+" "+curData.getString(2));
+                    mTextViewResult.setText("MATCHED!!\n");
 //                    this.mCheckBoxMatched.setChecked(true);
                     mImageFingerprint3.setImageBitmap(this.toGrayscale(mRegisterImage));
                     relLayout3.setVisibility(View.VISIBLE);
@@ -1088,7 +1084,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                 Log.d("str3", "str3: " + urlId+" id "+position+" "+memId+" "+MemberType+" "+loginDetailsResponce.success.toString());
                 if(loginDetailsResponce.success.equalsIgnoreCase("true")) {
                     showToast(this, "Fingerprint Saved");
-                  //  dbh.insertUserDetails(memId + "", finger_type, mFingerprint1Template, mFingerprint2Template, mFingerprint3Template, MemberType);
+                  //  dbh.insertFingerPrints(memId + "", finger_type, mFingerprint1Template, mFingerprint2Template, mFingerprint3Template, MemberType);
                     selectedFinger();
                     resetCapures();
                 }else{
@@ -1144,7 +1140,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
                     Log.d("image1", "Number of movies received: " + response.body());
 
                     Toast.makeText(getApplicationContext(), "Fingerprint saved Successfully", Toast.LENGTH_SHORT).show();
-                    dbh.insertUserDetails(memId + "", finger_type, mFingerprint1Template, mFingerprint2Template, mFingerprint3Template,MemberType);
+                    dbh.insertFingerPrints(memId + "", finger_type, mFingerprint1Template, mFingerprint2Template, mFingerprint3Template,MemberType);
 
                 } catch (Exception ex) {
                     Toast.makeText(getApplicationContext(), "Fingerprint not saved", Toast.LENGTH_SHORT).show();

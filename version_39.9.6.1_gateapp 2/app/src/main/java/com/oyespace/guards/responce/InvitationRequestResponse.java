@@ -38,6 +38,7 @@ public class InvitationRequestResponse {
     public void setSuccess(Boolean success) {
         this.success = success;
     }
+
     public class Data {
 
         @SerializedName("invitation")
@@ -51,6 +52,7 @@ public class InvitationRequestResponse {
         public void setInvitation(Invitation invitation) {
             this.invitation = invitation;
         }
+
         public class Invitation {
 
             @SerializedName("inInvtID")

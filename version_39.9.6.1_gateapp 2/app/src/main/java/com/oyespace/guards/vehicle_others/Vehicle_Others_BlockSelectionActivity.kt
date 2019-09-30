@@ -33,9 +33,9 @@ import kotlinx.android.synthetic.main.title_bar.view.*
 class Vehicle_Others_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter: BlockSelectionAdapter?=null
-    var mUnitsAdapter: SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter: UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter? = null
+    var mUnitsAdapter: SelectedUnitsAdapter? = null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter? = null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""

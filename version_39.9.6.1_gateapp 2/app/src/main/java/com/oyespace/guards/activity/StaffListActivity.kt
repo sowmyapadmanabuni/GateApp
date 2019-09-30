@@ -44,7 +44,7 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonAdd -> {
-                Prefs.putString(ConstantUtils.TYPE,"Create")
+                Prefs.putString(ConstantUtils.TYPE, "Create")
                 buttonAdd.setEnabled(false)
                 buttonAdd.setClickable(false)
                 val intentReg = Intent(this@StaffListActivity, WorkersTypeList::class.java)
@@ -74,9 +74,6 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
-
-
-
 
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
@@ -117,30 +114,29 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
        // if (::WorkerAdapter.isInitialized) {
 
 
-            tv.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                    if(WorkerAdapter!=null){
+        tv.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                if (WorkerAdapter != null) {
+                    WorkerAdapter!!.getFilter().filter(charSequence)
+
+                }
+            }
+
+            override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+                try {
+                    if (WorkerAdapter != null) {
                         WorkerAdapter!!.getFilter().filter(charSequence)
 
                     }
-                }
-
-                override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                    try{
-                        if(WorkerAdapter!=null){
-                            WorkerAdapter!!.getFilter().filter(charSequence)
-
-                        }
-                    }
-                    catch (e:KotlinNullPointerException){
-
-                    }
-                }
-
-                override fun afterTextChanged(editable: Editable) {
+                } catch (e: KotlinNullPointerException) {
 
                 }
-            });
+            }
+
+            override fun afterTextChanged(editable: Editable) {
+
+            }
+        });
       //  }
         btn_mic.setOnClickListener {
             Speak()
@@ -153,7 +149,8 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
             .workerList("7470AD35-D51C-42AC-BC21-F45685805BBE", intToString(LocalDb.getAssociation().asAssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+            .subscribeWith(object :
+                CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
 
                 override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
 
@@ -176,7 +173,10 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
 
                         LocalDb.saveStaffList(arrayList);
 
-                        WorkerAdapter = StaffAdapter(arrayList as ArrayList<WorkerDetails>, this@StaffListActivity)
+                        WorkerAdapter = StaffAdapter(
+                            arrayList as ArrayList<WorkerDetails>,
+                            this@StaffListActivity
+                        )
                         rv_staff!!.adapter = WorkerAdapter
 
                     } else {
@@ -279,12 +279,12 @@ class StaffListActivity  : BaseKotlinActivity() , View.OnClickListener {
 
       //  clearApplicationData(this@StaffListActivity)
       //  deleteAppData()
-        val intent=Intent(this@StaffListActivity, StaffListActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
-
-
-        startActivity(intent)
-        this.finish();
+//        val intent=Intent(this@StaffListActivity, StaffListActivity::class.java)
+//        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK );
+//
+//
+//        startActivity(intent)
+//        this.finish();
     }
 
  fun deleteAppData() {

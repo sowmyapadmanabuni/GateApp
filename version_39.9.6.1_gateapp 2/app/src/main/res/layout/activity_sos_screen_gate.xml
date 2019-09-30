@@ -3,192 +3,155 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    <RelativeLayout
+
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <!-- Oyespace toolbar-->
-        <RelativeLayout
-                android:id="@+id/rl_header"
-                android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
+        <!-- HEADER START -->
+        <RelativeLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="0dp"
                 android:layout_weight="1.2"
-                android:background="@color/white"
-                android:padding="2dp">
-
-            <ImageView
-                    android:id="@+id/img_back"
-                    android:layout_width="60dp"
-                    android:layout_height="25dp"
-                    android:layout_marginLeft="0dp"
-                    android:layout_marginTop="4.00dp"
-                    android:visibility="gone" />
-
-            <ImageView
-                    android:id="@+id/rl_header1"
-                    android:layout_width="150dp"
+                android:padding="2dp"
+                android:layout_margin="0dp"
+                android:id="@+id/rl_header"
+                android:background="@color/white">
+            <ImageView android:layout_width="150dp"
                     android:layout_height="40dp"
+                    android:id="@+id/rl_header1"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="@dimen/_2sdp"
-                    android:src="@drawable/oyespace_toolbar" />
-
+                    android:src="@drawable/oyespace_toolbar"/>
         </RelativeLayout>
-        <!--Divider line-->
+        <RelativeLayout android:layout_width="match_parent" android:layout_below="@+id/rl_header" android:layout_height="2dp" android:background="@color/orange" android:id="@+id/r1" />
+        <!-- HEADER END -->
+
+
+        <!-- MAP START -->
         <RelativeLayout
-                android:id="@+id/r1"
                 android:layout_width="match_parent"
-                android:layout_height="2dp"
-                android:layout_below="@+id/rl_header"
-                android:background="@color/orange">
-
-        </RelativeLayout>
-        <!--SOS View-->
-        <RelativeLayout
-                android:id="@+id/r_sos"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-            <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="53dp"
-                    android:text="SOS Alerts"
-                    android:textAlignment="center"
-                    android:textColor="@color/orangedark"
-                    android:textSize="20dp" />
-        </RelativeLayout>
-        <!--Map view-->
-        <RelativeLayout
-                android:id="@+id/r1_imap"
-                android:layout_width="match_parent"
-                android:layout_height="170dp"
-                android:layout_below="@id/r_sos"
+                android:layout_height="200dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginRight="10dp"
+                android:id="@+id/r1_imap"
                 android:background="@drawable/border">
-
             <fragment
                     android:id="@+id/map"
                     class="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-
+                    android:layout_height="match_parent"/>
         </RelativeLayout>
-        <!--Image to be loaded-->
+        <!-- MAP END -->
 
-        <RelativeLayout
-                android:id="@+id/r2"
+        <!-- PHOTO & SOS DETAILS START -->
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/r1_imap"
-                android:layout_marginTop="@dimen/_45sdp">
+                android:layout_marginTop="16dp"
+                android:padding="10dp"
+                android:orientation="horizontal">
 
             <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="120dp"
                     android:id="@+id/sos_image"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginTop="0dp"
-                    android:background="@drawable/border"
                     android:scaleType="fitXY"
-                    android:src="@drawable/newicons_camera" />
-
-            <TextView
-                    android:id="@+id/g1"
+                    android:background="@drawable/border"
+                    android:src="@drawable/newicons_camera"/>
+            <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignRight="@id/sos_image"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginLeft="180dp"
-                    android:paddingBottom="@dimen/_10sdp"
-                    android:text="Resident Details"
-                    android:textColor="@color/orangedark">
+                    android:layout_height="match_parent"
+                    android:paddingLeft="15dp"
+                    android:orientation="vertical">
 
-            </TextView>
+                <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Resident Details"
+                        android:textColor="@color/orangedark"
+                        android:layout_marginBottom="8dp"
+                        android:id="@+id/g1" />
 
-            <TextView
-                    android:id="@+id/sos_username"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/g1"
-                    android:layout_marginLeft="180dp"
-                    android:paddingBottom="@dimen/_10sdp"
-                    android:text="Resident Name:"
-                    android:textColor="@color/black" />
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resident Name:"
+                        android:textColor="@color/black"
+                        android:layout_marginBottom="4dp"
+                        android:id="@+id/sos_username"
+                        />
+                <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resident Mobile No:"
+                        android:id="@+id/sos_usermobile"
+                        android:layout_marginBottom="4dp"
+                        android:textColor="@color/black" />
 
-            <TextView
-                    android:id="@+id/sos_usermobile"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/sos_username"
-                    android:layout_marginLeft="180dp"
-                    android:text="Resident Mobile No:"
-                    android:textColor="@color/black" />
+                <TextView android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:id="@+id/sos_unitname"
+                        android:textColor="@color/black" />
 
-        </RelativeLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+        <!-- PHOTO & SOS DETAILS END -->
 
 
-        <!--Emergency text-->
 
-        <RelativeLayout
-                android:id="@+id/r_emer"
-                android:layout_width="wrap_content"
+        <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/r2"
-                android:layout_marginTop="30dp">
+                android:orientation="vertical"
+                android:layout_marginTop="18dp">
 
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:paddingTop="@dimen/_5sdp"
-                    android:text="Emergency Contacts"
                     android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:text="Emergency Contacts"
                     android:textColor="@color/orangedark"
-                    android:textSize="18sp" />
-        </RelativeLayout>
+                     />
 
 
-        <include
-                android:id="@+id/id1"
-                layout="@layout/activity_sos_recycle"
-                android:layout_width="match_parent"
-                android:layout_height="132dp"
-                android:layout_below="@id/r_emer"
-                android:layout_marginTop="@dimen/_20sdp"></include>
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:weightSum="3"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp">
+                <include android:id="@+id/call_ambulance" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+                <include android:id="@+id/call_police" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+                <include android:id="@+id/call_fire" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+            </LinearLayout>
 
-        <RelativeLayout
+        </LinearLayout>
+
+        <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/id1"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="@dimen/_15sdp"
-                android:layout_marginBottom="25dp"
+                android:layout_gravity="center"
                 android:gravity="center"
-                android:orientation="horizontal"
-                android:padding="10dp">
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal">
 
-            <Button
+            <Button android:layout_width="120dp"
+                    android:layout_height="35dp"
                     android:id="@+id/btn_dismiss_sos"
-                    android:layout_width="130dp"
-                    android:layout_height="35dp"
-                    android:layout_marginRight="@dimen/_60sdp"
-                    android:background="@drawable/round_button_color_red"
+                    android:layout_marginRight="30dp"
                     android:text="Pass"
-                    android:textColor="@color/white" />
+                    android:background="@drawable/round_button_color_red" android:textColor="@color/white"/>
 
-            <Button
-                    android:id="@+id/btn_attend_sos"
-                    android:layout_width="130dp"
+            <Button android:layout_width="120dp"
                     android:layout_height="35dp"
-                    android:layout_toRightOf="@id/btn_dismiss_sos"
-                    android:background="@drawable/round_button_color_orange"
-                    android:text="Attend"
-                    android:textColor="@color/white" />
-        </RelativeLayout>
+                    android:id="@+id/btn_attend_sos"  android:text="Attend"  android:background="@drawable/round_button_color_orange"   android:textColor="@color/white"/>
+        </LinearLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
+
+
 </ScrollView>

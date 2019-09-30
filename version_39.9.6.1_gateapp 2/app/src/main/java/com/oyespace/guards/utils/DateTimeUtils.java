@@ -193,7 +193,7 @@ public class DateTimeUtils {
 
             String inputPattern = "yyyy-MM-dd'T'HH:mm:ss";
 
-          //  String outputPattern = "dd/MM/yyyy HH:mm:ss";MM/dd/yyyy '@'hh:mm a
+            //  String outputPattern = "dd/MM/yyyy HH:mm:ss";MM/dd/yyyy '@'hh:mm a
             String outputPattern = "dd/MM/yyyy HH:mm:ss";
 
             LocalDateTime inputDate = null;
@@ -210,11 +210,11 @@ public class DateTimeUtils {
             System.out.println("outputDate: " + outputDate);
 
 
-          //  SimpleDateFormat dateFormatLocal = new SimpleDateFormat("hh:mm:ss aa");
+            //  SimpleDateFormat dateFormatLocal = new SimpleDateFormat("hh:mm:ss aa");
             SimpleDateFormat dateFormatGMT = new SimpleDateFormat("dd/MM/yyyy hh:mm a");
             dateFormatGMT.setTimeZone(TimeZone.getDefault());
             dt_dwnld_date = dateFormatGMT.parse(date);
-          //  Log.d("mycode1156 time", dateFormatLocal.format(dt_dwnld_date) + " ");
+            //  Log.d("mycode1156 time", dateFormatLocal.format(dt_dwnld_date) + " ");
             return outputDate;
         } catch (java.text.ParseException e) {
             //Log.d("mycode1156 time", " " + e.toString());

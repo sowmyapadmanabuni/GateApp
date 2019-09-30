@@ -2,7 +2,6 @@ package com.oyespace.guards.activity
 
 import android.app.Activity
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
@@ -12,7 +11,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -20,10 +18,7 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import kotlinx.android.synthetic.main.activity_mobile_number.*
 import kotlinx.android.synthetic.main.activity_name_entry.*
-import kotlinx.android.synthetic.main.activity_name_entry.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import java.util.*
 
 class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
@@ -74,7 +69,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra(PERSONNAME, Ed_Name.getText().toString())
                         d.putExtra("DOB",s_dob.toString())
                         d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                        d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
+                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                         startActivity(d);
                         finish();
                     }
@@ -95,7 +90,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                    // d.putExtra("DOB",ed_dob!!.getText().toString())
                     d.putExtra("DOB",s_dob.toString())
                     d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                    d.putExtra(BLOCK_ID,intent.getStringExtra(BLOCK_ID))
+                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                     startActivity(d);
                     finish();
 
@@ -114,7 +109,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         ed_dob=findViewById(R.id.ed_dob)
         lyt_dob=findViewById(R.id.lyt_dob)
 
-        if(getIntent().getStringExtra(PERSONNAME)!=null) {
+        if (getIntent().getStringExtra(PERSONNAME) != null) {
             Ed_Name.setText(getIntent().getStringExtra(PERSONNAME))
         }
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {

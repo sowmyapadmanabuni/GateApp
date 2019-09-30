@@ -1,3 +1,4 @@
+
 package com.oyespace.guards.activity
 
 import android.Manifest
@@ -44,7 +45,7 @@ class SplashActivity : BaseLocationActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
-
+        Prefs.putBoolean("ACTIVE_SOS", false);
        // app = getApplication() as Myapp?;
         val searchData = LocalDb.getSearchData()
 

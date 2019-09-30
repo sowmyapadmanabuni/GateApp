@@ -65,10 +65,10 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
     internal var personPhoto: Bitmap? = null
     var tv_name:TextView?=null
     var designation = arrayOf("Assistant Manager", "Assistant Security Officer", "CareTaker", "Cook", "Driver","Electrician","Gardener","Gym Trainer","Head Guard","Health Instructor","Lady Head Guard","Lady Supervisor","Lady Senior Security Guard","Lady Security Guard","Maid","Manager","Nurse","Others","Plumber","Stay at Home Maid","Security Guard","Security Officer","Senior Security","Security Supervisor","Senior Supervisor","Sweeper","Tuition Teacher")
-    var tv_designation:TextView?=null
+    var tv_designation: TextView? = null
     var overlapImage:ImageView?=null
     internal val CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034
-    var iv_personphoto:ImageView?=null
+    var iv_personphoto: ImageView? = null
     var calender:ImageView?=null
     private val datePicker: DatePicker? = null
     private var cal: Calendar? = null
@@ -290,11 +290,31 @@ System.out.println("Day = " + out[1]);
                         showProgress()
 
                         if(imgName!=null) {
-                            editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), imgName!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID,0))
+                            editStaff(
+                                tv_name!!.text.toString(),
+                                tv_mobilenumber!!.text.toString(),
+                                imgName!!,
+                                "Staff",
+                                tv_designation!!.text.toString(),
+                                "",
+                                s_dob.toString(),
+                                true,
+                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0)
+                            )
 
                         }
                         else{
-                            editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID,0))
+                            editStaff(
+                                tv_name!!.text.toString(),
+                                tv_mobilenumber!!.text.toString(),
+                                intent.getStringExtra("IMAGE"),
+                                "Staff",
+                                tv_designation!!.text.toString(),
+                                "",
+                                s_dob.toString(),
+                                true,
+                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0)
+                            )
 
                         }
 //                    }else {
@@ -519,10 +539,20 @@ System.out.println("Day = " + out[1]);
 
                     if (imgName != null) {
 
-                        updateStaffImage(imgName.toString(), "", intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("FIRSTNAME"))
+                        updateStaffImage(
+                            imgName.toString(),
+                            "",
+                            intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                            intent.getStringExtra("FIRSTNAME")
+                        )
 
                     }else{
-                        updateStaffImage(intent.getStringExtra("IMAGE"), "", intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("FIRSTNAME"))
+                        updateStaffImage(
+                            intent.getStringExtra("IMAGE"),
+                            "",
+                            intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                            intent.getStringExtra("FIRSTNAME")
+                        )
 
                     }
                     file.delete()

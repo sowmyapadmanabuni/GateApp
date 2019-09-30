@@ -1,8 +1,5 @@
 package com.oyespace.guards.request;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 public class InvitationUpdateReq {
 
     public String iNIsUsed;

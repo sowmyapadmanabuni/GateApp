@@ -237,7 +237,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         setContentView(R.layout.activity_register_finger_print)
 
-        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+        val dir =
+            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
         if (dir.isDirectory()) {
             val children = dir.list()
             for (i in children!!.indices) {
@@ -457,8 +458,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 //
 //        }
 
-        val d = Intent(this@Biometric, Dashboard::class.java)
-        startActivity(d)
+//        val d = Intent(this@Biometric, Dashboard::class.java)
+//        startActivity(d)
         finish()
 
         /*}
@@ -758,7 +759,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
                 if (mRegisterImage != null) {
                     mRegisterImage = null
-                        //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
+                    //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
                 }
 
                 mRegisterImage = ByteArray(mImageWidth * mImageHeight)
@@ -885,7 +886,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
 
 
-                 // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
 
                 if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
                 {
@@ -922,7 +923,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     if (existInDB1[0]) {
                         t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
                     } else {
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -1010,7 +1012,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     } else {
 
 
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         relLayout3!!.visibility = View.VISIBLE

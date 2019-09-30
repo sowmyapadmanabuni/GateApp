@@ -1,14 +1,16 @@
 package com.oyespace.guards.utils;
 
 import android.util.Log;
+
 import com.oyespace.guards.pojo.VisitorEntryLog;
-import com.oyespace.guards.responce.ResponseVisitorLog;
 import com.oyespace.guards.responce.VisitorLogExitResp;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
+
+import io.realm.Realm;
 
 /**
  * Created by Kalyan on 5/28/2017.
@@ -26,9 +28,9 @@ public class RandomUtils {
         return sb.toString();
     }
 
-    public static ArrayList<VisitorEntryLog> getSortedVisitorLog(ArrayList<VisitorEntryLog> arrayList ){
-        ArrayList<VisitorEntryLog> nonExitedSort =new ArrayList<>();
-        ArrayList<VisitorEntryLog> exitedSort =new ArrayList<>();
+    public static ArrayList<VisitorEntryLog> getSortedVisitorLog(ArrayList<VisitorEntryLog> arrayList) {
+        ArrayList<VisitorEntryLog> nonExitedSort = new ArrayList<>();
+        ArrayList<VisitorEntryLog> exitedSort = new ArrayList<>();
 
         for (VisitorEntryLog s : arrayList) {
             //if the existing elements contains the search input
@@ -64,7 +66,7 @@ public class RandomUtils {
             }
         });
 
-        ArrayList<VisitorEntryLog> newAl =new ArrayList<>();
+        ArrayList<VisitorEntryLog> newAl = new ArrayList<>();
 
         newAl.addAll(nonExitedSort);
         newAl.addAll(exitedSort);
@@ -122,8 +124,8 @@ public class RandomUtils {
 
 
     public static boolean entryExists(String isdCode ,String mobNum ) {
-
-        ArrayList<VisitorEntryLog> filteredList =new ArrayList<>();
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<VisitorEntryLog> filteredList = new ArrayList<>();
       //  var filteredList = ArrayList<ResponseVisitorLog.Data.Visitorlogbydate>()
 
         if (LocalDb.getVisitorEnteredLog() == null) {

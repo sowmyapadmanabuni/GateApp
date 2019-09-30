@@ -87,7 +87,7 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
     RecyclerView rv_image;
     ImageView iv_delete, imageView1,iv_edit;
     int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
-    Bitmap photo = null ;
+    Bitmap photo = null;
     /*sumeeth fragment*/
     private FragmentManager fragmentManager;
     private ViewPager viewPager;
@@ -207,7 +207,7 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
 
-                Picasso.with(GuestAddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
+                //Picasso.with(GuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
 
 
 //                Picasso.with(GuestAddCarFragment.this)
@@ -229,14 +229,14 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
        // iamgeLyt.removeAllViews();
         list.clear();
 
-        Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+        Picasso.with(this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
 
 //        Picasso.with(this)
 //                .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
 //                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
-        Log.v("Oyespace",IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg");
+        Log.v("Oyespace", IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
 
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -248,13 +248,13 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
             ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
         } else {
             if (getIntent().getIntExtra(ACCOUNT_ID, 0) != 0) {
-               // Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON"+"NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
+                // Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON"+"NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
                 imageView1.setImageBitmap(photo);
 //                Picasso.with(this)
 //                        .load(IMAGE_BASE_URL + "Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
 //                        .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(imageView1);
 
-              //  Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+                //  Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
 
             }
@@ -273,7 +273,7 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
                 i.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                 i.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                 i.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
-                i.putExtra(BLOCK_ID,getIntent().getStringExtra(BLOCK_ID));
+                i.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
 
                 startActivity(i);
                 finish();
@@ -355,8 +355,8 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
                     d.putExtra(PERSON_PHOTO, byteArray);
                     d.putExtra(ITEMS_PHOTO_LIST, list);
                     d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
-                    d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
-                    d.putExtra(BLOCK_ID,getIntent().getStringExtra(BLOCK_ID));
+                d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
+                d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
                     startActivity(d);
                     finish();
                 }
@@ -547,9 +547,9 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
             showViewPager();
 
         } else if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-             photo = (Bitmap) data.getExtras().get("data");
+            photo = (Bitmap) data.getExtras().get("data");
             imageView1.setImageBitmap(photo);
-           // personPhoto = photo;
+            // personPhoto = photo;
             SaveImage(photo);
             Log.d("Activity", "CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE ");
         }
@@ -568,7 +568,7 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
         res.updateConfiguration(conf, dm);
     }
 
-    public void SaveImage(Bitmap showedImgae){
+    public void SaveImage(Bitmap showedImgae) {
 
         String root = Environment.getExternalStorageDirectory().toString();
         File myDir = new File(root + "/DCIM/myCapturedImages");
@@ -576,9 +576,9 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
         Random generator = new Random();
         int n = 10000;
         n = generator.nextInt(n);
-        String fname = "FILENAME-"+ n +".jpg";
-        file = new File (myDir, fname);
-        if (file.exists ()) file.delete ();
+        String fname = "FILENAME-" + n + ".jpg";
+        file = new File(myDir, fname);
+        if (file.exists()) file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
             showedImgae.compress(Bitmap.CompressFormat.JPEG, 100, out);

@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.title_bar.*
 class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter: PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter? = null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -104,7 +104,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                     }
                     val _intent = Intent(this@UnitSelectionActivity, BlockSelectionActivity::class.java)
                     var json = Gson().toJson(selectedUnits)
-                Log.v("JSONNN",json)
+                Log.v("JSONNN", json)
                     _intent.putExtra(FLOW_TYPE, DELIVERY)
                     _intent.putExtra(VISITOR_TYPE, DELIVERY)
                     _intent.putExtra(SELECTED_UNITS,json);
@@ -339,8 +339,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
-        }
-        else{
+        } else {
             selectedUnits.add(checked);
         }
         //orderListAdapter!!.notifyDataSetChanged();
@@ -705,7 +704,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID,orderData?.unUnitID)
+                intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()

@@ -42,6 +42,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
     init {
         this.searchList = items
     }
+
     private var progressDialog: ProgressDialog? = null
 
     override fun onBindViewHolder(holder: StaffViewHolder, position: Int) {
@@ -56,8 +57,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
         if(staffdata?.wkMobile.toString().length > 0){
             holder.iv_call.visibility=View.VISIBLE
-        }
-        else{
+        } else{
             holder.iv_call.visibility=View.INVISIBLE
         }
         holder.lv_staff.setOnClickListener {
@@ -134,7 +134,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
         Picasso.with(mcontext)
             .load(IMAGE_BASE_URL +"Images/"+staffdata.wkEntryImg)
-           .placeholder(R.drawable.placeholder_dark_potrait).error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
+            .placeholder(R.drawable.placeholder_dark_potrait).error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
 
 //        Picasso.with(mcontext)
 //            .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+staffdata.wkWorkID+".jpg")
@@ -182,23 +182,23 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 //                alert.show()
 //            }
 //          else
-             //   if(staffdata?.wkMobile.toString().length > 0){
+            //   if(staffdata?.wkMobile.toString().length > 0){
 
-                val d=Intent(mcontext, MobileNumberforEntryScreen::class.java)
-                d.putExtra("UNITID", staffdata.unUnitID)
-                d.putExtra("FIRSTNAME", staffdata.wkfName)
-                d.putExtra("LASTNAME", staffdata.wklName)
-                d.putExtra(MOBILENUMBER, staffdata.wkMobile)
-                d.putExtra("DESIGNATION",  staffdata.wkDesgn)
-                d.putExtra("WORKTYPE",  staffdata.wkWrkType)
-                d.putExtra(ConstantUtils.WORKER_ID,  staffdata.wkWorkID)
-                d.putExtra("UNITNAME",  staffdata.unUniName)
-                d.putExtra("Image",staffdata.wkEntryImg)
-                d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
-            d.putExtra("BIRTHDAY",staffdata.wkdob)
+            val d=Intent(mcontext, MobileNumberforEntryScreen::class.java)
+            d.putExtra("UNITID", staffdata.unUnitID)
+            d.putExtra("FIRSTNAME", staffdata.wkfName)
+            d.putExtra("LASTNAME", staffdata.wklName)
+            d.putExtra(MOBILENUMBER, staffdata.wkMobile)
+            d.putExtra("DESIGNATION",  staffdata.wkDesgn)
+            d.putExtra("WORKTYPE",  staffdata.wkWrkType)
+            d.putExtra(ConstantUtils.WORKER_ID,  staffdata.wkWorkID)
+            d.putExtra("UNITNAME",  staffdata.unUniName)
+            d.putExtra("Image",staffdata.wkEntryImg)
+            d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
+            d.putExtra("BIRTHDAY", staffdata.wkdob)
 
-                mcontext.startActivity(d);
-                (mcontext as Activity).finish()
+            mcontext.startActivity(d);
+            (mcontext as Activity).finish()
 
 //            }
 //          else{
@@ -256,7 +256,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 //
 //
 //                }
-           // }
+            // }
 
         }
 
@@ -276,7 +276,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
             intent.putExtra("IMAGE",  staffdata.wkEntryImg)
             intent.putExtra("DOB",staffdata.wkdob)
 
-           // (mcontext as Activity).startActivityForResult(intent, 2)
+            // (mcontext as Activity).startActivityForResult(intent, 2)
             mcontext.startActivity(intent);
             (mcontext as Activity).finish()
 
@@ -310,15 +310,15 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
     }
 
-    private fun visitorLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String,vlEntryImage:String) {
+    private fun visitorLog(
+        unitId: String, personName: String, mobileNumb: String, desgn: String,
+        workerType:String, staffID:Int, unitName:String, vlEntryImage:String) {
 
 
         var memID:Int=410;
         if(BASE_URL.contains("dev",true)){
             memID=64;
-        }
-        else if(BASE_URL.contains("uat",true)){
+        } else if(BASE_URL.contains("uat",true)){
             memID=64;
         }
 //        var memID:Int=64;
@@ -339,7 +339,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
             unitName,unitId ,desgn,
             personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
-            1,"Staff Manaual Entry",SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+            1, "Staff Manaual Entry", SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""));
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
@@ -354,55 +354,85 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                             visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
 
-                            if(unitId.contains(",")) {
+                            if (unitId.contains(",")) {
 
                                 var unitname_dataList: Array<String>
                                 var unitid_dataList: Array<String>
 
                                 unitname_dataList =
-                                    unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                    unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
                                 unitid_dataList =
-                                    unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                    unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
                                 // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                                 if (unitid_dataList.size > 0) {
                                     for (i in 0 until unitid_dataList.size) {
 
                                         val ddc =
                                             Intent(mcontext, BackgroundSyncReceiver::class.java)
-                                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                                        ddc.putExtra("msg", personName + " " + desgn + " is coming to your home"+ "(" + "(" + unitname_dataList.get(
-                                            i
-                                        ).replace(" ", "") + ")"+ ")")
+                                        ddc.putExtra(
+                                            ConstantUtils.BSR_Action,
+                                            ConstantUtils.VisitorEntryFCM
+                                        )
+                                        ddc.putExtra(
+                                            "msg",
+                                            personName + " " + desgn + " is coming to your home" + "(" + "(" + unitname_dataList.get(
+                                                i
+                                            ).replace(" ", "") + ")" + ")"
+                                        )
                                         ddc.putExtra("mobNum", mobileNumb)
                                         ddc.putExtra("name", personName)
-                                        ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID.toString())
-                                        ddc.putExtra("unitname", unitname_dataList.get(i).replace(" ", ""))
+                                        ddc.putExtra(
+                                            "nr_id",
+                                            globalApiObject.data.visitorLog.vlVisLgID.toString()
+                                        )
+                                        ddc.putExtra(
+                                            "unitname",
+                                            unitname_dataList.get(i).replace(" ", "")
+                                        )
                                         ddc.putExtra("memType", "Owner")
-                                        ddc.putExtra(UNITID, unitid_dataList.get(i).replace(" ", ""))
+                                        ddc.putExtra(
+                                            UNITID,
+                                            unitid_dataList.get(i).replace(" ", "")
+                                        )
                                         ddc.putExtra(COMPANY_NAME, "Staff")
                                         //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
-                                        ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                        ddc.putExtra(
+                                            "VLVisLgID",
+                                            globalApiObject.data.visitorLog.vlVisLgID
+                                        )
                                         ddc.putExtra(VISITOR_TYPE, "Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                                         mcontext.sendBroadcast(ddc);
 
-                                    }}}
-                            else{
-                                val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
-                                ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                                ddc.putExtra("msg", personName+" "+desgn +" is coming to your home"+"("+unitName+")")
+                                    }
+                                }
+                            } else {
+                                val ddc = Intent(mcontext, BackgroundSyncReceiver::class.java)
+                                ddc.putExtra(
+                                    ConstantUtils.BSR_Action,
+                                    ConstantUtils.VisitorEntryFCM
+                                )
+                                ddc.putExtra(
+                                    "msg",
+                                    personName + " " + desgn + " is coming to your home" + "(" + unitName + ")"
+                                )
                                 ddc.putExtra("mobNum", mobileNumb)
                                 ddc.putExtra("name", personName)
-                                ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID.toString())
+                                ddc.putExtra(
+                                    "nr_id",
+                                    globalApiObject.data.visitorLog.vlVisLgID.toString()
+                                )
                                 ddc.putExtra("unitname", unitName)
                                 ddc.putExtra("memType", "Owner")
-                                ddc.putExtra(UNITID,unitId.toString())
-                                ddc.putExtra(COMPANY_NAME,"Staff")
-                                ddc.putExtra(UNIT_ACCOUNT_ID,0)
-                                ddc.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
-                                ddc.putExtra(VISITOR_TYPE,"Staff")
+                                ddc.putExtra(UNITID, unitId.toString())
+                                ddc.putExtra(COMPANY_NAME, "Staff")
+                                ddc.putExtra(UNIT_ACCOUNT_ID, 0)
+                                ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                ddc.putExtra(VISITOR_TYPE, "Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -410,12 +440,10 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                             }
 
 
-
                             //  if (  (globalApiObject.data.visitorLog.unUniName).contains(","))
 
 
-
-                           // getUnitLog(unitId, personName,  " " ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
+                            // getUnitLog(unitId, personName,  " " ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
 
 //                            val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
 //                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
@@ -464,8 +492,9 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
     }
 
 
-    private fun getUnitLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int) {
+    private fun getUnitLog(
+        unitId: String, personName: String, mobileNumb: String, desgn: String,
+        workerType:String, staffID:Int, unitName:String, vlVisLgID:Int) {
 
         RetrofitClinet.instance
             .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toInt())
@@ -479,7 +508,10 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
                         val ddc  =  Intent(mcontext, BackgroundSyncReceiver::class.java)
                         ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home"+"("+unitName+")")
+                        ddc.putExtra(
+                            "msg",
+                            personName + " " + desgn + " is coming to your home" + "(" + unitName + ")"
+                        )
                         ddc.putExtra("mobNum", mobileNumb)
                         ddc.putExtra("name", personName)
                         ddc.putExtra("nr_id", vlVisLgID.toString())
@@ -489,7 +521,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                         ddc.putExtra(COMPANY_NAME,"Staff")
                         ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
                         ddc.putExtra("VLVisLgID",vlVisLgID)
-                        ddc.putExtra(VISITOR_TYPE,"Staff")
+                        ddc.putExtra(VISITOR_TYPE, "Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -529,9 +561,9 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
                         //(mcontext as Activity).finish()
-                        val d = Intent(mcontext, Dashboard::class.java)
-                        d.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                        mcontext.startActivity(d)
+//                        val d = Intent(mcontext, Dashboard::class.java)
+//                        d.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//                        mcontext.startActivity(d)
                         (mcontext as Activity).finish()
                     } else {
                         Utils.showToast(mcontext, globalApiObject.apiVersion)

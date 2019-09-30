@@ -445,9 +445,9 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 //            mImageFingerprint3!!.setImageBitmap(grayBitmap)
 //
 //        }
-
-        val d = Intent(this@EditBiometric, Dashboard::class.java)
-        startActivity(d)
+//
+//        val d = Intent(this@EditBiometric, Dashboard::class.java)
+//        startActivity(d)
         finish()
 
         /*}
@@ -915,7 +915,8 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                     if (existInDB1[0]) {
                         t1.speak("Please change finger angle and retry", TextToSpeech.QUEUE_FLUSH, null)
                     } else {
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint2!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         //                    Bitmap waterMarkedPhoto1 = BitmapFactory.decodeByteArray(mFingerprint2Template, 0, mFingerprint2Template.length);
@@ -1003,7 +1004,8 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                     } else {
 
 
-                        mTextViewResult!!.text = "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
+                        mTextViewResult!!.text =
+                            "MATCHED!!\n"//+curData.getString(1)+" "+curData.getString(2));
                         //                    this.mCheckBoxMatched.setChecked(true);
                         mImageFingerprint3!!.setImageBitmap(this.toGrayscale(mRegisterImage))
                         relLayout3!!.visibility = View.VISIBLE

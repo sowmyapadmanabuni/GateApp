@@ -90,13 +90,21 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             Log.v("UNITS@@@..",unitname_dataList.size.toString()+" ..."+unitname_dataList.get(i).replace(" ",""))
 
                             showProgress()
-                   visitorLog(unitname_dataList.get(i).replace(" ",""),unitid_dataList.get(i).replace(" ",""),unitAccountId_dataList.get(i).replace(" ",""));
+                            visitorLog(
+                                unitname_dataList.get(i).replace(" ", ""),
+                                unitid_dataList.get(i).replace(" ", ""),
+                                unitAccountId_dataList.get(i).replace(" ", "")
+                            );
 
                         }
                     }
                 }else{
                     showProgress()
-                    visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID),intent.getStringExtra(UNIT_ACCOUNT_ID));
+                    visitorLog(
+                        intent.getStringExtra(UNITNAME),
+                        intent.getStringExtra(UNITID),
+                        intent.getStringExtra(UNIT_ACCOUNT_ID)
+                    );
                 }
 
             }
@@ -236,7 +244,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             itemLyt.setVisibility(View.GONE)
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
-               // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
                 singUp(intent.getStringExtra(PERSONNAME),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(MOBILENUMBER))
 
             }
@@ -291,10 +299,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     }
 
 
-
-
-
-    private fun visitorLog(UNUniName: String,UNUnitID: String,Unit_ACCOUNT_ID:String) {
+    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
       //  var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
 
         var imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
@@ -339,26 +344,37 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                       // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
+                        // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
 
 
-                       var id: Long  = dbh!!.insertVisitorData(intent.getStringExtra(UNITNAME),Prefs.getInt(ASSOCIATION_ID,0).toString(),intent.getStringExtra(PERSONNAME),memID,globalApiObject.data.visitorLog.vlVisLgID, toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(VISITOR_TYPE),1,"","" )
+                        var id: Long = dbh!!.insertVisitorData(
+                            intent.getStringExtra(UNITNAME),
+                            Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                            intent.getStringExtra(PERSONNAME),
+                            memID,
+                            globalApiObject.data.visitorLog.vlVisLgID,
+                            toInteger(intent.getStringExtra(UNITID)),
+                            intent.getStringExtra(MOBILENUMBER),
+                            intent.getStringExtra(COMPANY_NAME),
+                            intent.getStringExtra(VISITOR_TYPE),
+                            1,
+                            "",
+                            ""
+                        )
 
 
 
 
-                        if(id<=0)
-            {
-              // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-            } else
-            {
-               // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
+                        if (id <= 0) {
+                            // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
+                        } else {
+                            // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
 
-            }
+                        }
 
                         for (i in list.indices) {
-                            val fileName = list[i].substring(list[i].lastIndexOf("/")+1);
-                            val dir =Environment.getExternalStorageDirectory().getPath()
+                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
+                            val dir = Environment.getExternalStorageDirectory().getPath()
                             val file = File(dir, fileName)
                             file.delete()
                         }
@@ -377,7 +393,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
-                        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -460,7 +476,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val imageFile = File(mPath)
 
-      //  Log.v("FILENamen vmxc vmc11",imageFile)
+        //  Log.v("FILENamen vmxc vmc11",imageFile)
 
         try {
             val outputStream = FileOutputStream(imageFile)
@@ -525,7 +541,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 } catch (ex: Exception) {
                     Log.d("uploadImage", "errr:" + ex.toString())
 
-                  //  Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
+                    //  Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
                 }
 
 
@@ -541,7 +557,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 // Log error here since request failed
                 Log.d("uploadImage", t.toString())
-              //  Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
+                //  Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
 //                finish()
             }
         })
@@ -668,7 +684,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
                     if (globalApiObject.success == true) {
 //                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        val dir =
+                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
                         if (dir.isDirectory) {
                             val children = dir.list()
                             for (i in children!!.indices) {
@@ -715,7 +732,10 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val req = StaffRegistrationReq(Prefs.getInt(ASSOCIATION_ID,0), 0, "", 0,0,0,0,
             intent.getStringExtra(COMPANY_NAME),intent.getStringExtra(PERSONNAME),"","",
-            "", intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(UNITID),
+            "",
+            intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
+            intent.getStringExtra(VISITOR_TYPE),
+            intent.getStringExtra(UNITID),
             intent.getStringExtra(UNITNAME),imgName)
         Log.d("staffRegistration ","StaffEntry "+req.toString())
 
@@ -725,7 +745,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateStaffResponse<WorkerData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateStaffResponse<WorkerData>) {
                     if (globalApiObject.success == true) {
-                     //   Utils.showToast(applicationContext, intToString(globalApiObject.data.worker.wkWorkID))
+                        //   Utils.showToast(applicationContext, intToString(globalApiObject.data.worker.wkWorkID))
                         val d  =  Intent(this@StaffEntryRegistration,Biometric::class.java)
                         d.putExtra(WORKER_ID, globalApiObject.data.worker.wkWorkID)
                         d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))

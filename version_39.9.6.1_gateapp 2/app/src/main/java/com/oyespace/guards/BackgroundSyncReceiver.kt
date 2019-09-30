@@ -8,6 +8,9 @@ import android.graphics.BitmapFactory
 import android.os.Environment
 import android.util.Base64
 import android.util.Log
+import android.widget.Toast
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.network.CommonDisposable
@@ -54,27 +57,27 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 var unitAccountId_dataList: Array<String>
                 unitname_dataList = intent.getStringExtra("unitname").split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-               // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 if(unitid_dataList.size>0) {
                     for (i in 0 until unitid_dataList.size) {
 
-try {
+                        try {
 
-    getUnitLog(
-        unitid_dataList.get(i).replace(" ", "").toInt(),
-        intent.getStringExtra("name"),
-        "",
-        intent.getStringExtra(VISITOR_TYPE),
-        "Staff",
-        0,
-        unitname_dataList.get(i).replace(" ", ""),
-        intent.getIntExtra("VLVisLgID", 0),
-        intent.getStringExtra("msg"),
-        intent.getStringExtra("nr_id")
-    )
-}catch (e:Exception){
+                            getUnitLog(
+                                unitid_dataList.get(i).replace(" ", "").toInt(),
+                                intent.getStringExtra("name"),
+                                "",
+                                intent.getStringExtra(VISITOR_TYPE),
+                                "Staff",
+                                0,
+                                unitname_dataList.get(i).replace(" ", ""),
+                                intent.getIntExtra("VLVisLgID", 0),
+                                intent.getStringExtra("msg"),
+                                intent.getStringExtra("nr_id")
+                            )
+                        }catch (e:Exception){
 
-}
+                        }
 //                        sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
 //                            intent.getStringExtra("name"), intent.getStringExtra("nr_id"),
 //                            unitname_dataList.get(i).replace(" ",""), intent.getStringExtra("memType"));
@@ -92,11 +95,11 @@ try {
             }else{
 
                 try{
-                getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
+                    getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
 
-            }catch (e:Exception){
+                }catch (e:Exception){
 
-            }
+                }
 //                sendFCM(intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                    intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                    intent.getStringExtra("unitname").replace(" ",""),intent.getStringExtra("memType"));
@@ -160,6 +163,18 @@ try {
         else if(intent.getStringExtra(BSR_Action).equals(SENDAUDIO)){
             //Toast.makeText(context,"coming",Toast.LENGTH_LONG).show()
             sendFCM_forAudioMessage(intent.getStringExtra("FILENAME"))
+        }
+        else if(intent.getStringExtra(BSR_Action).equals(BGS_SOS_STATUS)){
+            Log.e("BGS_SOS_STATUS","BGS_SOS_STATUS");
+            val sosId = intent.getIntExtra("sos_id",0)
+            val sosStatus = intent.getStringExtra("sos_status")
+            val gateNumber = Prefs.getString(ConstantUtils.GATE_NO, "")
+            val gateMob = Prefs.getString(ConstantUtils.GATE_MOB, "")
+            if(sosId != 0 && !sosStatus.equals("")) {
+                Log.e("BGS_SOS_STATUS",""+sosId+" "+gateNumber+" "+ gateMob+" "+ sosStatus);
+                val sosObj: SOSUpdateReq = SOSUpdateReq(sosId, gateNumber, gateMob, sosStatus)
+                updateSOS(sosObj)
+            }
         }
 
     }
@@ -335,7 +350,7 @@ try {
 
             override fun onFailure(call: Call<Any>, t: Throwable) {
                 Log.d("uploadImage", t.toString())
-               // Toast.makeText(mcontext, "Not Uploaded", Toast.LENGTH_SHORT).show()
+                // Toast.makeText(mcontext, "Not Uploaded", Toast.LENGTH_SHORT).show()
 
             }
         })
@@ -380,6 +395,36 @@ try {
                 }
             })
     }
+
+
+    private fun updateSOS(sosUpdateReq: SOSUpdateReq) {
+
+        RetrofitClinet.instance
+            .updateSOS(OYE247TOKEN,sosUpdateReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<SOSUpdateResp>() {
+                override fun onSuccessResponse(t: SOSUpdateResp) {
+                    Log.e("updateSOS","SUCCESS "+t)
+                    Prefs.remove("PENDING_SOS")
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.e("updateSOS","ERROR "+e)
+                    val json:String =  Gson().toJson(sosUpdateReq)
+                    Prefs.putString("PENDING_SOS",json);
+                }
+
+                override fun noNetowork() {
+                    Log.e("updateSOS","NONETWROK ")
+                    val json:String =  Gson().toJson(sosUpdateReq)
+                    Prefs.putString("PENDING_SOS",json);
+                }
+
+            })
+
+    }
+
 
     private fun getUnitList() {
 
@@ -488,9 +533,7 @@ try {
 
                         val smsIntent = Intent(ConstantUtils.SYNC)
                         smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(
-                            mcontext
-                        ).sendBroadcast(smsIntent)
+                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
 
                     } else {
                         Log.d("SYCNCHECK","in 437")
@@ -774,7 +817,18 @@ try {
                         if(UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")){
 
                             if(!UnitList.data.unit.owner.isEmpty()){
-                                unAccountID= UnitList.data.unit.owner[0].acAccntID.toString()
+
+                                try{
+                                    for (i in 0..UnitList.data.unit.owner.size) {
+                                        unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
+                                }
                             }
                             else{
                                 unAccountID="0"
@@ -784,34 +838,72 @@ try {
                         }
                         else if(UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")){
                             if(!UnitList.data.unit.tenant.isEmpty()) {
-                                unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-                            }
-                                else{
-                                    unAccountID="0"
+                                try{
+                                    for (i in 0..UnitList.data.unit.tenant.size) {
+
+                                        unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
                                 }
+                            }
+                            else{
+                                unAccountID="0"
+                            }
 
                         }
                         else if(UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")){
 
-                                if(!UnitList.data.unit.tenant.isEmpty()) {
-                                    unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-                                } else{
-                                    unAccountID="0"
+                            if(!UnitList.data.unit.tenant.isEmpty()) {
+
+                                try{
+                                    for (i in 0..UnitList.data.unit.tenant.size) {
+
+                                        unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
                                 }
+
+                            } else{
+                                unAccountID="0"
+                            }
 
                         }else if(UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")){
 //                                    if(!UnitList.data.unit.owner.isEmpty()) {
 //                                        unAccountID = "0"
 //                                    } else{
-                                        unAccountID="0"
-                                   // }
+                            unAccountID="0"
+                            // }
 
                         }else if(UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")){
-                                        if(!UnitList.data.unit.owner.isEmpty()) {
-                                            unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                                        } else{
-                                            unAccountID="0"
-                                        }
+                            if(!UnitList.data.unit.owner.isEmpty()) {
+                                try{
+
+                                    for (i in 0..UnitList.data.unit.owner.size) {
+                                        unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
+                                        getFamilyMemberData(
+                                            unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                        )
+                                    }
+                                }catch(e:IndexOutOfBoundsException){
+
+                                }
+
+                            } else{
+                                unAccountID="0"
+                            }
                         }else{
                             unAccountID="0"
                         }
@@ -819,11 +911,11 @@ try {
 
                         try {      sendFCM(msg, mobileNumb,
                             personName, nrId,
-                           unitName, "Owner");
+                            unitName, "Owner");
 
-                    }catch (e:KotlinNullPointerException){
+                        }catch (e:KotlinNullPointerException){
 
-                    }
+                        }
 
                         try {     getNotificationCreate(unAccountID.toString(),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",msg,unitId.toString(),vlVisLgID.toString(),unitId.toString()+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
                             DateTimeUtils.getCurrentTimeLocal(),
@@ -883,6 +975,73 @@ try {
 
                 }
             })
+
+    }
+
+
+    fun getFamilyMemberData(unitId: String,assnID: Int,accountId:Int,desgn:String,msg:String,vlVisLgID:Int){
+        RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId,assnID.toString(),accountId.toString())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<GetFamilyMemberResponse>() {
+
+                override fun onSuccessResponse(getdata: GetFamilyMemberResponse) {
+
+                    try{
+
+                        for (i in 0..getdata.data.familyMembers.size) {
+                            try {
+                                getNotificationCreate(
+                                    getdata.data.familyMembers[i].acAccntID.toString(),
+                                    Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                                    "gate_app",
+                                    msg,
+                                    unitId.toString(),
+                                    vlVisLgID.toString(),
+                                    unitId.toString() + "admin",
+                                    "gate_app",
+                                    LocalDb.getAssociation()!!.asAsnName,
+                                    "gate_app",
+                                    DateTimeUtils.getCurrentTimeLocal(),
+                                    DateTimeUtils.getCurrentTimeLocal(),
+                                    vlVisLgID.toString()
+                                )
+                            } catch (e: KotlinNullPointerException) {
+
+                            }
+                            sendCloudFunctionNotification(
+                                Prefs.getInt(ASSOCIATION_ID, 0),
+                                LocalDb.getAssociation()!!.asAsnName,
+                                msg,
+                                desgn,
+                                "gate_app",
+                                unitId.toString() + "admin",
+                                getdata.data.familyMembers[i].acAccntID,
+                                getdata.data.familyMembers[i].acAccntID.toString()
+                            )
+
+                        }
+                    }catch(e:IndexOutOfBoundsException){
+
+                    }
+
+
+
+
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+                    //  visitorLogBiometric(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+
+
+                }
+                override fun noNetowork() {
+                    Toast.makeText(mcontext, "No network call ", Toast.LENGTH_LONG).show()
+                }
+            })
+
 
     }
 

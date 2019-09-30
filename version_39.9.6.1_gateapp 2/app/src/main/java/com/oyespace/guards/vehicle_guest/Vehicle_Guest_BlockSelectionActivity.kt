@@ -33,9 +33,9 @@ import kotlinx.android.synthetic.main.title_bar.view.*
 class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter: BlockSelectionAdapter?=null
-    var mUnitsAdapter: SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter: UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter? = null
+    var mUnitsAdapter: SelectedUnitsAdapter? = null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter? = null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""
@@ -46,7 +46,7 @@ class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickL
     internal var unitNames = ""
     internal var unitId = ""
     internal var acAccntID=""
-    internal var blockID=""
+    internal var blockID = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -192,7 +192,7 @@ class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickL
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
                 acAccntID += selected.get(j).acAccntID
-                blockID +=selected.get(j).blBlockID
+                blockID += selected.get(j).blBlockID
 
 //                if (selected.get(j).tenant.size != 0) {
 //                    try {
@@ -235,7 +235,7 @@ class Vehicle_Guest_BlockSelectionActivity : BaseKotlinActivity(), View.OnClickL
                 d.putExtra(VISITOR_TYPE,ConstantUtils.GUEST)
                 d.putExtra(COMPANY_NAME,"Guest")
                 d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                d.putExtra(BLOCK_ID,blockID)
+                d.putExtra(BLOCK_ID, blockID)
                 startActivity(d);
                 finish();
                 }

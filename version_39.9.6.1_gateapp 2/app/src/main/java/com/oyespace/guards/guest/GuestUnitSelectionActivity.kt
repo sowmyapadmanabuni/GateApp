@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.title_bar.*
 class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
     var orderListAdapter:UnitListAdapter?=null
-    var pageNumberAdapter: PaginationAdapter?=null
+    var pageNumberAdapter: PaginationAdapter? = null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
     var selectedUnits = ArrayList<UnitPojo>()
@@ -293,7 +293,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
             try {
                 arrayList = ArrayList(arrayFullList.subList(start, end + 1))
-            }catch (e:IndexOutOfBoundsException){
+            } catch (e: IndexOutOfBoundsException) {
 
             }
             rv_unit.showProgress()
@@ -339,8 +339,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             if(indices != null && indices.size > 0){
                 selectedUnits.removeAt(indices[0]);
             }
-        }
-        else{
+        } else {
             selectedUnits.add(checked);
         }
         //orderListAdapter!!.notifyDataSetChanged();

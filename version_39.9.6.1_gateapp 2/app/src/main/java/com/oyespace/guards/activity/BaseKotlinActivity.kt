@@ -42,12 +42,12 @@ open class BaseKotlinActivity : AppCompatActivity(){
 
     }
 
-    open fun initRealm() {
+    open fun initRealm(){
         realm = Realm.getDefaultInstance()
     }
 
-    open fun closeRealm() {
-        if (realm != null && !realm.isClosed) {
+    open fun closeRealm(){
+        if(realm != null && !realm.isClosed){
             realm.close();
         }
     }

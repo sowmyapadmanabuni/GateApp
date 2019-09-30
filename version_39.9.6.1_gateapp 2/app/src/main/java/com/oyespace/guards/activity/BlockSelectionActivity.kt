@@ -31,9 +31,9 @@ import kotlinx.android.synthetic.main.title_bar.view.*
 class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter: BlockSelectionAdapter?=null
-    var mUnitsAdapter: SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter: UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter? = null
+    var mUnitsAdapter: SelectedUnitsAdapter? = null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter? = null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""
@@ -183,7 +183,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unitNames += ", "
                     unitId += ", "
                     acAccntID += ", "
-                    blockID+=","
+                    blockID += ","
                     //acAccntID += ", "
                     unitNumber1 += ", "
                     unitNumber2 += ", "
@@ -239,7 +239,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                    d.putExtra(BLOCK_ID,blockID)
+                    d.putExtra(BLOCK_ID, blockID)
                     d.putExtra(
                         "RESIDENT_NUMBER",
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
@@ -261,7 +261,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                    d.putExtra(BLOCK_ID,blockID)
+                    d.putExtra(BLOCK_ID, blockID)
                     //d.putExtra("RESIDENT_NUMBER",unitNumber1)
                     d.putExtra(
                         "RESIDENT_NUMBER",

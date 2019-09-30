@@ -330,11 +330,12 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         Btn_SendOtp.setOnClickListener {
 
             mobilenumber= phone
+            phone = Ed_phoneNum.text.toString().replace(" ", "")
 
-            if (phone!=null) {
+            if (phone != null) {
 
                 Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
-                if (intent.getStringExtra(MOBILENUMBER).equals("+91"+phone)) {
+                if (intent.getStringExtra(MOBILENUMBER).equals("+91" + phone)) {
 
                     sendotp()
 
@@ -858,15 +859,17 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         dialogs!!.setCancelable(false)
         dialogs!!.setContentView(R.layout.layout_otp_dialog)
         val ed_otp = dialogs!!.findViewById(R.id.ed_otp) as EditText
-        val btn_otpbycall=dialogs!!.findViewById(R.id.btn_otpbycall) as Button
+        val btn_otpbycall = dialogs!!.findViewById(R.id.btn_otpbycall) as Button
         otpnumber = ed_otp.text.toString()
         val btn_verifyotp = dialogs!!.findViewById(R.id.btn_verifyotp) as Button
-        val btn_cancel= dialogs!!.findViewById(R.id.btn_cancel) as Button
+        val btn_cancel = dialogs!!.findViewById(R.id.btn_cancel) as Button
 
-        btn_otpbycall.setOnClickListener{
-            Toast.makeText(this@MobileNumberEntryScreenwithOTP,"coming",Toast.LENGTH_LONG).show()
-            sendOTPbyCallReq( "261622AtznpKYJ5c5ab60e",countryCode.toString()
-                    +phone,"voice")
+        btn_otpbycall.setOnClickListener {
+            Toast.makeText(this@MobileNumberEntryScreenwithOTP, "coming", Toast.LENGTH_LONG).show()
+            sendOTPbyCallReq(
+                "261622AtznpKYJ5c5ab60e", countryCode.toString()
+                        + phone, "voice"
+            )
         }
 
         btn_cancel.setOnClickListener {
@@ -924,7 +927,18 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                            // getAccountDetails(countryCode.toString(), phone.toString());
 
-                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME"),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"),intent.getStringExtra("WORKTYPE"),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra("UNITNAME"),intent.getStringExtra("Image"))
+                            getVisitorByWorkerId(
+                                Prefs.getInt(ASSOCIATION_ID, 0),
+                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                                intent.getStringExtra("UNITID"),
+                                intent.getStringExtra("FIRSTNAME"),
+                                intent.getStringExtra(MOBILENUMBER),
+                                intent.getStringExtra("DESIGNATION"),
+                                intent.getStringExtra("WORKTYPE"),
+                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                                intent.getStringExtra("UNITNAME"),
+                                intent.getStringExtra("Image")
+                            )
 
 
 
@@ -975,8 +989,10 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
 
     }
-    private fun visitorLog(unitId:String,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String) {
+
+    private fun visitorLog(
+        unitId: String, personName: String, mobileNumb: String, desgn: String,
+        workerType:String, staffID:Int, unitName:String) {
 
 
         var memID:Int=410;
@@ -1005,7 +1021,16 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             personName,"",0,"+",mobileNumb,
             "","","","",
             1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",intent.getStringExtra("Image"),Prefs.getString(ConstantUtils.GATE_NO, ""));
+            ,
+            SPPrdImg6,
+            SPPrdImg7,
+            SPPrdImg8,
+            SPPrdImg9,
+            SPPrdImg10,
+            "",
+            intent.getStringExtra("Image"),
+            Prefs.getString(ConstantUtils.GATE_NO, "")
+        );
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(
@@ -1066,7 +1091,11 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
 
-        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID.toInt(), visitorLogID)
+        val req = VisitorEntryReq(
+            DateTimeUtils.getCurrentTimeLocal(),
+            LocalDb.getStaffList()[0].wkWorkID.toInt(),
+            visitorLogID
+        )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
@@ -1108,9 +1137,9 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         finish()
     }
 
-    private fun sendOTPbyCallReq(  authkey: String, mobile: String, retrytype: String) {
+    private fun sendOTPbyCallReq(authkey: String, mobile: String, retrytype: String) {
 
-        val dataReq = GetOTPbyCallReq(authkey,mobile,retrytype)
+        val dataReq = GetOTPbyCallReq(authkey, mobile, retrytype)
 
 
         OTPbyCallRetrofitClinet.instance
@@ -1141,7 +1170,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
                 }
 
                 override fun noNetowork() {
@@ -1150,11 +1179,21 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             })
     }
 
-    fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: String, personName: String, mobileNumb: String, desgn: String,
-                             workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
+    fun getVisitorByWorkerId(
+        assnID: Int,
+        workerID: Int,
+        unitId: String,
+        personName: String,
+        mobileNumb: String,
+        desgn: String,
+        workerType: String,
+        staffID: Int,
+        unitName: String,
+        wkEntryImg: String
+    ) {
 
         // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
-        RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
+        RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID, assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
@@ -1211,7 +1250,14 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //                        intent.getStringExtra("UNITNAME")
 //                    );
 
-                    visitorLog(intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME") + " " +intent.getStringExtra("LASTNAME"), intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"),intent.getIntExtra("WORKERID",0), intent.getStringExtra("UNITNAME")
+                    visitorLog(
+                        intent.getStringExtra("UNITID"),
+                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+                        intent.getStringExtra(MOBILENUMBER),
+                        intent.getStringExtra("DESIGNATION"),
+                        intent.getStringExtra("WORKTYPE"),
+                        intent.getIntExtra("WORKERID", 0),
+                        intent.getStringExtra("UNITNAME")
                     );
 
                     //   }
@@ -1224,7 +1270,11 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 }
 
                 override fun noNetowork() {
-                    Toast.makeText(this@MobileNumberEntryScreenwithOTP, "No network call ", Toast.LENGTH_LONG)
+                    Toast.makeText(
+                        this@MobileNumberEntryScreenwithOTP,
+                        "No network call ",
+                        Toast.LENGTH_LONG
+                    )
                         .show()
                 }
             })

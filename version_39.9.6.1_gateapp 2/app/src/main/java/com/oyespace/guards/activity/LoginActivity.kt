@@ -15,7 +15,6 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -24,10 +23,13 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.constants.PrefKeys.*
+import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.GetOTPReq
+import com.oyespace.guards.pojo.GetOTPResp
+import com.oyespace.guards.pojo.GetVerifyOTPRequest
+import com.oyespace.guards.pojo.GetVerifyOTPResponse
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
@@ -56,7 +58,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
             R.id.Btn_SendOtp -> {
 
                 mobilenumber= phone.toString()
-                phone=Ed_phoneNum.text.toString().replace(" ","")
+                phone = Ed_phoneNum.text.toString().replace(" ", "")
 
                 if (TextUtils.isEmpty(Ed_phoneNum.text.toString())) {
 
