@@ -1,13 +1,10 @@
 package com.oyespace.guards.vehicle_others
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
-import com.oyespace.guards.Dashboard
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -16,8 +13,6 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import kotlinx.android.synthetic.main.activity_service_provider_list.*
-import kotlinx.android.synthetic.main.activity_unit_list.*
-
 import java.util.*
 
 class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
@@ -31,6 +26,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         "Zomato",
         "Swiggy",
         "FoodPanda",
+        "Uber Eats",
+        "Dominos",
         "BlueDart",
         "DTDC",
         "Fedex",
@@ -43,6 +40,7 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         "Carpenter",
         "Plumber",
         "electrician",
+        "Gas Cylinder",
         "Others"
 
     )
@@ -53,6 +51,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.zomoto,
         R.mipmap.sw,
         R.mipmap.foodpanda,
+        R.drawable.ubereats,
+        R.drawable.dominospizza,
         R.mipmap.bluedart,
         R.mipmap.dtdc,
         R.mipmap.fedex,
@@ -65,6 +65,7 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.carpenter,
         R.drawable.plumber,
         R.drawable.electrician,
+        R.drawable.gas_cylinder,
         R.drawable.others
 
 
@@ -95,10 +96,9 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         }
 
-        val rv_serviceProvider = findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_serviceProvider)
+        val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
         rv_serviceProvider.setHasFixedSize(true)
-        val gridLayoutManager =
-            androidx.recyclerview.widget.GridLayoutManager(this@VehicleOthersServiceProviderListActivity, 3)
+        val gridLayoutManager = GridLayoutManager(this@VehicleOthersServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         //  val sectionModelArrayList: ArrayList<SectionModel> = ArrayList()
@@ -159,8 +159,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         for (i in 0 until vendor_names.size) {
             val vendorPojo = VendorPojo()
-            vendorPojo.setVendor_names(vendor_names[i])
-            vendorPojo.setImage_url(myImageList[i])
+            vendorPojo.vendor_names = vendor_names[i]
+            vendorPojo.image_url = myImageList[i]
             vendordata.add(vendorPojo)
         }
         return vendordata

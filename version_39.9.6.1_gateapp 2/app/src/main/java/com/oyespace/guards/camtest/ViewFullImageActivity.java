@@ -1,10 +1,12 @@
 package com.oyespace.guards.camtest;
 
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
 import com.oyespace.guards.R;
 
 public class ViewFullImageActivity extends AppCompatActivity {
@@ -19,7 +21,7 @@ public class ViewFullImageActivity extends AppCompatActivity {
         pos=getIntent().getIntExtra("pos",0);
         Log.i("List", "Passed Array List :: " + pos);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
        viewPager.setAdapter(new ViewPagerAdapter(this));
        viewPager.setCurrentItem(pos);
 

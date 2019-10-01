@@ -15,7 +15,6 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -24,10 +23,13 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.constants.PrefKeys.*
+import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.GetOTPReq
+import com.oyespace.guards.pojo.GetOTPResp
+import com.oyespace.guards.pojo.GetVerifyOTPRequest
+import com.oyespace.guards.pojo.GetVerifyOTPResponse
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
@@ -42,7 +44,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
     private var countryName: String? = null
-    private val REQUEST_CODE_SPEECH_INPUT = 100;
+    private val REQUEST_CODE_SPEECH_INPUT = 100
     var otpnumber: String? = null
     var mobilenumber:String?=null
     var phone:String?=null
@@ -56,6 +58,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
             R.id.Btn_SendOtp -> {
 
                 mobilenumber= phone.toString()
+                phone = Ed_phoneNum.text.toString().replace(" ", "")
 
                 if (TextUtils.isEmpty(Ed_phoneNum.text.toString())) {
 
@@ -74,7 +77,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
                         .show()
 
                     val maxLength = 10
-                    Ed_phoneNum.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength)))
+                    Ed_phoneNum.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 
                 } else if (countryCode!!.startsWith("91") && Ed_phoneNum.text.toString().length < 10) {
 
@@ -200,8 +203,8 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.setText(result[0].trim() + "")
-                    phone = Ed_phoneNum.text.toString().replace(" ","");
+                    Ed_phoneNum.text = result[0].trim() + ""
+                    phone = Ed_phoneNum.text.toString().replace(" ", "")
                 }
             }
         }
@@ -326,12 +329,12 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
     private fun showDialog(title: String) {
         var dialogs = Dialog(this@LoginActivity)
 
-        dialogs!!.setCancelable(false)
-        dialogs!!.setContentView(R.layout.layout_otp_dialog)
-        val ed_otp = dialogs!!.findViewById(R.id.ed_otp) as EditText
+        dialogs.setCancelable(false)
+        dialogs.setContentView(R.layout.layout_otp_dialog)
+        val ed_otp = dialogs.findViewById(R.id.ed_otp) as EditText
         otpnumber = ed_otp.text.toString()
-        val btn_cancel= dialogs!!.findViewById(R.id.btn_cancel) as Button
-        val btn_verifyotp = dialogs!!.findViewById(R.id.btn_verifyotp) as Button
+        val btn_cancel = dialogs.findViewById(R.id.btn_cancel) as Button
+        val btn_verifyotp = dialogs.findViewById(R.id.btn_verifyotp) as Button
         btn_verifyotp.setOnClickListener {
 
 
@@ -361,7 +364,7 @@ class LoginActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePic
 
         }
         btn_cancel.setOnClickListener {
-            dialogs!!.dismiss()
+            dialogs.dismiss()
         }
         dialogs.show()
 

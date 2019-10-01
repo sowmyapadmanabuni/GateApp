@@ -1,13 +1,11 @@
 package com.oyespace.guards.network
 
 
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksList
-import com.oyespace.guards.com.oyespace.guards.pojo.SearchUnitRequest
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
-import com.oyespace.guards.models.*
+import com.oyespace.guards.models.GetGuardsListResponse
+import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.GuardsList
+import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY
@@ -70,13 +68,13 @@ interface WebApi {
             : Single<VisitorExitResp>
 
 
-//    @GET("oye247/api/v1/GetWorkerListByAssocID/{id}")
-//    fun workerList(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String)
-//            : Single<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>
-
     @GET("oye247/api/v1/GetWorkerListByAssocID/{id}")
     fun workerList(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String)
             : Single<GetWorkersResponse<WorkersList>>
+
+    @POST("oyesafe/api/v1/SOS/SOSStopUpdate")
+    fun updateSOS(@Header("X-OYE247-APIKey") token: String, @Body sosUpdateReq: SOSUpdateReq)
+            : Single<SOSUpdateResp>
 
     @POST("oyesafe/api/v1/FingerPrint/Create")
     fun createFingerPrintCall(@Header(OYE247KEY) token: String, @Body fingerPrintCreateReq: FingerPrintCreateReq)
@@ -122,7 +120,7 @@ interface WebApi {
 
     @GET("oye247/api/v1/GetVisitorLogEntryListByAssocID/{id}")
     fun getVisitorLogEntryList(@Header(OYE247KEY) token: String, @Path("id") assnId: Int)
-            : Single<GetVisitorsResponse<ArrayList<VisitorLog>>>
+            : Single<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>
 
     @GET("oye247/api/v1/TicketingResponse/GetTicketingResponseListByTicketingResID/{id}")
     fun getTicketingResponses(@Header(OYE247KEY) token: String, @Path("id") ticketID: String)
@@ -155,7 +153,7 @@ interface WebApi {
     fun getNotificationCreate(@Header(OYE247KEY) token: String,@Body notificationCreateReq:NotificationCreateReq):Single<NotificationCreateResponse>
 
     @GET("oyeliving/api/v1/Unit/GetUnitListByUnitID/{id}")
-    fun getUnitListbyUnitId(@Header(CHAMPKEY) token: String, @Path("id") unitId: String):Single<UnitlistbyUnitID>
+    fun getUnitListbyUnitId(@Header(CHAMPKEY) token: String, @Path("id") unitId: Int): Single<UnitlistbyUnitID>
 
     @POST("oyeliving/api/v1/Unit/UnitNameSearchByAssociationID")
     fun searchUnits(@Body unitSearch: SearchUnitRequest, @Header("X-Champ-APIKey") token: String)
@@ -164,4 +162,25 @@ interface WebApi {
     @GET("oyeliving/api/v1/Unit/GetUnitListByBlockID/{id}")
     fun getUnitsFromBlock(@Header("X-Champ-APIKey") token: String, @Path("id") assid: String)
             : Single<UnitsList<ArrayList<UnitPojo>>>
+
+    @POST("oye247/api/v1/Invitation/create")
+    fun sendInviteRequest(@Header(OYE247KEY) token: String, @Body inviteCreateReq: InviteCreateReq)
+            : Single<InviteCreateRes>
+
+    @GET("oye247/api/v1/Invitation/GetInvitationByInvitationID/{id}")
+    fun getInvitationByInvitationID(@Header(CHAMPKEY) token: String, @Path("id") invitationId: String): Single<InviteCreateRes>
+
+    @POST("oye247/api/v1/Invitation/InvitationUsedStatusUpdate")
+    fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq): Single<InviteCreateRes>
+
+    @GET("oyesafe/api/v1/GetFamilyMemberListByAssocAndUnitID/{uid}/{aid}/{accid}")
+    fun getFamilyMemberList(
+        @Header("X-OYE247-APIKey") token: String, @Path("uid") unUnitID: String, @Path(
+            "aid"
+        ) asAssnID: String, @Path("accid") accountID: String
+    ): Single<GetFamilyMemberResponse>
+
+    @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
+    fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
+            : Single<ResidentValidationResponse>
 }

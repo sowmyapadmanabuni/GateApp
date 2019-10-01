@@ -2,8 +2,6 @@ package com.oyespace.guards.pojo
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
 import io.realm.RealmList
 import kotlinx.android.parcel.Parcelize
 
@@ -84,7 +82,7 @@ data class UnitPojo(
     val unUniIden: String,
     val unUniName: String,
     val unUniType: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val undCreated: String,
     val undUpdated: String,
     val unitParkingLot: List<Any>,
@@ -96,7 +94,7 @@ data class Tenant(
     val acAccntID: Int,
     val asAssnID: Int,
     val blBlockID: Int,
-    val unUnitID: Int,
+    val unUnitID: String,
     val utEmail: String,
     val utEmail1: String,
     val utIsActive: Boolean,
@@ -116,7 +114,7 @@ data class UnitOwner(
     val acAccntID: Int,
     val asAssnID: Int,
     val blBlockID: Int,
-    val unUnitID: Int,
+    val unUnitID: String,
     val uoEmail: String,
     val uoEmail1: String,
     val uoEmail2: String,
@@ -156,7 +154,7 @@ data class UnitPojo2(
     val unUniIden: String,
     val unUniName: String,
     val unUniType: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val undCreated: String,
     val undUpdated: String,
     val unitParkingLot: List<UnitParkingLot>,
@@ -165,7 +163,7 @@ data class UnitPojo2(
 data class Owner(
     val acAccntID: Int,
     val asAssnID: Int,
-    val unUnitID: Int,
+    val unUnitID: String,
     val uoEmail: String,
     val uoEmail1: String,
     val uoEmail2: String,
@@ -191,7 +189,7 @@ data class UnitParkingLot(
     val acAccntID: Int,
     val asAssnID: Int,
     val meMemID: Int,
-    val unUnitID: Int,
+    val unUnitID: String,
     val upIsActive: Boolean,
     val upSrtD: String,
     val updCreated: String,
@@ -217,9 +215,9 @@ data class StaffRegistrationReq(
     val WKLName: String,
     val WKMobile: String,
     val WKWrkType: String,
-    val UNUnitID : Int,
+    val UNUnitID: String,
     val UNUniName : String,
-val WKEntryImg: String
+    val WKEntryImg: String
 )
 
 
@@ -371,12 +369,6 @@ data class GetWorkerListbyAssnIDResp<T>(
     val success: Boolean
 )
 
-data class GetWorkerListbyAssnIDResp_<T>(
-    val apiVersion: String,
-    val `data`: WorkerListbyAssnIDData_,
-    val success: Boolean
-)
-
 data class WorkerListbyAssnIDData(
     val worker: ArrayList<WorkerDetails>
 )
@@ -386,7 +378,7 @@ data class WorkerListbyAssnIDData_(
 
 data class WorkerDetails(
     val asAssnID: Int,
-    val blBlockID: Int,
+    val blBlockID: String,
 
     val unUnitID: String,
     val unUniName: String,
@@ -404,6 +396,7 @@ data class WorkerDetails(
     val wkidCrdNo: String,
     val wkisdCode: Any,
     val wklName: String
+
 )
 
 //Finger print req
@@ -535,7 +528,7 @@ data class CreateVisitorLogReq(
   //  val MEMemID: Int,
     val RERgVisID: Int,
     val UNUniName: String,
-    val UNUnitID: Int,
+    val UNUnitID: String,
     val VLComName: String,
     val VLFName: String,
     val VLGtName: String,
@@ -558,8 +551,8 @@ data class CreateVisitorLogReq(
     val SPPrdImg8: String,
     val SPPrdImg9: String,
     val SPPrdImg10: String,
-val WKSelfImg:String,
-val VLEntryImg:String,
+    val WKSelfImg: String,
+    val VLEntryImg: String,
     val VLENGName:String
 
 
@@ -584,7 +577,7 @@ data class VisitorLogResp(
     val reRgVisID: Int,
     val startDate: String,
     val unUniName: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val vlCmntImg: Any,
     val vlCmnts: Any,
     val vlComName: Any,
@@ -696,7 +689,7 @@ data class Workers(
     val asAssnID: Int,
     val blBlockID: Int,
 
-    val unUnitID: Int,
+    val unUnitID: String,
     val vnVendorID: Int,
     val wkDesgn: String,
     val WKEntryImg: String,
@@ -959,7 +952,7 @@ data class Member(
     val meosDate: String,
     val meuMemShp: Boolean,
     val mrmRoleID: Int,
-    val unUnitID: Int
+    val unUnitID: String
 )
 
 data class Account1(
@@ -1071,7 +1064,7 @@ data class VisitorEntryLog(
     val spPrdImg9: String,
     val startDate: String,
     val unUniName: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val vlCmntImg: String,
     val vlCmnts: String,
     val vlComName: String,
@@ -1154,7 +1147,7 @@ data class VisitorExitLog(
     val spPrdImg9: String,
     val startDate: String,
     val unUniName: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val vlCmntImg: String,
     val vlCmnts: String,
     val vlComName: String,
@@ -1203,8 +1196,7 @@ data class CheckPointByAssocID(
     val cpdCreated: String,
     val cpdUpdated: String,
     val cpgpsPnt: String,
-    val meMemID: Int,
-    val cpSurrName:String
+    val meMemID: Int
 )
 //getDeviceList
 data class getDeviceList(
@@ -1257,7 +1249,7 @@ data class VisitorEntryByMobile(
     val spPrdImg9: String,
     val startDate: String,
     val unUniName: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val vlCmntImg: String,
     val vlCmnts: String,
     val vlComName: String,
@@ -1326,53 +1318,53 @@ data class VisitorData(
 
 data class WorkerMultiEntryCheck(
 
-val vlVisLgID: Int,
-val vlfName: String,
-val vllName: String,
-val vlMobile: String,
-val vlVisType: String,
-val vlComName: String,
-val vlpOfVis : String,
-val vlSelfImg : String,
-val vlVisCnt : Int,
-val vlVehNum: String,
-val vlVehType: String,
-val vlItmCnt: Int,
-val unUniName: String,
-val vlEntyWID: Int,
-val vlEntryImg: String,
-val vlExitImg: String,
-val vlEntryGPS: String,
-val vlExitGPS: String,
-val vlExitWID: Int,
-val vlEntryT: String,
-val vlExitT: String,
-val reRgVisID: Int,
-val meMemID: Int,
-val vlCmnts: String,
-val vlCmntImg: String,
-val vlVerStat: String,
-val vlGtName: String,
-val unUnitID: Int,
-val vlPrmStat: String,
-val vlPrmBy: String,
-val fmid: Int,
-val asAssnID: Int,
-val vldCreated: String,
-val vldUpdated: String,
-val vlIsActive: Boolean,
-val startDate: String,
-val endDate: String,
-val spPrdImg1: String,
-val spPrdImg2: String,
-val spPrdImg3: String,
-val spPrdImg4: String,
-val spPrdImg5: String,
-val spPrdImg6: String,
-val spPrdImg7: String,
-val spPrdImg8: String,
-val spPrdImg9: String,
-val spPrdImg10: String
+    val vlVisLgID: Int,
+    val vlfName: String,
+    val vllName: String,
+    val vlMobile: String,
+    val vlVisType: String,
+    val vlComName: String,
+    val vlpOfVis: String,
+    val vlSelfImg: String,
+    val vlVisCnt: Int,
+    val vlVehNum: String,
+    val vlVehType: String,
+    val vlItmCnt: Int,
+    val unUniName: String,
+    val vlEntyWID: Int,
+    val vlEntryImg: String,
+    val vlExitImg: String,
+    val vlEntryGPS: String,
+    val vlExitGPS: String,
+    val vlExitWID: Int,
+    val vlEntryT: String,
+    val vlExitT: String,
+    val reRgVisID: Int,
+    val meMemID: Int,
+    val vlCmnts: String,
+    val vlCmntImg: String,
+    val vlVerStat: String,
+    val vlGtName: String,
+    val unUnitID: String,
+    val vlPrmStat: String,
+    val vlPrmBy: String,
+    val fmid: Int,
+    val asAssnID: Int,
+    val vldCreated: String,
+    val vldUpdated: String,
+    val vlIsActive: Boolean,
+    val startDate: String,
+    val endDate: String,
+    val spPrdImg1: String,
+    val spPrdImg2: String,
+    val spPrdImg3: String,
+    val spPrdImg4: String,
+    val spPrdImg5: String,
+    val spPrdImg6: String,
+    val spPrdImg7: String,
+    val spPrdImg8: String,
+    val spPrdImg9: String,
+    val spPrdImg10: String
 )
 
 //send staff image request
@@ -1435,50 +1427,50 @@ data class WorkerMobileData(
 
     val  wkWorkID:Int,
 
-val  wkfName:String,
+    val wkfName: String,
 
-val  wklName:String,
+    val wklName: String,
 
-val  wkMobile:String,
+    val wkMobile: String,
 
-val  wkEntryImg:String,
+    val wkEntryImg: String,
 
-val  wkWrkType:String,
+    val wkWrkType: String,
 
-val  wkDesgn:String,
+    val wkDesgn: String,
 
-val  wkidCrdNo:String,
+    val wkidCrdNo: String,
 
-val  vnVendorID:Int,
+    val vnVendorID: Int,
 
-val  blBlockID:Int,
+    val blBlockID: Int,
 
-val  unUnitID:Int,
+    val unUnitID: String,
 
-val  asAssnID:Int,
+    val asAssnID: Int,
 
-val wkisdCode:Any,
+    val wkisdCode: Any,
 
-val  wkdCreated:String,
+    val wkdCreated: String,
 
-val  wkdUpdated:String,
+    val wkdUpdated: String,
 
-val  wkdob:String,
+    val wkdob: String,
 
-val  wkIsActive:Boolean,
- val unUniName:String,
+    val wkIsActive: Boolean,
+    val unUniName: String,
 
-val  wkExitImg:String,
+    val wkExitImg: String,
 
-val  wkEntryGPS:String,
+    val wkEntryGPS: String,
 
-val  wkExitGPS:String,
+    val wkExitGPS: String,
 
-val  wkSelfImg:String,
+    val wkSelfImg: String,
 
-val  fromDate:String,
+    val fromDate: String,
 
-val  toDate:String
+    val toDate: String
 )
 //NotificatioCreateRequest
 data class NotificationCreateReq(
@@ -1495,7 +1487,9 @@ data class NotificationCreateReq(
     val NTDUpdated:String,
     val NTDCreated:String,
     val VLVisLgID:String,
-   val NTStatDesc:String
+    val NTStatDesc: String,
+    val NTJoinStat: String
+
 
 )
 
@@ -1563,7 +1557,7 @@ data class Units(
     val unUniIden: String,
     val unUniName: String,
     val unUniType: String,
-    val unUnitID: Int,
+    val unUnitID: String,
     val undCreated: String,
     val undUpdated: String,
     val unitParkingLot: List<Any>,
@@ -1579,6 +1573,84 @@ data class UnitListSearch<T>(
 
 data class UnitDataSingle(
     val unit: UnitPojo
+)
+//Invite create req
+
+data class InviteCreateReq(
+    val unUnitID: String,
+    val INFName: String,
+    val INLName: String,
+    val INMobile: String,
+    val INEmail: String,
+    val INVchlNo: String,
+    val INVisCnt: String,
+    val INPhoto: String,
+    val INSDate: String,
+    val INEDate: String,
+    val INPOfInv: String,
+    val INMultiEy: Boolean,
+    val ASAssnID: Int,
+    val INQRCode: Boolean
+)
+
+//Invite create Res
+
+data class InviteCreateRes(
+
+    val apiVersion: String,
+    val `data`: Invitedata,
+    val success: Boolean
+)
+
+data class Invitedata(
+    val invitation: Invitation
+)
+
+data class Invitation(
+    val inInvtID: Int,
+    val meMemID: Int,
+    val unUnitID: String,
+    val infName: String,
+    val inlName: String,
+    val inMobile: String,
+    val inEmail: String,
+    val inVchlNo: String,
+    val inVisCnt: Int,
+    val inPhoto: String,
+    val insDate: String,
+    val ineDate: String,
+    val inpOfInv: String,
+    val inIsUsed: Int,
+    val inqrCode: String,
+    val inMultiEy: String,
+    val asAssnID: Int,
+    val indCreated: String,
+    val indUpdated: String,
+    val inIsActive: Boolean
+
+)
+
+data class InvitationUpdateReq(
+    var iNIsUsed: String? = null,
+
+    var iNInvtID: Int = 0
+
+)
+
+data class GetOTPbyCallReq(
+
+    val authkey: String,
+    val mobile: String,
+    val retrytype: String
+
+)
+
+data class OTPbyCallResponse(
+
+    val message: String,
+    val type: String
+
+
 )
 
 
@@ -1602,18 +1674,90 @@ data class CheckPointData(
     val cpdUpdated: String,
     val cpgpsPnt: String,
     val meMemID: Int,
-    val cpSurrName:String,
-    val cpcPntAt:String
+    val cpSurrName: String,
+    val cpcPntAt: String
+)
+
+data class GetFamilyMemberResponse(
+
+    val apiVersion: String,
+    val `data`: FamilyMembersData,
+    val success: Boolean
+)
+
+data class FamilyMembersData(
+    val familyMembers: ArrayList<FamilyMember>
+)
+
+data class FamilyMember(
+    val fmid: Int,
+    val fmName: String,
+    val fmMobile: String,
+    val meMemID: Int,
+    val unUnitID: Int,
+    val fmRltn: String,
+    val fmisdCode: String,
+    val asAssnID: Int,
+    val acAccntID: Int,
+    val fmImgName: String,
+    val fmlName: String,
+    val fmGurName: String,
+    val fmMinor: Boolean,
+    val fmdCreated: String,
+    val fmdUpdated: String,
+    val fmIsActive: Boolean,
+    val pAccntID: Int
+
 )
 
 
+data class ResidentValidationRequest(
+
+    val MobileNumber: String,
+    val AssociationID: Int
+
+)
 
 
+data class ResidentValidationResponse(
+
+    val apiVersion: String,
+    val `data`: ResidentData,
+    val success: Boolean
+
+)
+
+data class ResidentData(
 
 
+    val `object`: ResidentObject
 
 
+)
 
+data class ResidentObject(
+
+
+    val code: Int,
+    val message: String
+
+
+)
+
+//SOS update request
+data class SOSUpdateReq(
+    val SOSID: Int,
+    val DEGate: String,
+    val DEMobileNo: String,
+    val SOStatus: String
+)
+
+
+data class SOSUpdateResp(
+    val apiVersion: String,
+    val data: String,
+    val success: Boolean
+)
 
 
 

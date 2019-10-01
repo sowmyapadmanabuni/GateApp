@@ -2,8 +2,8 @@ package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import com.oyespace.guards.R
 
 
@@ -17,7 +17,7 @@ class SectionedRecyclerView : AppCompatActivity() {
     }
 
     fun gridSectionedRecyclerView(view: View) {
-        startRecyclerViewActivity(RecyclerViewType.GRID);
+        startRecyclerViewActivity(RecyclerViewType.GRID)
     }
 
     private fun startRecyclerViewActivity(recyclerViewType: RecyclerViewType) {

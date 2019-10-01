@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
-import androidx.viewpager.widget.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,9 +11,12 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.viewpager.widget.PagerAdapter;
+
+import com.oyespace.guards.R;
+
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import com.oyespace.guards.R;
 
 
 /**
@@ -54,7 +56,7 @@ public class CarImages_Adapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, final int position) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View pagerview = inflater.inflate(R.layout.custom_add_car_images_layout, container, false);
-        final ImageView pagerImage = (ImageView) pagerview.findViewById(R.id.car_images);
+        final ImageView pagerImage = pagerview.findViewById(R.id.car_images);
         Log.e("Path", "" + listimage.get(position));
         Bitmap b = null;
         try {
@@ -66,7 +68,7 @@ public class CarImages_Adapter extends PagerAdapter {
         }
         pagerImage.setImageBitmap(b);
         container.addView(pagerview, 0);
-        final ImageView imagedelete = (ImageView) pagerview.findViewById(R.id.image_delete_button);
+        final ImageView imagedelete = pagerview.findViewById(R.id.image_delete_button);
         imagedelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

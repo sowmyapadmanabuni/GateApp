@@ -1,38 +1,18 @@
 package com.oyespace.guards.activity
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.SeviceProviderListResponse
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.oyespace.guards.R
 import com.oyespace.guards.adapter.CompanyItemRVAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.utils.Prefs
-
-import kotlinx.android.synthetic.main.activity_service_provider_list.*
-import java.util.*
-
-import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.utils.NetworkAvailable
 import com.oyespace.guards.pojo.VendorPojo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
-
-
-
-
-
-
-
+import com.oyespace.guards.utils.Prefs
+import java.util.*
 
 
 class ServiceProviderListActivity : BaseKotlinActivity() {
@@ -45,6 +25,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.zomoto,
         R.mipmap.sw,
         R.mipmap.foodpanda,
+        R.drawable.ubereats,
+        R.drawable.dominospizza,
         R.mipmap.bluedart,
         R.mipmap.dtdc,
         R.mipmap.fedex,
@@ -60,6 +42,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         R.drawable.ola,
         R.drawable.uber,
         R.drawable.meru,
+        R.drawable.gas_cylinder,
         R.drawable.others
 
 
@@ -68,6 +51,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         "Zomato",
         "Swiggy",
         "FoodPanda",
+        "Uber Eats",
+        "Dominos",
         "BlueDart",
         "DTDC",
         "Fedex",
@@ -83,6 +68,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         "OLA",
         "Uber",
         "Meru",
+        "Gas Cylinder",
         "Others"
 
     )
@@ -115,9 +101,9 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
         //  getServiceProviderList()
-        val rv_serviceProvider = findViewById(R.id.rv_serviceProvider) as androidx.recyclerview.widget.RecyclerView
-        rv_serviceProvider!!.setHasFixedSize(true)
-        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(this@ServiceProviderListActivity, 3)
+        val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
+        rv_serviceProvider.setHasFixedSize(true)
+        val gridLayoutManager = GridLayoutManager(this@ServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         val data: ArrayList<VendorPojo> = prepareData()
@@ -239,8 +225,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
         for (i in 0 until vendor_names.size) {
             val vendorPojo = VendorPojo()
-            vendorPojo.setVendor_names(vendor_names[i])
-            vendorPojo.setImage_url(myImageList[i])
+            vendorPojo.vendor_names = vendor_names[i]
+            vendorPojo.image_url = myImageList[i]
             vendordata.add(vendorPojo)
         }
         return vendordata

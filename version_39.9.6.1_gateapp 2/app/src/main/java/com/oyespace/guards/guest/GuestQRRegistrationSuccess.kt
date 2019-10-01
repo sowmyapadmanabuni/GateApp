@@ -11,19 +11,20 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.network.*
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
+import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.NumberUtils.toInteger
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -66,8 +67,8 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.button_done -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
                 visitorLog()
 
@@ -112,37 +113,37 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
 //        )
 
-        tv_name.setText(intent.getStringExtra(PERSONNAME))
+        tv_name.text = intent.getStringExtra(PERSONNAME)
 
         val input =intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_mobilenumber.setText(number)
+        tv_mobilenumber.text = number
 //        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
 //                + "" + intent.getStringExtra(MOBILENUMBER))
-        tv_for.setText(resources.getString(R.string.textto)+ intent.getStringExtra(UNITNAME))
-        tv_totalperson.setText(resources.getString(R.string.textperson))
-        tv_from.setText(resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME))
+        tv_for.text = resources.getString(R.string.textto) + intent.getStringExtra(UNITNAME)
+        tv_totalperson.text = resources.getString(R.string.textperson)
+        tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
             minteger++
-            menuCount.setText("" + minteger)
+            menuCount.text = "" + minteger
 
         }
 
         menuRemove.setOnClickListener {
             if (minteger > 1) {
                 minteger--
-                menuCount.setText("" + minteger)
+                menuCount.text = "" + minteger
 
             } else {
 
             }
         }
         if (intent.getStringExtra(FLOW_TYPE) == STAFF_REGISTRATION) {
-            tv_from.setText("Designation: " + intent.getStringExtra(COMPANY_NAME))
-            itemLyt.setVisibility(View.GONE)
+            tv_from.text = "Designation: " + intent.getStringExtra(COMPANY_NAME)
+            itemLyt.visibility = View.GONE
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 singUp(
@@ -157,11 +158,15 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun visitorLog() {
-        var memID:Int=64;
+        var memID: Int = 64
         if(!BASE_URL.contains("dev",true)){
-            memID=410;
+            memID = 410
         }
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, intent.getStringExtra(UNITNAME), toInteger(intent.getStringExtra(UNITID)),
+        val req = CreateVisitorLogReq(
+            Prefs.getInt(ASSOCIATION_ID, 0),
+            0,
+            intent.getStringExtra(UNITNAME),
+            intent.getStringExtra(UNITID),
             intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), LocalDb.getAssociation()!!.asAsnName, 0, "",
             intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
@@ -174,6 +179,9 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
+
+                        //  getInvitationCreate(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(PERSONNAME),"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),"","","","",getCurrentTimeLocal(),getCurrentTimeLocal(),"",true,Prefs.getInt(ASSOCIATION_ID,0),true)
+
                         visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         var imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + globalApiObject.data.visitorLog.vlVisLgID + ".jpg"
 
@@ -184,17 +192,20 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra("name", intent.getStringExtra(PERSONNAME))
                         d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
                         d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-
+                        d.putExtra(VISITOR_TYPE, GUEST)
                         d.putExtra("memType", "Owner")
                         d.putExtra(UNITID,intent.getStringExtra(UNITID))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
 
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        sendBroadcast(d);
+                        sendBroadcast(d)
 
-                        val intentdata = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
-                        startActivity(intentdata)
+//                        val intentdata = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
+//                        startActivity(intentdata)
+
+                        finish()
 
 
                         Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
@@ -333,7 +344,8 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
                 try {
                     Log.d("uploadImage", "response:" + response.body()!!)
                     file.delete()
-                    Toast.makeText(getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Uploaded Successfully", Toast.LENGTH_SHORT)
+                        .show()
 
                 } catch (ex: Exception) {
                     Log.d("uploadImage", "errr:" + ex.toString())
@@ -441,5 +453,65 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //        startActivity(d)
         finish()
     }
+
+    private fun getInvitationCreate(
+        unUnitID: String,
+        INFName: String,
+        INLName: String,
+        INMobile: String,
+        INEmail: String,
+        INVchlNo: String,
+        INVisCnt: String,
+        INPhoto: String,
+        INSDate: String,
+        INEDate: String,
+        INPOfInv: String,
+        INMultiEy: Boolean,
+        ASAssnID: Int,
+        INQRCode: Boolean
+    ) {
+
+
+        val dataReq = InviteCreateReq(
+            unUnitID,
+            INFName,
+            INLName,
+            INMobile,
+            INEmail,
+            INVchlNo,
+            INVisCnt,
+            INPhoto,
+            INSDate,
+            INEDate,
+            INPOfInv,
+            INMultiEy,
+            ASAssnID,
+            INQRCode
+        )
+
+
+        RetrofitClinet.instance
+            .sendInviteRequest(OYE247TOKEN, dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<InviteCreateRes>() {
+
+                override fun onSuccessResponse(inviteCreateRes: InviteCreateRes) {
+
+
+                }
+
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList", e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
+
+
 
 }

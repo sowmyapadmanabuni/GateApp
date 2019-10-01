@@ -12,15 +12,20 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.viewpager.widget.ViewPager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.viewpager.widget.ViewPager;
+
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
@@ -30,29 +35,27 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 import com.oyespace.guards.Dashboard;
-import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.network.ChampApiInterface;
 import com.oyespace.guards.network.ResponseHandler;
 import com.oyespace.guards.network.RestClient;
 import com.oyespace.guards.network.URLData;
+import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
 import com.oyespace.guards.utils.Prefs;
 import com.oyespace.guards.vehicle_others.VehicleOthersServiceProviderListActivity;
 import com.yarolegovich.lovelydialog.LovelyStandardDialog;
-//import com.google.firebase.codelab.mlkit.R;
-//import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
-//import com.google.firebase.ml.custom.FirebaseModelInterpreter;
-//import com.google.firebase.ml.vision.FirebaseVision;
-//import com.google.firebase.ml.vision.common.FirebaseVisionImage;
-//import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
-//import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
 import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
@@ -61,6 +64,7 @@ import static com.oyespace.guards.utils.Utils.showToast;
 
 public class  CaptureImageOcr extends Activity implements View.OnClickListener, ResponseHandler {
 
+    String imgNamee;
     public static final int REQUEST_CAMERA = 0, SELECT_FILE = 1, PICK_INSURANCE_REQUEST_CODE = 2, PICK_RCBOOK_REQUEST_CODE = 3;
     private static final int DIM_BATCH_SIZE = 1;
     private static final int DIM_PIXEL_SIZE = 3;
@@ -197,12 +201,12 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
 
 
     private void initViews() {
-        vehicalnumber =(EditText) findViewById(R.id.txt_Vehical_otp);
-        iamgeLyt = (LinearLayout) findViewById(R.id.imageLyt);
-        resident = (Button)findViewById(R.id.resident);
-        guest = (Button)findViewById(R.id.guest);
-        other = (Button) findViewById(R.id.other_guest) ;
-        buttonNext = (Button)findViewById(R.id.buttonNext);
+        vehicalnumber = findViewById(R.id.txt_Vehical_otp);
+        iamgeLyt = findViewById(R.id.imageLyt);
+        resident = findViewById(R.id.resident);
+        guest = findViewById(R.id.guest);
+        other = findViewById(R.id.other_guest);
+        buttonNext = findViewById(R.id.buttonNext);
         buttonNext.setText(getResources().getString(R.string.textverify));
         resident.setVisibility(View.INVISIBLE);
         guest.setVisibility(View.INVISIBLE);
@@ -238,6 +242,7 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
                 break;
             case R.id.guest:
 
+                deleteImage();
                 Intent in = new Intent(this, CustomViewFinderScannerActivity.class);
                 startActivity(in);
                 finish();
@@ -245,9 +250,9 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
 
             case R.id.other_guest:
 
+                deleteImage();
                 Intent in2 = new Intent(this, VehicleOthersServiceProviderListActivity.class);
                 in2.putExtra(VEHICLE_NUMBER,vehicalnumber.getText().toString());
-
                 startActivity(in2);
                 finish();
                 break;
@@ -283,8 +288,8 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
                             .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    Intent intent = new Intent(CaptureImageOcr.this, Dashboard.class);
-                                    startActivity(intent);
+//                                    Intent intent = new Intent(CaptureImageOcr.this, Dashboard.class);
+//                                    startActivity(intent);
                                     finish();
                                 }
                             })
@@ -365,9 +370,10 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
         runCloudTextRecognition(thumbnail);
+        imgNamee = System.currentTimeMillis() + ".jpg";
 
         File destination = new File(Environment.getExternalStorageDirectory().getPath(),
-                System.currentTimeMillis() + ".jpg");
+                imgNamee);
 
           setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
         Log.d("Image url ", destination.getAbsoluteFile().toString());
@@ -498,5 +504,11 @@ final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.l
         Intent i=new Intent(CaptureImageOcr.this,Dashboard.class);
         startActivity(i);
         finish();
+    }
+
+    public void deleteImage() {
+        File dir = new File(Environment.getExternalStorageDirectory().getPath());
+        File file = new File(dir, imgNamee);
+        file.delete();
     }
 }

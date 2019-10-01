@@ -1,10 +1,12 @@
 package com.oyespace.guards.vehicle_others;
 
 import android.os.Bundle;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.viewpager.widget.ViewPager;
+
 import com.oyespace.guards.R;
 
 public class VehicleOthersViewFullImageActivity extends AppCompatActivity {
@@ -19,7 +21,7 @@ public class VehicleOthersViewFullImageActivity extends AppCompatActivity {
         pos=getIntent().getIntExtra("pos",0);
         Log.i("List", "Passed Array List :: " + pos);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
        viewPager.setAdapter(new VehicleOthersViewPagerAdapter(this));
        viewPager.setCurrentItem(pos);
 

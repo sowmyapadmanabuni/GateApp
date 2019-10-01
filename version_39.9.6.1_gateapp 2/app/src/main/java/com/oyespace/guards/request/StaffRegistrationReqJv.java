@@ -2,7 +2,7 @@ package com.oyespace.guards.request;
 
 public class StaffRegistrationReqJv {
     public int ASAssnID;
-    public int BLBlockID; 
+    public String BLBlockID;
     public String EmailID; 
     public int FLFloorID; 
     public int OYEMemberID; 
@@ -14,9 +14,9 @@ public class StaffRegistrationReqJv {
     public String WKDOB;
     public String WKISDCode;  
     public String WKLName;  
-    public String WKMobile;  
-    public String WKWrkType;  
-    public int UNUnitID ;  
+    public String WKMobile;
+    public String WKWrkType;
+    public String UNUnitID;
     public String UNUniName ;
     public String WKEntryImg;
 }

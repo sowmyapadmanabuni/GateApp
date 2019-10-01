@@ -2,15 +2,13 @@ package com.oyespace.guards.com.oyespace.guards.activity
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
 import android.media.RingtoneManager
 import android.os.Build
-import androidx.core.app.NotificationCompat
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.oyespace.guards.R
@@ -60,7 +58,7 @@ class FirebaseMessagingServiceSos: FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
         super.onMessageReceived(remoteMessage)
         remoteMessage?.let { message ->
-            Log.i(TAG, message.getData().get("message"))
+            Log.i(TAG, message.data.get("message"))
 
 
             notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

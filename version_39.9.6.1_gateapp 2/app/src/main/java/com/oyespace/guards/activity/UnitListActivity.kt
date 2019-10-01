@@ -9,29 +9,23 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.oyespace.guards.Dashboard
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.UnitList
 import com.oyespace.guards.pojo.UnitPojo
-import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_unit_list.*
@@ -80,13 +74,13 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
         if(LocalDb.getUnitList()!=null){
             arrayList = LocalDb.getUnitList()
-            orderListAdapter = UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@UnitListActivity)
+            orderListAdapter = UnitListAdapter(arrayList, this@UnitListActivity)
             rv_unit.adapter = orderListAdapter
         }else {
             makeUnitLog()
         }
 
-        rv_unit.setLayoutManager(androidx.recyclerview.widget.GridLayoutManager(this@UnitListActivity, 2))
+        rv_unit.setLayoutManager(GridLayoutManager(this@UnitListActivity, 2))
 
         btn_mic.setOnClickListener {
             Speak()
@@ -100,9 +94,9 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
             R.id.buttonNext ->{
 
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
-                if (arrayList?.size > 0) {
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
+                if (arrayList.size > 0) {
                     for (j in arrayList.indices) {
                         if (arrayList.get(j).isSelected) {
                             if((unitNames.length!=0)||(unitNumber1.length!=0)){
@@ -167,14 +161,19 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                             d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
                             d.putExtra("RESIDENT_NUMBER",unitNumber1+", "+unitNumber2+", "+unitNumber3+", "+unitNumber4+", "+unitNumber5)
 
-                            startActivity(d);
-                            finish();
+                            startActivity(d)
+                            finish()
                         }else {
 
                             val d = Intent(this@UnitListActivity, MobileNumberScreen::class.java)
-                            Log.d("intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " "
-                                    + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " "
-                                    + getIntent().getStringExtra(COUNTRYCODE) + " ");
+                            Log.d(
+                                "intentdata NameEntr",
+                                "buttonNext " + intent.getStringExtra(UNITNAME) + " "
+                                        + intent.getStringExtra(UNITID) + " " + intent.getStringExtra(
+                                    MOBILENUMBER
+                                ) + " "
+                                        + intent.getStringExtra(COUNTRYCODE) + " "
+                            )
                             d.putExtra(UNITID, unitId)
                             d.putExtra(UNITNAME, unitNames)
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -183,13 +182,13 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                             //d.putExtra("RESIDENT_NUMBER",unitNumber1)
                             d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
                             d.putExtra("RESIDENT_NUMBER",unitNumber1+", "+unitNumber2+", "+unitNumber3+", "+unitNumber4+", "+unitNumber5)
-                            startActivity(d);
-                            finish();
+                            startActivity(d)
+                            finish()
                         }
 
                     } else {
-                        buttonNext.setEnabled(true)
-                        buttonNext.setClickable(true)
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
                         Toast.makeText(applicationContext, "Select Unit", Toast.LENGTH_SHORT).show()
 
                     }
@@ -230,11 +229,11 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                 override fun onSuccessResponse(UnitList: UnitList<ArrayList<UnitPojo>>) {
 
                     if (UnitList.success == true) {
-                        Log.d("cdvd",UnitList.toString());
+                        Log.d("cdvd", UnitList.toString())
 
                         arrayList = UnitList.data.unit
 //                        TODO save unit list
-                        orderListAdapter = UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@UnitListActivity)
+                        orderListAdapter = UnitListAdapter(arrayList, this@UnitListActivity)
                         rv_unit.adapter = orderListAdapter
 //                        rv_unit.adapter = UnitAdapter(entries, this@UnitListActivity)
 
@@ -244,7 +243,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd",e.message);
+                    Log.d("cdvd", e.message)
                     Toast.makeText(this@UnitListActivity, "Error ", Toast.LENGTH_LONG).show()
 
                 }
@@ -273,13 +272,13 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
 
@@ -296,19 +295,19 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
 
         override fun onBindViewHolder(holder: MenuHolder, position: Int) {
-            val orderData = listVistor?.get(position)
-            val vistordate = orderData?.asAssnID
-            holder.apartmentNamee.text = orderData?.unUniName
+            val orderData = listVistor.get(position)
+            val vistordate = orderData.asAssnID
+            holder.apartmentNamee.text = orderData.unUniName
 
             holder.cb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
                 // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
-                listVistor!!.get(position).isSelected=isChecked
+                listVistor.get(position).isSelected = isChecked
 
             }
             //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
 
             holder.iv_unit.setOnClickListener {
-                if (orderData!!.owner.size == 0 && orderData!!.tenant.size == 0) {
+                if (orderData.owner.size == 0 && orderData.tenant.size == 0) {
                     //  Log.d("cdvd 2", "" + orderData?.owner[0].uoisdCode + " " + orderData?.owner[0].uoMobile);
 
 //if(orderData.owner[0].uoMobile!=null) {
@@ -344,9 +343,9 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 //                    mcontext.startActivity(intent)
 
 
-                    if (orderData!!.tenant.size != 0) {
+                    if (orderData.tenant.size != 0) {
 
-                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                        val alertadd = AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -390,7 +389,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                         iv_unit1.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL);
+                            val intent = Intent(Intent.ACTION_CALL)
                             intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile)
                             mcontext.startActivity(intent)
 
@@ -399,7 +398,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                         iv_unit2.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL);
+                            val intent = Intent(Intent.ACTION_CALL)
                             intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile1)
                             mcontext.startActivity(intent)
 
@@ -411,9 +410,9 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                     } else {
 
-                        if (orderData!!.owner.size != 0) {
+                        if (orderData.owner.size != 0) {
 
-                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                            val alertadd = AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -495,7 +494,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                             iv_unit1.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile)
                                 mcontext.startActivity(intent)
 
@@ -503,7 +502,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                             iv_unit2.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile1)
                                 mcontext.startActivity(intent)
 
@@ -511,21 +510,21 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                             iv_unit3.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile2)
                                 mcontext.startActivity(intent)
 
                             }
                             iv_unit4.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile3)
                                 mcontext.startActivity(intent)
 
                             }
                             iv_unit5.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile4)
                                 mcontext.startActivity(intent)
 
@@ -574,27 +573,27 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID, AppUtils.intToString(orderData?.unUnitID))
-                intent.putExtra(UNITNAME, orderData?.unUniName)
+                intent.putExtra(UNITID, orderData.unUnitID)
+                intent.putExtra(UNITNAME, orderData.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
 
-                if( listVistor!!.get(position).isSelected){
-                    listVistor!!.get(position).isSelected=false
-                    holder.cb_unit.setChecked(false)
+                if (listVistor.get(position).isSelected) {
+                    listVistor.get(position).isSelected = false
+                    holder.cb_unit.isChecked = false
                 }else{
-                    listVistor!!.get(position).isSelected=true
-                    holder.cb_unit.setChecked(true)
+                    listVistor.get(position).isSelected = true
+                    holder.cb_unit.isChecked = true
                 }
 
             })
         }
 
         override fun getItemCount(): Int {
-            return listVistor?.size ?: 0
+            return listVistor.size
         }
 
-        inner class MenuHolder(private val view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: CheckBox
@@ -661,4 +660,6 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
 //        startActivity(i_delivery)
         finish()
     }
+
+
 }

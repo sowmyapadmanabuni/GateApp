@@ -1,18 +1,17 @@
 package com.oyespace.guards.testgridsectionedrecyclerview
 
 import android.os.Bundle
+import android.view.MenuItem
 import androidx.annotation.Nullable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import android.view.MenuItem
 import com.oyespace.guards.R
-import com.oyespace.guards.pojo.SPData
 
 
 class RecyclerViewActivity : AppCompatActivity() {
     var recyclerViewType: RecyclerViewType? = null
-    var recyclerView: androidx.recyclerview.widget.RecyclerView? = null
+    var recyclerView: RecyclerView? = null
 
     override fun onCreate(@Nullable savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,15 +30,16 @@ class RecyclerViewActivity : AppCompatActivity() {
         when (recyclerViewType) {
             //  LINEAR_HORIZONTAL -> supportActionBar!!.setTitle(resources.getString(R.string.linear_sectioned_recyclerview_horizontal))
             // LINEAR_VERTICAL -> supportActionBar!!.setTitle(resources.getString(R.string.linear_sectioned_recyclerview_vertical))
-            RecyclerViewType.GRID -> supportActionBar!!.setTitle(resources.getString(R.string.grid_sectioned_recyclerview))
+            RecyclerViewType.GRID -> supportActionBar!!.title =
+                resources.getString(R.string.grid_sectioned_recyclerview)
         }
     }
 
     //setup recycler view
     private fun setUpRecyclerView() {
-        recyclerView = findViewById(R.id.sectioned_recycler_view) as androidx.recyclerview.widget.RecyclerView
+        recyclerView = findViewById<RecyclerView>(R.id.sectioned_recycler_view)
         recyclerView!!.setHasFixedSize(true)
-        val linearLayoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        val linearLayoutManager = LinearLayoutManager(this)
         recyclerView!!.layoutManager = linearLayoutManager
     }
 
@@ -65,7 +65,7 @@ class RecyclerViewActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.getItemId()) {
+        when (item.itemId) {
             android.R.id.home -> finish()
         }
         return super.onOptionsItemSelected(item)

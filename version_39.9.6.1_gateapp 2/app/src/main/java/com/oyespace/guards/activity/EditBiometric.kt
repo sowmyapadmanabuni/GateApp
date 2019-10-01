@@ -7,29 +7,24 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
-import android.content.res.Resources
-import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
-import android.os.PowerManager
 import android.speech.tts.TextToSpeech
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import com.oyespace.guards.*
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.CaptureFPResponse
 import com.oyespace.guards.network.ResponseHandler
@@ -41,16 +36,10 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
-import kotlinx.android.synthetic.main.layout_viewpager_iem.*
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.net.URL
 import java.nio.ByteBuffer
-import java.sql.Blob
 import java.util.*
-import kotlin.math.absoluteValue
 
 
 class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
@@ -367,7 +356,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         relLayout3 = findViewById(R.id.layout_fp3_done)
 
         grayBuffer = IntArray(JSGFPLib.MAX_IMAGE_WIDTH_ALL_DEVICES * JSGFPLib.MAX_IMAGE_HEIGHT_ALL_DEVICES)
-        for (i in grayBuffer!!.indices)
+        for (i in grayBuffer.indices)
             grayBuffer[i] = Color.GRAY//getResources().getColor(R.color.google_light);
         grayBitmap = Bitmap.createBitmap(
             JSGFPLib.MAX_IMAGE_WIDTH_ALL_DEVICES,
@@ -449,9 +438,9 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 //            mImageFingerprint3!!.setImageBitmap(grayBitmap)
 //
 //        }
-
-        val d = Intent(this@EditBiometric, Dashboard::class.java)
-        startActivity(d)
+//
+//        val d = Intent(this@EditBiometric, Dashboard::class.java)
+//        startActivity(d)
         finish()
 
         /*}
@@ -506,7 +495,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         if (bSecuGenDeviceOpened) {
             autoOn!!.stop()
             EnableControls()
-            sgfplib!!.CloseDevice()
+            sgfplib.CloseDevice()
             bSecuGenDeviceOpened = false
         }
         unregisterReceiver(mUsbReceiver)
@@ -548,7 +537,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         DisableControls()
         registerReceiver(mUsbReceiver, filter)
         try {
-            var error = sgfplib!!.Init(SGFDxDeviceName.SG_DEV_AUTO)
+            var error = sgfplib.Init(SGFDxDeviceName.SG_DEV_AUTO)
             if (error != SGFDxErrorCode.SGFDX_ERROR_NONE) {
                 val dlgAlert = AlertDialog.Builder(this)
                 if (error == SGFDxErrorCode.SGFDX_ERROR_DEVICE_NOT_FOUND)
@@ -574,7 +563,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                     }.create().show()
 
             } else {
-                val usbDevice = sgfplib!!.GetUsbDevice()
+                val usbDevice = sgfplib.GetUsbDevice()
                 if (usbDevice == null) {
                     val dlgAlert = AlertDialog.Builder(this)
                     dlgAlert.setMessage("SecuGen fingerprint sensor not found!")
@@ -588,21 +577,21 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                     dlgAlert.setCancelable(false)
                     dlgAlert.create().show()
                 } else {
-                    var hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
+                    var hasPermission = sgfplib.GetUsbManager().hasPermission(usbDevice)
                     if (!hasPermission) {
                         if (!usbPermissionRequested) {
                             // debugMessage("Requesting USB Permission\n");
                             //Log.d(TAG, "Call GetUsbManager().requestPermission()");
                             usbPermissionRequested = true
-                            sgfplib!!.GetUsbManager().requestPermission(usbDevice, mPermissionIntent)
+                            sgfplib.GetUsbManager().requestPermission(usbDevice, mPermissionIntent)
                         } else {
                             //wait up to 20 seconds for the system to grant USB permission
-                            hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
+                            hasPermission = sgfplib.GetUsbManager().hasPermission(usbDevice)
                             // debugMessage("Waiting for USB Permission\n");
                             var i = 0
                             while (hasPermission == false && i <= 40) {
                                 ++i
-                                hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
+                                hasPermission = sgfplib.GetUsbManager().hasPermission(usbDevice)
                                 try {
                                     Thread.sleep(50)
                                 } catch (e: InterruptedException) {
@@ -615,12 +604,12 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                     }
                     if (hasPermission) {
                         // debugMessage("Opening SecuGen Device\n");
-                        error = sgfplib!!.OpenDevice(0)
+                        error = sgfplib.OpenDevice(0)
                         // debugMessage("OpenDevice() ret: " + error + "\n");
                         if (error == SGFDxErrorCode.SGFDX_ERROR_NONE) {
                             bSecuGenDeviceOpened = true
                             val deviceInfo = SecuGen.FDxSDKPro.SGDeviceInfoParam()
-                            error = sgfplib!!.GetDeviceInfo(deviceInfo)
+                            error = sgfplib.GetDeviceInfo(deviceInfo)
                             // debugMessage("GetDeviceInfo() ret: " + error + "\n");
                             mImageWidth = deviceInfo.imageWidth
                             mImageHeight = deviceInfo.imageHeight
@@ -629,8 +618,8 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                             // debugMessage("Image height: " + mImageHeight + "\n");
                             // debugMessage("Image resolution: " + mImageDPI + "\n");
                             // debugMessage("Serial Number: " + new String(deviceInfo.deviceSN()) + "\n");
-                            sgfplib!!.SetTemplateFormat(SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
-                            sgfplib!!.GetMaxTemplateSize(mMaxTemplateSize)
+                            sgfplib.SetTemplateFormat(SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                            sgfplib.GetMaxTemplateSize(mMaxTemplateSize)
                             // debugMessage("TEMPLATE_FORMAT_SG400 SIZE: " + mMaxTemplateSize[0] + "\n");
                             mRegisterTemplate = ByteArray(mMaxTemplateSize!![0])
                             mFingerprint1Template = ByteArray(mMaxTemplateSize!![0])
@@ -638,7 +627,10 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                             mFingerprint3Template = ByteArray(mMaxTemplateSize!![0])
 
                             EnableControls()
-                            sgfplib!!.WriteData(SGFDxConstant.WRITEDATA_COMMAND_ENABLE_SMART_CAPTURE, 1.toByte())
+                            sgfplib.WriteData(
+                                SGFDxConstant.WRITEDATA_COMMAND_ENABLE_SMART_CAPTURE,
+                                1.toByte()
+                            )
                             if (mAutoOnEnabled) {
                                 autoOn!!.start()
                                 DisableControls()
@@ -667,7 +659,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         if (bSecuGenDeviceOpened) {
             autoOn!!.stop()
             //            EnableControls();
-            sgfplib!!.CloseDevice()
+            sgfplib.CloseDevice()
             bSecuGenDeviceOpened = false
         }
         // sgfplib.CloseDevice();
@@ -779,7 +771,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                 // sgfplib.SetLedOn(true)
 
 
-                result = sgfplib!!.GetImageEx(mRegisterImage, 10000, 50)
+                result = sgfplib.GetImageEx(mRegisterImage, 10000, 50)
                // Toast.makeText(this@EditBiometric, " E " + result.toString(), Toast.LENGTH_LONG).show()
 
                 if (result.toString() == "52" || result.toString() == "0" || result.toString().equals(0)) {
@@ -809,9 +801,9 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
                 if (copy1 == false) {
                     mImageFingerprint1!!.setImageBitmap(this.toGrayscale(mRegisterImage))
-                    for (i in mFingerprint1Template!!.indices)
+                    for (i in mFingerprint1Template.indices)
                         mFingerprint1Template[i] = 0
-                    result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint1Template)
+                    result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mFingerprint1Template)
 
                     relLayout1!!.visibility = View.VISIBLE
                     change = findViewById(R.id.btn_delete_fp1)
@@ -840,14 +832,14 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
             val d = Intent(this, EditBiometric::class.java)
             intent.getIntExtra(WORKER_ID, 0)
-            d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME))
-            d.putExtra(UNITID, getIntent().getStringExtra(UNITID))
-            d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME))
-            d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE))
-            d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE))
-            d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME))
-            d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
-            d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE))
+            d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
+            d.putExtra(UNITID, intent.getStringExtra(UNITID))
+            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+            d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+            d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+            d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+            d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+            d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
             startActivity(d)
 
             //  Relaunching the biometric page
@@ -879,7 +871,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                 next!!.visibility = View.INVISIBLE
                 save!!.visibility = View.VISIBLE
 
-                var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
+                var result = sgfplib.GetImageEx(mRegisterImage, 10000, 50)
 
 
                  // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
@@ -902,14 +894,14 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
                 if (copy2 == false) {
 
-                    for (i in mFingerprint2Template!!.indices)
+                    for (i in mFingerprint2Template.indices)
                         mFingerprint2Template[i] = 0
-                    result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint2Template)
+                    result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mFingerprint2Template)
 
                     var existInDB1 = BooleanArray(1)
                     existInDB1 = BooleanArray(1)
                     val res: Long
-                    res = sgfplib!!.MatchTemplate(
+                    res = sgfplib.MatchTemplate(
                         mFingerprint1Template,
                         mFingerprint2Template,
                         SGFDxSecurityLevel.SL_LOWEST,
@@ -968,7 +960,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                 next!!.visibility = View.INVISIBLE
                 save!!.visibility = View.VISIBLE
 
-                var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
+                var result = sgfplib.GetImageEx(mRegisterImage, 10000, 50)
 
               //  Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(true), Toast.LENGTH_LONG).show()
 
@@ -988,15 +980,15 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
                 if (copy3 == false) {
 
-                    for (i in mFingerprint3Template!!.indices)
+                    for (i in mFingerprint3Template.indices)
                         mFingerprint3Template[i] = 0
-                    result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint3Template)
+                    result = sgfplib.CreateTemplate(fpInfo, mRegisterImage, mFingerprint3Template)
 
 
 
                     val existInDB1 = BooleanArray(1)
                     val res: Long
-                    res = sgfplib!!.MatchTemplate(
+                    res = sgfplib.MatchTemplate(
                         mFingerprint2Template,
                         mFingerprint3Template,
                         SGFDxSecurityLevel.SL_LOWEST,
@@ -1044,7 +1036,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
         if (v.id == R.id.btn_delete_fp1) {
             mImageFingerprint1!!.setImageBitmap(grayBitmap)
-            for (i in mFingerprint1Template!!.indices)
+            for (i in mFingerprint1Template.indices)
                 mFingerprint1Template[i] = 0
             // next=findViewById(R.id.buttonNext);
             next!!.visibility = View.VISIBLE
@@ -1057,7 +1049,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
             copy1 = false
         } else if (v.id == R.id.btn_delete_fp2) {
             mImageFingerprint2!!.setImageBitmap(grayBitmap)
-            for (i in mFingerprint2Template!!.indices)
+            for (i in mFingerprint2Template.indices)
                 mFingerprint2Template[i] = 0
 
             relLayout2!!.visibility = View.INVISIBLE
@@ -1068,7 +1060,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
         } else if (v.id == R.id.btn_delete_fp3) {
             mImageFingerprint3!!.setImageBitmap(grayBitmap)
-            for (i in mFingerprint3Template!!.indices)
+            for (i in mFingerprint3Template.indices)
                 mFingerprint3Template[i] = 0
             relLayout3!!.visibility = View.INVISIBLE
             copy3 = false
@@ -1157,21 +1149,21 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
     private fun resetCapures() {
         mImageFingerprint1!!.setImageBitmap(grayBitmap)
-        for (i in mFingerprint1Template!!.indices)
+        for (i in mFingerprint1Template.indices)
             mFingerprint1Template[i] = 0
 
         relLayout1!!.visibility = View.INVISIBLE
         copy1 = false
 
         mImageFingerprint2!!.setImageBitmap(grayBitmap)
-        for (i in mFingerprint2Template!!.indices)
+        for (i in mFingerprint2Template.indices)
             mFingerprint2Template[i] = 0
 
         relLayout2!!.visibility = View.INVISIBLE
         copy2 = false
 
         mImageFingerprint3!!.setImageBitmap(grayBitmap)
-        for (i in mFingerprint3Template!!.indices)
+        for (i in mFingerprint3Template.indices)
             mFingerprint3Template[i] = 0
 
         relLayout3!!.visibility = View.INVISIBLE

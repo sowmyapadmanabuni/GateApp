@@ -7,29 +7,25 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
-import android.content.res.Resources
-import android.database.Cursor
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
+import android.os.Environment
 import android.os.Handler
 import android.os.Message
-import android.os.PowerManager
 import android.speech.tts.TextToSpeech
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
-import android.view.MotionEvent
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
-import com.oyespace.guards.*
+import com.oyespace.guards.BackgroundSyncReceiver
+import com.oyespace.guards.DataBaseHelper
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.CaptureFPResponse
 import com.oyespace.guards.network.ResponseHandler
@@ -41,16 +37,11 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils.isEmpty
 import com.oyespace.guards.utils.Utils.showToast
-import kotlinx.android.synthetic.main.layout_viewpager_iem.*
 import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.net.URL
+import java.io.File
 import java.nio.ByteBuffer
-import java.sql.Blob
 import java.util.*
-import kotlin.math.absoluteValue
 
 
 class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
@@ -190,7 +181,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 DisableControls()
             }
 
-//            //Toast.makeText(
+//            Toast.makeText(
 //                applicationContext,
 //                "Inside " + action!!, Toast.LENGTH_SHORT
 //            ).show()
@@ -202,7 +193,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     var fingerDetectedHandler: Handler = object : Handler() {
         // @Override
         override fun handleMessage(msg: Message) {
-           // //Toast.makeText(this@Biometric, "capture finger" , Toast.LENGTH_LONG).show()
+            Toast.makeText(this@Biometric, "capture finger", Toast.LENGTH_LONG).show()
 
             //Handle the message
             CaptureFingerPrint()
@@ -244,6 +235,17 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
 
         setContentView(R.layout.activity_register_finger_print)
+
+        val dir =
+            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+        if (dir.isDirectory()) {
+            val children = dir.list()
+            for (i in children!!.indices) {
+                File(dir, children!![i]).delete()
+            }
+        }
+
+
         Log.d("btn_biometric", "af setContentView")
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
@@ -341,7 +343,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             mButtonRegister1!!.visibility = View.INVISIBLE
             mButtonRegister2!!.visibility = View.INVISIBLE
             mButtonRegister3!!.visibility = View.INVISIBLE
-            ////Toast.makeText(this, "All fingers are registerd", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "All fingers are registerd", Toast.LENGTH_SHORT).show()
             highlightFingers()
         } else {
             selectedFinger()
@@ -450,8 +452,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 //
 //        }
 
-        val d = Intent(this@Biometric, Dashboard::class.java)
-        startActivity(d)
+//        val d = Intent(this@Biometric, Dashboard::class.java)
+//        startActivity(d)
         finish()
 
         /*}
@@ -473,7 +475,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                                 //open activity
                             }
                         }).create().show();
-                //Toast.makeText(this, "Please register four finger", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please register four finger", Toast.LENGTH_SHORT).show();
             }
             else{
                 new android.support.v7.app.AlertDialog.Builder(RegisterFingerPrint.this)
@@ -492,7 +494,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                                 //open activity
                             }
                         }).create().show();
-                //Toast.makeText(this, "Please connect biometric device3", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Please connect biometric device3", Toast.LENGTH_SHORT).show();
             }
 
         }*/
@@ -656,7 +658,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 }
             }
         } catch (ex: Exception) {
-            //Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT)
+                .show()
         }
 
     }
@@ -723,6 +726,9 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         var buffer: ByteArray? = ByteArray(mImageWidth * mImageHeight)
 
+        //   result = sgfplib.GetImageEx(buffer,10000,50);
+
+
         //commented val result = sgfplib!!.GetImage(buffer)
         //        if (this.mToggleButtonNFIQ.isChecked()) {
         //            long nfiq = sgfplib.ComputeNFIQ(buffer, mImageWidth, mImageHeight);
@@ -745,9 +751,10 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         try {
             if (v === this.mButtonRegister1) {
+
                 if (mRegisterImage != null) {
                     mRegisterImage = null
-                    //Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
+                    //  Toast.makeText(this@Biometric, "mRegisterImageNull" + mRegisterImage, Toast.LENGTH_LONG).show()
                 }
 
                 mRegisterImage = ByteArray(mImageWidth * mImageHeight)
@@ -778,12 +785,12 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 result = sgfplib!!.GetImageEx(mRegisterImage, 10000, 50)
 
                 if (result.toString() == "52" || result.toString() == "0" || result.toString().equals(0)) {
-                     // //Toast.makeText(this@Biometric, " ElseD: " + result.toString(), Toast.LENGTH_LONG).show()
+                    // Toast.makeText(this@Biometric, " ElseD: " + result.toString(), Toast.LENGTH_LONG).show()
                 }
 
                 if(result.toString().equals("54"))
                 {
-                    //  //Toast.makeText(this@Biometric, " Blue: " + result.toString(), Toast.LENGTH_LONG).show()
+                    //  Toast.makeText(this@Biometric, " Blue: " + result.toString(), Toast.LENGTH_LONG).show()
 
                     //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
 
@@ -827,8 +834,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             }
         }
         catch (e:NullPointerException){
-            //  //Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
-           // //Toast.makeText(this@Biometric, " Catch: " + result.toString(), Toast.LENGTH_LONG).show()
+            //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
+            // Toast.makeText(this@Biometric, " Catch: " + result.toString(), Toast.LENGTH_LONG).show()
 
             val d = Intent(this, Biometric::class.java)
             intent.getIntExtra(WORKER_ID, 0)
@@ -875,11 +882,11 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
 
 
-                  //Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
 
                 if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
                 {
-                    // //Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                    // Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
                     //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
 
                 }
@@ -948,7 +955,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         {
             e.printStackTrace()
             //FingerImage 2
-            //  //Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
+            //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
             //t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
         }
 
@@ -964,12 +971,12 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
                 var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
 
-              //  //Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(true), Toast.LENGTH_LONG).show()
+                //  Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(true), Toast.LENGTH_LONG).show()
 
 
                 if(result.toString() == "52"||result.toString()=="0"||result.toString()==""||result.toString().equals(0))
                 {
-                    // //Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
+                    // Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
                     // t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
 
                 }
@@ -1076,19 +1083,22 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         if (v.id == R.id.buttonSaveToDB) {
             if (copy1 == false) {
-                //Toast.makeText(applicationContext, "Take 1st finger print", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Take 1st finger print", Toast.LENGTH_SHORT)
+                    .show()
                 t1.speak("take 1st finger print", TextToSpeech.QUEUE_FLUSH, null)
             } else if (copy2 == false) {
-                //Toast.makeText(applicationContext, "Take 2nd finger print", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Take 2nd finger print", Toast.LENGTH_SHORT)
+                    .show()
                 t1.speak("take 2nd finger print", TextToSpeech.QUEUE_FLUSH, null)
             } else if (copy3 == false) {
-                //Toast.makeText(applicationContext, "Take 3rd finger print", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Take 3rd finger print", Toast.LENGTH_SHORT)
+                    .show()
                 t1.speak("take 3rd finger print", TextToSpeech.QUEUE_FLUSH, null)
 
             } else {
 
                 t1.speak("Finger print data saved", TextToSpeech.QUEUE_FLUSH, null)
-                //  //Toast.makeText(this@Biometric,dbh.fingercount(memId).toString()+".."+fingerId.toString()+".."+mFingerprint1Template.toString()+".."+mFingerprint2Template+".."+mFingerprint3Template,Toast.LENGTH_LONG).show()
+                //  Toast.makeText(this@Biometric,dbh.fingercount(memId).toString()+".."+fingerId.toString()+".."+mFingerprint1Template.toString()+".."+mFingerprint2Template+".."+mFingerprint3Template,Toast.LENGTH_LONG).show()
 
                 uploadFingerPrint(mFingerprint1Template, mFingerprint2Template, mFingerprint3Template)
 
@@ -1127,8 +1137,12 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 selectedFinger()
 
             } else {
-                //Toast.makeText(applicationContext, "Complete the Current selected Registration", Toast.LENGTH_SHORT)
-                 //   .show()
+                Toast.makeText(
+                    applicationContext,
+                    "Complete the Current selected Registration",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
                 t1.speak("Complete the Current selected Registration", TextToSpeech.QUEUE_FLUSH, null)
             }
         }
@@ -1139,8 +1153,12 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 selectedFinger()
 
             } else {
-                //Toast.makeText(applicationContext, "Complete the Current selected Registration", Toast.LENGTH_SHORT)
-                 //   .show()
+                Toast.makeText(
+                    applicationContext,
+                    "Complete the Current selected Registration",
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
                 t1.speak("Complete the Current selected Registration", TextToSpeech.QUEUE_FLUSH, null)
             }
         }
@@ -1175,7 +1193,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     override fun onFailure(e: Exception, urlId: Int) {
 
-        showToast(this, e.message + " id " + urlId)
+        //showToast(this, e.message + " id " + urlId)
     }
 
     override fun onSuccess(responce: String, data: Any, urlId: Int, position: Int) {
@@ -1258,7 +1276,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         restClient.post<Any>(this, loginReq, FingerPrintCreateResp::class.java, this, URLData.URL_SAVE_FINGERPRINT)
         val response=FingerPrintCreateResp()
-        // //Toast.makeText(this@Biometric,response.toString(),Toast.LENGTH_LONG).show()
+        // Toast.makeText(this@Biometric,response.toString(),Toast.LENGTH_LONG).show()
 
     }
 
@@ -1283,7 +1301,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_right_thumb
             if (bl_right_thumb) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1292,7 +1310,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_right_index
             if (bl_right_index) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1301,7 +1319,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_right_centre
             if (bl_right_middle) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1310,7 +1328,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_right_ring
             if (bl_right_ring) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1319,7 +1337,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_right_small
             if (bl_right_little) {
                 fingerId++
-                //  //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                //  Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1328,7 +1346,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_left_thumb
             if (bl_left_thumb) {
                 fingerId++
-                //   //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                //   Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1337,7 +1355,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_left_index
             if (bl_left_index) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1346,7 +1364,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_left_centre
             if (bl_left_middle) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1355,7 +1373,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_left_ring
             if (bl_left_ring) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1364,7 +1382,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             finger_type = key_left_small
             if (bl_left_little) {
                 fingerId++
-                // //Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
+                // Toast.makeText(this@Biometric,"Finger Id: "+fingerId,Toast.LENGTH_LONG).show()
 
                 selectedFinger()
             }
@@ -1415,8 +1433,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         if (bl_right_little)
             btn_right_small.alpha = 0.3.toFloat()
 
-        // //Toast.makeText(getApplicationContext(),"Hi there"+dbh.fingercount(memId),Toast.LENGTH_SHORT).show();
-        // //Toast.makeText(this@Biometric,dbh.fingercount(memId),Toast.LENGTH_LONG).show()
+        // Toast.makeText(getApplicationContext(),"Hi there"+dbh.fingercount(memId),Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this@Biometric,dbh.fingercount(memId),Toast.LENGTH_LONG).show()
 
         if (dbh.fingercount(memId) > 1) {
 
@@ -1430,7 +1448,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     override fun run() {
         i++
-        ////Toast.makeText(getApplicationContext(),"Hi there"+i,Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplicationContext(),"Hi there"+i,Toast.LENGTH_SHORT).show();
     }
 
     fun clicked(view: View) {
@@ -1456,6 +1474,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     finger_type = key_left_small
                     if (bl_left_little) {
                         selectedFinger()
+
 
                     }
                 }

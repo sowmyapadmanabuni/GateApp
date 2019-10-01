@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.provider.Settings;
-import androidx.core.content.FileProvider;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -23,6 +22,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
+
 import com.oyespace.guards.Myapp;
 import com.oyespace.guards.R;
 
@@ -207,8 +209,8 @@ public class Utils {
         // information, so unfortunately resorting to extension sniffing.
         int pos = filename.lastIndexOf('.');
         if (pos != -1) {
-            String ext = filename.substring(filename.lastIndexOf('.') + 1,
-                    filename.length());
+            String ext = filename.substring(filename.lastIndexOf('.') + 1
+            );
             //Video mime types
             if (ext.equalsIgnoreCase("mp4"))
                 return "video/mp4";

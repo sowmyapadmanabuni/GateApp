@@ -1,15 +1,14 @@
-package com.oyespace.guards.com.oyespace.guards.ui
+package com.oyespace.guards.ui
 
 import android.content.Context
-import androidx.annotation.Nullable
-import androidx.recyclerview.widget.RecyclerView.AdapterDataObserver
-import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import androidx.annotation.Nullable
+import androidx.recyclerview.widget.RecyclerView
 
 
-class RecyclerViewEmptyExtdener : androidx.recyclerview.widget.RecyclerView {
+class RecyclerViewEmptyExtdener : RecyclerView {
     private var mContext: Context? = null
     //The empty view which is shown when the data is empty
     private var emptyView: View? = null
@@ -26,7 +25,7 @@ class RecyclerViewEmptyExtdener : androidx.recyclerview.widget.RecyclerView {
         mContext = context
     }
 
-    override fun setAdapter(adapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>?) {
+    override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
         super.setAdapter(adapter)
         //Setting the adapter data change listener
         adapter!!.registerAdapterDataObserver(object : AdapterDataObserver() {
@@ -35,7 +34,7 @@ class RecyclerViewEmptyExtdener : androidx.recyclerview.widget.RecyclerView {
                 //If data count is not 0 emptyView visibility is set to gone and recycler view is shown
                 if (adapter.itemCount != 0) {
                     if (emptyView != null) {
-                        emptyView!!.setVisibility(View.GONE)
+                        emptyView!!.visibility = View.GONE
                         visibility = View.VISIBLE
                     }
                 } else {
@@ -43,7 +42,7 @@ class RecyclerViewEmptyExtdener : androidx.recyclerview.widget.RecyclerView {
                     // visibility is set to gone
                     if (emptyView != null) {
                         visibility = View.GONE
-                        emptyView!!.setVisibility(View.VISIBLE)
+                        emptyView!!.visibility = View.VISIBLE
                     }
                 }
             }

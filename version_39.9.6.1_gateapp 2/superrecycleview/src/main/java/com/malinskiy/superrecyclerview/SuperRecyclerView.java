@@ -2,12 +2,6 @@ package com.malinskiy.superrecyclerview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.annotation.ColorRes;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +11,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import androidx.annotation.ColorRes;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.malinskiy.superrecyclerview.swipe.SwipeDismissRecyclerViewTouchListener;
 import com.malinskiy.superrecyclerview.util.FloatUtil;
@@ -112,21 +113,21 @@ public class SuperRecyclerView extends FrameLayout {
             return;
         }
         View v = LayoutInflater.from(getContext()).inflate(mSuperRecyclerViewMainLayout, this);
-        mPtrLayout = (SwipeRefreshLayout) v.findViewById(R.id.ptr_layout);
+        mPtrLayout = v.findViewById(R.id.ptr_layout);
         mPtrLayout.setEnabled(false);
 
-        mProgress = (ViewStub) v.findViewById(R.id.progress);
+        mProgress = v.findViewById(R.id.progress);
 
         mProgress.setLayoutResource(mProgressId);
         mProgressView = mProgress.inflate();
 
-        mMoreProgress = (ViewStub) v.findViewById(R.id.more_progress);
+        mMoreProgress = v.findViewById(R.id.more_progress);
         mMoreProgress.setLayoutResource(mMoreProgressId);
         if (mMoreProgressId != 0)
             mMoreProgressView = mMoreProgress.inflate();
         mMoreProgress.setVisibility(View.GONE);
 
-        mEmpty = (ViewStub) v.findViewById(R.id.empty);
+        mEmpty = v.findViewById(R.id.empty);
         mEmpty.setLayoutResource(mEmptyId);
         if (mEmptyId != 0)
             mEmptyView = mEmpty.inflate();

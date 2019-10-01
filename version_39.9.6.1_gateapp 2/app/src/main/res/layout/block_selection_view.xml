@@ -5,11 +5,12 @@
                 android:layout_gravity="center"
                 android:padding="6dp"
                 android:gravity="center">
+
     <androidx.cardview.widget.CardView
             xmlns:card_view="http://schemas.android.com/apk/res-auto"
             android:id="@+id/block_sel_shape"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/dp_30"
+            android:layout_height="@dimen/dp_30"
             card_view:cardElevation="0dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"

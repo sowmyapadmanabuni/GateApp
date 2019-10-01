@@ -5,32 +5,21 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import com.oyespace.guards.models.VisitorLog;
-import com.oyespace.guards.network.ResponseHandler;
-import com.oyespace.guards.network.RestClient;
-import com.oyespace.guards.network.URLData;
-import com.oyespace.guards.pertroling.GPSTracker;
+
 import com.oyespace.guards.pojo.VisitorEntryLog;
-import com.oyespace.guards.request.SaveTrackingReq;
-import com.oyespace.guards.responce.SaveTrackingResp;
-import com.oyespace.guards.utils.ConstantUtils;
-import com.oyespace.guards.utils.DateTimeUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 
 import java.util.Locale;
 
 import static com.oyespace.guards.constants.PrefKeys.BG_NOTIFICATION_ON;
-import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.ConstantUtils.DELIVERY;
 import static com.oyespace.guards.utils.DateTimeUtils.deliveryTimeUp;
 import static com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal;
-import static com.oyespace.guards.utils.Utils.showToast;
 
 public class BGService extends Service  {
     String language;
@@ -88,8 +77,8 @@ public class BGService extends Service  {
             }
         };
         overStayingNames="";
-        if(DataBaseHelper.getVisitorEnteredLog()!=null) {
-            for (VisitorLog s : DataBaseHelper.getVisitorEnteredLog()) {
+        if (LocalDb.getVisitorEnteredLog() != null) {
+            for (VisitorEntryLog s : LocalDb.getVisitorEnteredLog()) {
                 //if the existing elements contains the search input
                 if (s.getVlVisType().equalsIgnoreCase(DELIVERY)&&deliveryTimeUp(s.getVlEntryT(),getCurrentTimeLocal(),1)) {
                     //adding the element to filtered list

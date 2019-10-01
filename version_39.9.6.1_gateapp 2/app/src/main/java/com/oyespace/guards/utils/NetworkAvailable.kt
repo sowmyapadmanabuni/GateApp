@@ -1,14 +1,12 @@
-package com.oyespace.guards.com.oyespace.guards.utils
+package com.oyespace.guards.utils
 
 import android.content.Context
-import android.net.NetworkInfo
-import android.content.Context.CONNECTIVITY_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.util.Log
 
 
- class NetworkAvailable {
+class NetworkAvailable {
 
      val instance = NetworkAvailable()
     var context: Context?=null
@@ -18,7 +16,7 @@ import android.util.Log
     var connected = false
 
     fun getInstance(ctx: Context): NetworkAvailable {
-        context = ctx.getApplicationContext()
+        context = ctx.applicationContext
         return instance
     }
 

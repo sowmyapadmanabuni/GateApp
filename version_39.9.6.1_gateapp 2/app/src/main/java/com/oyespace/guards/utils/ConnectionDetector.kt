@@ -1,4 +1,4 @@
-package com.oyespace.guards.com.oyespace.guards.utils
+package com.oyespace.guards.utils
 
 import android.content.Context
 import android.net.ConnectivityManager

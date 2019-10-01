@@ -2,9 +2,9 @@ package com.oyespace.guards.cloudfunctios
 
 import com.google.gson.GsonBuilder
 import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
-import com.oyespace.guards.com.oyespace.guards.cloudfunctios.CloudFunctionApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import oyespace.guards.cloudfunctios.CloudFunctionApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber

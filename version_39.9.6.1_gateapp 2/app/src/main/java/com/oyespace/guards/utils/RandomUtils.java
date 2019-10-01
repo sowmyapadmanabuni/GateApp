@@ -1,17 +1,17 @@
 package com.oyespace.guards.utils;
 
 import android.util.Log;
-import com.oyespace.guards.DataBaseHelper;
+
 import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.pojo.VisitorEntryLog;
-import com.oyespace.guards.responce.ResponseVisitorLog;
 import com.oyespace.guards.responce.VisitorLogExitResp;
-import io.realm.Realm;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
+
+import io.realm.Realm;
 
 /**
  * Created by Kalyan on 5/28/2017.
@@ -29,9 +29,9 @@ public class RandomUtils {
         return sb.toString();
     }
 
-    public static ArrayList<VisitorLog> getSortedVisitorLog(ArrayList<VisitorLog> arrayList ){
-        ArrayList<VisitorLog> nonExitedSort =new ArrayList<>();
-        ArrayList<VisitorLog> exitedSort =new ArrayList<>();
+    public static ArrayList<VisitorLog> getSortedVisitorLog(ArrayList<VisitorLog> arrayList) {
+        ArrayList<VisitorLog> nonExitedSort = new ArrayList<>();
+        ArrayList<VisitorLog> exitedSort = new ArrayList<>();
 
         for (VisitorLog s : arrayList) {
             //if the existing elements contains the search input
@@ -67,7 +67,7 @@ public class RandomUtils {
             }
         });
 
-        ArrayList<VisitorLog> newAl =new ArrayList<>();
+        ArrayList<VisitorLog> newAl = new ArrayList<>();
 
         newAl.addAll(nonExitedSort);
         newAl.addAll(exitedSort);
@@ -126,17 +126,17 @@ public class RandomUtils {
 
     public static boolean entryExists(String isdCode ,String mobNum ) {
         Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorLog> filteredList =new ArrayList<>();
+        ArrayList<VisitorEntryLog> filteredList = new ArrayList<>();
       //  var filteredList = ArrayList<ResponseVisitorLog.Data.Visitorlogbydate>()
 
-        if (DataBaseHelper.getVisitorEnteredLog() == null) {
+        if (LocalDb.getVisitorEnteredLog() == null) {
             filteredList = new ArrayList<>();
         } else {
-            filteredList = DataBaseHelper.getVisitorEnteredLog();
+            filteredList = LocalDb.getVisitorEnteredLog();
         }
 
         //looping through existing elements
-        for (VisitorLog s : filteredList) {
+        for (VisitorEntryLog s : filteredList) {
             //if the existing elements contains the search input
           //  Log.d("button_done ", "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals("0001-01-01T00:00:00", true) + " ");
             Log.d("button_done ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlExitT().equalsIgnoreCase("0001-01-01T00:00:00") + " ");

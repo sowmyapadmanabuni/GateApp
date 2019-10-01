@@ -8,13 +8,13 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.LinearLayoutManager
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -23,17 +23,15 @@ import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.RegisterFingerPrint
 import com.oyespace.guards.activity.ServiceProviderListActivity
 import com.oyespace.guards.activity.StaffListActivity
-import com.oyespace.guards.adapter.UnitListAdapter
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
-import com.oyespace.guards.guest.GuestUnitScreen
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.GlobalApiObject
+import com.oyespace.guards.pojo.VisitorLog
+import com.oyespace.guards.pojo.Visitorlogbydate
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
 import com.oyespace.guards.utils.LocalDb
@@ -83,9 +81,9 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
 //        makeVisitorLog()
 //        makeUnitLog()
         rv_dashboard.setLayoutManager(
-            androidx.recyclerview.widget.LinearLayoutManager(
+            LinearLayoutManager(
                 this,
-                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                LinearLayoutManager.VERTICAL,
                 false
             )
         )
@@ -105,9 +103,9 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
                     }
 
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                    if (report.isAnyPermissionPermanentlyDenied) {
                         // show alert dialog navigating to Settings
-                        showSettingsDialog();
+                        showSettingsDialog()
                     }
                 }
 
@@ -117,20 +115,21 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
                 ) {
                     if (token != null) {
                         token.continuePermissionRequest()
-                    };
+                    }
                 }
             }).
                 withErrorListener(object: PermissionRequestErrorListener {
 
                     override fun onError( error: DexterError) {
-                        Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 })
             .onSameThread()
-            .check();
+            .check()
 
-        txt_assn_name.setText("Society: " + LocalDb.getAssociation().asAsnName)
-        txt_device_name.setText("Gate: " )
+        txt_assn_name.text = "Society: " + LocalDb.getAssociation().asAsnName
+        txt_device_name.text = "Gate: "
 
     }
 
@@ -157,7 +156,7 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
@@ -207,7 +206,7 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
 
 //                        val orderListAdapter = VistorListAdapter(newAl, this@DashboardActivity)
 //                        rv_dashboard.adapter = orderListAdapter
-                        Log.d("dvd",""+globalApiObject.data);
+                        Log.d("dvd", "" + globalApiObject.data)
 
                         if (arrayList.size == 0) {
                             Toast.makeText(this@DashboardActivity, "No items", Toast.LENGTH_SHORT).show()

@@ -1,10 +1,8 @@
 package com.oyespace.guards.fragment
 
 import android.content.pm.PackageManager
-import androidx.fragment.app.Fragment
-import androidx.core.content.ContextCompat
-
 import android.util.Log
+import androidx.core.content.ContextCompat
 import com.oyespace.guards.listeners.PermissionCallback
 import io.reactivex.disposables.CompositeDisposable
 import java.util.*
@@ -12,7 +10,7 @@ import java.util.*
 /**
  * Created by Kalyan on 21-Oct-17.
  */
-open class BaseKotlinFragment : Fragment() {
+open class BaseKotlinFragment : androidx.fragment.app.Fragment() {
 
     private var callback: PermissionCallback? = null
     private var mRequestcode: Int = 0

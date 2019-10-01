@@ -10,10 +10,8 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import androidx.appcompat.app.AlertDialog
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -23,6 +21,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -30,28 +29,23 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.Dashboard
+import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-
+import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
 import java.util.*
-import com.oyespace.guards.R
-import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 
 class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListener, CountryCodePicker.OnCountryChangeListener{
 
@@ -88,14 +82,14 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                 d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
-                startActivity(d);
-                finish();
+                startActivity(d)
+                finish()
 
             }
 
             R.id.buttonNext ->{
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if(textview.text.length==13) {
 //                    val d = Intent(this@VehicleOthersMobileNumberScreen, VehicleOthersNameEntryScreen::class.java)
 ////                    Log.d("intentdata MobileNumber","buttonNext "+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
@@ -116,9 +110,10 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                     if(entryExists(ccd,mobileNumber)) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@VehicleOthersMobileNumberScreen)
-                        builder.setTitle("Vendor Entry already done")
-                        builder.setMessage("No Duplicates allowed")
+                        //  builder.setTitle("Vendor Entry already done")
+                        builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
+
 //                            val d = Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
 //                            startActivity(d)
                             finish()
@@ -149,8 +144,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                     finish()
 //                    getAccountDetails("+"+countryCode.toString(),textview.getText().toString());
                 }else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this,"Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -180,8 +175,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.getExtras();
-                            val number = bundle?.getString("incoming_number");
+                            val bundle = intent?.extras
+                            val number = bundle?.getString("incoming_number")
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (textview != null && number != null) {
@@ -193,20 +188,21 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                                 mobileNumber=number.substring(3,13)
                             }
                         }
+                        LocalDb.disconnectCall(context)
                     }
 
-                }, PhoneStateListener.LISTEN_CALL_STATE);
+                }, PhoneStateListener.LISTEN_CALL_STATE)
 
                 //
             }
-        };
+        }
         btn_nobalance=findViewById(R.id.btn_nobalance)
         timer=findViewById(R.id.timer)
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
         if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
-            txt_assn_name!!.setTextSize(5 * getResources().getDisplayMetrics().density);
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
@@ -226,8 +222,9 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
         val timer = object: CountDownTimer(60000,1000){
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text =
+                    ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -245,7 +242,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
 
         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
 //        tv_guardnumber.text =
 //            resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,"")

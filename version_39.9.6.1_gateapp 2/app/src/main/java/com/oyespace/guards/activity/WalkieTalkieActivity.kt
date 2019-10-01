@@ -1,16 +1,13 @@
 package com.oyespace.guards.activity
 
-import android.content.ContentValues
 import android.content.Intent
-import android.graphics.Bitmap
 import android.media.MediaRecorder
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
-import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.network.ImageApiClient
@@ -23,9 +20,8 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
-import retrofit2.Response
-import timber.log.Timber
-import java.io.*
+import java.io.File
+import java.io.IOException
 
 
 class WalkieTalkieActivity : AppCompatActivity() {
@@ -47,7 +43,7 @@ class WalkieTalkieActivity : AppCompatActivity() {
         }
 
 
-        mFileName = audiofile!!.getAbsolutePath()
+        mFileName = audiofile!!.absolutePath
         Log.d("uploadAudio 51",mFileName )
 
         record.setOnClickListener {

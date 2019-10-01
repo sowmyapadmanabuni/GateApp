@@ -3,16 +3,12 @@
 
     <!--<item android:drawable="@drawable/guest_filled"-->
     <!--android:state_selected="true"/>-->
-    <!--<item android:drawable="@drawable/guest"/>-->
-    <item android:state_focused="true"
-          android:state_pressed="false"
-          android:drawable="@drawable/guest"/>
-    <item android:state_focused="true"
-          android:state_pressed="true"
-          android:drawable="@drawable/guest"/>
+    <!--<item android:drawable="@drawable/resident"/>-->
+    <item android:state_focused="true" android:drawable="@drawable/resident" android:state_pressed="false" />
+    <item android:state_focused="true" android:drawable="@drawable/resident" android:state_pressed="true" />
     <item android:state_focused="false"
           android:state_pressed="true"
           android:drawable="@drawable/guest_filled"/>
-    <item android:drawable="@drawable/guest"/>
+    <item android:drawable="@drawable/resident" />
 
 </selector>

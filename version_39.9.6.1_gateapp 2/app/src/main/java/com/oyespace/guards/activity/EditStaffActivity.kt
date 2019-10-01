@@ -1,30 +1,20 @@
 package com.oyespace.guards.activity
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
-import com.oyespace.guards.R
-import android.R.attr.country
 import android.app.Activity
-import android.graphics.Bitmap
-import android.provider.MediaStore
-import android.speech.RecognizerIntent
-import android.view.View
-import android.widget.*
-import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.Toast
-import android.widget.DatePicker
-import java.util.*
 import android.app.DatePickerDialog
-import android.app.Dialog
 import android.content.*
+import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
+import android.os.Bundle
 import android.os.Environment
-import androidx.appcompat.app.AlertDialog
+import android.provider.MediaStore
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import com.oyespace.guards.Dashboard
+import android.view.View
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
+import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
@@ -36,7 +26,6 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
@@ -49,7 +38,7 @@ import timber.log.Timber
 import java.io.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import javax.xml.datatype.DatatypeConstants.MONTHS
+import java.util.*
 
 
 class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListener{
@@ -76,10 +65,10 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
     internal var personPhoto: Bitmap? = null
     var tv_name:TextView?=null
     var designation = arrayOf("Assistant Manager", "Assistant Security Officer", "CareTaker", "Cook", "Driver","Electrician","Gardener","Gym Trainer","Head Guard","Health Instructor","Lady Head Guard","Lady Supervisor","Lady Senior Security Guard","Lady Security Guard","Maid","Manager","Nurse","Others","Plumber","Stay at Home Maid","Security Guard","Security Officer","Senior Security","Security Supervisor","Senior Supervisor","Sweeper","Tuition Teacher")
-var tv_designation:TextView?=null
+    var tv_designation: TextView? = null
     var overlapImage:ImageView?=null
     internal val CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034
-var iv_personphoto:ImageView?=null
+    var iv_personphoto: ImageView? = null
     var calender:ImageView?=null
     private val datePicker: DatePicker? = null
     private var cal: Calendar? = null
@@ -102,35 +91,35 @@ var iv_personphoto:ImageView?=null
 //        calendar = Calendar.getInstance();
 //        year = calendar!!.get(Calendar.YEAR);
       val sDOB=intent.getStringExtra("DOB")
-       sDOB.substring(0,10);
+        sDOB.substring(0, 10)
 
-         cal = Calendar.getInstance()
+        cal = Calendar.getInstance()
          y = cal!!.get(Calendar.YEAR)
          m = cal!!.get(Calendar.MONTH)
          d = cal!!.get(Calendar.DAY_OF_MONTH)
 
 
-        date =sDOB.substring(0,10);
-        s_dob=sDOB.substring(0,10);
+        date = sDOB.substring(0, 10)
+        s_dob = sDOB.substring(0, 10)
 
- inputt =  SimpleDateFormat("yyyy-MM-dd");
- output =  SimpleDateFormat("dd-MM-yyyy");
-try {
-    oneWayTripDate = inputt!!.parse(date);                 // parse input
+        inputt = SimpleDateFormat("yyyy-MM-dd")
+        output = SimpleDateFormat("dd-MM-yyyy")
+        try {
+            oneWayTripDate = inputt!!.parse(date)                 // parse input
     //0001-01-01
 
     if(output!!.format(oneWayTripDate).equals("01-01-0001")){
-        ed_dob?.setHint(resources.getString(R.string.textselectdob));    // format output
+        ed_dob?.hint = resources.getString(R.string.textselectdob)    // format output
     }else
     {
-        ed_dob?.setText(output!!.format(oneWayTripDate));    // format output
+        ed_dob?.text = output!!.format(oneWayTripDate)    // format output
 
- out = output!!.format(oneWayTripDate).split(",").toTypedArray();
+        out = output!!.format(oneWayTripDate).split(",").toTypedArray()
 
         try {
-            System.out.println("Year = " + out[2]);
-System.out.println("Month = " + out[0]);
-System.out.println("Day = " + out[1]);
+            System.out.println("Year = " + out[2])
+            System.out.println("Month = " + out[0])
+            System.out.println("Day = " + out[1])
             y = out[2].toInt()
             m = out[0].toInt()
             d = out[1].toInt()
@@ -142,7 +131,7 @@ System.out.println("Day = " + out[1]);
     }
 
 } catch (e: ParseException) {
-    e.printStackTrace();
+            e.printStackTrace()
 }
 
 //
@@ -170,22 +159,22 @@ System.out.println("Day = " + out[1]);
 
                 // Display Selected date in textbox
 
-                var userAge =  GregorianCalendar(year,month,day);
-                var minAdultAge =  GregorianCalendar();
-                minAdultAge.add(Calendar.YEAR, -18);
-                if (minAdultAge.before(userAge)) {
-                    Toast.makeText(this,"Age is below 18.",Toast.LENGTH_LONG).show();
+                 var userAge = GregorianCalendar(year, month, day)
+                 var minAdultAge = GregorianCalendar()
+                 minAdultAge.add(Calendar.YEAR, -18)
+                 if (minAdultAge.before(userAge)) {
+                     Toast.makeText(this, "Age is below 18.", Toast.LENGTH_LONG).show()
                 }
                 else{
                   //  ed_dob!!.setText("" + dayOfMonth + "-" + (monthOfYear+1) + "-" + year)
-                    ed_dob!!.setText("" + dayOfMonth + "-" + (monthOfYear+1) + "-" + year)
+                     ed_dob!!.text = "" + dayOfMonth + "-" + (monthOfYear + 1) + "-" + year
                     s_dob=(""+year+"-"+(monthOfYear+1)+"-"+dayOfMonth)
 
                 }
             }, y!!, m!!, d!!)
             try {
                // datepickerdialog!!.getDatePicker().setMinDate(1919, 5, 23));
-            datepickerdialog!!.getDatePicker().setMaxDate(cal!!.getTimeInMillis());
+                datepickerdialog!!.datePicker.maxDate = cal!!.timeInMillis
             }
             catch (e:KotlinNullPointerException){
 
@@ -195,7 +184,7 @@ System.out.println("Day = " + out[1]);
         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
         // val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
         receiver =  object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -207,8 +196,8 @@ System.out.println("Day = " + out[1]);
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.getExtras();
-                            val number = bundle?.getString("incoming_number");
+                            val bundle = intent?.extras
+                            val number = bundle?.getString("incoming_number")
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (tv_mobilenumber != null && number != null) {
@@ -225,11 +214,11 @@ System.out.println("Day = " + out[1]);
                         }
                     }
 
-                }, PhoneStateListener.LISTEN_CALL_STATE);
+                }, PhoneStateListener.LISTEN_CALL_STATE)
 
                 //
             }
-        };
+        }
 
         tv_name?.text= intent.getStringExtra("FIRSTNAME")
         tv_designation=findViewById(R.id.tv_designation)
@@ -239,7 +228,7 @@ System.out.println("Day = " + out[1]);
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
         if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
-            txt_assn_name!!.setTextSize(5 * getResources().getDisplayMetrics().density);
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
@@ -274,7 +263,7 @@ System.out.println("Day = " + out[1]);
 
 
 
-        token=Math.random();
+        token = Math.random()
         Picasso.with(this@EditStaffActivity)
             .load(
                 IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE")
@@ -358,7 +347,7 @@ System.out.println("Day = " + out[1]);
         when (requestCode) {
 
             CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE -> if (resultCode == Activity.RESULT_OK) {
-                val photo = data!!.getExtras()!!.get("data") as Bitmap
+                val photo = data!!.extras!!.get("data") as Bitmap
                 iv_personphoto!!.setImageBitmap(photo)
                 personPhoto = photo
 
@@ -432,13 +421,14 @@ System.out.println("Day = " + out[1]);
                                 } catch (ex: Exception) {
                                     Log.d("Dgddfdf picas", "7")
                                 }
-                                uploadImage(imgName.toString(), personPhoto);
+                                uploadImage(imgName.toString(), personPhoto)
                             } else {
 
-                               var drawable: BitmapDrawable = iv_personphoto!!.getDrawable() as BitmapDrawable
-                              personPhoto = drawable.getBitmap();
+                                var drawable: BitmapDrawable =
+                                    iv_personphoto!!.drawable as BitmapDrawable
+                                personPhoto = drawable.bitmap
 
-                                uploadImage(intent.getStringExtra("IMAGE"), personPhoto);
+                                uploadImage(intent.getStringExtra("IMAGE"), personPhoto)
 
                             }
                         }
@@ -654,9 +644,10 @@ System.out.println("Day = " + out[1]);
                         } else {
 
                                 if(output!!.format(oneWayTripDate).equals("01-01-0001")){
-                                    ed_dob?.setHint(resources.getString(R.string.textselectdob));    // format output
+                                    ed_dob?.hint =
+                                        resources.getString(R.string.textselectdob)    // format output
                                 }else {
-                                    ed_dob?.setText(output!!.format(oneWayTripDate));
+                                    ed_dob?.text = output!!.format(oneWayTripDate)
                                 }
                                 val builder = AlertDialog.Builder(this@EditStaffActivity)
                                 // builder.setTitle("Vendor Entry already done")
@@ -672,7 +663,7 @@ System.out.println("Day = " + out[1]);
 //                                    startActivity(d)
 //                                    finish()
                                 }
-                                builder.setCancelable(false);
+                                builder.setCancelable(false)
                                 builder.show()
                            // Toast.makeText(this@EditStaffActivity,globalApiObject.data.message,Toast.LENGTH_LONG).show()
 

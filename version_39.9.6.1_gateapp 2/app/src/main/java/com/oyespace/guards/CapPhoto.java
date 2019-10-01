@@ -1,7 +1,5 @@
 package com.oyespace.guards;
 
-import java.io.*;
-
 import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Context;
@@ -15,8 +13,12 @@ import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
-import android.os.*;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.SurfaceHolder;
@@ -24,7 +26,16 @@ import android.view.SurfaceView;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import static com.oyespace.guards.utils.ConstantUtils.BSR_Action;
+import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_GUARD_PHOTO;
 
 public class CapPhoto extends Service  implements
         SurfaceHolder.Callback {
@@ -128,28 +139,120 @@ private Camera openFrontFacingCameraGingerbread() {
         return (result);
         }
 
+    Camera.PictureCallback mCall = new Camera.PictureCallback() {
+
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            // decode the data obtained by the camera into a Bitmap
+            Log.d("ImageTakin", "Done");
+            if (bmp != null)
+
+                bmp.recycle();
+            System.gc();
+            bmp = decodeBitmap(data);
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            if (bmp != null && QUALITY_MODE == 0)
+                bmp.compress(Bitmap.CompressFormat.JPEG, 70, bytes);
+            else if (bmp != null && QUALITY_MODE != 0)
+                bmp.compress(Bitmap.CompressFormat.JPEG, QUALITY_MODE, bytes);
+            byteArray = bytes.toByteArray();
+            Log.v("Shalini...", data.toString());
+
+            //   uploadImage(imgName,personPhoto);
+
+            Intent ddc = new Intent(getApplicationContext(), BackgroundSyncReceiver.class);
+            Log.d("btn_biometric", "af " + imagename + "..." + System.currentTimeMillis());
+
+            ddc.putExtra(BSR_Action, UPLOAD_GUARD_PHOTO);
+            ddc.putExtra("imgName", imagename);
+            ddc.putExtra("GUARD_PHOTO", byteArray);
+            sendBroadcast(ddc);
+
+
+            File imagesFolder = new File(
+                    Environment.getExternalStorageDirectory(), "/DCIM/myCapturedImages");
+            if (!imagesFolder.exists())
+                imagesFolder.mkdirs(); // <----
+            File image = new File(imagesFolder, System.currentTimeMillis()
+                    + ".jpg");
+
+            // write the bytes in file
+            try {
+                fo = new FileOutputStream(image);
+            } catch (FileNotFoundException e) {
+                Log.e("TAG", "FileNotFoundException", e);
+                // TODO Auto-generated catch block
+            }
+            try {
+                fo.write(bytes.toByteArray());
+            } catch (IOException e) {
+                Log.e("TAG", "fo.write::PictureTaken", e);
+                // TODO Auto-generated catch block
+            }
+
+            // remember close de FileOutput
+            try {
+                fo.close();
+                if (Build.VERSION.SDK_INT < 19)
+                    sendBroadcast(new Intent(
+                            Intent.ACTION_MEDIA_MOUNTED,
+                            Uri.parse("file://"
+                                    + Environment.getExternalStorageDirectory())));
+                else {
+                    MediaScannerConnection
+                            .scanFile(
+                                    getApplicationContext(),
+                                    new String[]{image.toString()},
+                                    null,
+                                    new MediaScannerConnection.OnScanCompletedListener() {
+                                        public void onScanCompleted(
+                                                String path, Uri uri) {
+                                            Log.i("ExternalStorage", "Scanned "
+                                                    + path + ":");
+                                            Log.i("ExternalStorage", "-> uri="
+                                                    + uri);
+                                        }
+                                    });
+                }
+
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            if (mCamera != null) {
+                mCamera.stopPreview();
+                mCamera.release();
+                mCamera = null;
+            }
+            /*
+             * Toast.makeText(getApplicationContext(),
+             * "Your Picture has been taken !", Toast.LENGTH_LONG).show();
+             */
+            if (bmp != null) {
+                bmp.recycle();
+                bmp = null;
+                System.gc();
+            }
+            mCamera = null;
+            handler.post(new Runnable() {
+
+                @Override
+                public void run() {
+//        Toast.makeText(getApplicationContext(),
+//        "Your Picture has been taken !", Toast.LENGTH_SHORT)
+//        .show();
+                }
+            });
+            stopSelf();
+        }
+    };
+
         /** Check if this device has a camera */
         private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(
-        PackageManager.FEATURE_CAMERA)) {
-        // this device has a camera
-        return true;
-        } else {
-        // no camera on this device
-        return false;
-        }
-        }
-
-        /** Check if this device has front camera */
-        private boolean checkFrontCamera(Context context) {
-        if (context.getPackageManager().hasSystemFeature(
-        PackageManager.FEATURE_CAMERA_FRONT)) {
-        // this device has front camera
-        return true;
-        } else {
-        // no front camera on this device
-        return false;
-        }
+            // this device has a camera
+            // no camera on this device
+            return context.getPackageManager().hasSystemFeature(
+                    PackageManager.FEATURE_CAMERA);
         }
 
         Handler handler = new Handler();
@@ -443,112 +546,16 @@ private Camera openFrontFacingCameraGingerbread() {
         return 1;
         }
         byte[] byteArray=null;
-        Camera.PictureCallback mCall = new Camera.PictureCallback() {
 
-        @Override
-        public void onPictureTaken(byte[] data, Camera camera) {
-        // decode the data obtained by the camera into a Bitmap
-        Log.d("ImageTakin", "Done");
-        if (bmp != null)
-
-        bmp.recycle();
-        System.gc();
-        bmp = decodeBitmap(data);
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        if (bmp != null && QUALITY_MODE == 0)
-        bmp.compress(Bitmap.CompressFormat.JPEG, 70, bytes);
-        else if (bmp != null && QUALITY_MODE != 0)
-        bmp.compress(Bitmap.CompressFormat.JPEG, QUALITY_MODE, bytes);
-        byteArray=bytes.toByteArray();
-        Log.v("Shalini...",data.toString());
-
-                //   uploadImage(imgName,personPhoto);
-
-                Intent ddc =new Intent(getApplicationContext(), BackgroundSyncReceiver.class);
-                Log.d("btn_biometric", "af " +  imagename+"..."+System.currentTimeMillis());
-
-                ddc.putExtra(BSR_Action, UPLOAD_GUARD_PHOTO);
-                ddc.putExtra("imgName", imagename);
-                ddc.putExtra("GUARD_PHOTO", byteArray);
-                sendBroadcast(ddc);
-
-        File imagesFolder = new File(
-        Environment.getExternalStorageDirectory(), "MYGALLERY");
-        if (!imagesFolder.exists())
-        imagesFolder.mkdirs(); // <----
-        File image = new File(imagesFolder, System.currentTimeMillis()
-        + ".jpg");
-
-        // write the bytes in file
-        try {
-        fo = new FileOutputStream(image);
-        } catch (FileNotFoundException e) {
-        Log.e("TAG", "FileNotFoundException", e);
-        // TODO Auto-generated catch block
+    /**
+     * Check if this device has front camera
+     */
+    private boolean checkFrontCamera(Context context) {
+        // this device has front camera
+        // no front camera on this device
+        return context.getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_CAMERA_FRONT);
         }
-        try {
-        fo.write(bytes.toByteArray());
-        } catch (IOException e) {
-        Log.e("TAG", "fo.write::PictureTaken", e);
-        // TODO Auto-generated catch block
-        }
-
-        // remember close de FileOutput
-        try {
-        fo.close();
-        if (Build.VERSION.SDK_INT < 19)
-        sendBroadcast(new Intent(
-        Intent.ACTION_MEDIA_MOUNTED,
-        Uri.parse("file://"
-        + Environment.getExternalStorageDirectory())));
-        else {
-        MediaScannerConnection
-        .scanFile(
-        getApplicationContext(),
-        new String[] { image.toString() },
-        null,
-        new MediaScannerConnection.OnScanCompletedListener() {
-        public void onScanCompleted(
-        String path, Uri uri) {
-        Log.i("ExternalStorage", "Scanned "
-        + path + ":");
-        Log.i("ExternalStorage", "-> uri="
-        + uri);
-        }
-        });
-        }
-
-        } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-        }
-        if (mCamera != null) {
-        mCamera.stopPreview();
-        mCamera.release();
-        mCamera = null;
-        }
-        /*
-         * Toast.makeText(getApplicationContext(),
-         * "Your Picture has been taken !", Toast.LENGTH_LONG).show();
-         */
-        if (bmp != null) {
-        bmp.recycle();
-        bmp = null;
-        System.gc();
-        }
-        mCamera = null;
-        handler.post(new Runnable() {
-
-        @Override
-        public void run() {
-        Toast.makeText(getApplicationContext(),
-        "Your Picture has been taken !", Toast.LENGTH_SHORT)
-        .show();
-        }
-        });
-        stopSelf();
-        }
-        };
 
         @Override
         public IBinder onBind(Intent intent) {

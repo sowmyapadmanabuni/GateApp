@@ -1,26 +1,20 @@
 package com.oyespace.guards.activity
 
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
-import com.oyespace.guards.adapter.WorkersTypeListAdapter
-import kotlinx.android.synthetic.main.activity_worker.*
-import com.oyespace.guards.R
-import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.Prefs
-import java.util.*
-import android.R.attr.versionName
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import com.oyespace.guards.utils.ConstantUtils.GATE_NO
-import com.oyespace.guards.utils.LocalDb
-
 import android.util.Log
 import android.widget.TextView
+import com.oyespace.guards.R
+import com.oyespace.guards.adapter.WorkersTypeListAdapter
+import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.utils.ConstantUtils.GATE_NO
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import kotlinx.android.synthetic.main.activity_worker.*
+import java.util.*
 
 
 class WorkersTypeList: BaseKotlinActivity() {
-    val workType: ArrayList<String> = ArrayList();
+    val workType: ArrayList<String> = ArrayList()
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView
@@ -48,7 +42,12 @@ class WorkersTypeList: BaseKotlinActivity() {
         }
 
         addEntries()
-        rv_workerlist.setLayoutManager(androidx.recyclerview.widget.GridLayoutManager(this@WorkersTypeList, 3))
+        rv_workerlist.setLayoutManager(
+            androidx.recyclerview.widget.GridLayoutManager(
+                this@WorkersTypeList,
+                3
+            )
+        )
         rv_workerlist.adapter = WorkersTypeListAdapter( workType,this)
 
     }
@@ -64,7 +63,7 @@ class WorkersTypeList: BaseKotlinActivity() {
         workType.add("Gym Trainer")
         workType.add("Head Guard")
         workType.add("Health Instructor")
-        workType.add("Lady Head Guard")
+        workType.add("HouseKeeping")
         workType.add("Lady Supervisor")
         workType.add("Lady Senior Security Guard")
         workType.add("Lady Security Guard")

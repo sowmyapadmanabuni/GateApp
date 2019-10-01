@@ -8,10 +8,8 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
-import com.oyespace.guards.activity.MobileNumberScreen
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -32,8 +30,8 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if (Ed_Name.text.length > 2) {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@GuestNameEntryScreen, GuestAddCarFragment::class.java)
@@ -52,13 +50,14 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                    d.putExtra(PERSONNAME, Ed_Name.getText().toString())
+                    d.putExtra(PERSONNAME, Ed_Name.text.toString())
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                     startActivity(d)
                     finish()
                 } else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this, "Enter Valid Name", Toast.LENGTH_SHORT).show()
 
                 }

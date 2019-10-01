@@ -4,51 +4,38 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.speech.RecognizerIntent
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.TextView
 import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.gson.Gson
 import com.oyespace.guards.R
-import com.oyespace.guards.com.oyespace.guards.adapter.BlockSelectionAdapter
-import com.oyespace.guards.com.oyespace.guards.adapter.SelectedUnitsAdapter
-import com.oyespace.guards.com.oyespace.guards.adapter.UnitSearchResultAdapter
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksData
-import com.oyespace.guards.com.oyespace.guards.pojo.BlocksList
-import com.oyespace.guards.com.oyespace.guards.pojo.SearchUnitRequest
-import com.oyespace.guards.com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.adapter.BlockSelectionAdapter
+import com.oyespace.guards.adapter.SelectedUnitsAdapter
+import com.oyespace.guards.adapter.UnitSearchResultAdapter
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.UnitList
-import com.oyespace.guards.pojo.UnitListSearch
-import com.oyespace.guards.pojo.UnitPojo
+import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
-import kotlinx.android.synthetic.main.activity_block_selection.*
-import kotlinx.android.synthetic.main.title_bar.view.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.activity_block_selection.*
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import kotlinx.android.synthetic.main.search_layout.*
-import java.lang.Exception
+import kotlinx.android.synthetic.main.title_bar.view.*
 
 class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var mBlocksArray = ArrayList<BlocksData>()
-    var mBlocksAdapter:BlockSelectionAdapter?=null
-    var mUnitsAdapter:SelectedUnitsAdapter?=null
-    var mSearchUnitsAdapter:UnitSearchResultAdapter?=null
+    var mBlocksAdapter: BlockSelectionAdapter? = null
+    var mUnitsAdapter: SelectedUnitsAdapter? = null
+    var mSearchUnitsAdapter: UnitSearchResultAdapter? = null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
     internal var unitNumber1=""
@@ -57,6 +44,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     internal var unitNumber4=""
     internal var unitNumber5=""
     internal var unitNames = ""
+    internal var blockID = ""
     internal var unitId = ""
     internal var acAccntID=""
 
@@ -75,7 +63,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
             }catch (e:IllegalStateException){
 
             }
-            setUnitsAdapter();
+            setUnitsAdapter()
 
         }catch (e:Exception){
             e.printStackTrace()
@@ -97,11 +85,12 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun onSearchResultClick(unit:UnitPojo, index:Int){
-        val indices = selected!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(unit.unUnitID)) index else null}
+        val indices =
+            selected.mapIndexedNotNull { index, event -> if (event.unUnitID.equals(unit.unUnitID)) index else null }
         if(indices == null || indices.size == 0){
-            selected.add(unit);
+            selected.add(unit)
             setUnitsAdapter()
-            search_text.setText("");
+            search_text.setText("")
             markSelectedBlock()
         }
         //searched.clear();
@@ -114,7 +103,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unit,index -> onSearchResultClick(unit,index)
             })
         rcv_searched_units.adapter = mSearchUnitsAdapter
-        rcv_searched_units.setLayoutManager(androidx.recyclerview.widget.LinearLayoutManager(this@BlockSelectionActivity));
+        rcv_searched_units.layoutManager = LinearLayoutManager(this@BlockSelectionActivity)
         mSearchUnitsAdapter!!.notifyDataSetChanged()
         rcv_searched_units.visibility = View.VISIBLE
     }
@@ -125,12 +114,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unit,index -> onUnitClose(unit,index)
             })
         rcv_selected_units.adapter = mUnitsAdapter
-        rcv_selected_units.setLayoutManager(
-            androidx.recyclerview.widget.GridLayoutManager(
-                this@BlockSelectionActivity,
-                5
-            )
-        );
+        rcv_selected_units.layoutManager = GridLayoutManager(this@BlockSelectionActivity, 5)
         mUnitsAdapter!!.notifyDataSetChanged()
     }
 
@@ -140,28 +124,25 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     block,index -> onPageClick(block,index)
             })
         rcv_blocks.adapter = mBlocksAdapter
-        rcv_blocks.setLayoutManager(androidx.recyclerview.widget.GridLayoutManager(this@BlockSelectionActivity, 5));
+        rcv_blocks.layoutManager = GridLayoutManager(this@BlockSelectionActivity, 5)
         mBlocksAdapter!!.notifyDataSetChanged()
     }
 
     private fun markSelectedBlock(){
-        var updatedBlocks = ArrayList<BlocksData>();
+        var updatedBlocks = ArrayList<BlocksData>()
         for(i in 0 until mBlocksArray.size){
-            var block:BlocksData = mBlocksArray[i];
-            val indices = selected!!.mapIndexedNotNull { index, event ->  if (event.blBlockID.equals(block.blBlockID)) index else null}
-            if(indices != null && indices.size > 0){
-                block.isSelected = true;
-            }else{
-                block.isSelected = false
-            }
+            var block: BlocksData = mBlocksArray[i]
+            val indices =
+                selected.mapIndexedNotNull { index, event -> if (event.blBlockID.equals(block.blBlockID)) index else null }
+            block.isSelected = indices != null && indices.size > 0
             updatedBlocks.add(block)
         }
-        mBlocksArray = updatedBlocks;
+        mBlocksArray = updatedBlocks
         setBlockAdapter()
     }
 
     private fun onUnitClose(unit:UnitPojo, index:Int){
-        selected.removeAt(index);
+        selected.removeAt(index)
         mUnitsAdapter!!.notifyDataSetChanged()
         markSelectedBlock()
     }
@@ -169,8 +150,8 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id){
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
               //  if (selected?.size > 0) {
                     onNextPress()
               //  }
@@ -186,13 +167,14 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     private fun onNextPress() {
 
-        if (selected?.size > 0) {
+        if (selected.size > 0) {
             for (j in selected.indices) {
                 if ((unitNames.length != 0) || (unitNumber1.length != 0)) {
                     unitNames += ", "
                     unitId += ", "
                     acAccntID += ", "
-                    acAccntID += ", "
+                    blockID += ","
+                    //acAccntID += ", "
                     unitNumber1 += ", "
                     unitNumber2 += ", "
                     unitNumber3 += ", "
@@ -202,6 +184,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
                 acAccntID += selected.get(j).acAccntID
+                blockID += selected.get(j).blBlockID
 
 
 //                if (selected.get(j).tenant.size != 0) {
@@ -246,27 +229,31 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
+                    d.putExtra(BLOCK_ID, blockID)
                     d.putExtra(
                         "RESIDENT_NUMBER",
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
                     )
 
-                    startActivity(d);
-                    finish();
+                    startActivity(d)
+                    finish()
                 } else {
 
                     val d = Intent(this@BlockSelectionActivity, MobileNumberScreen::class.java)
                     Log.d(
-                        "intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " "
-                                + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " "
-                                + getIntent().getStringExtra(COUNTRYCODE) + " "
-                    );
+                        "intentdata NameEntr", "buttonNext " + intent.getStringExtra(UNITNAME) + " "
+                                + intent.getStringExtra(UNITID) + " " + intent.getStringExtra(
+                            MOBILENUMBER
+                        ) + " "
+                                + intent.getStringExtra(COUNTRYCODE) + " "
+                    )
                     d.putExtra(UNITID, unitId)
                     d.putExtra(UNITNAME, unitNames)
                     d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
+                    d.putExtra(BLOCK_ID, blockID)
                     //d.putExtra("RESIDENT_NUMBER",unitNumber1)
                     d.putExtra(
                         "RESIDENT_NUMBER",
@@ -274,13 +261,13 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     )
 
 
-                    startActivity(d);
-                    finish();
+                    startActivity(d)
+                    finish()
                 }
 
             } else {
-                buttonNext.setEnabled(true)
-                buttonNext.setClickable(true)
+                buttonNext.isEnabled = true
+                buttonNext.isClickable = true
                 Toast.makeText(applicationContext, "Select Unit", Toast.LENGTH_SHORT).show()
 
             }
@@ -293,21 +280,21 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     private fun onPageClick(selectedBlock:BlocksData, index:Int){
         val _intent = Intent(this@BlockSelectionActivity, UnitSelectionActivity::class.java)
-        _intent.putExtra(ConstantUtils.SELECTED_BLOCK,selectedBlock.blBlockID);
-        _intent.putExtra(ConstantUtils.SELECTED_BLOCK_NAME,selectedBlock.blBlkName);
+        _intent.putExtra(ConstantUtils.SELECTED_BLOCK, selectedBlock.blBlockID)
+        _intent.putExtra(ConstantUtils.SELECTED_BLOCK_NAME, selectedBlock.blBlkName)
         _intent.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
         _intent.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
         _intent.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
         var json = Gson().toJson(selected)
-        _intent.putExtra(ConstantUtils.SELECTED_UNITS,json);
+        _intent.putExtra(ConstantUtils.SELECTED_UNITS, json)
         startActivity(_intent)
-        finish();
+        finish()
     }
 
     private fun initTitles(){
-        title_unit.header_title.setText(this.resources.getString(R.string.units_selection_title));
-        title_block.header_title.setTextColor(this.resources.getColor(R.color.black));
-        title_block.header_title.setText(this.resources.getString(R.string.blocks_selection_title));
+        title_unit.header_title.text = this.resources.getString(R.string.units_selection_title)
+        title_block.header_title.setTextColor(this.resources.getColor(R.color.black))
+        title_block.header_title.text = this.resources.getString(R.string.blocks_selection_title)
     }
 
 
@@ -359,9 +346,9 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 override fun onSuccessResponse(BlocksList: BlocksList<ArrayList<BlocksData>>) {
                     dismissProgressrefresh()
                     if (BlocksList.success == true) {
-                        mBlocksArray = BlocksList.data.blocksByAssoc;
+                        mBlocksArray = BlocksList.data.blocksByAssoc
                         setBlockAdapter()
-                        markSelectedBlock();
+                        markSelectedBlock()
                     }
                 }
 
@@ -385,7 +372,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                     if(result != null && result.size > 0) {
-                        search_text.setText(result[0].trim());
+                        search_text.setText(result[0].trim())
                     }
                 }
             }

@@ -12,13 +12,13 @@ import android.os.Bundle
 import android.provider.CallLog
 import android.provider.Settings
 import android.speech.RecognizerIntent
-import androidx.appcompat.app.AlertDialog
 import android.text.InputFilter
 import android.text.TextUtils
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -43,14 +43,12 @@ import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_mobile_number.btn_mic
-import kotlinx.android.synthetic.main.activity_mobile_number.buttonNext
 import java.util.*
 
 
 class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, CountryCodePicker.OnCountryChangeListener {
 
-    val workType: ArrayList<String> = ArrayList();
+    val workType: ArrayList<String> = ArrayList()
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
     private var countryName: String? = null
@@ -68,7 +66,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 
     // private var Ed_phoneNum:String?=null
 
-    private val REQUEST_CODE_SPEECH_INPUT = 100;
+    private val REQUEST_CODE_SPEECH_INPUT = 100
 
     override fun onClick(v: View?) {
 
@@ -102,8 +100,8 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 //            }
 
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
                 if (textview.text.length == 10) {
 //                    val d = Intent(this@MobileNumberScreen, NameEntryScreen::class.java)
@@ -137,12 +135,12 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                             startActivity(d)
                             finish()
                         }
-                        builder.setCancelable(false);
-                        builder.show()
+                       builder.setCancelable(false)
+                       builder.show()
                     } else {
-                        getAccountDetails(countryCode.toString(),phone.toString());
+                       getAccountDetails(countryCode.toString(), phone.toString())
 
-                    }
+                   }
 
                 }
 //                else if(Ed_phoneNum.text.length > 0) {
@@ -165,8 +163,8 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 ////                    getAccountDetails("+"+countryCode.toString(),textview.getText().toString());
 //                }
                 else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -254,8 +252,8 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 
         Log.d(
             "intentdata MobileNumber",
-            "" + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-        );
+            "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+        )
 
         btn_mic.setOnClickListener {
             Speak()
@@ -274,12 +272,12 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                 buttonSkip.visibility=View.INVISIBLE
             }
             img_logo.visibility=View.VISIBLE
-           Ed_phoneNum.setVisibility(View.VISIBLE)
+            Ed_phoneNum.visibility = View.VISIBLE
             textview.visibility = View.GONE
 //            Ed_phoneNum.setVisibility(View.GONE)
 //            textview.visibility = View.VISIBLE
         } else {
-            buttonSkip.setVisibility(View.INVISIBLE)
+            buttonSkip.visibility = View.INVISIBLE
         }
 
         val mobilePHONEDATA:String = Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
@@ -339,7 +337,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
             if (TextUtils.isEmpty(Ed_phoneNum.text.toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
-                Ed_phoneNum.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength)))
+                Ed_phoneNum.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 
             } else if ( Ed_phoneNum.text.length < 10) {
                 Toast.makeText(this, "Enter valid mobile number", Toast.LENGTH_LONG).show()
@@ -358,7 +356,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                         startActivity(d)
                         finish()
                     }
-                    builder.setCancelable(false);
+                    builder.setCancelable(false)
                     builder.show()
                 } else {
                    // getAccountDetails(countryCode.toString(), textview.getText().toString());
@@ -400,9 +398,9 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                     }
 
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                    if (report.isAnyPermissionPermanentlyDenied) {
                         // show alert dialog navigating to Settings
-                        showSettingsDialog();
+                        showSettingsDialog()
                     }
                 }
 
@@ -413,16 +411,17 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                 ) {
                     if (token != null) {
                         token.continuePermissionRequest()
-                    };
+                    }
                 }
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
+                        .show()
                 }
             })
             .onSameThread()
-            .check();
+            .check()
 
 //        val telephony = this@MobileNumberScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 //        telephony.listen(object : PhoneStateListener() {
@@ -474,7 +473,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
@@ -573,14 +572,14 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 
                             Log.d(
                                 "intentdata NameEntr",
-                                "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(
+                                "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(
                                     UNITID
                                 )
-                                        + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(
+                                        + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(
                                     COUNTRYCODE
                                 ) + " "
                                         + globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-                            );
+                            )
                             d.putExtra(UNITID, intent.getStringExtra(UNITID))
                             d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -595,8 +594,8 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                             )
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
 
-                            startActivity(d);
-                            finish();
+                            startActivity(d)
+                            finish()
 
                         } else {
                             progressBar?.visibility = View.GONE
@@ -627,17 +626,17 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
             "intentdata MobileNumber",
             "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
                     + " " + textview.text + " " + countryCode
-        );
+        )
         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
         d.putExtra(UNITID, intent.getStringExtra(UNITID))
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-        d.putExtra(MOBILENUMBER, textview.getText().toString())
+        d.putExtra(MOBILENUMBER, textview.text.toString())
         d.putExtra(COUNTRYCODE, countryCode)
 
-        startActivity(d);
-        finish();
+        startActivity(d)
+        finish()
     }
 
     fun sendotp() {
@@ -710,8 +709,8 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.setText(result[0].trim() + "")
-                    phone = Ed_phoneNum.text.toString().replace(" ","");
+                    Ed_phoneNum.text = result[0].trim() + ""
+                    phone = Ed_phoneNum.text.toString().replace(" ", "")
                 }
             }
         }
@@ -731,20 +730,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
     }
 
 
-    override fun onPause() {
-
-       // unregisterReceiver(receiver)
-
-        super.onPause()
-    }
-
-    override fun onResume() {
-        super.onResume()
-//        val action = "android.intent.action.PHONE_STATE"
-//        registerReceiver(receiver, IntentFilter(action))
-    }
-
-  //  override fun onResume() {
+    //  override fun onResume() {
        // super.onResume()
 
 //        Toast.makeText(this, "Inside OnResume",Toast.LENGTH_LONG).show()
@@ -840,11 +826,11 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
     private fun showDialog(title: String) {
         var dialogs = Dialog(this@Vehicle_Others_MobileNumberScreenwithOTP)
 
-        dialogs!!.setCancelable(false)
-        dialogs!!.setContentView(R.layout.layout_otp_dialog)
-        val ed_otp = dialogs!!.findViewById(R.id.ed_otp) as EditText
+        dialogs.setCancelable(false)
+        dialogs.setContentView(R.layout.layout_otp_dialog)
+        val ed_otp = dialogs.findViewById(R.id.ed_otp) as EditText
         otpnumber = ed_otp.text.toString()
-        val btn_verifyotp = dialogs!!.findViewById(R.id.btn_verifyotp) as Button
+        val btn_verifyotp = dialogs.findViewById(R.id.btn_verifyotp) as Button
         btn_verifyotp.setOnClickListener {
 
 
@@ -893,7 +879,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
                     override fun onSuccessResponse(globalApiObject: GetVerifyOTPResponse) {
                         if (globalApiObject.success == true) {
 
-                            getAccountDetails(countryCode.toString(),phone.toString());
+                            getAccountDetails(countryCode.toString(), phone.toString())
                         } else {
 
 

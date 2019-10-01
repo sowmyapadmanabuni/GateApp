@@ -1,12 +1,14 @@
 package com.oyespace.guards.vehicle_others;
 
 import android.content.Context;
-import androidx.viewpager.widget.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import androidx.viewpager.widget.PagerAdapter;
+
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.ImageHelper;
 
@@ -76,7 +78,7 @@ public class VehicleOthersViewPagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == ((RelativeLayout) object);
+        return view == object;
     }
 
     @Override
@@ -84,7 +86,7 @@ public class VehicleOthersViewPagerAdapter extends PagerAdapter {
         View itemView = mLayoutInflater.inflate(R.layout.layout_viewpager_iem, container, false);
 
 
-        ImageView imageView = (ImageView) itemView.findViewById(R.id.image);
+        ImageView imageView = itemView.findViewById(R.id.image);
         ImageHelper.loadImage(mContext, imagesList.get(position), imageView);
 
 

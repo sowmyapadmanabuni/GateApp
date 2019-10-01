@@ -3,23 +3,19 @@ package com.oyespace.guards.activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.recyclerview.widget.GridLayoutManager
 import android.util.Log
 import android.view.View
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.utils.*
-import kotlinx.android.synthetic.main.activity_final_registration.*
-import java.util.*
+import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.R
-import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
+import com.oyespace.guards.utils.ConstantUtils.WORKER_ID
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_final_registration.txt_assn_name
-import kotlinx.android.synthetic.main.activity_final_registration.txt_device_name
-import kotlinx.android.synthetic.main.activity_final_registration.txt_gate_name
-import kotlinx.android.synthetic.main.activity_unit_list.*
+import kotlinx.android.synthetic.main.activity_final_registration.*
+import java.util.*
 
 class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
 
@@ -30,12 +26,12 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
             when (v?.id) {
 
                 R.id.button_done ->{
-                    button_done.setEnabled(false)
-                    button_done.setClickable(false)
+                    button_done.isEnabled = false
+                    button_done.isClickable = false
                     Log.d("button_done ","StaffEntry "+ ConstantUtils.FLOW_TYPE +" "+ ConstantUtils.STAFF_REGISTRATION +" "+ ConstantUtils.FLOW_TYPE.equals(ConstantUtils.STAFF_REGISTRATION,true))
                     //finish();
-                    val i_staff = Intent(this@StaffDetails, StaffListActivity::class.java)
-                    startActivity(i_staff)
+//                    val i_staff = Intent(this@StaffDetails, StaffListActivity::class.java)
+//                    startActivity(i_staff)
                     finish()
                 }
 
@@ -79,33 +75,42 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
                     +" "+intent.getStringExtra(ConstantUtils.MOBILENUMBER)+" "+intent.getStringExtra(ConstantUtils.COUNTRYCODE)+" "
                     +intent.getStringExtra(ConstantUtils.PERSONNAME)+" "
                     +" "+intent.getStringExtra(ConstantUtils.FLOW_TYPE)+" "
-                    +intent.getStringExtra(ConstantUtils.VISITOR_TYPE)+" "+intent.getStringExtra(ConstantUtils.COMPANY_NAME));
+                    + intent.getStringExtra(ConstantUtils.VISITOR_TYPE) + " " + intent.getStringExtra(
+                ConstantUtils.COMPANY_NAME
+            )
+            )
             txt_header.text=resources.getString(R.string.textidcard)+" "+ LocalDb.getAssociation()!!.asAsnName
 
-            tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(ConstantUtils.PERSONNAME))
-            tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": "+intent.getStringExtra(ConstantUtils.COUNTRYCODE)+""+intent.getStringExtra(ConstantUtils.MOBILENUMBER))
-            tv_for.setText(resources.getString(R.string.textto) +intent.getStringExtra(ConstantUtils.UNITNAME))
-            tv_totalperson.setText(resources.getString(R.string.textperson))
-            tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(ConstantUtils.COMPANY_NAME))
+            tv_name.text =
+                resources.getString(R.string.textname) + ": " + intent.getStringExtra(ConstantUtils.PERSONNAME)
+            tv_mobilenumber.text =
+                resources.getString(R.string.textmobile) + ": " + intent.getStringExtra(
+                    ConstantUtils.COUNTRYCODE
+                ) + "" + intent.getStringExtra(ConstantUtils.MOBILENUMBER)
+            tv_for.text =
+                resources.getString(R.string.textto) + intent.getStringExtra(ConstantUtils.UNITNAME)
+            tv_totalperson.text = resources.getString(R.string.textperson)
+            tv_from.text =
+                resources.getString(R.string.textfrom) + intent.getStringExtra(ConstantUtils.COMPANY_NAME)
 
             menuAdd.setOnClickListener {
                 minteger++
-                menuCount.setText(""+minteger)
+                menuCount.text = "" + minteger
 
             }
 
             menuRemove.setOnClickListener {
                 if (minteger>1) {
                     minteger--
-                    menuCount.setText("" + minteger)
+                    menuCount.text = "" + minteger
 
                 }else{
 
                 }
             }
             if (intent.getStringExtra(ConstantUtils.FLOW_TYPE) == ConstantUtils.STAFF_REGISTRATION) {
-                tv_from.setText("Designation: "+intent.getStringExtra(ConstantUtils.COMPANY_NAME))
-                itemLyt.setVisibility(View.GONE)
+                tv_from.text = "Designation: " + intent.getStringExtra(ConstantUtils.COMPANY_NAME)
+                itemLyt.visibility = View.GONE
             } else {
 
             }
@@ -115,7 +120,7 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
                 .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ConstantUtils.ASSOCIATION_ID,0)+"STAFF"+ intent.getIntExtra(WORKER_ID, 0)+".jpg")
                 .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(profile_image)
 
-            val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
+            val mLayoutManager = GridLayoutManager(applicationContext, 2)
             rv_image.layoutManager = mLayoutManager
 
         }
