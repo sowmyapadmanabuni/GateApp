@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,15 +23,10 @@ import android.widget.Toast;
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
 
-import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity;
 import com.oyespace.guards.network.ChampApiClient;
 import com.oyespace.guards.network.ChampApiInterface;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
-import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
-import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration;
-import com.oyespace.guards.request.InvitationUpdateReq;
 import com.oyespace.guards.request.ResidentValidationRequest;
-import com.oyespace.guards.responce.InvitationRequestResponse;
 import com.oyespace.guards.responce.ResidentValidationResponse;
 import com.oyespace.guards.utils.Prefs;
 
@@ -42,24 +38,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
-import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
-import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
-import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
-import static com.oyespace.guards.utils.ConstantUtils.FROMDATE;
-import static com.oyespace.guards.utils.ConstantUtils.FROMTIME;
-import static com.oyespace.guards.utils.ConstantUtils.GUEST;
-import static com.oyespace.guards.utils.ConstantUtils.INVITATIONID;
-import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
-import static com.oyespace.guards.utils.ConstantUtils.NUMBEROFPERSONS;
-import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
-import static com.oyespace.guards.utils.ConstantUtils.TODATE;
-import static com.oyespace.guards.utils.ConstantUtils.UNITID;
-import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
-import static com.oyespace.guards.utils.ConstantUtils.VEHICLENUMBER;
-import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_GUESTWITHQRCODE;
-import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
-import static com.oyespace.guards.utils.DateTimeUtils.compareDate;
-import static com.oyespace.guards.utils.RandomUtils.entryExists;
 
 public class ResidentIdActivity extends BaseScannerActivity implements ZXingScannerView.ResultHandler {
 
@@ -116,12 +94,14 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
         if(residentdata.contains(";")) {
             final String[] residentdataList = residentdata.split(";");
-            //       System.out.println("Guest Data CustomViewFinderScannerActivity " + guestdataList[0] + " " + " " + guestdataList[1] + " " + guestdataList[2] + " " + guestdataList[3] + " " + guestdataList[5]);
 
 
             if(residentdataList.length>1) {
 
                 if(residentdataList[1].equalsIgnoreCase( Prefs.getInt(ASSOCIATION_ID,0)+"")) {
+
+                    System.out.println("Guest Data CustomViewFinderScannerActivity " + residentdataList[0]  );
+
 
                     getResidentValidation(residentdataList[0].toString(), Prefs.getInt(ASSOCIATION_ID, 0));
                 }else {
@@ -227,15 +207,19 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
     void getResidentValidation( String mobileNumber,int associationId) {
 
+
         ResidentValidationRequest residentValidationRequest = new ResidentValidationRequest();
 
-        residentValidationRequest.FMMobile = mobileNumber;
-        residentValidationRequest.ASAssnID =associationId;
+        residentValidationRequest.MobileNumber = mobileNumber;
+        residentValidationRequest.AssociationID =associationId;
+
+
 
         Call<ResidentValidationResponse> call = champApiInterface.residentValidation(residentValidationRequest);
         call.enqueue(new Callback<ResidentValidationResponse>() {
             @Override
             public void onResponse(Call<ResidentValidationResponse> call, Response<ResidentValidationResponse> response) {
+
 
                 ViewGroup viewGroup = findViewById(android.R.id.content);
 

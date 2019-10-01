@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minWidth="300dp"
+        android:minHeight="400dp">
+
+
+
+
+    <TextView
+            android:id="@+id/tv_msg"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_margin="@dimen/_10sdp"
+            android:layout_below="@+id/dialog_imageview"
+            android:layout_centerHorizontal="true"
+            android:text="SubsCription Expired"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="45sp" />
+
+    <Button
+            android:id="@+id/btn_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_msg"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:text="OK"
+            android:textSize="22sp" />
+
+</RelativeLayout>

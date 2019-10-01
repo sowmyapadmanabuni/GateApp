@@ -200,6 +200,33 @@ public class VisitorLogExitResp {
             @Expose
             private String vlEntryImg;
 
+            @SerializedName("vlVenImg")
+            @Expose
+            private String vlVenImg;
+
+            @SerializedName("vlVoiceNote")
+            @Expose
+            private String vlVoiceNote;
+
+
+            public String getVlVenImg() {
+                return vlVenImg;
+            }
+
+            public void setVlVenImg(String vlVenImg) {
+                this.vlVenImg = vlVenImg;
+            }
+
+            public String getVlVoiceNote() {
+                return vlVoiceNote;
+            }
+
+            public void setVlVoiceNote(String vlVoiceNote) {
+                this.vlVoiceNote = vlVoiceNote;
+            }
+
+
+
             public String getVlEntryImg() {
                 return vlEntryImg;
             }

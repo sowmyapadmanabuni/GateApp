@@ -177,4 +177,7 @@ interface WebApi {
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
             : Single<ResidentValidationResponse>
+
+    @GET("oyesafe/api/v1/Subscription/GetLatestSubscriptionByAssocID/{id}")
+    fun getSubscriptionData(@Header("X-OYE247-APIKey") token: String,@Path("id") assid: String):Single<SubscriptionResp>
 }

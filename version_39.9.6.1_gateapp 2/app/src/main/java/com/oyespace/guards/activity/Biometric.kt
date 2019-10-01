@@ -1102,7 +1102,11 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 t1.speak("Finger print data saved", TextToSpeech.QUEUE_FLUSH, null)
                 //  Toast.makeText(this@Biometric,dbh.fingercount(memId).toString()+".."+fingerId.toString()+".."+mFingerprint1Template.toString()+".."+mFingerprint2Template+".."+mFingerprint3Template,Toast.LENGTH_LONG).show()
 
+                Log.v("DATA SIZE",mFingerprint1Template.size.toString()+".."+mFingerprint2Template.size.toString()+".."+mFingerprint3Template.size.toString())
+
+
                 uploadFingerPrint(mFingerprint1Template, mFingerprint2Template, mFingerprint3Template)
+
 
                 next = findViewById(R.id.buttonNext)
                 next!!.visibility = View.VISIBLE

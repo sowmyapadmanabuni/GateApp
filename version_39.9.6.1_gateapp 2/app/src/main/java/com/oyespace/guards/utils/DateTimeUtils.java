@@ -1,11 +1,27 @@
 package com.oyespace.guards.utils;
 
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
+import com.oyespace.guards.R;
+import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
+import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration;
+
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +29,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.FROMDATE;
+import static com.oyespace.guards.utils.ConstantUtils.FROMTIME;
+import static com.oyespace.guards.utils.ConstantUtils.GUEST;
+import static com.oyespace.guards.utils.ConstantUtils.INVITATIONID;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.NUMBEROFPERSONS;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.TODATE;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_GUESTWITHQRCODE;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 /**
  * Created by Kalyan on 22-Dec-17.
@@ -225,6 +258,39 @@ public class DateTimeUtils {
         }
 
     }
+
+    public static boolean CheckDates(String startDate, String endDate,Context context) {
+
+        SimpleDateFormat dfDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+
+        boolean b = false;
+
+        try {
+            if (dfDate.parse(startDate).before(dfDate.parse(endDate))) {
+                //Toast.makeText(context,"111",Toast.LENGTH_LONG).show();
+                b = true;  // If start date is before end date.
+            } else if (dfDate.parse(startDate).equals(dfDate.parse(endDate))) {
+                b = true;  // If two dates are equal.
+               // Toast.makeText(context,"222",Toast.LENGTH_LONG).show();
+            } else {
+                b = false; // If start date is after the end date.
+                //Toast.makeText(context,"333",Toast.LENGTH_LONG).show();
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return b;
+    }
+
+//    public void overlayAlert(Context context) {
+//
+//        final Dialog dialog = new Dialog(context); // Context, this, etc.
+//        dialog.setContentView(R.layout.layout_subscriptiondailog);
+//        dialog.setTitle(R.string.dialog_title);
+//        dialog.show();
+//
+//    }
 
 
 
