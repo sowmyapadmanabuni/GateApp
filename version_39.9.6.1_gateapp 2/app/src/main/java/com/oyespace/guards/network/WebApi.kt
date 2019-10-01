@@ -3,6 +3,8 @@ package com.oyespace.guards.network
 
 import com.oyespace.guards.models.GetGuardsListResponse
 import com.oyespace.guards.models.GuardsList
+import com.oyespace.guards.models.PatrolShift
+import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
@@ -177,4 +179,9 @@ interface WebApi {
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
             : Single<ResidentValidationResponse>
+
+    @GET("oye247/api/v1/GetPatrollingShiftsListByGateNameANDAssociationID/{gate}/{assnId}/")
+    fun patrolScheduleList(@Header("X-OYE247-APIKey") token: String, @Path("gate") gate: String, @Path("assnId") assnId: String)
+            : Single<ShiftsListResponse<ArrayList<PatrolShift>>>
+
 }

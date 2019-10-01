@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:layout_height="wrap_content">
+
+
+    <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="4dp"
+            app:contentPadding="6dp"
+            app:cardCornerRadius="6dp"
+            app:cardUseCompatPadding="true">
+
+    <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:orientation="horizontal">
+
+        <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animdlg_lottie"
+                android:layout_centerVertical="true"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:lottie_rawRes="@raw/gmap"
+                android:scaleType="fitCenter"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true" />
+
+        <LinearLayout
+                android:layout_toRightOf="@+id/animdlg_lottie"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/schedule_name"
+                    android:textSize="20dp"
+                    android:textStyle="bold"
+                    android:singleLine="true"
+                    android:layout_marginBottom="4dp"
+                    android:textColor="@color/orangedark"
+                    android:text="GATE 1"
+                    />
+            <View android:layout_height="0.5dp" android:layout_width="match_parent" android:background="@color/orange" />
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/schedule_time"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="bold"
+                    android:text="From 11:45AM To 11:30PM"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/schedule_days"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="italic"
+                    android:singleLine="true"
+                    android:ellipsize="marquee"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:scrollHorizontally="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:text="Sunday,Monday,Tuesday,Wednesday,Thursday,friday,Saturday, Sunday,Monday,Tuesday,Wednesday,Thursday,friday,Saturday"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

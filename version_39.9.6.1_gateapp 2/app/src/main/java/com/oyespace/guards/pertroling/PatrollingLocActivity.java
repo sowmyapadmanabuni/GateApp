@@ -127,10 +127,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         initScanner();
         initSpeech();
 
-        mGeofencePendingIntent = null;
-        mGeofencingClient = LocationServices.getGeofencingClient(this);
-        populateGeofenceList();
-        addGeofences();
+        //mGeofencePendingIntent = null;
+        //mGeofencingClient = LocationServices.getGeofencingClient(this);
+        //populateGeofenceList();
+        //addGeofences();
     }
 
 
@@ -205,7 +205,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             Toast.makeText(this, (messageId), Toast.LENGTH_SHORT).show();
         } else {
             // Get the status code for the error and log it using a user-friendly message.
-           // String errorMessage = GeofenceErrorMessages.getErrorString(this, task.getException());
+            // String errorMessage = GeofenceErrorMessages.getErrorString(this, task.getException());
             Log.w("GEOFENCING", ""+task.getException());
         }
     }
@@ -606,7 +606,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             ex.printStackTrace();
         }
 
-        removeGeofences();
+       // removeGeofences();
         super.onDestroy();
     }
 

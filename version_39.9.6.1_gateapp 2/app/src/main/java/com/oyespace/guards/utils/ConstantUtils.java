@@ -83,6 +83,8 @@ public class ConstantUtils {
     public static final String PATROLLING_START_POINT_AND_END_POINT="Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT="Patrolling Start Point";
     public static final String PATROLLING_END_POINT="Patrolling End Point";
+    public static final String PATROLLING_SCHEDULE_ID = "PATROLLING_SCHEDULE_ID";
+
     public static final String BACKGROUND_SYNC="BACKGROUND_SYNC";
     public static final String NONREGULAR="NONREGULAR";
     public static final String SYNC="SYNC";
@@ -106,5 +108,7 @@ public class ConstantUtils {
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
+
+
 
 }
