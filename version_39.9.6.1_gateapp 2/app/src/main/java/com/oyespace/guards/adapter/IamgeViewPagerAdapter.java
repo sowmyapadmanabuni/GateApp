@@ -1,4 +1,4 @@
-package com.oyespace.guards.camtest;
+package com.oyespace.guards.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,28 +10,31 @@ import android.widget.RelativeLayout;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.oyespace.guards.R;
+import com.oyespace.guards.camtest.AddCarFragment;
+import com.oyespace.guards.camtest.ImageHelper;
 
-import java.util.ArrayList;
 
-public class ViewPagerAdapter extends PagerAdapter {
+
+
+public class IamgeViewPagerAdapter extends PagerAdapter {
 
 
     Context mContext;
     LayoutInflater mLayoutInflater;
-    ArrayList<String>imagesList;
+    String imagesList[];
 
 
-    public ViewPagerAdapter(Context context) {
+    public IamgeViewPagerAdapter(Context context, String imagesList[]) {
 
         mContext = context;
-        imagesList=new ArrayList<>();
-        imagesList=AddCarFragment.list;
+        imagesList=imagesList;
+
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
     public int getCount() {
-        return imagesList.size();
+        return imagesList.length;
     }
 
     @Override
@@ -45,7 +48,7 @@ public class ViewPagerAdapter extends PagerAdapter {
 
 
         ImageView imageView = (ImageView) itemView.findViewById(R.id.image);
-        ImageHelper.loadImage(mContext, imagesList.get(position), imageView);
+      //  ImageHelper.loadImage(mContext, imagesList[position], imageView);
 
 
         container.addView(itemView);

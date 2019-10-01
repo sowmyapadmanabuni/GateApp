@@ -1087,7 +1087,10 @@ data class VisitorEntryLog(
     val vlfName: String,
     val vlgpsPnt: String,
     val vllName: String,
-    val vlpOfVis: String
+    val vlpOfVis: String,
+    val vlVenImg:String,
+    val vlVoiceNote:String
+
 )
 
 ///Ticketing Responses
@@ -1169,7 +1172,9 @@ data class VisitorExitLog(
     val vlfName: String,
     val vlgpsPnt: String,
     val vllName: String,
-    val vlpOfVis: String
+    val vlpOfVis: String,
+    val vlVoiceNote:String,
+    val vlVenImg:String
 )
 
 
@@ -1753,6 +1758,36 @@ data class SOSUpdateResp(
     val success: Boolean
 )
 
+data class SubscriptionResp(
+    val apiVersion: String,
+    val `data`: SubscriptionData,
+    val success: Boolean
+)
+
+data class SubscriptionData(
+    val subscription: Subscription
+)
+
+data class Subscription(
+    val asAssnID: Int,
+    val discountPerc: Double,
+    val discountVal: Double,
+    val oyeLivingSubs: Boolean,
+    val oyeSafeSubs: Boolean,
+    val pdid: Int,
+    val prid: Int,
+    val suIsActive: Boolean,
+    val suNofGDev: Int,
+    val suNofPDev: Int,
+    val suNoofBio: Int,
+    val suTotVal: Double,
+    val sudCreated: String,
+    val sudUpdated: String,
+    val sueDate: String,
+    val sugTotVal: Double,
+    val suid: Int,
+    val susDate: String
+)
 
 
 

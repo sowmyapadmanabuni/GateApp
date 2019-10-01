@@ -184,4 +184,6 @@ interface WebApi {
     fun patrolScheduleList(@Header("X-OYE247-APIKey") token: String, @Path("gate") gate: String, @Path("assnId") assnId: String)
             : Single<ShiftsListResponse<ArrayList<PatrolShift>>>
 
+    @GET("oyesafe/api/v1/Subscription/GetLatestSubscriptionByAssocID/{id}")
+    fun getSubscriptionData(@Header("X-OYE247-APIKey") token: String,@Path("id") assid: String):Single<SubscriptionResp>
 }

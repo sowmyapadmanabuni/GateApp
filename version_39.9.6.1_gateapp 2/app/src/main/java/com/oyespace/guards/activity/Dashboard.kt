@@ -26,8 +26,10 @@ import android.telephony.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.messaging.FirebaseMessaging
@@ -49,6 +51,7 @@ import com.oyespace.guards.pertroling.PScheduleListActivity
 import com.oyespace.guards.pertroling.PatrollingActivitynew
 import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.request.VisitorExitReqJv
 import com.oyespace.guards.residentidcard.ResidentIdActivity
@@ -74,6 +77,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
@@ -169,6 +173,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var usbConnected = true
     private var sgfplib: JSGFPLib? = null
     //a separate thread.
+
+
+
+
     var fingerDetectedHandler: Handler = object : Handler() {
         // @Override
         override fun handleMessage(msg: Message) {
@@ -283,6 +291,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
+
+
+     //   getSubscriptionData()
 
         cd = ConnectionDetector()
         cd.isConnectingToInternet(this@Dashboard)
@@ -553,6 +564,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     override fun onResume() {
 
+
+        fixedRateTimer("timer",false,0,60000){
+            this@Dashboard.runOnUiThread {
+              //  getSubscriptionData()
+            }
+        }
+
         try {
 
             Prefs.putBoolean("ACTIVE_SOS",false);
@@ -570,7 +588,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         val updateHandler = Handler()
 
         val runnable = Runnable {
-            // openAlert() // some action(s)
         }
 
         updateHandler.postDelayed(runnable, 1000)
@@ -1730,27 +1747,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         LocalDb.saveAllVisitorLog(newAl)
 
 
-
-                        Collections.sort(
-                            arrayList,
-                            object : Comparator<VisitorLogExitResp.Data.VisitorLog> {
-                                override fun compare(
-                                    lhs: VisitorLogExitResp.Data.VisitorLog,
-                                    rhs: VisitorLogExitResp.Data.VisitorLog
-                                ): Int {
+                        Collections.sort(arrayList, object : Comparator<VisitorLogExitResp.Data.VisitorLog> {
+                            override fun compare(lhs:  VisitorLogExitResp.Data.VisitorLog, rhs: VisitorLogExitResp.Data.VisitorLog): Int {
 
 
-                                    return (formatDateDMY(rhs.vldUpdated) + " " + (rhs.vlExitT).replace(
-                                        "1900-01-01T",
-                                        ""
-                                    )).compareTo(
-                                        formatDateDMY(lhs.vldUpdated) + " " + (lhs.vlExitT).replace(
-                                            "1900-01-01T",
-                                            ""
-                                        )
-                                    )
+                                return (formatDateDMY(rhs.vldUpdated)+" "+(rhs.vlExitT).replace("1900-01-01T","")).compareTo(formatDateDMY(lhs.vldUpdated)+" "+(lhs.vlExitT).replace("1900-01-01T",""))
 
-                                }
+                            }
+
+
+
                             })
 
 
@@ -2666,6 +2672,37 @@ try {
             }
         }
     }
+
+    fun getSubscriptionData(){
+        RetrofitClinet.instance.getSubscriptionData(OYE247TOKEN,LocalDb.getAssociation()!!.asAssnID.toString() )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<SubscriptionResp>() {
+
+                override fun onSuccessResponse(getdata: SubscriptionResp) {
+
+                 //   CheckDates(getdata.data.subscription.sueDate,getCurrentTimeLocal(),this@Dashboard)
+
+
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+                    //  visitorLogBiometric(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+
+
+                }
+                override fun noNetowork() {
+                    Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG).show()
+                }
+            })
+
+
+    }
+
+
+
 
 }
 

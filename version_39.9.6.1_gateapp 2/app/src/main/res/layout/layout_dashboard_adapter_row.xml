@@ -163,7 +163,18 @@
             </LinearLayout>
             <LinearLayout android:layout_width="0dp"
                           android:layout_height="match_parent"
+                    android:orientation="vertical"
                           android:layout_weight="1.9">
+
+                <ImageView
+                        android:id="@+id/iv_attachment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/attachment"
+                        android:visibility="gone" />
+
                 <Button
                         android:id="@+id/btn_makeexit"
                         android:layout_marginTop="@dimen/_20sdp"
@@ -182,18 +193,29 @@
                       android:layout_height="wrap_content"
         android:background="@color/white">
         <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="60dp"
+                      android:layout_height="150dp"
                       android:background="#FFCC80"
                       android:paddingRight="10dp"
 
                       android:layout_centerHorizontal="true"
-                      android:orientation="horizontal"
+                      android:orientation="vertical"
                       android:visibility="gone"
                       android:id="@+id/expanded_view"
         >
+
+            <TextView
+                    android:id="@+id/tv_comments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:gravity="center"
+                    android:visibility="visible"
+                    android:layout_gravity="center_vertical|center"
+                    />
+
             <ImageView
                     android:id="@+id/iv_guard"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:visibility="gone"
@@ -202,7 +224,7 @@
 
             <ImageView
                     android:id="@+id/iv_menu"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:paddingLeft="10dp"
@@ -213,7 +235,7 @@
 
             <ImageView
                     android:id="@+id/iv_map"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:src="@drawable/googlemaps"
@@ -223,12 +245,24 @@
 
             />
 
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="New Feature is coming soon"
-                      android:gravity="center"
-                      android:layout_gravity="center_vertical|center"
-            />
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:layout_width="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/rv_images"
+                    android:layout_height="wrap_content">
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <ImageView
+                    android:id="@+id/iv_play"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/play"
+                    android:visibility="gone"
+                    android:paddingLeft="10dp"/>
+
+
 
 
         </LinearLayout>

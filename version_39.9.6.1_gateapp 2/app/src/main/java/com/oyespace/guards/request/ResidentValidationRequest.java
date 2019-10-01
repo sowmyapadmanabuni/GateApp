@@ -3,9 +3,9 @@ package com.oyespace.guards.request;
 public class ResidentValidationRequest {
 
 
-    public String FMMobile;
+    public String MobileNumber;
 
-    public Integer ASAssnID;
+    public Integer AssociationID;
 
 
 }
