@@ -141,8 +141,8 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
                    }else  if(entryExists(guestdataList[1].replace("+",""),guestdataList[2])) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         AlertDialog.Builder builder =new  AlertDialog.Builder(CustomViewFinderScannerActivity.this);
-                            builder.setTitle("Entry already done");
-                            builder.setMessage("No Duplicates allowed");
+                           // builder.setTitle("Entry already done");
+                            builder.setMessage("This number is being used by a person already in");
                         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
