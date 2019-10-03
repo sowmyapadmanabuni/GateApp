@@ -608,10 +608,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             .registerReceiver(receiver, IntentFilter("SYNC"))//constant
         super.onResume()
 
+        val log = DataBaseHelper.getVisitorEnteredLog()
 
-        if (DataBaseHelper.getVisitorEnteredLog() != null) {
+        if (log != null) {
             dismissProgressrefresh()
-            newAl = DataBaseHelper.getVisitorEnteredLog()
+            newAl = log
             // LocalDb.saveAllVisitorLog(newAl);
 
             if ((newAl)!!.isEmpty()) {

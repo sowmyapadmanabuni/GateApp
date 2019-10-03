@@ -14,6 +14,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
+import com.oyespace.guards.models.GetVisitorsResponse
 import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
@@ -552,53 +553,29 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object :
-                CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
+                CommonDisposable<GetVisitorsResponse<ArrayList<VisitorLog>>>() {
 
-                override fun onSuccessResponse(visitorList: VisitorLogEntryResp<ArrayList<VisitorEntryLog>>) {
-                    Log.d("SYCNCHECK", "in 416")
-                    Log.d("SYCNCHECK", "in 417" + visitorList.toString())
+                override fun onSuccessResponse(visitorList: GetVisitorsResponse<ArrayList<VisitorLog>>) {
+                    Log.e("SYCNCHECK", "in 416")
+                    Log.e("SYCNCHECK", "in 417" + visitorList.toString())
 
-                    if (visitorList.success == true) {
-                        Log.d("SYCNCHECK", "in 421")
-                        Log.d("cdvd", visitorList.toString())
-                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
-                        arrayListVisitors = visitorList.data.visitorLog
-
-
-
-
-
-                        if (visitorList.data.visitorLog != null) {
-
-                            Collections.sort(
-                                arrayListVisitors,
-                                object : Comparator<VisitorEntryLog> {
-                                    override fun compare(
-                                        lhs: VisitorEntryLog,
-                                        rhs: VisitorEntryLog
-                                    ): Int {
-                                        return (DateTimeUtils.formatDateDMY(rhs.vldCreated) + " " + (rhs.vlEntryT).replace(
-                                            "1900-01-01T",
-                                            ""
-                                        )).compareTo(
-                                            DateTimeUtils.formatDateDMY(lhs.vldCreated) + " " + (lhs.vlEntryT).replace(
-                                                "1900-01-01T",
-                                                ""
-                                            )
-                                        )
-
-                                    }
-                                })
-                        }
-                        LocalDb.saveEnteredVisitorLog(arrayListVisitors)
-
-                        val smsIntent = Intent(ConstantUtils.SYNC)
-                        smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
+                    if (visitorList.success == true && visitorList.data.visitorLog != null) {
+                        Log.e("SYCNCHECK", "in 421-" + visitorList.data.visitorLog.size)
+                        Log.e("cdvd_", "" + visitorList.data.visitorLog)
+                        //val list = RealmList<com.oyespace.guards.models.VisitorLog>()
+                        //list.addAll(visitorList.data.visitorLog)
+                        val visitorsList = visitorList.data.visitorLog
+                        val realmDB = DataBaseHelper(mcontext)
+                        realmDB.saveVisitors(visitorsList)
 
                     } else {
                         Log.d("SYCNCHECK", "in 437")
+
+
                     }
+                    val smsIntent = Intent(ConstantUtils.SYNC)
+                    smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
+                    LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
                 }
 
                 override fun onErrorResponse(e: Throwable) {

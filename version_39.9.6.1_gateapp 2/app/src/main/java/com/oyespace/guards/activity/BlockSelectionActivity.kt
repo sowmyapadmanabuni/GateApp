@@ -38,34 +38,35 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     var mSearchUnitsAdapter: UnitSearchResultAdapter? = null
     var selected = ArrayList<UnitPojo>()
     var searched = ArrayList<UnitPojo>()
-    internal var unitNumber1=""
-    internal var unitNumber2=""
-    internal var unitNumber3=""
-    internal var unitNumber4=""
-    internal var unitNumber5=""
+    internal var unitNumber1 = ""
+    internal var unitNumber2 = ""
+    internal var unitNumber3 = ""
+    internal var unitNumber4 = ""
+    internal var unitNumber5 = ""
     internal var unitNames = ""
     internal var blockID = ""
     internal var unitId = ""
-    internal var acAccntID=""
+    internal var acAccntID = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_selection)
         //setDarkStatusBar()
 
-        try{
+        try {
             try {
                 var json: String = (intent.getStringExtra(SELECTED_UNITS))
                 if (json != null) {
-                    var selArray: Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)
+                    var selArray: Array<UnitPojo> =
+                        Gson().fromJson(json, Array<UnitPojo>::class.java)
                     selected = ArrayList(selArray.asList())
                 }
-            }catch (e:IllegalStateException){
+            } catch (e: IllegalStateException) {
 
             }
             setUnitsAdapter()
 
-        }catch (e:Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
@@ -74,7 +75,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
 
         search_text.setOnEditorActionListener { v, actionId, event ->
-            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 searchUnits()
                 true
             } else {
@@ -84,10 +85,10 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     }
 
-    private fun onSearchResultClick(unit:UnitPojo, index:Int){
+    private fun onSearchResultClick(unit: UnitPojo, index: Int) {
         val indices =
             selected.mapIndexedNotNull { index, event -> if (event.unUnitID.equals(unit.unUnitID)) index else null }
-        if(indices == null || indices.size == 0){
+        if (indices == null || indices.size == 0) {
             selected.add(unit)
             setUnitsAdapter()
             search_text.setText("")
@@ -97,40 +98,49 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         //setSearchUnitsAdapter()
     }
 
-    private fun setSearchUnitsAdapter(){
+    private fun setSearchUnitsAdapter() {
         mSearchUnitsAdapter =
-            UnitSearchResultAdapter(this@BlockSelectionActivity, searched,clickListener = {
-                    unit,index -> onSearchResultClick(unit,index)
-            })
+            UnitSearchResultAdapter(
+                this@BlockSelectionActivity,
+                searched,
+                clickListener = { unit, index ->
+                    onSearchResultClick(unit, index)
+                })
         rcv_searched_units.adapter = mSearchUnitsAdapter
         rcv_searched_units.layoutManager = LinearLayoutManager(this@BlockSelectionActivity)
         mSearchUnitsAdapter!!.notifyDataSetChanged()
         rcv_searched_units.visibility = View.VISIBLE
     }
 
-    private fun setUnitsAdapter(){
+    private fun setUnitsAdapter() {
         mUnitsAdapter =
-            SelectedUnitsAdapter(this@BlockSelectionActivity, selected,clickListener = {
-                    unit,index -> onUnitClose(unit,index)
-            })
+            SelectedUnitsAdapter(
+                this@BlockSelectionActivity,
+                selected,
+                clickListener = { unit, index ->
+                    onUnitClose(unit, index)
+                })
         rcv_selected_units.adapter = mUnitsAdapter
         rcv_selected_units.layoutManager = GridLayoutManager(this@BlockSelectionActivity, 5)
         mUnitsAdapter!!.notifyDataSetChanged()
     }
 
-    private fun setBlockAdapter(){
+    private fun setBlockAdapter() {
         mBlocksAdapter =
-            BlockSelectionAdapter(this@BlockSelectionActivity, mBlocksArray,clickListener = {
-                    block,index -> onPageClick(block,index)
-            })
+            BlockSelectionAdapter(
+                this@BlockSelectionActivity,
+                mBlocksArray,
+                clickListener = { block, index ->
+                    onPageClick(block, index)
+                })
         rcv_blocks.adapter = mBlocksAdapter
         rcv_blocks.layoutManager = GridLayoutManager(this@BlockSelectionActivity, 5)
         mBlocksAdapter!!.notifyDataSetChanged()
     }
 
-    private fun markSelectedBlock(){
+    private fun markSelectedBlock() {
         var updatedBlocks = ArrayList<BlocksData>()
-        for(i in 0 until mBlocksArray.size){
+        for (i in 0 until mBlocksArray.size) {
             var block: BlocksData = mBlocksArray[i]
             val indices =
                 selected.mapIndexedNotNull { index, event -> if (event.blBlockID.equals(block.blBlockID)) index else null }
@@ -141,20 +151,20 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         setBlockAdapter()
     }
 
-    private fun onUnitClose(unit:UnitPojo, index:Int){
+    private fun onUnitClose(unit: UnitPojo, index: Int) {
         selected.removeAt(index)
         mUnitsAdapter!!.notifyDataSetChanged()
         markSelectedBlock()
     }
 
     override fun onClick(v: View?) {
-        when (v?.id){
+        when (v?.id) {
             R.id.buttonNext -> {
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
-              //  if (selected?.size > 0) {
-                    onNextPress()
-              //  }
+                //  if (selected?.size > 0) {
+                onNextPress()
+                //  }
             }
             R.id.btn_search_action -> {
                 searchUnits()
@@ -173,8 +183,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unitNames += ", "
                     unitId += ", "
                     acAccntID += ", "
-                    blockID += ","
-                    //acAccntID += ", "
+                    acAccntID += ", "
                     unitNumber1 += ", "
                     unitNumber2 += ", "
                     unitNumber3 += ", "
@@ -184,36 +193,6 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
                 acAccntID += selected.get(j).acAccntID
-                blockID += selected.get(j).blBlockID
-
-
-//                if (selected.get(j).tenant.size != 0) {
-//                    try {
-//                        unitNumber1 += selected.get(j).tenant[0].utMobile
-//                        unitNumber2 += selected.get(j).tenant[0].utMobile1
-//                        //0  Toast.makeText(this@UnitListActivity, unitNumber1, Toast.LENGTH_LONG).show()
-//                    } catch (e: IndexOutOfBoundsException) {
-//
-//                    }
-//                } else {
-//                    if (selected.get(j).owner.size != 0) {
-//
-//                        try {
-//                            unitNumber1 += selected.get(j).owner[0].uoMobile
-//                            unitNumber2 += selected.get(j).owner[0].uoMobile1
-//                            unitNumber3 += selected.get(j).owner[0].uoMobile2
-//                            unitNumber4 += selected.get(j).owner[0].uoMobile3
-//                            unitNumber5 += selected.get(j).owner[0].uoMobile4
-//
-//                            //   Toast.makeText(this@UnitListActivity,unitNumber1,Toast.LENGTH_LONG).show()
-//                        } catch (e: IndexOutOfBoundsException) {
-//
-//                        }
-//
-//                    }
-//
-//                }
-
 
             }
 
@@ -229,7 +208,6 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                    d.putExtra(BLOCK_ID, blockID)
                     d.putExtra(
                         "RESIDENT_NUMBER",
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
@@ -253,7 +231,6 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                    d.putExtra(BLOCK_ID, blockID)
                     //d.putExtra("RESIDENT_NUMBER",unitNumber1)
                     d.putExtra(
                         "RESIDENT_NUMBER",
@@ -273,12 +250,12 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
             }
 
 
-        }else{
+        } else {
             Toast.makeText(applicationContext, "No data", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun onPageClick(selectedBlock:BlocksData, index:Int){
+    private fun onPageClick(selectedBlock: BlocksData, index: Int) {
         val _intent = Intent(this@BlockSelectionActivity, UnitSelectionActivity::class.java)
         _intent.putExtra(ConstantUtils.SELECTED_BLOCK, selectedBlock.blBlockID)
         _intent.putExtra(ConstantUtils.SELECTED_BLOCK_NAME, selectedBlock.blBlkName)
@@ -291,15 +268,15 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         finish()
     }
 
-    private fun initTitles(){
+    private fun initTitles() {
         title_unit.header_title.text = this.resources.getString(R.string.units_selection_title)
         title_block.header_title.setTextColor(this.resources.getColor(R.color.black))
         title_block.header_title.text = this.resources.getString(R.string.blocks_selection_title)
     }
 
 
-    private fun searchUnits(){
-        if(search_text.text.toString().trim().length > 0) {
+    private fun searchUnits() {
+        if (search_text.text.toString().trim().length > 0) {
             showProgressrefresh()
             var associationId: Int = Prefs.getInt(ASSOCIATION_ID, 0)
             var searchObj = SearchUnitRequest(associationId, search_text.text.toString())
@@ -321,13 +298,21 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                         override fun onErrorResponse(e: Throwable) {
                             dismissProgressrefresh()
-                            Toast.makeText(this@BlockSelectionActivity, "No Units Found !!! ", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@BlockSelectionActivity,
+                                "No Units Found !!! ",
+                                Toast.LENGTH_LONG
+                            ).show()
 
                         }
 
                         override fun noNetowork() {
                             dismissProgressrefresh()
-                            Toast.makeText(this@BlockSelectionActivity, "No network call ", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                this@BlockSelectionActivity,
+                                "No network call ",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     })
             )
@@ -335,7 +320,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     }
 
 
-    private fun getBlocksList(){
+    private fun getBlocksList() {
         showProgressrefresh()
         RetrofitClinet.instance
             .blocksList(CHAMPTOKEN, AppUtils.intToString(Prefs.getInt(ASSOCIATION_ID, 0)))
@@ -360,7 +345,11 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                 override fun noNetowork() {
                     dismissProgressrefresh()
-                    Toast.makeText(this@BlockSelectionActivity, "No network call ", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        this@BlockSelectionActivity,
+                        "No network call ",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             })
     }
@@ -371,7 +360,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
             REQUEST_CODE_SPEECH -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    if(result != null && result.size > 0) {
+                    if (result != null && result.size > 0) {
                         search_text.setText(result[0].trim())
                     }
                 }

@@ -114,29 +114,27 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 
     private final int REQUEST_CODE_SPEECH_INPUT = 100;
     EditText Ed_Name;
-    private FragmentManager fragmentManager ;
+    public static Button image_Gallery, submit_button, buttonCapture;
     private ViewPager viewPager;
     ImageAdapter imageAdapter;
     RecyclerView rv_image;
-    ImageView iv_delete,imageView1,iv_edit;
+    ImageView iv_delete, imageView1, iv_edit;
     final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     Bitmap photo = null;
     TextView tv_name;
-    TextView txt_assn_name,txt_device_name,txt_gate_name ;
+    TextView txt_assn_name, txt_device_name, txt_gate_name;
     private View view;
-    private EditText notes, Regno, kms, exp_date, exp_price ,car_id;
-    public static Button  image_Gallery, submit_button,buttonCapture;
+    // private LinearLayout iamgeLyt;
+    String imgName;
+    private FragmentManager fragmentManager;
     ImageView dialog_imageview;
     static ArrayList<String> list = new ArrayList<>();
     private TextView upload_rc_book,
             upload_insurance, Make, model, year, variant, fuel, color, transmission, owners, insurance;
     //    private ViewPager viewPager_Image;
-
-   // private LinearLayout iamgeLyt;
-   String imgName;
+    private EditText notes, Regno, kms, exp_date, exp_price, car_id;
     private ProgressDialog progressDialog;
-
-    private ImageView  insurance_file_name, rc_book_file_name;
+    private ImageView insurance_file_name, rc_book_file_name;
     private ArrayList<String> listpager_Array = new ArrayList<>();
     //    private FloatingActionButton floatButton;
     public static final int REQUEST_CAMERA = 0, SELECT_FILE = 1, PICK_INSURANCE_REQUEST_CODE = 2, PICK_RCBOOK_REQUEST_CODE = 3;
@@ -153,11 +151,11 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setLocale(Prefs.getString(LANGUAGE,null));
+        setLocale(Prefs.getString(LANGUAGE, null));
         setContentView(R.layout.add_car_fragment);
         initViews();
-       //  imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg";
-       // String imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +workerResponce.data.worker.wkWorkID  + ".jpg";
+        //  imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg";
+        // String imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +workerResponce.data.worker.wkWorkID  + ".jpg";
         Dexter.withActivity(this)
                 .withPermissions(
                         //   Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -217,31 +215,30 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         //GridView gridview
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
 
-        tv_name=findViewById(R.id.tv_name);
-        iv_edit=findViewById(R.id.iv_edit);
+        tv_name = findViewById(R.id.tv_name);
+        iv_edit = findViewById(R.id.iv_edit);
         tv_name.setText(getIntent().getStringExtra(PERSONNAME));
-        txt_assn_name=findViewById(R.id.txt_assn_name);
-        txt_device_name=findViewById(R.id.txt_device_name);
-        txt_gate_name=findViewById(R.id.txt_gate_name);
+        txt_assn_name = findViewById(R.id.txt_assn_name);
+        txt_device_name = findViewById(R.id.txt_device_name);
+        txt_gate_name = findViewById(R.id.txt_gate_name);
         image_Gallery = findViewById(R.id.btnCaptureItemPhoto);
         //iamgeLyt = (LinearLayout) findViewById(R.id.imageLyt);
         rv_image = findViewById(R.id.rv_image);
 
-        buttonCapture=findViewById(R.id.buttonCapture);
-        imageView1=findViewById(R.id.imageView1);
+        buttonCapture = findViewById(R.id.buttonCapture);
+        imageView1 = findViewById(R.id.imageView1);
 
 //        if(Prefs.getString("Retake",null).equals("Yes")){
 //            buttonCapture.setText("RETAKE PERSON PHOTO");
 //        }
 
 
-        if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
             txt_assn_name.setTextSize(5 * getResources().getDisplayMetrics().density);
         }
         imageView1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
 
 
                 ViewGroup viewGroup = findViewById(android.R.id.content);
@@ -251,7 +248,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddCarFragment.this);
 
-                 dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
                 // Picasso.with(AddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
@@ -280,19 +277,19 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //        }
 
         txt_assn_name.setText("Society: " + LocalDb.getAssociation().getAsAsnName());
-        txt_gate_name.setText("Gate No: "+Prefs.getString(GATE_NO,null));
+        txt_gate_name.setText("Gate No: " + Prefs.getString(GATE_NO, null));
 //        txt_device_name.setText("Gate: "+Prefs.getInt(ASSOCIATION_ID,0) );
         try {
-            String appVersion="";
+            String appVersion = "";
             PackageManager manager = getBaseContext().getPackageManager();
             PackageInfo info = manager.getPackageInfo(getBaseContext().getPackageName(), 0);
             appVersion = info.versionName;
-            Log.d("tag","app "+appVersion+" "+info.versionName);
-            txt_device_name.setText("V: "+appVersion);
+            Log.d("tag", "app " + appVersion + " " + info.versionName);
+            txt_device_name.setText("V: " + appVersion);
 
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
-            txt_device_name.setText(" " );
+            txt_device_name.setText(" ");
 
         }
 
@@ -301,7 +298,6 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 
 //        floatButton.setOnClickListener(this);
         submit_button = findViewById(R.id.buttonNext);
-
 
 
         RecyclerView.LayoutManager mLayoutManager = new GridLayoutManager(getApplicationContext(), 4);
@@ -313,15 +309,15 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
-        if(getIntent().getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)){
+        if (getIntent().getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
             image_Gallery.setVisibility(View.INVISIBLE);
             rv_image.setVisibility(View.INVISIBLE);
             ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
-        }else{
-            if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
+        } else {
+            if (getIntent().getIntExtra(ACCOUNT_ID, 0) != 0) {
 
 
-                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
+                Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
 
                 Log.v("CALLER IMAGEVIEW", IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
 
@@ -337,20 +333,19 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                 //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
                 Picasso.with(this)
-                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+                        .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
 
         }
 
-        buttonCapture.setOnClickListener(new View.OnClickListener(){
+        buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
 
-
-                Intent intent =new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 
             }
@@ -365,8 +360,8 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(AddCarFragment.this);
-                 Ed_Name= dialogView.findViewById(R.id.Ed_Name);
-                ImageView btn_Mic=dialogView.findViewById(R.id.btn_Mic);
+                Ed_Name = dialogView.findViewById(R.id.Ed_Name);
+                ImageView btn_Mic = dialogView.findViewById(R.id.btn_Mic);
 
                 btn_Mic.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -375,7 +370,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                     }
                 });
 
-                Button btn_done=dialogView.findViewById(R.id.btn_done);
+                Button btn_done = dialogView.findViewById(R.id.btn_done);
 
                 builder.setView(dialogView);
 
@@ -402,7 +397,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
 
                 if (photo == null) {
-                    Toast.makeText(getApplicationContext(),"Capture Photo ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
                     submit_button.setEnabled(true);
                     submit_button.setClickable(true);
                 }
@@ -414,16 +409,16 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //                }
                 else {
 
-                    if(getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)){
+                    if (getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)) {
                         submit_button.setEnabled(false);
                         submit_button.setClickable(false);
                         staffRegistration();
-                    }else{
+                    } else {
 
 
-                        byte[] byteArray=null;
+                        byte[] byteArray = null;
                         try {
-                            Log.d("Dgddfdf picas","5 2");
+                            Log.d("Dgddfdf picas", "5 2");
                             ByteArrayOutputStream bos = new ByteArrayOutputStream();
                             photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                             byteArray = bos.toByteArray();
@@ -431,8 +426,8 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                             System.out.println("AFTER COMPRESSION-===>" + len);
                             bos.flush();
                             bos.close();
-                        }catch (Exception ex){
-                            Log.d("Dgddfdf picas","7");
+                        } catch (Exception ex) {
+                            Log.d("Dgddfdf picas", "7");
                         }
 
 
@@ -449,8 +444,8 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
                         d.putExtra(PERSON_PHOTO, byteArray);
                         d.putExtra(ITEMS_PHOTO_LIST, list);
-                        d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
-                        d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(UNIT_ACCOUNT_ID));
+                        d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
+                        d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                         d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
                         startActivity(d);
                         finish();
@@ -476,32 +471,32 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 
         StaffRegistrationReqJv loginReq = new StaffRegistrationReqJv();
 
-        loginReq.ASAssnID=Prefs.getInt(ASSOCIATION_ID,0);
+        loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
         loginReq.BLBlockID = getIntent().getStringExtra(BLOCK_ID);
-        loginReq.EmailID="";
-        loginReq.FLFloorID=0;
-        loginReq.OYEMemberID = 0 ;
-        loginReq.OYEMemberRoleID=0;
+        loginReq.EmailID = "";
+        loginReq.FLFloorID = 0;
+        loginReq.OYEMemberID = 0;
+        loginReq.OYEMemberRoleID = 0;
 
-        loginReq.VNVendorID=0;
-        loginReq.WKDesgn= getIntent().getStringExtra(COMPANY_NAME);
-        loginReq.WKFName= getIntent().getStringExtra(PERSONNAME);
-        loginReq.WKIDCrdNo="";
-        loginReq.WKDOB=getIntent().getStringExtra("DOB");
+        loginReq.VNVendorID = 0;
+        loginReq.WKDesgn = getIntent().getStringExtra(COMPANY_NAME);
+        loginReq.WKFName = getIntent().getStringExtra(PERSONNAME);
+        loginReq.WKIDCrdNo = "";
+        loginReq.WKDOB = getIntent().getStringExtra("DOB");
         loginReq.WKISDCode = "";
         //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
-        loginReq.WKLName="";
+        loginReq.WKLName = "";
 
-        loginReq.WKMobile=getIntent().getStringExtra(COUNTRYCODE)+ getIntent().getStringExtra(MOBILENUMBER);
-        loginReq.WKWrkType= getIntent().getStringExtra(VISITOR_TYPE);
+        loginReq.WKMobile = getIntent().getStringExtra(COUNTRYCODE) + getIntent().getStringExtra(MOBILENUMBER);
+        loginReq.WKWrkType = getIntent().getStringExtra(VISITOR_TYPE);
         //loginReq.UNUnitID=toInteger( getIntent().getStringExtra(UNITID));
         loginReq.UNUnitID = getIntent().getStringExtra(UNITID);
         // Toast.makeText(AddCarFragment.this,getIntent().getStringExtra(UNITID),Toast.LENGTH_LONG).show();
-        loginReq.UNUniName= getIntent().getStringExtra(UNITNAME);
-        loginReq.WKEntryImg=imgName;
+        loginReq.UNUniName = getIntent().getStringExtra(UNITNAME);
+        loginReq.WKEntryImg = imgName;
 
-        Log.d("saveCheckPoints","StaffEntry "+loginReq.ASAssnID+" "+loginReq.WKFName+" "
-                +loginReq.UNUnitID+" "+loginReq.WKMobile+" "+loginReq.UNUniName );
+        Log.d("saveCheckPoints", "StaffEntry " + loginReq.ASAssnID + " " + loginReq.WKFName + " "
+                + loginReq.UNUnitID + " " + loginReq.WKMobile + " " + loginReq.UNUniName);
 
         restClient.addHeader(OYE247KEY, OYE247TOKEN);
         restClient.post(this, loginReq, StaffRegistrationRespJv.class, this, URLData.URL_STAFF_REGISTRATION);
@@ -515,14 +510,14 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             StaffRegistrationRespJv workerResponce = (StaffRegistrationRespJv) data;
             if (workerResponce != null) {
                 Log.d("str3", "str3: " + urlId + " id " + position + " " + " " + " " + workerResponce.success);
-                if(workerResponce.success.equalsIgnoreCase("true")) {
-                    imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +workerResponce.data.worker.wkWorkID  + ".jpg";
+                if (workerResponce.success.equalsIgnoreCase("true")) {
+                    imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" + workerResponce.data.worker.wkWorkID + ".jpg";
 
-                    sendStaffImage(imgName,"",String.valueOf(workerResponce.data.worker.wkWorkID));
+                    sendStaffImage(imgName, "", String.valueOf(workerResponce.data.worker.wkWorkID));
 
-                    byte[] byteArray=null;
+                    byte[] byteArray = null;
                     try {
-                        Log.d("Dgddfdf picas","5 2");
+                        Log.d("Dgddfdf picas", "5 2");
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
                         photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                         byteArray = bos.toByteArray();
@@ -530,11 +525,11 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         System.out.println("AFTER COMPRESSION-===>" + len);
                         bos.flush();
                         bos.close();
-                    }catch (Exception ex){
-                        Log.d("Dgddfdf picas","7");
+                    } catch (Exception ex) {
+                        Log.d("Dgddfdf picas", "7");
                     }
 
-                    if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 2.1")) {
+                    if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
                         Intent d = new Intent(AddCarFragment.this, Biometric.class);
                         d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
@@ -547,8 +542,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         startActivity(d);
-                    }
-                    else if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
+                    } else if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
                         Intent intent = new Intent(AddCarFragment.this, StaffDetails.class);
                         intent.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
                         intent.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
@@ -561,8 +555,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         intent.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         startActivity(intent);
                         finish();
-                    }
-                    else{
+                    } else {
                         Intent d = new Intent(AddCarFragment.this, Biometric.class);
                         d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
                         d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
@@ -575,22 +568,22 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         startActivity(d);
                     }
-                 //   uploadImage(imgName,personPhoto);
+                    //   uploadImage(imgName,personPhoto);
 
-                    Intent ddc =new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
+                    Intent ddc = new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
                     Log.d("btn_biometric", "af " + imgName);
 
                     ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
                     ddc.putExtra("imgName", imgName);
                     ddc.putExtra(PERSON_PHOTO, byteArray);
                     sendBroadcast(ddc);
-                    Intent ddc1 =new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
+                    Intent ddc1 = new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
                     Log.d("SYNC_STAFF_LIST", "af " + imgName);
                     ddc1.putExtra(BSR_Action, SYNC_STAFF_LIST);
                     sendBroadcast(ddc1);
                     showToast(this, "Staff Registered");
                     finish();
-                }else{
+                } else {
                     showToast(this, "Staff not Registered");
                 }
 
@@ -615,7 +608,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //
 //          Intent i=new Intent(AddCarFragment.this, Dashboard.class);
 //          startActivity(i);
-          finish();
+        finish();
 
     }
 
@@ -655,9 +648,9 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
     public void onCaptureImageResult(Intent data, Context context) {
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        byte[] byteArray=null;
+        byte[] byteArray = null;
         try {
-            Log.d("Dgddfdf picas","5 2");
+            Log.d("Dgddfdf picas", "5 2");
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bos);
             byteArray = bos.toByteArray();
@@ -665,13 +658,13 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             System.out.println("AFTER COMPRESSION-===>" + len);
             bos.flush();
             bos.close();
-        }catch (Exception ex){
-            Log.d("Dgddfdf picas","7");
+        } catch (Exception ex) {
+            Log.d("Dgddfdf picas", "7");
         }
 
         assert thumbnail != null;
         thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-        String imgName=System.currentTimeMillis() + ".jpg";
+        String imgName = System.currentTimeMillis() + ".jpg";
 
         file = new File(Environment.getExternalStorageDirectory().getPath(), imgName);
         // file= new File(Environment.getExternalStorageDirectory()+ "/DCIM/myCapturedImages", imgName);
@@ -679,7 +672,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
         setviewPager(String.valueOf(file.getAbsoluteFile()), context);
 //
-        Intent ddc =new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
+        Intent ddc = new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
         Log.d("btn_biometric", "af " + file.getAbsoluteFile());
 
         ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
@@ -699,8 +692,6 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         }
 
 
-
-
     }
 
 
@@ -717,7 +708,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             list.add(selectedImagePath);
             ImageHelper.loadImage(context, selectedImagePath, imageView);
 
-            imageAdapter = new ImageAdapter(list,AddCarFragment.this,"On");
+            imageAdapter = new ImageAdapter(list, AddCarFragment.this, "On");
             rv_image.setAdapter(imageAdapter);
             // iamgeLyt.addView(imageView);
             // iv_delete = findViewById(R.id.iv_delete);
@@ -826,16 +817,16 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                     tv_name.setText(result.get(0));
                 }
                 break;
-                case REQUEST_CAMERA:
-                    if(resultCode == Activity.RESULT_OK){
+            case REQUEST_CAMERA:
+                if (resultCode == Activity.RESULT_OK) {
                     onCaptureImageResult(data, this);
 
 
-                        showViewPager();
+                    showViewPager();
                 }
                 break;
             case CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE:
-                if(resultCode == Activity.RESULT_OK){
+                if (resultCode == Activity.RESULT_OK) {
                     photo = (Bitmap) data.getExtras().get("data");
                     imageView1.setImageBitmap(photo);
                     //personPhoto=photo;
@@ -866,7 +857,6 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //        }
 
 
-
         Log.d("Activity", "Result Fail");
     }
 
@@ -882,18 +872,19 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         conf.locale = myLocale;
         res.updateConfiguration(conf, dm);
     }
+
     public void speak() {
 
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault());
-            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something");
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something");
 
-            try {
-                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
-            } catch ( Exception e) {
-            }
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
+        } catch (Exception e) {
         }
+    }
 //    void getVisitorLogEntryListByMobileNumber(){
 //
 //        Call<TicketListingTesponse> call = champApiInterface.getTicketingListResponse(EmergencyID);
@@ -954,18 +945,16 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //    }
 
 
-    void sendStaffImage(String WKEntryImg, String WKEntryGPS, String WKWorkID ) {
-
-
+    void sendStaffImage(String WKEntryImg, String WKEntryGPS, String WKWorkID) {
 
 
         SendStaffImageReq sendStaffImageReq = new SendStaffImageReq();
 
-        sendStaffImageReq.WKEntryImg=WKEntryImg;
-        sendStaffImageReq.WKEntryGPS=WKEntryGPS;
-        sendStaffImageReq.WKWorkID=WKWorkID;
+        sendStaffImageReq.WKEntryImg = WKEntryImg;
+        sendStaffImageReq.WKEntryGPS = WKEntryGPS;
+        sendStaffImageReq.WKWorkID = WKWorkID;
 
-        Log.v("IMAGE NAME....",WKEntryImg);
+        Log.v("IMAGE NAME....", WKEntryImg);
         //  Toast.makeText(AddCarFragment.this,WKEntryImg,Toast.LENGTH_LONG).show();
 
 
@@ -974,8 +963,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             @Override
             public void onResponse(Call<StaffImageRes> call, Response<StaffImageRes> response) {
 
-               // Toast.makeText(AddCarFragment.this,"Shalinii",Toast.LENGTH_LONG).show();
-
+                // Toast.makeText(AddCarFragment.this,"Shalinii",Toast.LENGTH_LONG).show();
 
 
 //                if (response.body().getSuccess() == true) {
@@ -1017,16 +1005,16 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 
             @Override
             public void onFailure(Call<StaffImageRes> call, Throwable t) {
-                Toast.makeText(AddCarFragment.this,t.toString(),Toast.LENGTH_LONG).show();
+                Toast.makeText(AddCarFragment.this, t.toString(), Toast.LENGTH_LONG).show();
                 call.cancel();
             }
         });
 
     }
 
-    public String getRealPathFromURI (Uri contentUri) {
+    public String getRealPathFromURI(Uri contentUri) {
         String path = null;
-        String[] proj = { MediaStore.MediaColumns.DATA };
+        String[] proj = {MediaStore.MediaColumns.DATA};
         Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
         if (cursor.moveToFirst()) {
             int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);

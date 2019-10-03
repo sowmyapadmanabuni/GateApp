@@ -1,11 +1,9 @@
 package com.oyespace.guards.network
 
 
-import com.oyespace.guards.models.GetGuardsListResponse
-import com.oyespace.guards.models.GetWorkersResponse
-import com.oyespace.guards.models.GuardsList
-import com.oyespace.guards.models.WorkersList
+import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY
@@ -120,7 +118,7 @@ interface WebApi {
 
     @GET("oye247/api/v1/GetVisitorLogEntryListByAssocID/{id}")
     fun getVisitorLogEntryList(@Header(OYE247KEY) token: String, @Path("id") assnId: Int)
-            : Single<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>
+            : Single<GetVisitorsResponse<ArrayList<VisitorLog>>>
 
     @GET("oye247/api/v1/TicketingResponse/GetTicketingResponseListByTicketingResID/{id}")
     fun getTicketingResponses(@Header(OYE247KEY) token: String, @Path("id") ticketID: String)

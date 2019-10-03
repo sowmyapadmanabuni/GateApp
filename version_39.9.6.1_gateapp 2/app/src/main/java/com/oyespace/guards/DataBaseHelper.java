@@ -5244,6 +5244,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         return fingerPrints;
     }
 
+    public void saveVisitors(RealmList<VisitorLog> visitorsList) {
+        Realm realm = Realm.getDefaultInstance();
+        if (!realm.isInTransaction()) {
+            realm.beginTransaction();
+        }
+        realm.insertOrUpdate(visitorsList);
+        realm.commitTransaction();
+    }
+
     public static ArrayList<VisitorLog> getVisitorEnteredLog(){
         Realm realm = Realm.getDefaultInstance();
         ArrayList<VisitorLog> list = new ArrayList<>();
@@ -5255,7 +5264,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 //                return 0;
 //            }
 //        });
-
         realm.close();
         return list;
     }
