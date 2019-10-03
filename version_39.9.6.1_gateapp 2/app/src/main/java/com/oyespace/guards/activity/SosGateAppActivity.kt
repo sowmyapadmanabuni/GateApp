@@ -645,7 +645,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
             if (sosObj != null && sosObj.userName != null && !sosObj.userName.equals("")) {
                 currentSOS = sosObj
                 sosId = currentSOS.id
-                val currentGate: String = Prefs.getString("GATE_NO", null)
+                val currentGate: String = Prefs.getString(PrefKeys.MOBILE_NUMBER, "");
 
                 if (currentSOS.userMobile != "" && currentSOS.userMobile != null) {
                     sos_usermobile.text = currentSOS.userMobile
@@ -669,6 +669,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                     btn_dismiss_sos.visibility = View.GONE
                     btn_attend_sos.text = "Resolved"
                     isResolving = true
+                }else{
+                    btn_dismiss_sos.visibility = View.VISIBLE
+                    btn_attend_sos.text = "Attend"
+                    isResolving = false
                 }
                 initFRTDB()
             } else {

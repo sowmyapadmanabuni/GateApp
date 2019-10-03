@@ -71,6 +71,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
     @Override
     protected void onHandleWork(Intent intent) {
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+        Log.e(TAG,"geofencingEvent: "+geofencingEvent);
         if (geofencingEvent.hasError()) {
             String errorMessage = GeofenceErrorMessages.getErrorString(this,
                     geofencingEvent.getErrorCode());

@@ -47,6 +47,7 @@ import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.network.*
 import com.oyespace.guards.ocr.CaptureImageOcr
+import com.oyespace.guards.pertroling.PScheduleListActivity
 import com.oyespace.guards.pertroling.PatrollingActivitynew
 import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
@@ -1366,7 +1367,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 clickable = 0
             }
             R.id.tv_patrolling -> {
-                val i_vehicle = Intent(this@Dashboard, PatrollingLocActivity::class.java)
+                //PatrollingLocActivity
+                val i_vehicle = Intent(this@Dashboard, PScheduleListActivity::class.java)
                 startActivity(i_vehicle)
             }
             R.id.tv_emergency -> {

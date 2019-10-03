@@ -1,9 +1,10 @@
 package com.oyespace.guards.network
 
 
-import com.oyespace.guards.models.GetGuardsListResponse
-import com.oyespace.guards.models.GuardsList
+import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.VisitorEntryLog
+import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY
@@ -177,6 +178,14 @@ interface WebApi {
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
             : Single<ResidentValidationResponse>
+
+    @GET("oye247/api/v1/GetCheckPointNamesByPatrollingSchedule/{schedId}")
+    fun scheduleCheckPointsList(@Header("X-OYE247-APIKey") token: String, @Path("schedId") scheduleId: String)
+            : Single<CheckPointsOfSheduleListResponse<ArrayList<PatrolShift>>>
+
+    @GET("oye247/api/v1/GetPatrollingShiftsListByGateNameANDAssociationID/{gate}/{assnId}/")
+    fun patrolScheduleList(@Header("X-OYE247-APIKey") token: String, @Path("gate") gate: String, @Path("assnId") assnId: String)
+            : Single<ShiftsListResponse<ArrayList<PatrolShift>>>
 
     @GET("oyesafe/api/v1/Subscription/GetLatestSubscriptionByAssocID/{id}")
     fun getSubscriptionData(@Header("X-OYE247-APIKey") token: String,@Path("id") assid: String):Single<SubscriptionResp>
