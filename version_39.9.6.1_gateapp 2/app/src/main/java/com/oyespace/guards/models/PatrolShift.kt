@@ -13,7 +13,8 @@ data class PatrolShift(
     var asAssnID: Int,
     var psdCreated: String,
     var psdUpdated: String,
-    var psIsActive: Boolean
+    var psIsActive: Boolean,
+    var point:ArrayList<ScheduleCheckPointsData>
 )
 
 data class ShiftsListResponse<T>(
@@ -35,4 +36,12 @@ data class CheckPointsOfSheduleListResponse<T>(
 
 data class CheckPointsScheduleData(
     val checkPointsBySchedule: ArrayList<PatrolShift>
+)
+
+data class ScheduleCheckPointsData(
+    val psChkPID:Int,
+    val asAssnID:Int,
+    val pcIsActive:Boolean,
+    val cpgpsPnts:String,
+    val pcid:Int
 )

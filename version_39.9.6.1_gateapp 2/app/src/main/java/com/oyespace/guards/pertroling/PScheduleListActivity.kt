@@ -7,6 +7,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.PatrolShiftsAdapter
+import com.oyespace.guards.models.CheckPointsOfSheduleListResponse
 import com.oyespace.guards.models.PatrolShift
 import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.CommonDisposable
@@ -80,4 +81,5 @@ class PScheduleListActivity:BaseKotlinActivity(){
                 }
             })
     }
+
 }

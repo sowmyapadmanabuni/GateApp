@@ -30,13 +30,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.broadcastreceiver.GeofenceBroadcastReceiver;
+import com.oyespace.guards.models.CheckPointsOfSheduleListResponse;
+import com.oyespace.guards.models.PatrolShift;
+import com.oyespace.guards.models.ScheduleCheckPointsData;
 import com.oyespace.guards.network.CommonDisposable;
 import com.oyespace.guards.network.RetrofitClinet;
 import com.oyespace.guards.pojo.CheckPointData;
@@ -64,6 +66,7 @@ import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_DISTANCE_THRESH
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
+import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
 
 public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void> {
 
@@ -74,7 +77,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private BroadcastReceiver locationUpdateReceiver;
     private BroadcastReceiver predictedLocationReceiver;
     private ZXingScannerView mScannerView;
-
+    private boolean isScanEnabled =false;
 
 
 
@@ -102,7 +105,6 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
             if (name.endsWith("LocationService")) {
                 locationService = ((LocationService.LocationServiceBinder) service).getService();
-
                 locationService.startUpdatingLocation();
             }
         }
@@ -123,6 +125,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         Prefs.remove(ACTIVE_PATROLLING_SCHEDULE);
         Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
 
+        getScheduleCheckPoints(getIntent().getIntExtra(PATROLLING_SCHEDULE_ID,0));
+
         startLocationListener();
         initScanner();
         initSpeech();
@@ -133,6 +137,43 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //addGeofences();
     }
 
+
+    private void getScheduleCheckPoints(int scheduleId){
+        if(scheduleId != 0) {
+            showProgressrefresh();
+            RetrofitClinet.Companion.getInstance()
+                    .scheduleCheckPointsList(OYE247TOKEN, "" + scheduleId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new CommonDisposable<CheckPointsOfSheduleListResponse<ArrayList<PatrolShift>>>() {
+                        @Override
+                        public void noNetowork() {
+                            dismissProgressrefresh();
+                        }
+
+                        @Override
+                        public void onErrorResponse(@NotNull Throwable e) {
+                            dismissProgressrefresh();
+                        }
+
+                        @Override
+                        public void onSuccessResponse(CheckPointsOfSheduleListResponse<ArrayList<PatrolShift>> checkPointResponse) {
+                            try {
+                                dismissProgressrefresh();
+                                Log.e("getScheduleCheckPoints",""+checkPointResponse.getData().getCheckPointsBySchedule());
+                                if(checkPointResponse.getSuccess() && checkPointResponse.getData().getCheckPointsBySchedule().size()>0){
+                                    isScanEnabled = true;
+                                    PatrolShift patrolShift = checkPointResponse.getData().getCheckPointsBySchedule().get(0);
+                                    ArrayList<ScheduleCheckPointsData> schedulecheckPointsData = patrolShift.getPoint();
+
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+        }
+    }
 
 
     private void populateGeofenceList(){
