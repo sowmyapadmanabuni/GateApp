@@ -2,6 +2,7 @@ package com.oyespace.guards.pojo
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
+import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import io.realm.RealmList
 import kotlinx.android.parcel.Parcelize
 
@@ -553,7 +554,8 @@ data class CreateVisitorLogReq(
     val SPPrdImg10: String,
     val WKSelfImg: String,
     val VLEntryImg: String,
-    val VLENGName:String
+    val VLENGName: String,
+    val VLEntryT: String = getCurrentTimeLocal()
 
 
 )

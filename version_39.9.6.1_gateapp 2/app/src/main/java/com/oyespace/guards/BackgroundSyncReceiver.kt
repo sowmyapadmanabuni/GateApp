@@ -556,22 +556,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 CommonDisposable<GetVisitorsResponse<ArrayList<VisitorLog>>>() {
 
                 override fun onSuccessResponse(visitorList: GetVisitorsResponse<ArrayList<VisitorLog>>) {
-                    Log.e("SYCNCHECK", "in 416")
-                    Log.e("SYCNCHECK", "in 417" + visitorList.toString())
+
+                    Log.i("SYCNCHECK", "visitor-> " + visitorList.data.visitorLog)
 
                     if (visitorList.success == true && visitorList.data.visitorLog != null) {
-                        Log.e("SYCNCHECK", "in 421-" + visitorList.data.visitorLog.size)
-                        Log.e("cdvd_", "" + visitorList.data.visitorLog)
-                        //val list = RealmList<com.oyespace.guards.models.VisitorLog>()
-                        //list.addAll(visitorList.data.visitorLog)
                         val visitorsList = visitorList.data.visitorLog
                         val realmDB = DataBaseHelper(mcontext)
                         realmDB.saveVisitors(visitorsList)
-
                     } else {
                         Log.d("SYCNCHECK", "in 437")
-
-
                     }
                     val smsIntent = Intent(ConstantUtils.SYNC)
                     smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)

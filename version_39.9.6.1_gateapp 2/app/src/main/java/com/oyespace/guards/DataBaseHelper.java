@@ -5249,6 +5249,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         if (!realm.isInTransaction()) {
             realm.beginTransaction();
         }
+        for (VisitorLog v : visitorsList) {
+            Log.i("taaag", "about to put in realm -> " + v.getVlVisLgID());
+        }
         realm.insertOrUpdate(visitorsList);
         realm.commitTransaction();
     }

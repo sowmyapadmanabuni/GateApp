@@ -639,11 +639,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         } else {
             dismissProgressrefresh()
         }
-//        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-//        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
-//        sendBroadcast(intentAction1)
-        //Toast.makeText(DashBoard.this,"NO data",Toast.LENGTH_LONG).show();
-        //}
+
+        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
+        sendBroadcast(intentAction1)
 
         if (isTimeAutomatic(application)) {
 
@@ -1590,9 +1589,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         mHandlerr = Handler()
         //startRepeatingTask()
         //database =  DBHelper(this);
-        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
-        sendBroadcast(intentAction1)
+
         tv = findViewById<EditText>(R.id.edt_search_text1)
         btn_mic = findViewById(R.id.btn_mic)
         btn_in = findViewById(R.id.btn_in)
