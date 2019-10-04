@@ -30,14 +30,11 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.NumberUtils.toInteger
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -315,7 +312,8 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),
-            imgName!!,Prefs.getString(ConstantUtils.GATE_NO, ""))
+            imgName!!,Prefs.getString(ConstantUtils.GATE_NO, ""),
+            DateTimeUtils.getCurrentTimeLocal())
 
         Log.d("CreateVisitorLogResp","StaffEntry destination "+req.toString())
 
@@ -350,7 +348,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                             file.delete()
                         }
 
-                        visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+                      //  visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
 //                        val d  =  Intent(this@ManualStaffEntryRegistration,BackgroundSyncReceiver::class.java)
 //                        d.putExtra(BSR_Action, VisitorEntryFCM)
@@ -373,6 +371,77 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
 
                         uploadImage(imgName!!,mBitmap)
+
+                        if(intent.getStringExtra(UNITID).contains(",")) {
+
+                            var unitname_dataList: Array<String>
+                            var unitid_dataList: Array<String>
+
+                            unitname_dataList =
+                                intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                            unitid_dataList =
+                                intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                            // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                            if (unitid_dataList.size > 0) {
+                                for (i in 0 until unitid_dataList.size) {
+
+
+
+
+                                    val d  =  Intent(this@ManualStaffEntryRegistration,BackgroundSyncReceiver::class.java)
+                                    d.putExtra(BSR_Action, VisitorEntryFCM)
+                                    d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+unitname_dataList.get(
+                                        i
+                                    ).replace(" ", "") +")")
+                                    d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+                                    d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                                    d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                                    d.putExtra("unitname", unitname_dataList.get(i).replace(" ", ""))
+                                    d.putExtra("memType", "Owner")
+                                    d.putExtra(UNITID,unitid_dataList.get(i).replace(" ", ""))
+                                    d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                                    // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
+                                    d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+                                    d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                    sendBroadcast(d);
+
+                                }
+                            }
+                        }
+                        else
+                        {
+                            val d  =  Intent(this@ManualStaffEntryRegistration,BackgroundSyncReceiver::class.java)
+                            d.putExtra(BSR_Action, VisitorEntryFCM)
+                            d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+intent.getStringExtra(UNITNAME)+")")
+                            d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+                            d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                            d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                            d.putExtra("unitname",  intent.getStringExtra(UNITNAME))
+                            d.putExtra("memType", "Owner")
+                            d.putExtra(UNITID,intent.getStringExtra(UNITID))
+                            d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                            // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
+                            d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+                            d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                            sendBroadcast(d);
+                        }
+
+
+//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
+                        val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        if (dir.isDirectory) {
+                            val children = dir.list()
+                            for (i in children!!.indices) {
+                                File(dir, children[i]).delete()
+                            }
+                        }
+                        finish();
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -671,28 +740,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                                 if (unitid_dataList.size > 0) {
                                     for (i in 0 until unitid_dataList.size) {
 
-//                                    val ddc = Intent(this@ManualStaffEntryRegistration, BackgroundSyncReceiver::class.java)
-//                                    ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-//                                    ddc.putExtra(
-//                                        "msg",
-//                                        "$personName $desgn " + " is coming to your home" + "(" + unitname_dataList.get(
-//                                            i
-//                                        ).replace(" ", "") + ")"
-//                                    )
-//                                    ddc.putExtra("mobNum", mobileNumb)
-//                                    ddc.putExtra("name", personName)
-//                                    ddc.putExtra("nr_id", visitorLogID.toString())
-//                                    ddc.putExtra("unitname", unitname_dataList.get(i).replace(" ", ""))
-//                                    ddc.putExtra("memType", "Owner")
-//                                    ddc.putExtra(UNITID, unitid_dataList.get(i).replace(" ", ""))
-//                                    ddc.putExtra(COMPANY_NAME, "Staff")
-//                                    ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
-//                                    ddc.putExtra("VLVisLgID", visitorLogID)
-//                                    ddc.putExtra(VISITOR_TYPE, "Staff")
-////                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-////                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-//                                    sendBroadcast(ddc);
+
 
 
                                         val d  =  Intent(this@ManualStaffEntryRegistration,BackgroundSyncReceiver::class.java)

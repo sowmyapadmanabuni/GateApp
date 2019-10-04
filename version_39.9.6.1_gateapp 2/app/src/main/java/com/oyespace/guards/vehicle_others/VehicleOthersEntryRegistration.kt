@@ -21,13 +21,10 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -285,7 +282,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),intent.getStringExtra(VEHICLE_NUMBER),"","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""))
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
+            DateTimeUtils.getCurrentTimeLocal())
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
@@ -303,11 +301,11 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                             file.delete()
                         }
 
-                       try {
-                           visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-                       }catch (e:NullPointerException){
-
-                       }
+//                       try {
+//                           visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+//                       }catch (e:NullPointerException){
+//
+//                       }
                         val d  =  Intent(this@VehicleOthersEntryRegistration, BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
                         d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+UNUniName+")")
@@ -329,6 +327,19 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
 //                        val d = Intent(this@VehicleOthersEntryRegistration, DashBoard::class.java)
 //                        startActivity(d)
+
+                        val dir =
+                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        if (dir.isDirectory) {
+                            val children = dir.list()
+                            for (i in children!!.indices) {
+                                File(dir, children[i]).delete()
+                            }
+                        }
+//                        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
+//                        startActivity(intent)
+                        finish()
+                        dismissProgress()
 
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)

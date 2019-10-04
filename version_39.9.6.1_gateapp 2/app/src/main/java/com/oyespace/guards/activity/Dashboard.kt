@@ -2242,7 +2242,7 @@ try {
             unitId, desgn, personName,
             LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb, "1", "", "", "",
             1, "Staff Biometric Entry", "", "", "", "", ""
-            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, "")
+            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""),getCurrentTimeLocal()
         )
 
         Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())
@@ -2289,31 +2289,134 @@ try {
 
 
                         //   getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
-                        visitorEntryLogBiometric(
-                            globalApiObject.data.visitorLog.vlVisLgID,
-                            unitId,
-                            personName,
-                            mobileNumb,
-                            desgn,
-                            workerType,
-                            staffID,
-                            unitName,
-                            wkEntryImg
-                        )
+//                        visitorEntryLogBiometric(
+//                            globalApiObject.data.visitorLog.vlVisLgID,
+//                            unitId,
+//                            personName,
+//                            mobileNumb,
+//                            desgn,
+//                            workerType,
+//                            staffID,
+//                            unitName,
+//                            wkEntryImg
+//                        )
 
-//                        val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
-//                        d.putExtra(BSR_Action, VisitorEntryFCM)
-//                        d.putExtra("msg", "$personName $desgn "+" is coming to your home"+"("+unitName+")")
-//                        d.putExtra("mobNum", mobileNumb)
-//                        d.putExtra("name", personName)
-//                        d.putExtra("nr_id", "0")
-//                        d.putExtra("unitname",unitName)
-//                        d.putExtra("memType", "Owner")
-//                        d.putExtra(UNITID,unitId.toString())
-//                        d.putExtra(COMPANY_NAME,"Staff")
-//                        d.putExtra(UNIT_ACCOUNT_ID,"0")
-//                        d.putExtra("VLVisLgID",0)
-//                        sendBroadcast(d);
+
+                        if (unitId.contains(",")) {
+
+                            var unitname_dataList: Array<String>
+                            var unitid_dataList: Array<String>
+
+                            unitname_dataList =
+                                unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                    .toTypedArray()
+                            unitid_dataList =
+                                unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                    .toTypedArray()
+                            // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                            if (unitid_dataList.size > 0) {
+                                for (i in 0 until unitid_dataList.size) {
+
+                                    val ddc = Intent(
+                                        this@Dashboard,
+                                        BackgroundSyncReceiver::class.java
+                                    )
+                                    ddc.putExtra(
+                                        ConstantUtils.BSR_Action,
+                                        ConstantUtils.VisitorEntryFCM
+                                    )
+                                    ddc.putExtra(
+                                        "msg",
+                                        "$personName $desgn " + " is coming to your home" + "(" + unitname_dataList.get(
+                                            i
+                                        ).replace(" ", "") + ")"
+                                    )
+                                    ddc.putExtra("mobNum", mobileNumb)
+                                    ddc.putExtra("name", personName)
+                                    ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID)
+                                    ddc.putExtra(
+                                        "unitname",
+                                        unitname_dataList.get(i).replace(" ", "")
+                                    )
+                                    ddc.putExtra("memType", "Owner")
+                                    ddc.putExtra(
+                                        UNITID,
+                                        unitid_dataList.get(i).replace(" ", "")
+                                    )
+                                    ddc.putExtra(COMPANY_NAME, "Staff")
+                                    ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                                    ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                    ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                    sendBroadcast(ddc);
+                                }
+                            }
+                        } else {
+                            val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+                            ddc.putExtra(
+                                ConstantUtils.BSR_Action,
+                                ConstantUtils.VisitorEntryFCM
+                            )
+                            ddc.putExtra(
+                                "msg",
+                                "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
+                            )
+                            ddc.putExtra("mobNum", mobileNumb)
+                            ddc.putExtra("name", personName)
+                            ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID)
+                            ddc.putExtra("unitname", unitName)
+                            ddc.putExtra("memType", "Owner")
+                            ddc.putExtra(UNITID, unitId)
+                            ddc.putExtra(COMPANY_NAME, "Staff")
+                            ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                            ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                            ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                            sendBroadcast(ddc);
+                        }
+
+
+//                            if (unitName.toString().contains(",")) {
+//
+//                                var unitid_dataList: Array<String>
+//                                var unitname_dataList: Array<String>
+//
+//                                unitname_dataList = unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//
+//
+//                                unitid_dataList =
+//                                    unitId.toString().split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                        .toTypedArray()
+//                                if (unitname_dataList.size > 0) {
+//                                    for (i in 0 until unitid_dataList.size) {
+//                                        getUnitLog(
+//                                            unitid_dataList.get(i).replace(" ", "").toInt(),
+//                                            personName,
+//                                            mobileNumb,
+//                                            desgn,
+//                                            workerType,
+//                                            staffID,
+//                                            unitname_dataList.get(i).replace(" ",""),
+//                                            visitorLogID
+//                                        )
+//                                    }
+//                                }
+//                            } else {
+//                                getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,visitorLogID)
+//                            }
+
+
+                        val intentAction1 =
+                            Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                        intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
+                        sendBroadcast(intentAction1)
+
+
+
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }

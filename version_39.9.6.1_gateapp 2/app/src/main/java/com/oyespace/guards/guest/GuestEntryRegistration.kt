@@ -23,13 +23,10 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -272,7 +269,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             SPPrdImg10,
             "",
             imageName.toString(),
-            Prefs.getString(ConstantUtils.GATE_NO, "")
+            Prefs.getString(ConstantUtils.GATE_NO, ""),
+            DateTimeUtils.getCurrentTimeLocal()
         )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
@@ -299,7 +297,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             Prefs.getInt(ASSOCIATION_ID, 0),
                             false
                         )
-                        visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+                      //  visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)
                         dd.putExtra(
@@ -323,6 +321,19 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         sendBroadcast(dd);
                         uploadImage(imageName.toString(), mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
+
+                        val dir =
+                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                        if (dir.isDirectory) {
+                            val children = dir.list()
+                            for (i in children!!.indices) {
+                                File(dir, children[i]).delete()
+                            }
+                        }
+                        //val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
+                        // startActivity(d)
+                        dismissProgress()
+                        finish()
 
 //                        val d = Intent(this@GuestEntryRegistration, DashBoard::class.java)
 //                        startActivity(d)

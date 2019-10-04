@@ -62,7 +62,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name:TextView
     var dbh: DataBaseHelper?=null
-    var visitorLogID:Int?=0
+    var visitorLogID:String=""
+    var pos=0
 
     override fun onClick(v: View?) {
 
@@ -89,6 +90,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                         for (i in 0 until unitname_dataList.size) {
 
+                            pos=i
+
                             Log.v("UNITS@@@..",unitname_dataList.size.toString()+" ..."+unitname_dataList.get(i).replace(" ",""))
 
                             showProgress()
@@ -99,15 +102,14 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                                     unitname_dataList.get(i).replace(" ", ""),
                                     unitid_dataList.get(i).replace(" ", ""),
                                     unitAccountId_dataList.get(i).replace(" ", ""),
-                                    unitname_dataList.size
+                                    i
 
                                 );
 
-
-
-
-
                         }
+
+
+
                     }
                 }else{
                     showProgress()
@@ -119,6 +121,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                     );
                 }
+
+
 
             }
 
@@ -312,7 +316,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     }
 
 
-    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String,listSize:Int) {
+    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String,pos:Int) {
       //  var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
 
         var imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
@@ -331,7 +335,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName,Prefs.getString(ConstantUtils.GATE_NO, ""))
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName,Prefs.getString(ConstantUtils.GATE_NO, ""),getCurrentTimeLocal())
 
         Log.d("CreateVisitorLogResp","StaffEntry destination "+req.toString())
 
@@ -341,10 +345,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
-
-                        visitorLogID=globalApiObject.data.visitorLog.vlVisLgID
-                            visitorEntryLog(visitorLogID!!,UNUniName,UNUnitID,Unit_ACCOUNT_ID,listSize)
-
 
 
 
@@ -382,6 +382,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
 
                         uploadImage(imgName,mBitmap)
+
+                        finish()
 
 
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
@@ -651,7 +653,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
 
 
-    private fun visitorEntryLog( visitorLogID: Int,UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String,listSize:Int) {
+    private fun visitorEntryLog( visitorLogID: Int) {
 //        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 //        val currentDate = sdf.format(Date())
 //        System.out.println(" C DATE is  "+currentDate)
@@ -668,27 +670,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
                 override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
                     if (globalApiObject.success == true) {
-
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                       Log.v("visitorLogIDIDDDD",visitorLogID.toString()+".."+UNUnitID+".."+UNUniName)
-//
-//                        val d  =  Intent(this@StaffEntryRegistration,BackgroundSyncReceiver::class.java)
-//                        d.putExtra(BSR_Action, VisitorEntryFCM)
-//                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+UNUniName+")")
-//                        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-//                        d.putExtra("name", intent.getStringExtra(PERSONNAME))
-//                        d.putExtra("nr_id", intToString(visitorLogID))
-//                        d.putExtra("unitname", UNUniName)
-//                        d.putExtra("memType", "Owner")
-//                        d.putExtra(UNITID,UNUnitID.toString())
-//                        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-//                        d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
-//                        d.putExtra("VLVisLgID",visitorLogID)
-//                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                        sendBroadcast(d);
-
-
-
 
 
                             dismissProgress()

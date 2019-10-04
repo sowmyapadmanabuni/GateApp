@@ -549,7 +549,8 @@ data class CreateVisitorLogReq(
     val SPPrdImg10: String,
     val WKSelfImg:String,
     val VLEntryImg:String,
-    val VLENGName:String
+    val VLENGName:String,
+    val VLEntryT: String
 
 
 )
