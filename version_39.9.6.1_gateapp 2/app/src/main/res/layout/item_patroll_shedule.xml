@@ -11,6 +11,7 @@
 
 
     <androidx.cardview.widget.CardView
+            android:id="@+id/schedule_card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardElevation="4dp"
@@ -41,17 +42,32 @@
                 android:layout_centerVertical="true"
                 android:orientation="vertical">
 
-            <androidx.appcompat.widget.AppCompatTextView
+            <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/schedule_name"
-                    android:textSize="20dp"
-                    android:textStyle="bold"
-                    android:singleLine="true"
-                    android:layout_marginBottom="4dp"
-                    android:textColor="@color/orangedark"
-                    android:text="GATE 1"
-                    />
+                    android:layout_height="wrap_content">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/schedule_name"
+                        android:textSize="20dp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:layout_marginBottom="4dp"
+                        android:textColor="@color/orangedark"
+                        android:text="GATE 1"
+                        />
+                <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/warning_pending"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        app:lottie_rawRes="@raw/error_alert"
+                        android:scaleType="fitCenter"
+                        android:layout_alignParentRight="true"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true" />
+
+            </RelativeLayout>
             <View android:layout_height="0.5dp" android:layout_width="match_parent" android:background="@color/orange" />
             <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/schedule_time"

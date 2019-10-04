@@ -1,5 +1,6 @@
 package com.oyespace.guards.pertroling
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -18,6 +19,7 @@ import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_pschedule_list.*
+import kotlinx.android.synthetic.main.header_with_back.*
 
 class PScheduleListActivity:BaseKotlinActivity(){
 
@@ -29,6 +31,9 @@ class PScheduleListActivity:BaseKotlinActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pschedule_list)
         title_block.findViewById<AppCompatTextView>(R.id.header_title).text = "Patrolling Schedules"
+        ot_back.setOnClickListener{
+            finish()
+        }
         getPatrollingSchedules()
     }
 
@@ -47,9 +52,19 @@ class PScheduleListActivity:BaseKotlinActivity(){
     }
 
     private fun onPageClick(selectedShift:PatrolShift, index:Int){
-        val mPatrolIntent = Intent(this@PScheduleListActivity, PatrollingLocActivity::class.java)
-        mPatrolIntent.putExtra(PATROLLING_SCHEDULE_ID,selectedShift.psPtrlSID)
-        startActivity(mPatrolIntent)
+        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1);
+        if(ongoingSchedule == -1 || ongoingSchedule == selectedShift.psPtrlSID){
+            navigateToScanView(selectedShift)
+        }else{
+            showAnimatedDialog("Please complete the pending patrolling",R.raw.error_alert,true,"OK")
+        }
+    }
+
+    private fun navigateToScanView(selectedShift:PatrolShift){
+        val mPatrolIntent =
+            Intent(this@PScheduleListActivity, PatrollingLocActivity::class.java)
+        mPatrolIntent.putExtra(PATROLLING_SCHEDULE_ID, selectedShift.psPtrlSID)
+        startActivityForResult(mPatrolIntent, 1)
     }
 
 
@@ -80,6 +95,15 @@ class PScheduleListActivity:BaseKotlinActivity(){
                     Toast.makeText(this@PScheduleListActivity, "No network call ", Toast.LENGTH_LONG).show()
                 }
             })
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == 1){
+            if(resultCode == Activity.RESULT_OK){
+                getPatrollingSchedules()
+            }
+        }
     }
 
 }

@@ -25,6 +25,10 @@ import java.util.*
  * Created by Kalyan on 21-Oct-17.
  */
 
+interface DialogPress {
+    fun onDialogPress()
+}
+
 open class BaseKotlinActivity : AppCompatActivity(){
 
     private var progressDialog: ProgressDialog? = null
@@ -234,7 +238,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
 
     fun showAnimatedDialog(desc: String, json: Int, isCancellable: Boolean, btnText: String) {
         val dialogBuilder = AlertDialog.Builder(this)
-
         val inflater = this.layoutInflater
         val dialogView = inflater.inflate(R.layout.animated_dialog, null)
         val text: TextView = dialogView.findViewById(R.id.animdlg_text)
