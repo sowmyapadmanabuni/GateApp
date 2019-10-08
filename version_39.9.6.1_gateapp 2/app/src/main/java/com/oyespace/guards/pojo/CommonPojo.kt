@@ -1761,6 +1761,28 @@ data class SOSUpdateResp(
     val success: Boolean
 )
 
+data class ResidentCheckReq(
+    val FMMobile: String,
+    val ASAssnID: Int
+)
+
+data class ResidentCheckObject(
+    val code: Int,
+    val message: String
+)
+
+data class ResidentCheckData(
+    val `object`: ResidentCheckObject
+)
+
+data class ResidentCheckResponse(
+
+    val apiVersion: String,
+    val `data`: ResidentCheckData,
+    val success: Boolean
+
+)
+
 
 
 

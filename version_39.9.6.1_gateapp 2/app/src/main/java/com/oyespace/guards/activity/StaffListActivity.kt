@@ -13,10 +13,10 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.StaffAdapter
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
@@ -161,9 +161,8 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
                             //Log.d("WorkerList success", workerListResponse.data.toString())
 
                             val _arrayList = workerListResponse.data.worker
-                            val realmDB = DataBaseHelper(this@StaffListActivity)
-                            realmDB.saveStaffsList(_arrayList)
-                            WorkerAdapter = StaffAdapter(DataBaseHelper.getStaffs(), this@StaffListActivity)
+                            RealmDB.saveStaffsList(_arrayList)
+                            WorkerAdapter = StaffAdapter(RealmDB.getStaffs(), this@StaffListActivity)
                             rv_staff!!.adapter = WorkerAdapter
                         }
 //                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {

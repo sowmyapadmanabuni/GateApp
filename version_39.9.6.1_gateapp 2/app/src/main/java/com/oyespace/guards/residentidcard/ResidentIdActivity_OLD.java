@@ -35,7 +35,7 @@ import retrofit2.Response;
 
 import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
 
-public class ResidentIdActivity extends BaseScannerActivity implements ZXingScannerView.ResultHandler {
+public class ResidentIdActivity_OLD extends BaseScannerActivity implements ZXingScannerView.ResultHandler {
 
     AlertDialog alertDialog;
     ChampApiInterface champApiInterface;
@@ -49,13 +49,13 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
 
-        btn_missedcall = findViewById(R.id.btn_missedcall);
+        btn_missedcall = findViewById(R.id.missedCallBtn);
 
         btn_missedcall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Intent i = new Intent(ResidentIdActivity.this, ResidentIdCardMobileNumberActivity.class);
+                Intent i = new Intent(ResidentIdActivity_OLD.this, ResidentIdCardMobileNumberActivity.class);
                 startActivity(i);
                 finish();
 
@@ -103,10 +103,10 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
                 } else {
                     ViewGroup viewGroup = findViewById(android.R.id.content);
 
-                    View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+                    View dialogView = LayoutInflater.from(ResidentIdActivity_OLD.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity_OLD.this);
 
                     ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                     Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
@@ -135,10 +135,10 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
         } else {
             ViewGroup viewGroup = findViewById(android.R.id.content);
 
-            View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+            View dialogView = LayoutInflater.from(ResidentIdActivity_OLD.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity_OLD.this);
 
             ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
             Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
@@ -182,10 +182,10 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
                 ViewGroup viewGroup = findViewById(android.R.id.content);
 
-                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+                View dialogView = LayoutInflater.from(ResidentIdActivity_OLD.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity_OLD.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
@@ -215,14 +215,14 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
 
             @Override
             public void onFailure(Call<ResidentValidationResponse> call, Throwable t) {
-                //  Toast.makeText(ResidentIdActivity.this,t.toString(),Toast.LENGTH_LONG).show();
+                //  Toast.makeText(ResidentIdActivity_OLD.this,t.toString(),Toast.LENGTH_LONG).show();
 
                 ViewGroup viewGroup = findViewById(android.R.id.content);
 
-                View dialogView = LayoutInflater.from(ResidentIdActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+                View dialogView = LayoutInflater.from(ResidentIdActivity_OLD.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
 
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ResidentIdActivity_OLD.this);
 
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);

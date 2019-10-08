@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
+import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.models.GetVisitorsResponse
 import com.oyespace.guards.models.GetWorkersResponse
@@ -232,7 +233,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     ba_fp2 = Base64.decode(fp2, Base64.DEFAULT)
                                     ba_fp3 = Base64.decode(fp3, Base64.DEFAULT)
 
-                                    dbh.insertFingerPrints(
+                                    RealmDB.insertFingerPrints(
                                         staffBiometricResp.data.fingerPrint.get(i).fpid,
                                         intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
                                         staffBiometricResp.data.fingerPrint.get(i).fpFngName,
@@ -243,7 +244,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         staffBiometricResp.data.fingerPrint.get(i).asAssnID
                                     )
 
-                                    Log.e("TOTAL_F_SAVED", "" + dbh.totalFingerPrints)
                                 } catch (e: Exception) {
                                     Log.d("getStaffBiometric", "Exception$e")
                                 }
@@ -424,8 +424,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                             Log.d("WorkerList success", workerListResponse.data.toString())
 
                             val arrayList = workerListResponse.data.worker
-                            val realmDb = DataBaseHelper(mcontext)
-                            realmDb.saveStaffsList(arrayList)
+                            RealmDB.saveStaffsList(arrayList)
 
                         } else {
 
@@ -561,8 +560,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     if (visitorList.success == true && visitorList.data.visitorLog != null) {
                         val visitorsList = visitorList.data.visitorLog
-                        val realmDB = DataBaseHelper(mcontext)
-                        realmDB.saveVisitors(visitorsList)
+                        RealmDB.saveVisitors(visitorsList)
                     } else {
                         Log.d("SYCNCHECK", "in 437")
                     }

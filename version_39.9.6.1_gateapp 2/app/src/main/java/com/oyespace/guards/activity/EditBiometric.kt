@@ -26,6 +26,7 @@ import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.CaptureFPResponse
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RestClient
@@ -1187,7 +1188,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
                 )
                 if (loginDetailsResponce.success) {
                     showToast(this, "Fingerprint Saved")
-                    dbh.insertFingerPrints(
+                    RealmDB.insertFingerPrints(
                         loginDetailsResponce.data.fingerPrint.fpid,
                         memId.toString() + "",
                         finger_type,

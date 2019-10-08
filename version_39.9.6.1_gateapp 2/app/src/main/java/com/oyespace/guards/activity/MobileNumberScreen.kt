@@ -34,7 +34,6 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.BuildConfig
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys
@@ -128,12 +127,6 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
             R.id.buttonNext -> {
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
-
-                if (BuildConfig.DEBUG) {
-                    textview.text = "+919930620323"
-                    ccd = "+91"
-                    mobileNumber = "9930620323"
-                }
 
                 if (textview.text.length == 13) {
 

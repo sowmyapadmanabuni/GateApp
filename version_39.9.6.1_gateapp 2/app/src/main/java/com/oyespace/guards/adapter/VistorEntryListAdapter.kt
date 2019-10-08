@@ -15,9 +15,9 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -262,7 +262,7 @@ class VistorEntryListAdapter(
         visitor!!.deleteFromRealm()
         realm.commitTransaction()
 
-        Log.e("REMOVED", "" + DataBaseHelper.getVisitorEnteredLog())
+        Log.e("REMOVED", "" + RealmDB.getVisitorEnteredLog())
 
         listVistor.removeAt(position)
 

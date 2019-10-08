@@ -2,16 +2,14 @@ package com.oyespace.guards.utils;
 
 import android.util.Log;
 
+import com.oyespace.guards.database.RealmDB;
 import com.oyespace.guards.models.VisitorLog;
-import com.oyespace.guards.pojo.VisitorEntryLog;
 import com.oyespace.guards.responce.VisitorLogExitResp;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
-
-import io.realm.Realm;
 
 /**
  * Created by Kalyan on 5/28/2017.
@@ -125,37 +123,6 @@ public class RandomUtils {
 
 
     public static boolean entryExists(String isdCode ,String mobNum ) {
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorEntryLog> filteredList = new ArrayList<>();
-      //  var filteredList = ArrayList<ResponseVisitorLog.Data.Visitorlogbydate>()
-
-        if (LocalDb.getVisitorEnteredLog() == null) {
-            filteredList = new ArrayList<>();
-        } else {
-            filteredList = LocalDb.getVisitorEnteredLog();
-        }
-
-        //looping through existing elements
-        for (VisitorEntryLog s : filteredList) {
-            //if the existing elements contains the search input
-          //  Log.d("button_done ", "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals("0001-01-01T00:00:00", true) + " ");
-            Log.d("button_done ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlExitT().equalsIgnoreCase("0001-01-01T00:00:00") + " ");
-
-            String phoneNumber = s.getVlMobile().replace("+91", "");
-            Log.d("Shalini ", "Shalini " + phoneNumber +"...."+isdCode + mobNum);
-
-
-
-            // if (s.getVlMobile().equalsIgnoreCase("+" + isdCode + mobNum)) {
-            if (phoneNumber.equalsIgnoreCase( mobNum)) {
-                Log.d("vlExitT ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlfName() + " ");
-                return true;
-                //adding the element to filtered list
-            } else {
-                Log.d("vlExitT else", "visitorlogbydate " +phoneNumber + " " + isdCode + mobNum + " ");
-
-            }
-        }
-        return false;
+        return RealmDB.entryExists(isdCode + mobNum);
     }
 }

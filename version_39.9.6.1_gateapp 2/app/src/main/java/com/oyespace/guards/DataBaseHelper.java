@@ -1,32 +1,17 @@
 package com.oyespace.guards;
 
-import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
-import android.provider.CallLog;
 import android.util.Log;
 
-import com.oyespace.guards.models.FingerPrint;
-import com.oyespace.guards.models.VisitorLog;
-import com.oyespace.guards.models.Worker;
-
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.realm.Realm;
-import io.realm.RealmList;
-import io.realm.Sort;
 
 import static com.oyespace.guards.utils.ConstantUtils.Emergency;
 
@@ -49,38 +34,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         DB_PATH = "/data/data/\" + context.getPackageName() + \"/databases/";
     }
 
-    public static List<String> getfiveCallDetails(Context context) {
-
-        StringBuffer sb = new StringBuffer();
-        String phNumber = "k";
-
-        List<String> list = new ArrayList<String>();
-        //  Cursor managedCursor = managedQuery(CallLog.Calls.CONTENT_URI, null, null, null, null);
-        @SuppressLint("MissingPermission") Cursor managedCursor = context.getContentResolver().query(CallLog.Calls.CONTENT_URI, null, null, null, null);
-        int number = managedCursor.getColumnIndex(CallLog.Calls.NUMBER);
-        if (managedCursor.getCount() > 5) {
-
-            for (int i = managedCursor.getCount(); i >= managedCursor.getCount() - 5; i--) {
-                managedCursor.moveToPosition(i - 1);
-                phNumber = managedCursor.getString(number); // mobile number
-                list.add(phNumber);
-
-            }
-
-        }
-
-        return list;
-    }
-
-    public static ArrayList<Worker> getStaffs() {
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<Worker> list = new ArrayList<>();
-        list.addAll(realm.where(Worker.class).findAll());
-        realm.close();
-        return list;
-
-    }
-
     public void createDataBase() {
         boolean dbExist = checkDataBase();
         if (dbExist) {
@@ -94,29 +47,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private boolean checkDataBase() {
         File dbFile = new File(DB_PATH + dbName);
         return dbFile.exists();
-    }
-
-    public void deleteDataBase() {
-        File dbFile = new File(DB_PATH + dbName);
-        dbFile.delete();
-        Log.d("Database", " database " + checkDataBase());
-    }
-
-    private void copyDataBase() throws IOException {
-        InputStream myInput = context.getAssets().open(dbName);
-        String outFileName = DB_PATH + dbName;
-        OutputStream myOutput = new FileOutputStream(outFileName);
-        byte[] buffer = new byte[1024];
-        int length;
-        while ((length = myInput.read(buffer)) > 0) {
-            myOutput.write(buffer, 0, length);
-        }
-
-        // 	Close the streams
-        myOutput.flush();
-        myOutput.close();
-        myInput.close();
-        Log.i("Database", "New database has been copied to device!");
     }
 
     @Override
@@ -419,50 +349,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
             //		db.execSQL("ALTER TABLE "+ NBA_Table_public +" ADD pre_dpvt_reason VARCHAR(50)");
         }
-
-
-    }
-
-    public boolean isFieldExist(String tableName, String fieldName, SQLiteDatabase DB) {
-        boolean isExist = true;
-        //		SQLiteDatabase db = this.getWritableDatabase();
-        Cursor res = DB.rawQuery("PRAGMA table_info(" + tableName + ")", null);
-        int value = res.getColumnIndex(fieldName);
-
-        if (value == -1) {
-            isExist = false;
-        }
-        res.close();
-        return isExist;
-    }
-
-    public void openDB() throws SQLException {
-        Log.i("openDB", "Checking sqliteDBInstance...");
-        if (this.sqliteDBInstance == null) {
-            Log.i("openDB", "Creating sqliteDBInstance...");
-            this.sqliteDBInstance = this.getWritableDatabase();
-        }
-    }
-
-    public long insertSecurityNotificationTable_old(int aid, String title, String subtitle) {
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues initialValues = new ContentValues();
-        initialValues.put("AssociatoinID", aid);
-        initialValues.put("noti_title", title);
-        initialValues.put("sub_title", subtitle);
-        initialValues.put("notified", "false");
-//        Cursor cursor = db.rawQuery("SELECT * FROM SecurityNotification where Nid=trim('"+number
-//                +"') and   email=trim('"+email+"')  ", null);
-//        Log.d("count",cursor.getCount()+"");
-//        if(cursor.getCount() >0)
-//        {
-//            cursor.moveToFirst();
-//            Log.d(" value"," updated "+number+" "+email);
-//            return cursor.getInt(0);
-//        }else{
-//            Log.d(" value"," inserted "+Fname+" "+email);
-        return db.insert("SecurityNotification", null, initialValues);
 
 
     }
@@ -5171,150 +5057,5 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         st1.executeInsert();
         Log.d(" vehicle123  ", "oyevehicles deleted ");
     }
-
-    public void insertFingerPrints(int fpId, String uname, String finger_type, byte[] photo1, byte[] photo2, byte[] photo3, String MemberType, int aid)
-    {
-        boolean commitNow = false;
-
-        int _uname = Integer.parseInt(uname);
-        Realm realm = Realm.getDefaultInstance();
-
-
-        FingerPrint existing = realm.where(FingerPrint.class).equalTo("userName",uname).equalTo("FPFngName",finger_type).findFirst();
-        if(existing == null) {
-            if (!realm.isInTransaction()) {
-                realm.beginTransaction();
-                commitNow = true;
-            }
-            FingerPrint fingerPrint = realm.createObject(FingerPrint.class, fpId);
-            fingerPrint.setFMID(_uname);
-            fingerPrint.setUserName(uname);
-            fingerPrint.setFPFngName(finger_type);
-            fingerPrint.setFPImg1(photo1);
-            fingerPrint.setFPImg2(photo2);
-            fingerPrint.setFPImg3(photo3);
-            fingerPrint.setFPMemType(MemberType);
-            fingerPrint.setASAssnID(aid);
-            if (commitNow) {
-                realm.commitTransaction();
-            }
-        }else{
-            if (!realm.isInTransaction()) {
-                realm.beginTransaction();
-                commitNow = true;
-            }
-            existing.setFMID(_uname);
-            existing.setUserName(uname);
-            existing.setFPFngName(finger_type);
-            existing.setFPImg1(photo1);
-            existing.setFPImg2(photo2);
-            existing.setFPImg3(photo3);
-            existing.setFPMemType(MemberType);
-            existing.setASAssnID(aid);
-            if (commitNow) {
-                realm.commitTransaction();
-            }
-        }
-
-    }
-
-    public int getTotalFingerPrints(){
-        int available=0;
-        Realm realm = Realm.getDefaultInstance();
-        long avail = realm.where(FingerPrint.class).count();
-        available = (int) avail;
-        return available;
-    }
-
-    public void saveStaffsList(RealmList<Worker> arrayList){
-        Realm realm = Realm.getDefaultInstance();
-        if(!realm.isInTransaction()) {
-            realm.beginTransaction();
-        }
-        realm.copyToRealmOrUpdate(arrayList);
-        realm.commitTransaction();
-        realm.close();
-    }
-
-    public ArrayList<FingerPrint> getRegularVisitorsFingerPrint(int AssociationID) {
-
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<FingerPrint> fingerPrints = new ArrayList<>();
-        fingerPrints.addAll(realm.where(FingerPrint.class).equalTo("ASAssnID", AssociationID).findAll());
-        return fingerPrints;
-    }
-
-    public void saveVisitors(RealmList<VisitorLog> visitorsList) {
-        Realm realm = Realm.getDefaultInstance();
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
-        }
-        for (VisitorLog v : visitorsList) {
-            Log.i("taaag", "about to put in realm -> " + v.getVlVisLgID());
-        }
-        realm.insertOrUpdate(visitorsList);
-        realm.commitTransaction();
-    }
-
-    public static ArrayList<VisitorLog> getVisitorEnteredLog(){
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorLog> list = new ArrayList<>();
-        list.addAll(realm.where(VisitorLog.class).findAll().sort("vlVisLgID", Sort.DESCENDING));
-
-//        Collections.sort(list, new Comparator<VisitorLog>() {
-//            @Override
-//            public int compare(VisitorLog o1, VisitorLog o2) {
-//                return 0;
-//            }
-//        });
-        realm.close();
-        return list;
-    }
-
-	/*
-	 // this code goes in mainactivity where database has to be created(ex in NBA app NBALoginAct.java)
-	  DataBaseHelper dbh;
-	 //DataBaseHelper object created...
-		dbh = new DataBaseHelper(this);
-
-		//creating DB.
-		try
-		{
-			dbh.createDataBase();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-
-		//CREATING NBAIMAGE DIRECTORY...
-		File fDir= new File(this.getFilesDir()+"/sdcard/NBAIMG");
-		if (!fDir.exists())
-		{
-			fDir.mkdir();
-		}
-		//CREATING NBA_DATABASE DIRECTORY...
-		File DB_Dir= new File(this.getFilesDir()+"/sdcard/NBA_DATABASE");
-		if (!DB_Dir.exists())
-		{
-			DB_Dir.mkdir();
-		}
-		//CREATING NBAI_XML DIRECTORY...
-		File sdcard = Environment.getExternalStorageDirectory();
-		File f=new File(sdcard+"/NbaXML");
-		if (!f.exists())
-		{
-			f.mkdir();
-		}
-		try
-		{
-			file = new File(f,"VillageXML.xml");
-			file.createNewFile();
-		}
-		catch(Exception e)
-		{
-			Toast.makeText(getApplicationContext(), String.valueOf(e), Toast.LENGTH_SHORT).show();
-		}
-	 */
 
 }

@@ -34,6 +34,7 @@ import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
@@ -41,7 +42,6 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -124,7 +124,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 //                    d.putExtra(MOBILENUMBER, mobileNumber)
 //                    d.putExtra(COUNTRYCODE, ccd)
 
-                    if (entryExists(ccd, mobileNumber)) {
+                    if (RealmDB.entryExists(ccd + mobileNumber)) {
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)
