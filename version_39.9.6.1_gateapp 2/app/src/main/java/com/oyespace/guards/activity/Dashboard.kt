@@ -321,45 +321,18 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
 
 
-                if (Prefs.getString("BUTTON", null).contains("IN")) {
-
-                    if (vistorEntryListAdapter != null) {
-                        vistorEntryListAdapter!!.getFilter().filter(charSequence)
-
-                    }
-                } else {
-                    if (vistorListAdapter != null) {
-                        vistorListAdapter!!.filter.filter(charSequence)
-
-                    }
-                }
-
 
             }
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                try {
-                    if (Prefs.getString("BUTTON", null).contains("IN")) {
-                        if (vistorEntryListAdapter != null) {
-                            vistorEntryListAdapter!!.getFilter().filter(charSequence)
 
-                        }
-                    } else {
-                        if (vistorListAdapter != null) {
-                            vistorListAdapter!!.filter.filter(charSequence)
-
-                        }
-                    }
-                } catch (e: KotlinNullPointerException) {
-
-                }
             }
 
             override fun afterTextChanged(editable: Editable) {
                 try {
                     if (Prefs.getString("BUTTON", null).contains("IN")) {
                         if (vistorEntryListAdapter != null) {
-                            vistorEntryListAdapter!!.getFilter().filter(editable)
+                            vistorEntryListAdapter!!.applySearch(editable.toString())
 
                         }
                     } else {
@@ -615,6 +588,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         super.onResume()
 
         val log = RealmDB.getVisitorEnteredLog()
+        for (vlog in log) {
+            Log.d("taaag", "~~~~~ ${vlog.vlfName}")
+        }
 
         if (log != null) {
             dismissProgressrefresh()

@@ -137,6 +137,23 @@ public class RealmDB {
         realm.commitTransaction();
     }
 
+    public static ArrayList<VisitorLog> searchVisitorLog(String searchQuery) {
+
+        Realm realm = Realm.getDefaultInstance();
+        ArrayList<VisitorLog> results = new ArrayList<>();
+        results.addAll(realm.where(VisitorLog.class)
+                .contains("vlfName", searchQuery)
+                .or()
+                .contains("vlComName", searchQuery)
+                .or()
+                .contains("vlMobile", searchQuery)
+                .or()
+                .contains("vLPOfVis", searchQuery)
+                .findAll());
+        return results;
+
+    }
+
     public static boolean entryExists(String mobile) {
 
         Realm realm = Realm.getDefaultInstance();

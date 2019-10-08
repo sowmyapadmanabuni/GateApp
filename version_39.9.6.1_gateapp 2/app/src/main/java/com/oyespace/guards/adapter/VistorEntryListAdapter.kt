@@ -401,37 +401,15 @@ class VistorEntryListAdapter(
 
     }
 
-    fun getFilter(): Filter {
-        return object : Filter() {
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                searchList = results?.values as ArrayList<VisitorLog>
-                notifyDataSetChanged()
-            }
+    fun applySearch(search: String) {
 
-            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
-                val charString = charSequence.toString()
-                if (charString.isEmpty()) {
-                    searchList = listVistor
-                } else {
-                    val filteredList = ArrayList<VisitorLog>()
-                    for (row in listVistor) {
-                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-                        if (row.vlfName.toLowerCase().contains(charString.toLowerCase()) || row.vlComName.toLowerCase().contains(
-                                charString.toLowerCase()
-                            ) || row.vlMobile.toLowerCase().contains(charString.toLowerCase()) || row.vLPOfVis.toLowerCase().contains(
-                                charString.toLowerCase()
-                            )
-                        ) {
-                            filteredList.add(row)
-                        }
-                    }
-                    searchList = filteredList
-                }
-                val filterResults = Filter.FilterResults()
-                filterResults.values = searchList
-                return filterResults
-            }
+        if (search.isEmpty()) {
+            searchList = listVistor
+        } else {
+            searchList = RealmDB.searchVisitorLog(search)
         }
+        notifyDataSetChanged()
+
     }
 
 }
