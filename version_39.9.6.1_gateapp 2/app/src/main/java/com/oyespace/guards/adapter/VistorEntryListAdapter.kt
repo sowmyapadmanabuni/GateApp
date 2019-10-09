@@ -100,6 +100,7 @@ class VistorEntryListAdapter(
             holder.visitorName.text = orderData.vlfName
 
             holder.btn_makeexit.setOnClickListener {
+                holder.btn_makeexit.visibility = View.GONE
                 exitVisitor(orderData, position)
             }
 
