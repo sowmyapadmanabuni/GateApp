@@ -210,7 +210,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     if (staffBiometricResp.success == true) {
                         Log.d("getStaffBiometric", staffBiometricResp.data.toString())
                         try {
-                            var dbh: DataBaseHelper = DataBaseHelper(mcontext)
 
                             for (i in 0 until staffBiometricResp.data.fingerPrint.size) {
 

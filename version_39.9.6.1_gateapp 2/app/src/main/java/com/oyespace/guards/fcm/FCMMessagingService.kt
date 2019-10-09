@@ -18,7 +18,6 @@ import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys.EMERGENCY_SOUND_ON
@@ -53,8 +52,6 @@ class FCMMessagingService : FirebaseMessagingService(){
         Log.i(TAG, token)
     }
 
-    lateinit var dbh: DataBaseHelper
-
     override fun onMessageReceived(remoteMessage: RemoteMessage?) {
         remoteMessage?.let { message ->
             //  Log.i(TAG, message.getData().get("message"))
@@ -85,18 +82,6 @@ class FCMMessagingService : FirebaseMessagingService(){
         Log.d("JSON s", "From:  " + remoteMessage!!.from)
 //        getNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,"Oyespace","Gate App",
 //            "gate_app","Gate",Prefs.getInt(DEVICE_ID,0))
-
-        try
-        {
-            dbh = DataBaseHelper(applicationContext)
-            Log.d("Dgddfdf", "fcm:msg " + remoteMessage.data["activt"])
-        }
-        catch (ex:Exception) {
-            ex.printStackTrace()
-            Log.d("JSON exbg", "Dgddfdfeemer  " + ex.toString())
-
-            Log.d("JSON exbg", "Notification  " + " data " + remoteMessage.data)
-        }
 
         Log.d("JSON s", "data: " + remoteMessage.data)
 

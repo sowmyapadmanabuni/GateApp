@@ -8,6 +8,7 @@ import com.oyespace.guards.models.Worker;
 
 import java.util.ArrayList;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -107,6 +108,28 @@ public class RealmDB {
 
     }
 
+    public static int fingercount(int MemberID) {
+
+        Realm realm = Realm.getDefaultInstance();
+
+        return (int) realm.where(FingerPrint.class)
+                .equalTo("userName", String.valueOf(MemberID))
+                .count();
+
+    }
+
+    public static boolean getMemberFingerExists(String username, String FingerName) {
+
+        Realm realm = Realm.getDefaultInstance();
+
+        return realm.where(FingerPrint.class)
+                .equalTo("userName", username)
+                .and()
+                .equalTo("FPFngName", FingerName)
+                .findFirst() != null;
+
+    }
+
     public static int getTotalFingerPrints() {
         int available = 0;
         Realm realm = Realm.getDefaultInstance();
@@ -123,6 +146,17 @@ public class RealmDB {
         realm.copyToRealmOrUpdate(arrayList);
         realm.commitTransaction();
         realm.close();
+    }
+
+    public static void saveVisitor(VisitorLog visitorLog) {
+
+        Realm realm = Realm.getDefaultInstance();
+        if (!realm.isInTransaction()) {
+            realm.beginTransaction();
+        }
+        realm.insertOrUpdate(visitorLog);
+        realm.commitTransaction();
+
     }
 
     public static void saveVisitors(RealmList<VisitorLog> visitorsList) {
@@ -142,13 +176,13 @@ public class RealmDB {
         Realm realm = Realm.getDefaultInstance();
         ArrayList<VisitorLog> results = new ArrayList<>();
         results.addAll(realm.where(VisitorLog.class)
-                .contains("vlfName", searchQuery)
+                .contains("vlfName", searchQuery, Case.INSENSITIVE)
                 .or()
-                .contains("vlComName", searchQuery)
+                .contains("vlComName", searchQuery, Case.INSENSITIVE)
                 .or()
                 .contains("vlMobile", searchQuery)
                 .or()
-                .contains("vLPOfVis", searchQuery)
+                .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
                 .findAll());
         return results;
 

@@ -75,7 +75,7 @@ public class ConstantUtils {
     //http://mediaupload.oyespace.com/Images/
     public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
     public static final String BASE_URL = "https://apidev.oyespace.com/";
-    //public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+    //    public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
 //    public static final String BASE_URL="https://apiuat.oyespace.com/";
 //    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
 //    public static final String BASE_URL = "https://api.oyespace.com/";
@@ -105,5 +105,7 @@ public class ConstantUtils {
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
+
+    public static final boolean useDummyValues = true;
 
 }

@@ -16,7 +16,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -59,7 +58,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    var dbh: DataBaseHelper? = null
+
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -170,7 +169,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         //launchCamera()
 //        val service =  Intent(getBaseContext(), CapPhoto::class.java)
 //        startService(service);
-        dbh = DataBaseHelper(applicationContext)
 
 //         imgName = "Selfie" + "Association" + Prefs.getInt(
 //            ASSOCIATION_ID,
@@ -343,6 +341,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     try {
                         if (globalApiObject.success == true) {
 
+                            // TODO shift this realm code into ReamDB
                             Log.d("taaag", "response for id: " + globalApiObject.data.visitorLog.vlVisLgID)
                             //realm.executeTransaction {
                             realm = Realm.getDefaultInstance()

@@ -95,23 +95,6 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         }
         rv_staff?.setLayoutManager(GridLayoutManager(this@StaffListActivity, 1))
 
-        //    sv_staff = findViewById(R.id.sv_staff);
-
-//        sv_staff!!.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-//            override fun onQueryTextSubmit(query: String): Boolean {
-//                return false
-//            }
-//
-//            override fun onQueryTextChange(query: String): Boolean {
-//                //FILTER AS YOU TYPE
-//                WorkerAdapter!!.getFilter().filter(query)
-//                return false
-//            }
-//        })
-
-        // if (::WorkerAdapter.isInitialized) {
-
-
         tv.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
                 if (WorkerAdapter != null) {

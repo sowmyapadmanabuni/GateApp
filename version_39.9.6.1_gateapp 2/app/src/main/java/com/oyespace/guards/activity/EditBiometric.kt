@@ -23,7 +23,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.database.RealmDB
@@ -106,7 +105,6 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
     private var nCaptureModeN: Int = 0
     private var fingerId = 0
     private var memId = 0
-    lateinit var dbh: DataBaseHelper
 
     lateinit var t1: TextToSpeech
     // private var sgfplib: JSGFPLib? = null
@@ -240,7 +238,6 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
 
-        dbh = DataBaseHelper(applicationContext)
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
         try {
@@ -324,7 +321,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         mButtonRegister2 = findViewById(R.id.buttonRegister2)
         mButtonRegister3 = findViewById(R.id.buttonRegister3)
 
-        if (dbh.fingercount(memId) == 9) {
+        if (RealmDB.fingercount(memId) == 9) {
             //
             next!!.visibility = View.INVISIBLE
             //  mButtonRegister!!.visibility = View.INVISIBLE
@@ -1371,17 +1368,17 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
 
     fun highlightFingers() {
 
-        bl_left_thumb = dbh.getMemberFingerExists(memId.toString() + "", "left_thumb")
-        bl_left_index = dbh.getMemberFingerExists(memId.toString() + "", "left_index")
-        bl_left_middle = dbh.getMemberFingerExists(memId.toString() + "", "left_centre")
-        bl_left_ring = dbh.getMemberFingerExists(memId.toString() + "", "left_ring")
-        bl_left_little = dbh.getMemberFingerExists(memId.toString() + "", "left_little")
+        bl_left_thumb = RealmDB.getMemberFingerExists(memId.toString() + "", "left_thumb")
+        bl_left_index = RealmDB.getMemberFingerExists(memId.toString() + "", "left_index")
+        bl_left_middle = RealmDB.getMemberFingerExists(memId.toString() + "", "left_centre")
+        bl_left_ring = RealmDB.getMemberFingerExists(memId.toString() + "", "left_ring")
+        bl_left_little = RealmDB.getMemberFingerExists(memId.toString() + "", "left_little")
 
-        bl_right_thumb = dbh.getMemberFingerExists(memId.toString() + "", "right_thumb")
-        bl_right_index = dbh.getMemberFingerExists(memId.toString() + "", "right_index")
-        bl_right_middle = dbh.getMemberFingerExists(memId.toString() + "", "right_centre")
-        bl_right_ring = dbh.getMemberFingerExists(memId.toString() + "", "right_ring")
-        bl_right_little = dbh.getMemberFingerExists(memId.toString() + "", "right_little")
+        bl_right_thumb = RealmDB.getMemberFingerExists(memId.toString() + "", "right_thumb")
+        bl_right_index = RealmDB.getMemberFingerExists(memId.toString() + "", "right_index")
+        bl_right_middle = RealmDB.getMemberFingerExists(memId.toString() + "", "right_centre")
+        bl_right_ring = RealmDB.getMemberFingerExists(memId.toString() + "", "right_ring")
+        bl_right_little = RealmDB.getMemberFingerExists(memId.toString() + "", "right_little")
 
         if (bl_left_thumb)
             btn_left_thumb.alpha = 0.3.toFloat()
@@ -1408,7 +1405,7 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         // Toast.makeText(getApplicationContext(),"Hi there"+dbh.fingercount(memId),Toast.LENGTH_SHORT).show();
         // Toast.makeText(this@Biometric,dbh.fingercount(memId),Toast.LENGTH_LONG).show()
 
-        if (dbh.fingercount(memId) > 1) {
+        if (RealmDB.fingercount(memId) > 1) {
 
             buttonDone!!.visibility = View.VISIBLE
         } else {

@@ -13,12 +13,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.Biometric
 import com.oyespace.guards.activity.EditStaffActivity
 import com.oyespace.guards.activity.MobileNumberforEntryScreen
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -36,7 +36,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
     RecyclerView.Adapter<StaffAdapter.StaffViewHolder>(), Filterable {
 
     private var searchList: ArrayList<Worker>? = null
-    val dbh: DataBaseHelper = DataBaseHelper(mcontext)
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): StaffViewHolder {
         return StaffViewHolder(LayoutInflater.from(mcontext).inflate(R.layout.layout_staff_adapter_row, parent, false))
     }
@@ -292,7 +292,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             mcontext.startActivity(intent)
         }
 
-        if(dbh.fingercount(staffdata.wkWorkID)>1){
+        if (RealmDB.fingercount(staffdata.wkWorkID) > 1) {
             holder.btn_biometric.visibility=View.INVISIBLE
         }else{
             if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 1") {

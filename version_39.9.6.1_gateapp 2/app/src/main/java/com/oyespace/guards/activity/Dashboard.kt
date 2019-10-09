@@ -147,7 +147,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     var subscriptionDate: String? = null
     internal var stringNumber: String? = null
     internal var stringCode: String? = null
-    internal var dbh: DataBaseHelper? = null
+
     internal var language: String? = ""
     internal var wvvalue: String? = ""
     var walk1: Button? = null
@@ -396,7 +396,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         setSupportActionBar(toolbar)
         mReceiver = BatteryBroadcastReceiver()
 
-        dbh = DataBaseHelper(applicationContext)
         telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         sendAnalyticsData("SDDashB_Oncreate", "Start", Date().toString() + "")
@@ -1370,6 +1369,20 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         Log.d("clcik", "view " + v.id)
         when (v.id) {
 
+            R.id.re_delivery -> {
+                tv.setText("")
+                val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
+                startActivity(i_delivery)
+
+            }
+
+            R.id.re_staff -> {
+                tv.setText("")
+                val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
+                startActivity(i_staff)
+
+            }
+
             R.id.re_vehicle -> {
 
 
@@ -1379,25 +1392,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
             }
 
-            R.id.re_delivery -> {
-                tv.setText("")
-                val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
-                startActivity(i_delivery)
-
-            }
 
             R.id.re_guest -> {
                 tv.setText("")
                 val i_guest =
                     Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
-
-            }
-
-            R.id.re_staff -> {
-                tv.setText("")
-                val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
-                startActivity(i_staff)
 
             }
 
@@ -1415,7 +1415,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     fun downloadBiometricData_Loop() {
         RealmDB.getStaffs().forEach {
-            if (dbh!!.fingercount(it.wkWorkID) <= 3) {
+            if (RealmDB.fingercount(it.wkWorkID) <= 3) {
                 val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
                 Log.d("btn_biometric", "af " + it.wkWorkID)
                 ddc.putExtra(BSR_Action, SYNC_STAFF_BIOMETRIC)

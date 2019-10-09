@@ -18,12 +18,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.CapPhoto
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.Biometric
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -39,6 +39,7 @@ import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -63,7 +64,6 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    var dbh: DataBaseHelper? = null
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -146,7 +146,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
         //launchCamera()
 //        val service =  Intent(getBaseContext(), CapPhoto::class.java)
 //        startService(service);
-        dbh = DataBaseHelper(applicationContext)
+
         token = Math.random()
 
         imgName = "Selfie" + "Association" + Prefs.getInt(
@@ -315,22 +315,6 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
             memID = 64
         }
 
-//        if(BASE_URL.equals("dev")){
-//            memID=64;
-//        }
-//        else if(BASE_URL.equals("uat")){
-//            memID=1;
-//        }else{
-//            memID=410;
-//        }
-//        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), memID, 0, intent.getStringExtra(UNITNAME),
-//            toInteger(intent.getStringExtra(UNITID)),intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
-//            "",0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
-//            intToString(minteger),"","","",
-//            minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-//            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName)
-
-
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0),
             intent.getIntExtra(WORKER_ID, 0),
@@ -376,30 +360,41 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                         // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
 
 
-                        var id: Long = dbh!!.insertVisitorData(
-                            intent.getStringExtra(UNITNAME),
-                            Prefs.getInt(ASSOCIATION_ID, 0).toString(),
-                            intent.getStringExtra(PERSONNAME),
-                            memID,
-                            globalApiObject.data.visitorLog.vlVisLgID,
-                            toInteger(intent.getStringExtra(UNITID)),
-                            intent.getStringExtra(MOBILENUMBER),
-                            intent.getStringExtra(COMPANY_NAME),
-                            intent.getStringExtra(VISITOR_TYPE),
-                            1,
-                            "",
-                            ""
-                        )
-
-
-
-
-                        if (id <= 0) {
-                            // Toast.makeText(this@StaffEntryRegistration,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-                        } else {
-                            // Toast.makeText(this@StaffEntryRegistration,"Insertion Successful",Toast.LENGTH_LONG).show()
-
+                        // TODO shift this realm code into ReamDB
+                        Log.d("taaag", "response for id: " + globalApiObject.data.visitorLog.vlVisLgID)
+                        //realm.executeTransaction {
+                        realm = Realm.getDefaultInstance()
+                        if (!realm.isInTransaction) {
+                            realm.beginTransaction()
                         }
+
+                        var vlog = realm.where(VisitorLog::class.java)
+                            .equalTo("vlVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                            .findFirst()
+
+                        val vlogCount = (realm.where(VisitorLog::class.java).equalTo(
+                            "vlVisLgID",
+                            globalApiObject.data.visitorLog.vlVisLgID
+                        ).count()).toInt()
+                        if (vlogCount == 0) {
+                            vlog = realm.createObject(
+                                VisitorLog::class.java,
+                                globalApiObject.data.visitorLog.vlVisLgID
+                            )
+                        }
+                        vlog!!.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
+                        vlog.mEMemID = memID
+                        vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
+                        vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
+                        vlog.vlfName = intent.getStringExtra(PERSONNAME)
+                        vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
+                        vlog.vlComName = intent.getStringExtra(COMPANY_NAME)
+                        vlog.vlVisType = intent.getStringExtra(VISITOR_TYPE)
+                        vlog.unUniName = intent.getStringExtra(UNITNAME)
+                        vlog.vlVisCnt = 1
+                        vlog.vlEntryT = getCurrentTimeLocal()
+                        realm.commitTransaction()
+
 
                         for (i in list.indices) {
                             val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)

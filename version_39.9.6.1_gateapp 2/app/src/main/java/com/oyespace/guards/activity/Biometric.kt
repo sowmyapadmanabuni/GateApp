@@ -24,7 +24,6 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.database.RealmDB
@@ -47,10 +46,10 @@ import java.util.*
 
 class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
 
-    var result:Long ?= null
-    lateinit var txt_assn_name:TextView
-    lateinit var txt_gate_name:TextView
-    lateinit var txt_device_name:TextView
+    var result: Long? = null
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
+    lateinit var txt_device_name: TextView
     internal var finger_type = ""
     internal var MemberType = "Regular"
     internal var key_left_thumb = "left_thumb"
@@ -93,22 +92,21 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     private var usbPermissionRequested: Boolean = false
 
     private lateinit var mFingerprint1Template: ByteArray
-    private  lateinit var mFingerprint2Template: ByteArray
+    private lateinit var mFingerprint2Template: ByteArray
     private lateinit var mFingerprint3Template: ByteArray
     private var mRegisterImage: ByteArray? = null
-    private  var mRegisterTemplate: ByteArray? =null
+    private var mRegisterTemplate: ByteArray? = null
     private var mMaxTemplateSize: IntArray? = null
     private var mImageWidth: Int = 0
     private var mImageHeight: Int = 0
     private var mImageDPI: Int = 0
-    private  lateinit var grayBuffer: IntArray
+    private lateinit var grayBuffer: IntArray
     private var grayBitmap: Bitmap? = null
     private var filter: IntentFilter? = null //2014-04-11
     private var autoOn: SGAutoOnEventNotifier? = null
     private var nCaptureModeN: Int = 0
     private var fingerId = 0
     private var memId = 0
-    lateinit var dbh: DataBaseHelper
 
     lateinit var t1: TextToSpeech
     // private var sgfplib: JSGFPLib? = null
@@ -248,11 +246,10 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
 
         Log.d("btn_biometric", "af setContentView")
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
 
-        dbh = DataBaseHelper(applicationContext)
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
         try {
@@ -337,7 +334,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         mButtonRegister2 = findViewById(R.id.buttonRegister2)
         mButtonRegister3 = findViewById(R.id.buttonRegister3)
 
-        if (dbh.fingercount(memId) == 9) {
+        if (RealmDB.fingercount(memId) == 9) {
             //
             next!!.visibility = View.INVISIBLE
             //  mButtonRegister!!.visibility = View.INVISIBLE
@@ -513,7 +510,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             bSecuGenDeviceOpened = false
         }
         unregisterReceiver(mUsbReceiver)
-        if(::mFingerprint1Template.isInitialized and ::mFingerprint2Template.isInitialized and :: mFingerprint3Template.isInitialized){
+        if (::mFingerprint1Template.isInitialized and ::mFingerprint2Template.isInitialized and ::mFingerprint3Template.isInitialized) {
             mFingerprint1Template
             mFingerprint2Template
             mFingerprint3Template
@@ -597,7 +594,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                             // debugMessage("Requesting USB Permission\n");
                             //Log.d(TAG, "Call GetUsbManager().requestPermission()");
                             usbPermissionRequested = true
-                            sgfplib!!.GetUsbManager().requestPermission(usbDevice, mPermissionIntent)
+                            sgfplib!!.GetUsbManager()
+                                .requestPermission(usbDevice, mPermissionIntent)
                         } else {
                             //wait up to 20 seconds for the system to grant USB permission
                             hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
@@ -676,7 +674,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         }
         // sgfplib.CloseDevice();
 
-        if(::mFingerprint1Template.isInitialized and ::mFingerprint2Template.isInitialized and :: mFingerprint3Template.isInitialized){
+        if (::mFingerprint1Template.isInitialized and ::mFingerprint2Template.isInitialized and ::mFingerprint3Template.isInitialized) {
             mFingerprint1Template
             mFingerprint2Template
             mFingerprint3Template
@@ -741,13 +739,13 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
     }
 
 
-
     private fun imageToBitmap(image: Bitmap): ByteArray {
         val stream = ByteArrayOutputStream()
         image.compress(Bitmap.CompressFormat.PNG, 90, stream)
 
         return stream.toByteArray()
     }
+
     override fun onClick(v: View) {
 
         try {
@@ -763,8 +761,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 previous!!.visibility = View.INVISIBLE
                 next!!.visibility = View.INVISIBLE
                 save!!.visibility = View.VISIBLE
-
-
 
 
 //            try {
@@ -789,8 +785,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     // Toast.makeText(this@Biometric, " ElseD: " + result.toString(), Toast.LENGTH_LONG).show()
                 }
 
-                if(result.toString().equals("54"))
-                {
+                if (result.toString().equals("54")) {
                     //  Toast.makeText(this@Biometric, " Blue: " + result.toString(), Toast.LENGTH_LONG).show()
 
                     //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
@@ -833,8 +828,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 fpInfo = null
 
             }
-        }
-        catch (e:NullPointerException){
+        } catch (e: NullPointerException) {
             //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
             // Toast.makeText(this@Biometric, " Catch: " + result.toString(), Toast.LENGTH_LONG).show()
 
@@ -880,13 +874,12 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 next!!.visibility = View.INVISIBLE
                 save!!.visibility = View.VISIBLE
 
-                var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
+                var result = sgfplib!!.GetImageEx(mRegisterImage, 10000, 50)
 
 
                 // Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
 
-                if(result.toString() == "52" || result.toString() == "" || result.toString().equals("0")||result.toString()=="0")
-                {
+                if (result.toString() == "52" || result.toString() == "" || result.toString().equals("0") || result.toString() == "0") {
                     // Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
                     //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
 
@@ -950,10 +943,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 fpInfo = null
 
             }
-        }
-        catch (e:Exception)
-
-        {
+        } catch (e: Exception) {
             e.printStackTrace()
             //FingerImage 2
             //  Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
@@ -970,13 +960,12 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 next!!.visibility = View.INVISIBLE
                 save!!.visibility = View.VISIBLE
 
-                var result = sgfplib!!.GetImageEx(mRegisterImage,10000,50)
+                var result = sgfplib!!.GetImageEx(mRegisterImage, 10000, 50)
 
                 //  Toast.makeText(this@Biometric, " D: " + sgfplib.SetLedOn(true), Toast.LENGTH_LONG).show()
 
 
-                if(result.toString() == "52"||result.toString()=="0"||result.toString()==""||result.toString().equals(0))
-                {
+                if (result.toString() == "52" || result.toString() == "0" || result.toString() == "" || result.toString().equals(0)) {
                     // Toast.makeText(this@Biometric, " ElseD: " + sgfplib.SetLedOn(false), Toast.LENGTH_LONG).show()
                     // t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
 
@@ -993,7 +982,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     for (i in mFingerprint3Template!!.indices)
                         mFingerprint3Template[i] = 0
                     result = sgfplib!!.CreateTemplate(fpInfo, mRegisterImage, mFingerprint3Template)
-
 
 
                     val existInDB1 = BooleanArray(1)
@@ -1037,11 +1025,10 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 fpInfo = null
 
             }
-        }catch (e:Exception)
-        {
+        } catch (e: Exception) {
             //Finger Image 3
             //  //Toast.makeText(this@Biometric, " Value: " + e, Toast.LENGTH_LONG).show()
-          //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
+            //  t1.speak("Try Again", TextToSpeech.QUEUE_FLUSH, null)
         }
 
         if (v.id == R.id.btn_delete_fp1) {
@@ -1110,7 +1097,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 mButtonRegister1!!.visibility = View.VISIBLE
                 mButtonRegister2!!.visibility = View.VISIBLE
                 mButtonRegister3!!.visibility = View.VISIBLE
-
 
 
             }
@@ -1202,9 +1188,9 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
             if (urlId == URLData.URL_SAVE_FINGERPRINT.urlId) {
                 //val loginDetailsResponce = data as FingerPrintCreateResp
                 val loginDetailsResponce = Gson().fromJson(responce, CaptureFPResponse::class.java)
-                Log.e("GSON_CPON0",""+responce);
-                Log.e("GSON_CPON",""+loginDetailsResponce);
-                Log.e("GSON_CPON2",""+loginDetailsResponce.data.fingerPrint.fpid);
+                Log.e("GSON_CPON0", "" + responce);
+                Log.e("GSON_CPON", "" + loginDetailsResponce);
+                Log.e("GSON_CPON2", "" + loginDetailsResponce.data.fingerPrint.fpid);
 
                 if (loginDetailsResponce != null) {
                     Log.d(
@@ -1213,7 +1199,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                     )
                     if (loginDetailsResponce.success) {
                         showToast(this, "Fingerprint Saved")
-                        Log.e("CAPTURE_F",""+loginDetailsResponce)
+                        Log.e("CAPTURE_F", "" + loginDetailsResponce)
                         RealmDB.insertFingerPrints(
                             loginDetailsResponce.data.fingerPrint.fpid.toInt(),
                             memId.toString() + "",
@@ -1236,7 +1222,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 }
 
             }
-        }catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             e.printStackTrace()
         }
         //  showToast(this, urlId+" id "+position+" "+memId+" "+MemberType+" ");
@@ -1244,7 +1230,11 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         //        finish();
     }
 
-    fun uploadFingerPrint(byteArray_fp1: ByteArray, byteArray_fp2: ByteArray?, byteArray_fp3: ByteArray?) {
+    fun uploadFingerPrint(
+        byteArray_fp1: ByteArray,
+        byteArray_fp2: ByteArray?,
+        byteArray_fp3: ByteArray?
+    ) {
 
         val str1 = Base64.encodeToString(
             byteArray_fp1,
@@ -1276,7 +1266,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         restClient.addHeader(OYE247KEY, OYE247TOKEN)
 
         restClient.post<Any>(this, loginReq, FingerPrintCreateResp::class.java, this, URLData.URL_SAVE_FINGERPRINT)
-        val response=FingerPrintCreateResp()
+        val response = FingerPrintCreateResp()
         // Toast.makeText(this@Biometric,response.toString(),Toast.LENGTH_LONG).show()
 
     }
@@ -1400,17 +1390,17 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
     fun highlightFingers() {
 
-        bl_left_thumb = dbh.getMemberFingerExists(memId.toString() + "", "left_thumb")
-        bl_left_index = dbh.getMemberFingerExists(memId.toString() + "", "left_index")
-        bl_left_middle = dbh.getMemberFingerExists(memId.toString() + "", "left_centre")
-        bl_left_ring = dbh.getMemberFingerExists(memId.toString() + "", "left_ring")
-        bl_left_little = dbh.getMemberFingerExists(memId.toString() + "", "left_little")
+        bl_left_thumb = RealmDB.getMemberFingerExists(memId.toString() + "", "left_thumb")
+        bl_left_index = RealmDB.getMemberFingerExists(memId.toString() + "", "left_index")
+        bl_left_middle = RealmDB.getMemberFingerExists(memId.toString() + "", "left_centre")
+        bl_left_ring = RealmDB.getMemberFingerExists(memId.toString() + "", "left_ring")
+        bl_left_little = RealmDB.getMemberFingerExists(memId.toString() + "", "left_little")
 
-        bl_right_thumb = dbh.getMemberFingerExists(memId.toString() + "", "right_thumb")
-        bl_right_index = dbh.getMemberFingerExists(memId.toString() + "", "right_index")
-        bl_right_middle = dbh.getMemberFingerExists(memId.toString() + "", "right_centre")
-        bl_right_ring = dbh.getMemberFingerExists(memId.toString() + "", "right_ring")
-        bl_right_little = dbh.getMemberFingerExists(memId.toString() + "", "right_little")
+        bl_right_thumb = RealmDB.getMemberFingerExists(memId.toString() + "", "right_thumb")
+        bl_right_index = RealmDB.getMemberFingerExists(memId.toString() + "", "right_index")
+        bl_right_middle = RealmDB.getMemberFingerExists(memId.toString() + "", "right_centre")
+        bl_right_ring = RealmDB.getMemberFingerExists(memId.toString() + "", "right_ring")
+        bl_right_little = RealmDB.getMemberFingerExists(memId.toString() + "", "right_little")
 
         if (bl_left_thumb)
             btn_left_thumb.alpha = 0.3.toFloat()
@@ -1437,7 +1427,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         // Toast.makeText(getApplicationContext(),"Hi there"+dbh.fingercount(memId),Toast.LENGTH_SHORT).show();
         // Toast.makeText(this@Biometric,dbh.fingercount(memId),Toast.LENGTH_LONG).show()
 
-        if (dbh.fingercount(memId) > 1) {
+        if (RealmDB.fingercount(memId) > 1) {
 
             buttonDone!!.visibility = View.VISIBLE
         } else {
@@ -1583,7 +1573,6 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         private val TAG = "SecuGen USB"
         private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
     }
-
 
 
 }
