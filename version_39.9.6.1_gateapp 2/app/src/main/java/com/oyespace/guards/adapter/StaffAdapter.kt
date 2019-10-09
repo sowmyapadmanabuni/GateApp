@@ -22,9 +22,15 @@ import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.pojo.CreateVisitorLogReq
+import com.oyespace.guards.pojo.CreateVisitorLogResp
+import com.oyespace.guards.pojo.UnitlistbyUnitID
+import com.oyespace.guards.pojo.VLRData
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -371,9 +377,6 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
                 .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
-                            // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-
 
                             if (unitId.contains(",")) {
 
@@ -489,6 +492,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
 
                             Utils.showToast(mcontext, "Entry not Saved"+globalApiObject.toString())
                         }
+                        (mcontext as Activity).finish()
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -565,50 +569,6 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
                 }
             })
 
-    }
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        //(mcontext as Activity).finish()
-//                        val d = Intent(mcontext, Dashboard::class.java)
-//                        d.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                        mcontext.startActivity(d)
-                        (mcontext as Activity).finish()
-                    } else {
-                        Utils.showToast(mcontext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(mcontext, "Something went wrong")
-//                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(mcontext, "No Internet")
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-//                    dismissProgress()
-                }
-            }))
     }
 
 

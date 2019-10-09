@@ -1029,8 +1029,6 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
-                            // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
                             val ddc  =  Intent(this@MobileNumberEntryScreenwithOTP, BackgroundSyncReceiver::class.java)
                             ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
@@ -1041,9 +1039,6 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                             ddc.putExtra("unitname", unitName)
                             ddc.putExtra("memType", "Owner")
                             ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                             this@MobileNumberEntryScreenwithOTP.sendBroadcast(ddc)
 
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
@@ -1052,10 +1047,11 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                             Utils.showToast(this@MobileNumberEntryScreenwithOTP, "Entry not Saved"+globalApiObject.toString())
                         }
+                        finish()
                     }
 
                     override fun onErrorResponse(e: Throwable) {
-                        Log.d("onErrorResponse","StaffEntry "+e.toString())
+                        Log.d("onErrorResponse", "StaffEntry " + e.toString())
 
                         Utils.showToast(this@MobileNumberEntryScreenwithOTP, "Something went wrong")
 //                    dismissProgress()
@@ -1072,47 +1068,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                     override fun onDismissProgress() {
 //                    dismissProgress()
                     }
-                }))
-    }
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        finish()
-                    } else {
-                        Utils.showToast(this@MobileNumberEntryScreenwithOTP, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(this@MobileNumberEntryScreenwithOTP, "Something went wrong")
-//                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(this@MobileNumberEntryScreenwithOTP, "No Internet")
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-//                    dismissProgress()
-                }
-            }))
+                })
+        )
     }
 
     override fun onBackPressed() {

@@ -29,14 +29,11 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.NumberUtils.toInteger
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
@@ -360,6 +357,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
                             // dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,0,0,"","","","","",1, getCurrentTimeLocal(),"")
 
+                            val visitorLogID = globalApiObject.data.visitorLog.vlVisLgID
 
                             // TODO shift this realm code into ReamDB
                             Log.d("taaag", "response for id: " + globalApiObject.data.visitorLog.vlVisLgID)
@@ -404,7 +402,92 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                                 file.delete()
                             }
 
-                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+                            if (intent.getStringExtra(UNITID).contains(",")) {
+
+                                var unitname_dataList: Array<String>
+                                var unitid_dataList: Array<String>
+
+                                unitname_dataList =
+                                    intent.getStringExtra(UNITNAME).split(",".toRegex())
+                                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                unitid_dataList =
+                                    intent.getStringExtra(UNITID).split(",".toRegex())
+                                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                if (unitid_dataList.size > 0) {
+                                    for (i in 0 until unitid_dataList.size) {
+
+
+                                        val d = Intent(
+                                            this@ManualStaffEntryRegistration,
+                                            BackgroundSyncReceiver::class.java
+                                        )
+                                        d.putExtra(BSR_Action, VisitorEntryFCM)
+                                        d.putExtra(
+                                            "msg",
+                                            intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(
+                                                COMPANY_NAME
+                                            ) + " is coming to your home" + "(" + unitname_dataList.get(
+                                                i
+                                            ).replace(" ", "") + ")"
+                                        )
+                                        d.putExtra(
+                                            "mobNum",
+                                            intent.getStringExtra(MOBILENUMBER)
+                                        )
+                                        d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                                        d.putExtra("nr_id", intToString(visitorLogID))
+                                        d.putExtra(
+                                            "unitname",
+                                            unitname_dataList.get(i).replace(" ", "")
+                                        )
+                                        d.putExtra("memType", "Owner")
+                                        d.putExtra(
+                                            UNITID,
+                                            unitid_dataList.get(i).replace(" ", "")
+                                        )
+                                        d.putExtra(
+                                            COMPANY_NAME,
+                                            intent.getStringExtra(COMPANY_NAME)
+                                        )
+                                        // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
+                                        d.putExtra("VLVisLgID", visitorLogID)
+                                        d.putExtra(
+                                            VISITOR_TYPE,
+                                            intent.getStringExtra(VISITOR_TYPE)
+                                        )
+                                        sendBroadcast(d)
+
+                                    }
+                                }
+                            } else {
+                                val d = Intent(
+                                    this@ManualStaffEntryRegistration,
+                                    BackgroundSyncReceiver::class.java
+                                )
+                                d.putExtra(BSR_Action, VisitorEntryFCM)
+                                d.putExtra(
+                                    "msg",
+                                    intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(
+                                        COMPANY_NAME
+                                    ) + " is coming to your home" + "(" + intent.getStringExtra(
+                                        UNITNAME
+                                    ) + ")"
+                                )
+                                d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+                                d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                                d.putExtra("nr_id", intToString(visitorLogID))
+                                d.putExtra("unitname", intent.getStringExtra(UNITNAME))
+                                d.putExtra("memType", "Owner")
+                                d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
+                                d.putExtra("VLVisLgID", visitorLogID)
+                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                sendBroadcast(d)
+                            }
+
+                            deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
 
                             uploadImage(imgName!!, mBitmap)
                             Log.d(
@@ -414,6 +497,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                         } else {
                             Utils.showToast(applicationContext, globalApiObject.apiVersion)
                         }
+                        finish()
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -634,151 +718,6 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
     }
 
-
-    private fun visitorEntryLog(visitorLogID: Int) {
-
-        try {
-            // val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
-            val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
-
-            Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-            compositeDisposable.add(
-                RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                        override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                            if (globalApiObject.success == true) {
-
-
-                                if (intent.getStringExtra(UNITID).contains(",")) {
-
-                                    var unitname_dataList: Array<String>
-                                    var unitid_dataList: Array<String>
-
-                                    unitname_dataList =
-                                        intent.getStringExtra(UNITNAME).split(",".toRegex())
-                                            .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                                    unitid_dataList =
-                                        intent.getStringExtra(UNITID).split(",".toRegex())
-                                            .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                                    // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                                    if (unitid_dataList.size > 0) {
-                                        for (i in 0 until unitid_dataList.size) {
-
-
-                                            val d = Intent(
-                                                this@ManualStaffEntryRegistration,
-                                                BackgroundSyncReceiver::class.java
-                                            )
-                                            d.putExtra(BSR_Action, VisitorEntryFCM)
-                                            d.putExtra(
-                                                "msg",
-                                                intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(
-                                                    COMPANY_NAME
-                                                ) + " is coming to your home" + "(" + unitname_dataList.get(
-                                                    i
-                                                ).replace(" ", "") + ")"
-                                            )
-                                            d.putExtra(
-                                                "mobNum",
-                                                intent.getStringExtra(MOBILENUMBER)
-                                            )
-                                            d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                                            d.putExtra("nr_id", intToString(visitorLogID))
-                                            d.putExtra(
-                                                "unitname",
-                                                unitname_dataList.get(i).replace(" ", "")
-                                            )
-                                            d.putExtra("memType", "Owner")
-                                            d.putExtra(
-                                                UNITID,
-                                                unitid_dataList.get(i).replace(" ", "")
-                                            )
-                                            d.putExtra(
-                                                COMPANY_NAME,
-                                                intent.getStringExtra(COMPANY_NAME)
-                                            )
-                                            // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
-                                            d.putExtra("VLVisLgID", visitorLogID)
-                                            d.putExtra(
-                                                VISITOR_TYPE,
-                                                intent.getStringExtra(VISITOR_TYPE)
-                                            )
-                                            sendBroadcast(d)
-
-                                        }
-                                    }
-                                } else {
-                                    val d = Intent(
-                                        this@ManualStaffEntryRegistration,
-                                        BackgroundSyncReceiver::class.java
-                                    )
-                                    d.putExtra(BSR_Action, VisitorEntryFCM)
-                                    d.putExtra(
-                                        "msg",
-                                        intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(
-                                            COMPANY_NAME
-                                        ) + " is coming to your home" + "(" + intent.getStringExtra(
-                                            UNITNAME
-                                        ) + ")"
-                                    )
-                                    d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-                                    d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                                    d.putExtra("nr_id", intToString(visitorLogID))
-                                    d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-                                    d.putExtra("memType", "Owner")
-                                    d.putExtra(UNITID, intent.getStringExtra(UNITID))
-                                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                                    // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
-                                    d.putExtra("VLVisLgID", visitorLogID)
-                                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                                    sendBroadcast(d)
-                                }
-
-
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                                val dir =
-                                    File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                                if (dir.isDirectory) {
-                                    val children = dir.list()
-                                    for (i in children!!.indices) {
-                                        File(dir, children[i]).delete()
-                                    }
-                                }
-                                finish()
-                            } else {
-                                Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                            }
-                        }
-
-                        override fun onErrorResponse(e: Throwable) {
-                            Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                            dismissProgress()
-                        }
-
-                        override fun noNetowork() {
-                            Utils.showToast(applicationContext, getString(R.string.no_internet))
-                        }
-
-                        override fun onShowProgress() {
-//                   showProgress()
-                        }
-
-                        override fun onDismissProgress() {
-                            dismissProgress()
-                        }
-                    })
-            )
-        } catch (e: NullPointerException) {
-
-        }
-    }
-
     private fun staffRegistration() {
         var imgName = "PERSON" + "Association" + Prefs.getInt(
             ASSOCIATION_ID,
@@ -946,22 +885,11 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
                 override fun onErrorResponse(e: Throwable) {
 
-                    val unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
-                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    val unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex())
-                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    val unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID)
-                        .split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-
-                    if (unitid_dataList.size > 0) {
-                        for (i in 0 until unitid_dataList.size) {
-                            visitorLog(
-                                unitname_dataList.get(i).replace(" ", ""),
-                                unitid_dataList.get(i).replace(" ", ""),
-                                unitAccountId_dataList.get(i).replace(" ", "")
-                            )
-                        }
-                    }
+                    visitorLog(
+                        intent.getStringExtra(UNITNAME),
+                        intent.getStringExtra(UNITID),
+                        intent.getStringExtra(UNIT_ACCOUNT_ID)
+                    )
 
                 }
 

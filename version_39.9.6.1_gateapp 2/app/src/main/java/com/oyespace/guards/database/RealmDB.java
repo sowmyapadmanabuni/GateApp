@@ -108,6 +108,20 @@ public class RealmDB {
 
     }
 
+    public static void deleteVisitorEntry(int visitorId) {
+
+        Realm rm = Realm.getDefaultInstance();
+        rm.executeTransaction(realm -> {
+
+            final RealmResults<VisitorLog> results = realm.where(VisitorLog.class)
+                    .equalTo("vlVisLgID", visitorId)
+                    .findAll();
+            results.deleteAllFromRealm();
+
+        });
+
+    }
+
     public static int fingercount(int MemberID) {
 
         Realm realm = Realm.getDefaultInstance();

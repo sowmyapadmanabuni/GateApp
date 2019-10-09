@@ -36,8 +36,11 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import com.oyespace.guards.utils.Utils.showToast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -635,7 +638,6 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
 
                             if (unitId.contains(",")) {
@@ -746,6 +748,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
                             Utils.showToast(this@MobileNumberforEntryScreen, "Entry not Saved"+globalApiObject.toString())
                         }
+
+                        finish()
+
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -766,51 +771,8 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     override fun onDismissProgress() {
 //                    dismissProgress()
                     }
-                }))
-    }
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(
-            DateTimeUtils.getCurrentTimeLocal(),
-            LocalDb.getStaffList()[0].wkWorkID.toInt(),
-            visitorLogID
+                })
         )
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        finish()
-                    } else {
-                        Utils.showToast(this@MobileNumberforEntryScreen, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(this@MobileNumberforEntryScreen, "Something went wrong")
-//                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(this@MobileNumberforEntryScreen, "No Internet")
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-//                    dismissProgress()
-                }
-            }))
     }
 
     override fun onBackPressed() {

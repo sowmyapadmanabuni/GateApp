@@ -377,9 +377,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             realm.commitTransaction()
                             //}
 
-
-//                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-
                             val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
                             d.putExtra(BSR_Action, VisitorEntryFCM)
                             d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + UNUniName + ")")

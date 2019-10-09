@@ -17,7 +17,6 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
@@ -176,23 +175,6 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
-                        // getInvitationCreate(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(PERSONNAME),"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),"","","","",getCurrentTimeLocal(),getCurrentTimeLocal(),"",true,Prefs.getInt(ASSOCIATION_ID,0),true)
-
-                        visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-//                        val d  =  Intent(this@VehicleGuestQRRegistration, BackgroundSyncReceiver::class.java)
-//                        d.putExtra(BSR_Action, VisitorEntryFCM)
-//                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
-//                        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-//                        d.putExtra("name", intent.getStringExtra(PERSONNAME))
-//                        d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-//                        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-//                        d.putExtra(UNITID,intent.getStringExtra(UNITID))
-//                        d.putExtra("memType", "Owner")
-////                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-////                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-//                        sendBroadcast(d);
-
 
                         val d  =  Intent(this@VehicleGuestQRRegistration,BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
@@ -224,6 +206,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
+                    finish()
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -319,51 +302,6 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 //        startActivity(d);
 //        finish();
    // }
-
-    private fun visitorEntryLog(visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(getCurrentTimeLocal(),0, visitorLogID)
-        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-
-
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-//                        val d = Intent(this@VehicleGuestQRRegistration, Dashboard::class.java)
-//                        startActivity(d)
-                        finish()
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            })
-        )
-    }
 
     fun setLocale(lang: String?) {
         var lang = lang

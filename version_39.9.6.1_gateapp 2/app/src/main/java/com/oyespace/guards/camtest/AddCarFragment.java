@@ -9,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -34,7 +33,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -625,19 +623,6 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         }
     }
 
-    private String getOriginalPath(Intent data, Context context) {
-        Uri selectedImageUri = data.getData();
-        Log.e("Select File", selectedImageUri.toString());
-        String[] projection = {MediaStore.MediaColumns.DATA};
-        CursorLoader cursorLoader = new CursorLoader(context, selectedImageUri, projection, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-        cursor.moveToFirst();
-
-        return cursor.getString(column_index);
-    }
-
     public void showViewPager() {
         Log.e("Data", "Recicved");
 //        image_Gallery.setVisibility(View.GONE);
@@ -1010,18 +995,6 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
             }
         });
 
-    }
-
-    public String getRealPathFromURI(Uri contentUri) {
-        String path = null;
-        String[] proj = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            path = cursor.getString(column_index);
-        }
-        cursor.close();
-        return path;
     }
 
     public void SaveImage(Bitmap showedImgae) {

@@ -237,10 +237,6 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
         <activity
-                android:name=".activity.TicketingDetailsActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
                 android:name=".Dashboard"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"

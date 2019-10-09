@@ -61,11 +61,6 @@ interface WebApi {
     @POST("oyesafe/api/v1/VisitorLog/Create")
     fun createVisitorLogCall(@Header(OYE247KEY) token: String, @Body createVisitorLogReq: CreateVisitorLogReq): Single<CreateVisitorLogResp<VLRData>>
 
-    @POST("oyesafe/api/v1/VisitorEntryWIDAndTime/Update")
-    fun visitorEntryCall(@Header("X-OYE247-APIKey") token: String, @Body visitorExitReq: VisitorEntryReq)
-            : Single<VisitorExitResp>
-
-
     @GET("oye247/api/v1/GetWorkerListByAssocID/{id}")
     fun workerList(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String)
             : Single<GetWorkersResponse<WorkersList>>

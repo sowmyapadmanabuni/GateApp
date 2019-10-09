@@ -23,7 +23,6 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
@@ -182,7 +181,6 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 
                         //  getInvitationCreate(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(PERSONNAME),"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),"","","","",getCurrentTimeLocal(),getCurrentTimeLocal(),"",true,Prefs.getInt(ASSOCIATION_ID,0),true)
 
-                        visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         var imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + globalApiObject.data.visitorLog.vlVisLgID + ".jpg"
 
                         val d  =  Intent(this@GuestQRRegistrationSuccess, BackgroundSyncReceiver::class.java)
@@ -366,72 +364,6 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         })
 
 
-    }
-//
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        val d = Intent(this@GuestQRRegistrationSuccess, GuestCustomViewFinderScannerActivity::class.java)
-//
-///*        Log.d(
-//            "intentdata NameEntr",
-//            "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-//                    + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + intent.getStringExtra(
-//                PERSONNAME
-//            )
-//        );
-//        d.putExtra(UNITID, intent.getStringExtra(UNITID))
-//        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-//        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-//        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-//        d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-//        d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
-//        d.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID, 0))*/
-//
-//        startActivity(d);
-//        finish();
-//    }
-
-    private fun visitorEntryLog(visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
-        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        //                      finish();
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            })
-        )
     }
 
     fun setLocale(lang: String?) {

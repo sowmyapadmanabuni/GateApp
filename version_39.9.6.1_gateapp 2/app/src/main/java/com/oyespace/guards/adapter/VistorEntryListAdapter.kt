@@ -23,7 +23,6 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
@@ -33,7 +32,6 @@ import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
 import java.util.*
 
 
@@ -62,8 +60,9 @@ class VistorEntryListAdapter(
         return MenuHolder(mainGroup)
     }
 
-    override fun onBindViewHolder(holder: MenuHolder, position: Int) {
+    override fun onBindViewHolder(holder: MenuHolder, p: Int) {
 
+        val position = holder.adapterPosition
 
         val orderData = listVistor.get(position)
         Log.e("orderData", "" + orderData)
@@ -74,8 +73,8 @@ class VistorEntryListAdapter(
             holder.entryTime.text = formatDateHM(orderData.vlEntryT) + " "
             Log.d("ddd", formatDateHM(orderData.vlEntryT))
             holder.entrydate.text = formatDateDMY(orderData.vldCreated)
-//            if (orderData.vlExitT.equals("0001-01-01T00:00:00", true)) {
-            if (true) {
+            if (orderData.vlExitT.equals("0001-01-01T00:00:00", true)) {
+//            if (true) {
                 holder.exitTime.text = ""
                 holder.exitdate.text = ""
                 holder.btn_makeexit.visibility = View.VISIBLE
@@ -247,23 +246,10 @@ class VistorEntryListAdapter(
 
     private fun exitVisitor(orderData: VisitorLog, position: Int) {
 
-        val realm = Realm.getDefaultInstance()
         val lgid = orderData.vlVisLgID
 
         makeExitCall(lgid)
-        val visitor = realm
-            .where(VisitorLog::class.java)
-            .equalTo("vlVisLgID", listVistor.get(position).vlVisLgID)
-            .findFirst()
-
-        if (!realm.isInTransaction) {
-            realm.beginTransaction()
-        }
-        visitor!!.deleteFromRealm()
-        realm.commitTransaction()
-
-        Log.e("REMOVED", "" + RealmDB.getVisitorEnteredLog())
-
+        RealmDB.deleteVisitorEntry(lgid)
         listVistor.removeAt(position)
 
     }
@@ -271,8 +257,7 @@ class VistorEntryListAdapter(
 
     private fun makeExitCall(visitorLogID: Int) {
 
-        val req =
-            VisitorExitReq(getCurrentTimeLocal(), 0, visitorLogID, Prefs.getString(GATE_NO, ""))
+        val req = VisitorExitReq(getCurrentTimeLocal(), 0, visitorLogID, Prefs.getString(GATE_NO, ""))
         CompositeDisposable().add(
             RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
                 .subscribeOn(Schedulers.io())
@@ -282,10 +267,7 @@ class VistorEntryListAdapter(
                         if (globalApiObject.success == true) {
 //                            Utils.showToast(mcontext, "Success")
                             val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
-                            intentAction1.putExtra(
-                                ConstantUtils.BSR_Action,
-                                SENDFCM_toSYNC_VISITORENTRY
-                            )
+                            intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
                             mcontext.sendBroadcast(intentAction1)
 
                         } else {

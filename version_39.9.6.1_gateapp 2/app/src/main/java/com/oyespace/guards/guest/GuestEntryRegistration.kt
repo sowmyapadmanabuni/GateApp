@@ -24,13 +24,10 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -290,7 +287,10 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             Prefs.getInt(ASSOCIATION_ID, 0),
                             false
                         )
-                        visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+
+                        deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+
+
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)
                         dd.putExtra("msg", intent.getStringExtra(PERSONNAME)+" is coming to your home" )
@@ -317,6 +317,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
+                    dismissProgress()
+                    finish()
                 }
 
 
@@ -470,83 +472,6 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         })
 
 
-    }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        val d = Intent(this@GuestEntryRegistration, GuestAddCarFragment::class.java)
-//
-//        Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-//                +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" "+intent.getStringExtra(PERSONNAME));
-//        d.putExtra(UNITID,intent.getStringExtra(UNITID) )
-//        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//        d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
-//        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
-//        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-//        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-//        d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-//        d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
-//        d.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID, 0))
-//
-//        startActivity(d)
-//
-//    }
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-        var req:VisitorEntryReq?=null
-
-             req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
-
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-
-
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-//                        finish();
-                        val dir =
-                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                        if (dir.isDirectory) {
-                            val children = dir.list()
-                            for (i in children!!.indices) {
-                                File(dir, children[i]).delete()
-                            }
-                        }
-                        //val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
-                       // startActivity(d)
-                        dismissProgress()
-                        finish()
-
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-                 // showProgress()
-                }
-
-                override fun onDismissProgress() {
-                  //  dismissProgress()
-                }
-            }))
     }
 
     fun setLocale(lang: String?) {
