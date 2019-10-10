@@ -63,7 +63,7 @@ data class GetVisitorsResponse<T>(
     val success: Boolean
 )
 data class VisitorsList(
-    val visitorLog: RealmList<VisitorLog>
+    val visitorLog: RealmList<VisitorLog>?
 )
 
 data class GetVisitorEntryResponse<T>(

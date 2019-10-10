@@ -551,7 +551,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             .getVisitorLogEntryList(OYE247TOKEN, Prefs.getInt(ASSOCIATION_ID, 0))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object :
+            .subscribe(object :
                 CommonDisposable<GetVisitorsResponse<ArrayList<VisitorLog>>>() {
 
                 override fun onSuccessResponse(visitorList: GetVisitorsResponse<ArrayList<VisitorLog>>) {

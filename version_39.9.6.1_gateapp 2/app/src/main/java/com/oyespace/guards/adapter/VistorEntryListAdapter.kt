@@ -64,7 +64,7 @@ class VistorEntryListAdapter(
 
         val position = holder.adapterPosition
 
-        val orderData = listVistor.get(position)
+        val orderData = searchList!!.get(position)
         Log.e("orderData", "" + orderData)
         if (orderData != null && orderData.isValid) {
 
