@@ -18,7 +18,6 @@ import com.oyespace.guards.activity.Biometric
 import com.oyespace.guards.activity.EditStaffActivity
 import com.oyespace.guards.activity.MobileNumberforEntryScreen
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -26,6 +25,7 @@ import com.oyespace.guards.pojo.CreateVisitorLogReq
 import com.oyespace.guards.pojo.CreateVisitorLogResp
 import com.oyespace.guards.pojo.UnitlistbyUnitID
 import com.oyespace.guards.pojo.VLRData
+import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb

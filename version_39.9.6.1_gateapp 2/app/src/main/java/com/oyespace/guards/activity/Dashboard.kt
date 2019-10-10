@@ -48,15 +48,13 @@ import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.ServiceProviderListActivity
 import com.oyespace.guards.activity.StaffListActivity
 import com.oyespace.guards.adapter.VistorEntryListAdapter
-import com.oyespace.guards.adapter.VistorListAdapter
+import com.oyespace.guards.adapter.VistorOutListAdapter
 import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.models.*
 import com.oyespace.guards.models.FingerPrint
-import com.oyespace.guards.models.VisitorEntryLog
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.network.*
@@ -64,6 +62,9 @@ import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pertroling.PatrollingActivitynew
 import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.realm.VisitorEntryLogRealm
+import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.request.VisitorExitReqJv
 import com.oyespace.guards.resident.ResidentIdActivity
@@ -74,7 +75,8 @@ import com.oyespace.guards.responce.VisitorLogExitResp
 import com.oyespace.guards.services.SOSSirenService
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils.*
+import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
 import com.oyespace.guards.utils.Utils.showToast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -90,6 +92,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.Comparator
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,
     ResponseHandler, Runnable,
@@ -120,7 +123,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     private var audiofile: File? = null
     var vistorEntryListAdapter: VistorEntryListAdapter? = null
-    var vistorListAdapter: VistorListAdapter? = null
+    var vistorOutListAdapter: VistorOutListAdapter? = null
     private var mFileName = ""
     private var myAudioRecorder: MediaRecorder? = null
 
@@ -230,11 +233,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 if (message.equals(VISITOR_ENTRY_SYNC, ignoreCase = true)) {
                     Log.e("VISITOR_ENTRY_SYNC", "VISITOR_ENTRY_SYNC")
                     var newAl: ArrayList<VisitorLog>? = ArrayList()
-                    if (RealmDB.getVisitorEnteredLog() != null) {
-                        newAl = RealmDB.getVisitorEnteredLog()
+                    if (VisitorEntryLogRealm.getVisitorEntryLog() != null) {
+                        newAl = VisitorEntryLogRealm.getVisitorEntryLog()
                         // LocalDb.saveAllVisitorLog(newAl);
 
-                        if ((newAl as ArrayList<VisitorEntryLog>?)!!.isEmpty()) {
+                        if ((newAl)!!.isEmpty()) {
                             rv_dashboard!!.visibility = View.GONE
                             tv_nodata.visibility = View.VISIBLE
                             dismissProgressrefresh()
@@ -242,7 +245,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                             rv_dashboard!!.visibility = View.VISIBLE
                             tv_nodata.visibility = View.GONE
                         }
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                        vistorEntryListAdapter = VistorEntryListAdapter(newAl, this@Dashboard)
                         rv_dashboard?.adapter = vistorEntryListAdapter
                         dismissProgressrefresh()
                         btn_in.setBackgroundColor(resources.getColor(R.color.orange))
@@ -334,8 +337,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                         }
                     } else {
-                        if (vistorListAdapter != null) {
-                            vistorListAdapter!!.filter.filter(editable)
+                        if (vistorOutListAdapter != null) {
+                            vistorOutListAdapter!!.applySearch(editable.toString())
 
                         }
                     }
@@ -584,7 +587,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             .registerReceiver(receiver, IntentFilter("SYNC"))//constant
         super.onResume()
 
-        val log = RealmDB.getVisitorEnteredLog()
+        val log = VisitorEntryLogRealm.getVisitorEntryLog()
         for (vlog in log) {
             Log.d("taaag", "~~~~~ ${vlog.vlfName}")
         }
@@ -909,7 +912,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     private fun reloadVisitorsList() {
-        newAl = RealmDB.getVisitorEnteredLog()
+        newAl = VisitorEntryLogRealm.getVisitorEntryLog()
         vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
         rv_dashboard?.adapter = vistorEntryListAdapter
         vistorEntryListAdapter!!.notifyDataSetChanged()
@@ -1205,7 +1208,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 if (id > 0) {
 
                     // check if staff has already entered
-                    val staff: VisitorLog? = RealmDB.getVisitorForId(id)
+                    val staff: VisitorLog? = VisitorEntryLogRealm.getVisitorForId(id)
 
                     // if yes, then make exit call
                     if (staff != null) {
@@ -1568,9 +1571,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                     btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
-                    if (RealmDB.getVisitorEnteredLog() != null) {
+                    if (VisitorEntryLogRealm.getVisitorEntryLog() != null) {
 
-                        newAl = RealmDB.getVisitorEnteredLog()
+                        newAl = VisitorEntryLogRealm.getVisitorEntryLog()
                         // LocalDb.saveAllVisitorLog(newAl);
                         if ((newAl)!!.isEmpty()) {
                             rv_dashboard!!.visibility = View.GONE
@@ -1658,102 +1661,33 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     fun getExitVisitorLog() {
 
-        val call =
-            champApiInterface?.getVisitorLogExitList(LocalDb.getAssociation()!!.asAssnID.toString() + "")
-        Log.d(
-            "button_done ",
-            "visitorlogbydate " + LocalDb.getAssociation()!!.asAssnID + " " + getCurrentTimeLocalYMD()
-        )
+        RetrofitClinet.instance
+            .getVisitorLogExitList(OYE247TOKEN, Prefs.getInt(ASSOCIATION_ID, 0))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CommonDisposable<GetExitVisitorsResponse<ArrayList<com.oyespace.guards.pojo.VisitorLog>>>() {
+                override fun onSuccessResponse(visitorlist: GetExitVisitorsResponse<ArrayList<com.oyespace.guards.pojo.VisitorLog>>) {
 
-        call?.enqueue(object : Callback<VisitorLogExitResp> {
-            override fun onResponse(
-                call: Call<VisitorLogExitResp>,
-                response: Response<VisitorLogExitResp>
-            ) {
-                dismissProgress()
-                if (response.body()!!.success == true) {
-
-                    if (response.body()!!.data.visitorLog != null) {
-                        tv_nodata.visibility = View.GONE
-
-                        rv_dashboard?.visibility = View.VISIBLE
-
-                        val nonExitedSort = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-                        val exitedSort = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-
-                        val arrayList = response.body()!!.data.visitorLog
-
-                        for (s in arrayList) {
-                            //if the existing elements contains the search input
-                            Log.d(
-                                "button_done ",
-                                "visitorlogbydate " + s.vlExitT + " " + (s.vlExitT == "0001-01-01T00:00:00")
-                            )
-
-                        }
-
-                        LocalDb.saveEnteredVisitorLog_old(nonExitedSort)
-
-                        var newAl = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-
-                        newAl =
-                            RandomUtils.getSortedVisitorLog_old(response.body()!!.data.visitorLog)
-                        LocalDb.saveAllVisitorLog(newAl)
-
-
-
-                        Collections.sort(
-                            arrayList,
-                            object : Comparator<VisitorLogExitResp.Data.VisitorLog> {
-                                override fun compare(
-                                    lhs: VisitorLogExitResp.Data.VisitorLog,
-                                    rhs: VisitorLogExitResp.Data.VisitorLog
-                                ): Int {
-
-
-                                    return (formatDateDMY(rhs.vldUpdated) + " " + (rhs.vlExitT).replace(
-                                        "1900-01-01T",
-                                        ""
-                                    )).compareTo(
-                                        formatDateDMY(lhs.vldUpdated) + " " + (lhs.vlExitT).replace(
-                                            "1900-01-01T",
-                                            ""
-                                        )
-                                    )
-
-                                }
-                            })
-
-
-                        //  VistorListAdapter vistorListAdapter = new VistorListAdapter(newAl, DashBoard.this);
-                        val vistorListAdapter =
-                            VistorListAdapter(response.body()!!.data.visitorLog, this@Dashboard)
-                        rv_dashboard?.adapter = vistorListAdapter
-
-                        if (arrayList.size == 0) {
-                            Toast.makeText(this@Dashboard, "No items", Toast.LENGTH_SHORT)
-                                .show()
-                        }
-                    } else {
-                        // rv_dashboard.setEmptyAdapter("No items to show!", false, 0);
-                        tv_nodata.visibility = View.VISIBLE
-
-                        rv_dashboard?.visibility = View.GONE
-
+                    if (visitorlist.success) {
+                        val visitorsList = visitorlist.data.visitorLog
+                        visitorsList.sortWith(Comparator { lhs, rhs -> rhs.vlVisLgID - lhs.vlVisLgID })
+                        VisitorExitLogRealm.addVisitorLogs(visitorsList)
+                        val visitorList = ArrayList<ExitVisitorLog>(visitorlist.data.visitorLog)
+                        vistorOutListAdapter = VistorOutListAdapter(visitorList, this@Dashboard)
+                        rv_dashboard?.adapter = vistorOutListAdapter
                     }
+
                 }
 
-            }
+                override fun onErrorResponse(e: Throwable) {
 
-            override fun onFailure(call: Call<VisitorLogExitResp>, t: Throwable) {
-                call.cancel()
-                Log.d(
-                    "button_done ",
-                    "visitorlogbydate " + t.message + " " + getCurrentTimeLocalYMD()
-                )
+                }
 
-            }
-        })
+                override fun noNetowork() {
+
+                }
+
+            })
 
     }
 

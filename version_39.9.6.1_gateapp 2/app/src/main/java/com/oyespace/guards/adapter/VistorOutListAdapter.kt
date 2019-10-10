@@ -12,27 +12,25 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.VisitorExitReq
-import com.oyespace.guards.pojo.VisitorExitResp
-import com.oyespace.guards.responce.VisitorLogExitResp
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.models.ExitVisitorLog
+import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
+import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.DateTimeUtils.*
+import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Data.VisitorLog>, private val mcontext: Context) :
+class VistorOutListAdapter(
+    private var listVistor: ArrayList<ExitVisitorLog>,
+    private val mcontext: Context
+) : RecyclerView.Adapter<VistorOutListAdapter.MenuHolder>() {
 
-    androidx.recyclerview.widget.RecyclerView.Adapter<VistorListAdapter.MenuHolder>(), Filterable {
-    private var searchList: ArrayList<VisitorLogExitResp.Data.VisitorLog>? = null
+    private var searchList: ArrayList<ExitVisitorLog>? = null
 
     private val mInflater: LayoutInflater
     var number: String? = null
@@ -63,7 +61,10 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         return MenuHolder(mainGroup)
     }
 
-    override fun onBindViewHolder(holder: MenuHolder, position: Int) {
+    override fun onBindViewHolder(holder: MenuHolder, p: Int) {
+
+        val position = holder.adapterPosition
+
         val orderData = searchList!!.get(position)
         val vistordate = orderData.asAssnID
         holder.apartmentNamee.text = orderData.unUniName
@@ -118,7 +119,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         holder.btn_makeexit.setOnClickListener {
             listVistor.get(position).vlExitT = DateTimeUtils.getCurrentTimeLocal()
 
-            makeExitCall(orderData.vlVisLgID)
+//            makeExitCall(orderData.vlVisLgID)
 
             notifyDataSetChanged()
 
@@ -234,79 +235,79 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
 
     }
 
-    private fun makeExitCall(visitorLogID: Int) {
-
-        val req = VisitorExitReq(
-            getCurrentTimeLocal(),
-            0,
-            visitorLogID,
-            LocalDb.getAssociation()!!.asAsnName
-        )
-        CompositeDisposable().add(
-            RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                        if (globalApiObject.success == true) {
-//                            Utils.showToast(mcontext, "Success")
-                        } else {
-                            Utils.showToast(mcontext, "Failed")
-                        }
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        Utils.showToast(mcontext, "Error visitor exit")
-                    }
-
-                    override fun noNetowork() {
-                        Utils.showToast(mcontext, "no_internet visitor exit")
-                    }
-
-                    override fun onShowProgress() {
-//                        showProgress()
-                    }
-
-                    override fun onDismissProgress() {
-//                        dismissProgress()
-                    }
-                })
-        )
-
-        val filteredList = java.util.ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-
-        //looping through existing elements
-        for (s in listVistor) {
-            //if the existing elements contains the search input
-            Log.d(
-                "button_done ",
-                "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals(
-                    "0001-01-01T00:00:00",
-                    true
-                ) + " "
-            )
-
-            if (s.vlExitT.equals("0001-01-01T00:00:00", true)) {
-                Log.d("vlExitT ", "visitorlogbydate " + s.vlExitT + " " + s.vlfName + " ")
-                filteredList.add(s)
-
-                //adding the element to filtered list
-            } else {
-
-            }
-        }
-        LocalDb.saveEnteredVisitorLog_old(filteredList)
-
-//        Collections.sort(listVistor, object : Comparator<Visitorlogbydate> {
-//            override  fun compare(lhs: Visitorlogbydate, rhs: Visitorlogbydate): Int {
-//                return rhs.vlExitT.compareTo(lhs.vlExitT)
+//    private fun makeExitCall(visitorLogID: Int) {
+//
+//        val req = VisitorExitReq(
+//            getCurrentTimeLocal(),
+//            0,
+//            visitorLogID,
+//            LocalDb.getAssociation()!!.asAsnName
+//        )
+//        CompositeDisposable().add(
+//            RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
+//                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
+//                        if (globalApiObject.success == true) {
+////                            Utils.showToast(mcontext, "Success")
+//                        } else {
+//                            Utils.showToast(mcontext, "Failed")
+//                        }
+//                    }
+//
+//                    override fun onErrorResponse(e: Throwable) {
+//                        Utils.showToast(mcontext, "Error visitor exit")
+//                    }
+//
+//                    override fun noNetowork() {
+//                        Utils.showToast(mcontext, "no_internet visitor exit")
+//                    }
+//
+//                    override fun onShowProgress() {
+////                        showProgress()
+//                    }
+//
+//                    override fun onDismissProgress() {
+////                        dismissProgress()
+//                    }
+//                })
+//        )
+//
+//        val filteredList = java.util.ArrayList<VisitorLogExitResp.Data.VisitorLog>()
+//
+//        //looping through existing elements
+//        for (s in listVistor) {
+//            //if the existing elements contains the search input
+//            Log.d(
+//                "button_done ",
+//                "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals(
+//                    "0001-01-01T00:00:00",
+//                    true
+//                ) + " "
+//            )
+//
+//            if (s.vlExitT.equals("0001-01-01T00:00:00", true)) {
+//                Log.d("vlExitT ", "visitorlogbydate " + s.vlExitT + " " + s.vlfName + " ")
+//                filteredList.add(s)
+//
+//                //adding the element to filtered list
+//            } else {
+//
 //            }
-//        })
-        listVistor = RandomUtils.getSortedVisitorLog_old(listVistor)
-
-        notifyDataSetChanged()
-
-    }
+//        }
+//        LocalDb.saveEnteredVisitorLog_old(filteredList)
+//
+////        Collections.sort(listVistor, object : Comparator<Visitorlogbydate> {
+////            override  fun compare(lhs: Visitorlogbydate, rhs: Visitorlogbydate): Int {
+////                return rhs.vlExitT.compareTo(lhs.vlExitT)
+////            }
+////        })
+//        listVistor = RandomUtils.getSortedVisitorLog_old(listVistor)
+//
+//        notifyDataSetChanged()
+//
+//    }
 
     override fun getItemCount(): Int {
         return searchList?.size ?: 0
@@ -354,35 +355,46 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
 
     }
 
-    override fun getFilter(): Filter {
-        return object : Filter() {
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                searchList = results?.values as ArrayList<VisitorLogExitResp.Data.VisitorLog>
-                notifyDataSetChanged()
-            }
+    fun applySearch(search: String) {
 
-            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
-                val charString = charSequence.toString()
-                if (charString.isEmpty()) {
-                    searchList = listVistor
-                } else {
-                    val filteredList = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-                    for (row in listVistor) {
-                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-                        if (row.vlfName!!.toLowerCase().contains(charString.toLowerCase()) || row.vlComName!!.toLowerCase().contains(
-                                charString.toLowerCase()
-                            ) || row.vlMobile!!.toLowerCase().contains(charString.toLowerCase()) || row.vlpOfVis
-                            !!.toLowerCase().contains(charString.toLowerCase())
-                        ) {
-                            filteredList.add(row)
-                        }
-                    }
-                    searchList = filteredList
-                }
-                val filterResults = Filter.FilterResults()
-                filterResults.values = searchList
-                return filterResults
-            }
+        if (search.isEmpty()) {
+            searchList = listVistor
+        } else {
+            searchList = VisitorExitLogRealm.searchVisitorLog(search)
         }
+        notifyDataSetChanged()
+
     }
+
+//    override fun getFilter(): Filter {
+//        return object : Filter() {
+//            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+//                searchList = results?.values as ArrayList<VisitorLogExitResp.Data.VisitorLog>
+//                notifyDataSetChanged()
+//            }
+//
+//            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
+//                val charString = charSequence.toString()
+//                if (charString.isEmpty()) {
+//                    searchList = listVistor
+//                } else {
+//                    val filteredList = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
+//                    for (row in listVistor) {
+//                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
+//                        if (row.vlfName!!.toLowerCase().contains(charString.toLowerCase()) || row.vlComName!!.toLowerCase().contains(
+//                                charString.toLowerCase()
+//                            ) || row.vlMobile!!.toLowerCase().contains(charString.toLowerCase()) || row.vlpOfVis
+//                            !!.toLowerCase().contains(charString.toLowerCase())
+//                        ) {
+//                            filteredList.add(row)
+//                        }
+//                    }
+//                    searchList = filteredList
+//                }
+//                val filterResults = Filter.FilterResults()
+//                filterResults.values = searchList
+//                return filterResults
+//            }
+//        }
+//    }
 }

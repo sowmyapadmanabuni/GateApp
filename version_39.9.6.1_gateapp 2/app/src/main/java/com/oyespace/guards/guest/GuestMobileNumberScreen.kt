@@ -34,10 +34,10 @@ import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -124,7 +124,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 //                    d.putExtra(MOBILENUMBER, mobileNumber)
 //                    d.putExtra(COUNTRYCODE, ccd)
 
-                    if (RealmDB.entryExists(ccd + mobileNumber)) {
+                    if (VisitorEntryLogRealm.entryExists(ccd + mobileNumber)) {
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)

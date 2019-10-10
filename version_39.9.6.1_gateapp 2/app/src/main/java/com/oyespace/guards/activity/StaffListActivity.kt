@@ -16,12 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.StaffAdapter
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.WorkerDetails
+import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb

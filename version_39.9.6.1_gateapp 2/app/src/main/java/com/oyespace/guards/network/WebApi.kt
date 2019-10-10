@@ -115,6 +115,10 @@ interface WebApi {
     fun getVisitorLogEntryList(@Header(OYE247KEY) token: String, @Path("id") assnId: Int)
             : Single<GetVisitorsResponse<ArrayList<VisitorLog>>>
 
+    @GET("oye247/api/v1/GetVisitorLogExitListByAssocID/{id}")
+    fun getVisitorLogExitList(@Header(OYE247KEY) token: String, @Path("id") associationID: Int)
+            : Single<GetExitVisitorsResponse<ArrayList<VisitorLog>>>
+
     @GET("oye247/api/v1/TicketingResponse/GetTicketingResponseListByTicketingResID/{id}")
     fun getTicketingResponses(@Header(OYE247KEY) token: String, @Path("id") ticketID: String)
             : Single<GetTicketingResponsesRes<TicketingResponseData>>

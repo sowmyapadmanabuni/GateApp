@@ -13,7 +13,6 @@ import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.models.GetVisitorsResponse
 import com.oyespace.guards.models.GetWorkersResponse
@@ -23,6 +22,8 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -559,7 +560,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     if (visitorList.success == true && visitorList.data.visitorLog != null) {
                         val visitorsList = visitorList.data.visitorLog
-                        RealmDB.saveVisitors(visitorsList)
+                        VisitorEntryLogRealm.addVisitorLogs(visitorsList)
                     } else {
                         Log.d("SYCNCHECK", "in 437")
                     }

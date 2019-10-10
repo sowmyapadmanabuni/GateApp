@@ -25,11 +25,11 @@ import com.google.gson.Gson
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.CaptureFPResponse
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RestClient
 import com.oyespace.guards.network.URLData
+import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils

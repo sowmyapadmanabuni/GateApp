@@ -17,6 +17,7 @@ data class SearchResult(
 ) : Parcelable
 
 data class GlobalApiObject<T>(val success: Boolean?, val apiVersion: String?, val data: VisitorLog)
+
 data class VisitorLog(val visitorlogbydate: ArrayList<Visitorlogbydate>)
 
 data class Visitorlogbydate(

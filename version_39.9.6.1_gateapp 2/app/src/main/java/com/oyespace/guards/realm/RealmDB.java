@@ -1,18 +1,13 @@
-package com.oyespace.guards.database;
-
-import android.util.Log;
+package com.oyespace.guards.realm;
 
 import com.oyespace.guards.models.FingerPrint;
-import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.models.Worker;
 
 import java.util.ArrayList;
 
-import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
-import io.realm.Sort;
 
 public class RealmDB {
     public static RealmResults<FingerPrint> getRegularVisitorsFingerPrint(int AssociationID) {
@@ -24,22 +19,6 @@ public class RealmDB {
                 .equalTo("ASAssnID", AssociationID)
                 .findAll();
 //        return fingerPrints;
-    }
-
-    public static ArrayList<VisitorLog> getVisitorEnteredLog() {
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorLog> list = new ArrayList<>();
-        list.addAll(realm.where(VisitorLog.class).findAll().sort("vlVisLgID", Sort.DESCENDING));
-        realm.close();
-        return list;
-    }
-
-    public static VisitorLog getVisitorForId(int id) {
-        Realm realm = Realm.getDefaultInstance();
-        return realm.where(VisitorLog.class)
-                .equalTo("reRgVisID", id)
-                .findFirst();
-
     }
 
     public static ArrayList<Worker> getStaffs() {
@@ -108,20 +87,6 @@ public class RealmDB {
 
     }
 
-    public static void deleteVisitorEntry(int visitorId) {
-
-        Realm rm = Realm.getDefaultInstance();
-        rm.executeTransaction(realm -> {
-
-            final RealmResults<VisitorLog> results = realm.where(VisitorLog.class)
-                    .equalTo("vlVisLgID", visitorId)
-                    .findAll();
-            results.deleteAllFromRealm();
-
-        });
-
-    }
-
     public static int fingercount(int MemberID) {
 
         Realm realm = Realm.getDefaultInstance();
@@ -160,56 +125,6 @@ public class RealmDB {
         realm.copyToRealmOrUpdate(arrayList);
         realm.commitTransaction();
         realm.close();
-    }
-
-    public static void saveVisitor(VisitorLog visitorLog) {
-
-        Realm realm = Realm.getDefaultInstance();
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
-        }
-        realm.insertOrUpdate(visitorLog);
-        realm.commitTransaction();
-
-    }
-
-    public static void saveVisitors(RealmList<VisitorLog> visitorsList) {
-        Realm realm = Realm.getDefaultInstance();
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
-        }
-        for (VisitorLog v : visitorsList) {
-            Log.i("taaag", "about to put in realm -> " + v.getVlVisLgID());
-        }
-        realm.insertOrUpdate(visitorsList);
-        realm.commitTransaction();
-    }
-
-    public static ArrayList<VisitorLog> searchVisitorLog(String searchQuery) {
-
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorLog> results = new ArrayList<>();
-        results.addAll(realm.where(VisitorLog.class)
-                .contains("vlfName", searchQuery, Case.INSENSITIVE)
-                .or()
-                .contains("vlComName", searchQuery, Case.INSENSITIVE)
-                .or()
-                .contains("vlMobile", searchQuery)
-                .or()
-                .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
-                .findAll());
-        return results;
-
-    }
-
-    public static boolean entryExists(String mobile) {
-
-        Realm realm = Realm.getDefaultInstance();
-
-        return realm.where(VisitorLog.class)
-                .equalTo("vlMobile", mobile)
-                .findFirst() != null;
-
     }
 
 }

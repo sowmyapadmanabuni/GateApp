@@ -17,12 +17,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.database.RealmDB
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
+import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
@@ -250,7 +250,7 @@ class VistorEntryListAdapter(
         val lgid = orderData.vlVisLgID
 
         makeExitCall(lgid)
-        RealmDB.deleteVisitorEntry(lgid)
+        VisitorEntryLogRealm.deleteVisitor(lgid)
         listVistor.removeAt(position)
 
     }
@@ -389,7 +389,7 @@ class VistorEntryListAdapter(
         if (search.isEmpty()) {
             searchList = listVistor
         } else {
-            searchList = RealmDB.searchVisitorLog(search)
+            searchList = VisitorEntryLogRealm.searchVisitorLog(search)
         }
         notifyDataSetChanged()
 
