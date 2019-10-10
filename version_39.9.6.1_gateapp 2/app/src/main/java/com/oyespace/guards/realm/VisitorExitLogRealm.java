@@ -3,7 +3,6 @@ package com.oyespace.guards.realm;
 import android.util.Log;
 
 import com.oyespace.guards.models.ExitVisitorLog;
-import com.oyespace.guards.models.VisitorLog;
 
 import java.util.ArrayList;
 
@@ -26,11 +25,11 @@ public class VisitorExitLogRealm {
         realm.commitTransaction();
     }
 
-    public static ArrayList<VisitorLog> getVisitorExitLog() {
+    public static ArrayList<ExitVisitorLog> getVisitorExitLog() {
         Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorLog> list = new ArrayList<>();
+        ArrayList<ExitVisitorLog> list = new ArrayList<>();
         list.addAll(realm
-                .where(VisitorLog.class)
+                .where(ExitVisitorLog.class)
                 .findAll().sort("vlVisLgID", Sort.DESCENDING));
         realm.close();
         return list;

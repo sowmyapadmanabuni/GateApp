@@ -46,7 +46,7 @@ data class GetExitVisitorsResponse<T>(
 )
 
 data class ExitVisitorsList(
-    val visitorLog: RealmList<ExitVisitorLog>
+    val visitorLog: RealmList<ExitVisitorLog>?
 )
 
 

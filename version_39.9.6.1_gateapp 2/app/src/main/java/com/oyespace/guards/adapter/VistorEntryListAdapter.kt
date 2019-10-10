@@ -251,7 +251,11 @@ class VistorEntryListAdapter(
 
         makeExitCall(lgid)
         VisitorEntryLogRealm.deleteVisitor(lgid)
-        listVistor.removeAt(position)
+        try {
+            listVistor.removeAt(position)
+        } catch (e: IndexOutOfBoundsException) {
+            e.printStackTrace()
+        }
 
     }
 

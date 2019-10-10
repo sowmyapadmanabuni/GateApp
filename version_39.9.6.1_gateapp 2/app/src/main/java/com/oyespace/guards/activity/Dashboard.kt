@@ -92,7 +92,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.Comparator
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,
     ResponseHandler, Runnable,
@@ -1668,13 +1667,19 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             .subscribe(object : CommonDisposable<GetExitVisitorsResponse<ArrayList<com.oyespace.guards.pojo.VisitorLog>>>() {
                 override fun onSuccessResponse(visitorlist: GetExitVisitorsResponse<ArrayList<com.oyespace.guards.pojo.VisitorLog>>) {
 
+                    rv_dashboard!!.visibility = View.GONE
+                    tv_nodata.visibility = View.VISIBLE
+
                     if (visitorlist.success) {
-                        val visitorsList = visitorlist.data.visitorLog
-                        visitorsList.sortWith(Comparator { lhs, rhs -> rhs.vlVisLgID - lhs.vlVisLgID })
-                        VisitorExitLogRealm.addVisitorLogs(visitorsList)
-                        val visitorList = ArrayList<ExitVisitorLog>(visitorlist.data.visitorLog)
-                        vistorOutListAdapter = VistorOutListAdapter(visitorList, this@Dashboard)
-                        rv_dashboard?.adapter = vistorOutListAdapter
+                        val visitorlog = visitorlist.data.visitorLog
+                        if (visitorlog != null) {
+                            VisitorExitLogRealm.addVisitorLogs(visitorlog)
+                            val visitorList = VisitorExitLogRealm.getVisitorExitLog()
+                            vistorOutListAdapter = VistorOutListAdapter(visitorList, this@Dashboard)
+                            rv_dashboard?.adapter = vistorOutListAdapter
+                            rv_dashboard!!.visibility = View.VISIBLE
+                            tv_nodata.visibility = View.GONE
+                        }
                     }
 
                 }
