@@ -73,6 +73,7 @@ public class ConstantUtils {
     public static final String SENDFCM_toSYNC_VISITORENTRY="SENDFCM_toSYNC_VISITORENTRY";
     public static final String BGS_SOS_STATUS="BGS_SOS_STATUS";
 
+
     //http://mediaupload.oyespace.com/Images/
   public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
  // public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
@@ -104,10 +105,16 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
     public static final float CHECKPOINT_DISTANCE_THRESHOLD = 15.0f;
+    public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
+
+    public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
+    public static final String SNOOZE_COUNT = "SNOOZED_COUNT_";
+    public static final String SNOOZE_TIME = "SNOOZED_TIME_";
+    public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
 
 
 

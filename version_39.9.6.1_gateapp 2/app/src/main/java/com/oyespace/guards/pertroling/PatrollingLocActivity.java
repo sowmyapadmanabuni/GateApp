@@ -38,6 +38,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
+import com.oyespace.guards.SGPatrollingService;
 import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.broadcastreceiver.GeofenceBroadcastReceiver;
 import com.oyespace.guards.models.CheckPointsOfSheduleListResponse;
@@ -47,6 +48,7 @@ import com.oyespace.guards.network.CommonDisposable;
 import com.oyespace.guards.network.RetrofitClinet;
 import com.oyespace.guards.pojo.CheckPointData;
 import com.oyespace.guards.pojo.GetCheckPointResponse;
+import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.Prefs;
 
 import org.jetbrains.annotations.NotNull;
@@ -83,6 +85,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private ZXingScannerView mScannerView;
     private boolean isScanEnabled =false;
     private int mActiveSchedule = 0;
+    private boolean isPlayingSiren = false;
     ArrayList<ScheduleCheckPointsData> scheduleCheckPoints = new ArrayList<ScheduleCheckPointsData>();
 
 
@@ -120,6 +123,14 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             }
         }
     };
+
+    @Override
+    protected void onStart() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true);
+        super.onStart();
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -369,23 +380,38 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     @Override
     public void handleResult(final Result result) {
         //showProgressrefreshWithText("Calibrating.. please wait for 5 seconds");
-        mScannerView.stopCamera();
-        toSpeech.speak("Calibrating.. Please wait..", TextToSpeech.QUEUE_FLUSH, null);
-        showAnimatedDialog("Calibrating.. Please wait..", R.raw.gps, false, "");
+        //Toast.makeText(PatrollingLocActivity.this,"Reached result",Toast.LENGTH_SHORT).show();
+        try {
+            String qrResultTemp = result.getText();
+            String[] qrCPDataTemp = qrResultTemp.split(",");
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                hideAnimatedDialog();
-                String patrolingdata = result.getText();
-                Log.e("ACTUAL", "" + result.getText());
-                String[] patrolingdataList = patrolingdata.split(",");
-                if (patrolingdataList.length > 4) {
-                    getCheckPoint(patrolingdataList);
-                }
+            if (qrCPDataTemp.length > 4) {
+                mScannerView.stopCamera();
+                toSpeech.speak("Calibrating.. Please wait..", TextToSpeech.QUEUE_FLUSH, null);
+                showAnimatedDialog("Calibrating.. Please wait..", R.raw.gps, false, "");
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        hideAnimatedDialog();
+                        String patrolingdata = result.getText();
+                        Log.e("ACTUAL", "" + result.getText());
+                        String[] patrolingdataList = patrolingdata.split(",");
+                        if (patrolingdataList.length > 4) {
+                            getCheckPoint(patrolingdataList);
+                        }else{
+                            mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
+                        }
+                    }
+                }, 6000);
+            }else{
+                mScannerView.resumeCameraPreview(this);
             }
-        }, 6000);
+        }catch (Exception e){
+            e.printStackTrace();
+            mScannerView.resumeCameraPreview(this);
+        }
+
     }
 
     private void parseCheckPoint(CheckPointData qrCheckpoint) {
@@ -420,7 +446,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
 
                 } else {
-                    showAnimatedDialog("Invalid QR Code.", R.raw.error, true, "OK");
+                   // showAnimatedDialog("Invalid QR Code.", R.raw.error, true, "OK");
                 }
 
             } else {
@@ -459,11 +485,11 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 if (mCPType.equals(CHECKPOINT_TYPE_START)) {
 
                     if (isValidDistance(coordinate.getLat(), coordinate.getLon())) {
-                        //@Todo: Zero must replace with actual current schedule id.
                         Prefs.putInt(ACTIVE_PATROLLING_SCHEDULE, mActiveSchedule);
                         Prefs.putInt(ACTIVE_PATROLLING_LAST_CP, checkPointData.getCpChkPntID());
                         toSpeech.speak("Checkpoint Scanned Successfully", TextToSpeech.QUEUE_FLUSH, null);
                         showAnimatedDialog("Checkpoint Scanned Successfully", R.raw.done, true, "OK");
+                        startSiren();
                         return true;
                     } else {
                         toSpeech.speak("You are out of checkpoint location", TextToSpeech.QUEUE_FLUSH, null);
@@ -484,10 +510,9 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
         } else {
             //@Todo: Get the last scanned checkpoint. Check the next checkpoint & validate
-            //@Todo: Add this check in dashboard/FRTDB for automatic resume
-            //@Todo: Check already scanned : Not in priority
-
-            //@Todo: Uncomment the commented line
+            if(!isPlayingSiren){
+                startSiren();
+            }
             int nextCP = getNextCheckPoint(lastScannedCP);
             if (nextCP == checkPointData.getCpChkPntID() && !mCPType.equalsIgnoreCase(CHECKPOINT_TYPE_START)) {
 
@@ -498,6 +523,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
                         toSpeech.speak("Patrolling Completed", TextToSpeech.QUEUE_FLUSH, null);
                         showAnimatedDialog("Patrolling Completed", R.raw.done, true, "OK");
+                        stopSiren();
                         onBackPressed();
                     }else{
                         Prefs.putInt(ACTIVE_PATROLLING_SCHEDULE, mActiveSchedule);
@@ -522,6 +548,16 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         }
 
 
+    }
+
+    private void startSiren(){
+        startService(new Intent(PatrollingLocActivity.this, SGPatrollingService.class));
+        isPlayingSiren = true;
+    }
+
+    private void stopSiren(){
+        stopService(new Intent(PatrollingLocActivity.this, SGPatrollingService.class));
+        isPlayingSiren = false;
     }
 
     private int getNextCheckPoint(int lastCheckPoint) {
@@ -694,6 +730,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     @Override
     public void onResume() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true);
         super.onResume();
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
@@ -709,6 +746,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     @Override
     public void onPause() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false);
         super.onPause();
         mScannerView.stopCamera();
     }
@@ -716,6 +754,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     @Override
     protected void onDestroy() {
         try {
+            Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false);
 
             if (toSpeech != null) {
                 toSpeech.stop();

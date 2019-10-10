@@ -2,7 +2,9 @@ package com.oyespace.guards.pertroling
 
 import android.app.Activity
 import android.content.Intent
+import android.os.BatteryManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import com.oyespace.guards.R
@@ -14,6 +16,7 @@ import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.utils.AppUtils
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -35,6 +38,26 @@ class PScheduleListActivity:BaseKotlinActivity(){
             finish()
         }
         getPatrollingSchedules()
+    }
+
+    override fun onStart() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
+        super.onStart()
+    }
+
+    override fun onDestroy() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
+        super.onDestroy()
+    }
+
+    override fun onPause() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
+        super.onPause()
+    }
+
+    override fun onResume() {
+        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
+        super.onResume()
     }
 
     private fun setSchedulesAdapter(){
@@ -64,7 +87,20 @@ class PScheduleListActivity:BaseKotlinActivity(){
         val mPatrolIntent =
             Intent(this@PScheduleListActivity, PatrollingLocActivity::class.java)
         mPatrolIntent.putExtra(PATROLLING_SCHEDULE_ID, selectedShift.psPtrlSID)
-        startActivityForResult(mPatrolIntent, 1)
+
+        Prefs.remove(SNOOZE_COUNT+selectedShift.psPtrlSID)
+        Prefs.remove(SNOOZE_IS_ACTIVE+selectedShift.psPtrlSID)
+        Prefs.remove(SNOOZE_TIME+selectedShift.psPtrlSID)
+
+        val bm: BatteryManager = this.getSystemService(BATTERY_SERVICE) as BatteryManager;
+        val batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+
+        Log.e("BATTERY",""+batLevel)
+        if(batLevel>30) {
+            startActivityForResult(mPatrolIntent, 1)
+        }else{
+            showAnimatedDialog("Please connect your charger to continue",R.raw.battery,false,"OK")
+        }
     }
 
 

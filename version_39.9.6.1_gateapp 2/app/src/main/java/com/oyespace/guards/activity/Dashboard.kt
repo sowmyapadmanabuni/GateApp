@@ -45,6 +45,8 @@ import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
+import com.oyespace.guards.models.PatrolShift
+import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.*
 import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pertroling.PScheduleListActivity
@@ -172,6 +174,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var usbPermissionRequested: Boolean = false
     private var usbConnected = true
     private var sgfplib: JSGFPLib? = null
+    var pTimer:Timer? = null;
+    var pTimerChecker:Timer? = null;
     //a separate thread.
 
 
@@ -562,12 +566,54 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
     }
 
-    override fun onResume() {
+    fun notifyPatrollingReminder(){
+        val intentAction1 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+        intentAction1.putExtra(BSR_Action, ConstantUtils.BGS_PATROLLING_ALARM)
+        sendBroadcast(intentAction1)
+    }
 
+
+    fun runTimerCheck(){
+        pTimerChecker = fixedRateTimer("patroll_timer_checker",false,6000,20000){
+            this@Dashboard.runOnUiThread {
+                val activeAlert = Prefs.getBoolean("ACTIVE_ALERT",false)
+                Log.e("activeAlert","RUN_TIMER_CHCKER "+activeAlert)
+                if(!activeAlert){
+                    Log.e("activeAlert","pTIMER "+pTimer)
+                    if(pTimer == null){
+                        Log.e("activeAlert","pTIMER is null")
+                        runPatrollingTimer()
+                    }
+                }
+            }
+        }
+    }
+
+    fun runPatrollingTimer(){
+        pTimer = fixedRateTimer("patroll_timer",false,60000,60000){
+            this@Dashboard.runOnUiThread {
+                notifyPatrollingReminder()
+            }
+        }
+    }
+
+    fun stopPatrollingTimer(){
+        if(pTimer != null){
+            Log.e("PTIMER","CANCELLED")
+            pTimer!!.cancel()
+            pTimer = null;
+        }
+    }
+
+
+
+    override fun onResume() {
+        runTimerCheck()
 
         fixedRateTimer("timer",false,0,60000){
             this@Dashboard.runOnUiThread {
               //  getSubscriptionData()
+              //  notifyPatrollingReminder()
             }
         }
 
@@ -994,8 +1040,17 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     public override fun onPause() {
+        Log.e("DB_ONPAUSE","ONPAUSE"+pTimer);
+        if(pTimer != null){
+            Log.e("PTIMER","CANCELLED")
+            pTimer!!.cancel()
+            pTimer = null
+        }
         androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
             .unregisterReceiver(receiver)
+        if(pTimer != null){
+            pTimer!!.cancel()
+        }
         super.onPause()
 
 
@@ -1004,6 +1059,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     public override fun onDestroy() {
         // clearApplicationData()
 
+        stopPatrollingTimer()
 
         if (bSecuGenDeviceOpened) {
             autoOn!!.stop()
@@ -1321,11 +1377,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     override fun onStart() {
         Prefs.putBoolean("ACTIVE_SOS",false);
+        Prefs.putBoolean("ACTIVE_ALERT",false);
         //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
         startService(Intent(this@Dashboard, FRTDBService::class.java))
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         getDeviceList(LocalDb.getAssociation()!!.asAssnID)
+
+
+
+
         super.onStart()
 
 
