@@ -11,7 +11,7 @@ public enum URLData {
     URL_VERIFY_OTP(BASE_URL+"oyeliving/api/v1/account/verifyotp", false, true, "", 2),
     URL_CHECK_GUARD_BY_MOBILE(BASE_URL+"oye247/api/v1/GetWorkersListByMobileNumber", false, true, "", 3),
     URL_SAVE_FINGERPRINT(BASE_URL+"oyesafe/api/v1/FingerPrint/Create", false, true, "", 4),
-    URL_VISITOR_LOG(BASE_URL+"oyesafe/api/v1/VisitorLog/Create", false, true, "", 5),
+    URL_VISITOR_LOG(BASE_URL+"oyesafe/api/v1/VisitorLogcreate/Create", false, true, "", 5),
     URL_VISITOR_MAKE_ENTRY(BASE_URL+"oyesafe/api/v1/VisitorEntryWIDAndTime/Update", false, true, "", 6),
     URL_VISITOR_MAKE_EXIT(BASE_URL+"oyesafe/api/v1/VisitorExitWIDAndTime/Update", false, true, "", 7),
     URL_CHEK_VEHICAL(BASE_URL+"oyeliving/api/v1/GetVisitorRoleByVehicleNumber",false,true,"",8),

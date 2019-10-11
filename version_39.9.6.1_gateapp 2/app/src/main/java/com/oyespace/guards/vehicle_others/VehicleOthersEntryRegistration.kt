@@ -25,6 +25,7 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -161,11 +162,6 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
         }
 
-//        Log.d("intentdata StaffEntry",""+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-//                +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
-//                +intent.getStringExtra(PERSONNAME)+" "
-//                +" "+intent.getStringExtra(FLOW_TYPE)+" "
-//                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME)+"..."+intent.getStringExtra(VEHICLE_NUMBER))
         txt_header.text= LocalDb.getAssociation()!!.asAsnName
 
         tv_name.text = resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME)
@@ -301,11 +297,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                             file.delete()
                         }
 
-//                       try {
-//                           visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-//                       }catch (e:NullPointerException){
-//
-//                       }
+
                         val d  =  Intent(this@VehicleOthersEntryRegistration, BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
                         d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+UNUniName+")")
@@ -319,14 +311,11 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+
                         sendBroadcast(d)
                         uploadImage(imgName.toString(),mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
-//                        val d = Intent(this@VehicleOthersEntryRegistration, DashBoard::class.java)
-//                        startActivity(d)
+
 
                         val dir =
                             File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
@@ -336,8 +325,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                                 File(dir, children[i]).delete()
                             }
                         }
-//                        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
-//                        startActivity(intent)
+
                         finish()
                         dismissProgress()
 
@@ -380,7 +368,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                 override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                     if (globalApiObject.success == true) {
                       //  var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                        uploadAccountImage(imgName.toString(),mBitmap)
+                        uploadImage(imgName.toString(),mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                     } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -406,248 +394,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             }))
     }
 
-    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-//                incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-//
-//        val imageFileOS: OutputStream?
-//        try {
-//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-//            imageFileOS!!.write(byteArrayProfile!!)
-//            imageFileOS.flush()
-//            imageFileOS.close()
-//
-//            Log.d("uploadImage Path bf", uriTarget.toString())
-//        } catch (e: FileNotFoundException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        } catch (e: IOException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-                    file.delete()
-                   // Toast.makeText(getApplicationContext(),"Uploaded Successfully",Toast.LENGTH_SHORT).show();
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                    Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
-                }
-
-//                val d = Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                startActivity(d)
-                finish()
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-                Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
-//                finish()
-            }
-        })
-
-    }
-
-    fun uploadAccountImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-//                incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-//
-//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-//
-//        val imageFileOS: OutputStream?
-//        try {
-//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-//            imageFileOS!!.write(byteArrayProfile!!)
-//            imageFileOS.flush()
-//            imageFileOS.close()
-//
-//            Log.d("uploadImage Path bf", uriTarget.toString())
-//        } catch (e: FileNotFoundException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        } catch (e: IOException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-
-            }
-        })
 
 
-    }
-
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        val d = Intent(this@VehicleOthersEntryRegistration,VehicleOthersNameEntryScreen::class.java)
-//
-//        Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-//                +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" "+intent.getStringExtra(PERSONNAME));
-//        d.putExtra(UNITID,intent.getStringExtra(UNITID) )
-//        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//        d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
-//        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
-//        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-//        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-//        d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-//        d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
-//        d.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID, 0))
-//
-//        startActivity(d);
-//        finish();
-//    }
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-      //  val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
-        val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-
-
-                        val dir =
-                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                        if (dir.isDirectory) {
-                            val children = dir.list()
-                            for (i in children!!.indices) {
-                                File(dir, children[i]).delete()
-                            }
-                        }
-//                        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
-//                        startActivity(intent)
-                        finish()
-                        dismissProgress()
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            }))
-    }
 
 
     fun setLocale(lang: String?) {
@@ -666,8 +414,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
     override fun onBackPressed() {
         super.onBackPressed()
-//        val intent= Intent(this@VehicleOthersEntryRegistration, Dashboard::class.java)
-//        startActivity(intent)
+
         finish()
     }
 

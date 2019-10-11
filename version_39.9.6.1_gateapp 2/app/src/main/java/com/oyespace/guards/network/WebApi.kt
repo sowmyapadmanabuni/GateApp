@@ -59,7 +59,7 @@ interface WebApi {
     fun serviceProviderList(@Header("X-OYE247-APIKey") token: String): Single<SeviceProviderListResponse>
 
     //http://apidev.oyespace.com/oyesafe/api/v1/VisitorLog/Create
-    @POST("oyesafe/api/v1/VisitorLog/Create")
+    @POST("oyesafe/api/v1/VisitorLogcreate/Create")
     fun createVisitorLogCall(@Header(OYE247KEY) token: String, @Body createVisitorLogReq: CreateVisitorLogReq): Single<CreateVisitorLogResp<VLRData>>
 
     @POST("oyesafe/api/v1/VisitorEntryWIDAndTime/Update")

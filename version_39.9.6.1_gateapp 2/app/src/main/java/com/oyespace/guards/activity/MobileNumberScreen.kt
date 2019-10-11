@@ -99,7 +99,6 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                 d.putExtra(MOBILENUMBER, "")
                 d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
@@ -629,18 +628,9 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, CountryCo
                                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                                 d.putExtra(MOBILENUMBER, MobNumber)
                                 d.putExtra(COUNTRYCODE, isdCode)
-                                d.putExtra(
-                                    PERSONNAME,
-                                    globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-                                )
-                                d.putExtra(
-                                    ACCOUNT_ID,
-                                    globalApiObject.data.accountByMobile[0].acAccntID
-                                )
-                                d.putExtra(
-                                    UNIT_ACCOUNT_ID,
-                                    intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
-                                )
+                                d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName)
+                                d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
+                                d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                                 startActivity(d);
                                 finish();

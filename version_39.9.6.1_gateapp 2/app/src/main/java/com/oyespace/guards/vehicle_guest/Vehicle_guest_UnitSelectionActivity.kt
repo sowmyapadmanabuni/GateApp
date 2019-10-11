@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -95,7 +96,14 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                         if (arrayFullList.get(j).isSelected) {
                             val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(arrayFullList.get(j).unUnitID)) index else null}
                             if(indices == null || indices.size == 0) {
-                                selectedUnits.add(arrayFullList[j])
+                              //  selectedUnits.add(arrayFullList[j])
+
+                                if(selectedUnits!=null){
+                                    selectedUnits.clear()
+                                    selectedUnits.add(arrayFullList[j])
+                                }else{
+                                    selectedUnits.add(arrayFullList[j])
+                                }
                             }
                         }
                     }
@@ -287,7 +295,12 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             /**
              * Sublist end index is exclusive. So an additional one is added to the end index
              */
-            arrayList = ArrayList(arrayFullList.subList(start,end+1))
+            try {
+                arrayList = ArrayList(arrayFullList.subList(start, end + 1))
+            }catch (e:Exception){
+                arrayList = ArrayList(arrayFullList.subList(start, end))
+
+            }
             rv_unit.showProgress()
                 orderListAdapter =
                     Vehicle_guest_UnitSelectionActivity.UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@Vehicle_guest_UnitSelectionActivity, checkListener = {
@@ -393,6 +406,8 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         private val mInflater: LayoutInflater
         private var lastSelectedPosition = -1
         private var lastCheckedRB: RadioButton? = null
+        var pos=0
+
 
 
         init {
@@ -401,7 +416,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuHolder {
-            val mainGroup = mInflater.inflate(R.layout.layout_unit_adapter_row, parent, false) as ViewGroup
+            val mainGroup = mInflater.inflate(R.layout.layout_unit_adapter_row_radiobutton, parent, false) as ViewGroup
             return MenuHolder(mainGroup)
         }
 
@@ -411,88 +426,45 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             val vistordate = orderData?.asAssnID
             holder.apartmentNamee.text = orderData?.unUniName
 
-            if(listVistor!!.get(position).isSelected){
-                holder.cb_unit.setChecked(true)
-                holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-            }else{
-                holder.cb_unit.isChecked = false;
-                holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
-            }
+            holder.rb_unit.setChecked(lastSelectedPosition == position);
 
-            holder.cb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
-                // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
-                listVistor!!.get(position).isSelected=isChecked
-                if(isChecked) {
-                    holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-                }else{
-                    holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+
+
+
+
+            holder.rb_unit.setOnClickListener(View.OnClickListener {
+
+
+                lastSelectedPosition = position;
+                listVistor!!.get(lastSelectedPosition).isSelected=true
+                if (lastSelectedPosition == position){
+                    holder.rb_unit.setChecked(true)
+                    listVistor!!.get(pos).isSelected=false
                 }
-                checkListener(listVistor!!.get(position),isChecked)
+                else{
+                    listVistor!!.get(pos).isSelected=false
+                    holder.rb_unit.setChecked(false)
 
+                }
+
+                notifyDataSetChanged();
+
+
+
+            })
+
+
+
+            if(listVistor!!.get(position).isSelected){
+                pos=position
+
+                holder.rb_unit.setChecked(true)
+                holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
+            }else{
+                holder.rb_unit.isChecked = false;
+                holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
             }
 
-//            val rbClick = object : View.OnClickListener {
-//                override fun onClick(v: View) {
-//                    val checked_rb = v as RadioButton
-//                    if (lastCheckedRB != null) {
-//                        lastCheckedRB!!.isChecked = false
-//                    }
-//                    lastCheckedRB = checked_rb
-//                }
-//            }
-
-//            if (listVistor[position].equals(lastSelectedPosition)) {
-//                Toast.makeText(mcontext,"hi",Toast.LENGTH_LONG).show()
-//                listVistor!!.get(lastSelectedPosition).isSelected=false
-//                notifyDataSetChanged();
-//            }
-//            else{
-//                Toast.makeText(mcontext,"bye",Toast.LENGTH_LONG).show()
-//                listVistor!!.get(position).isSelected=false
-//                notifyDataSetChanged();
-//            }
-
-//            holder.rb_unit.setOnClickListener(View.OnClickListener {
-//
-//                lastSelectedPosition = position;
-//                listVistor!!.get(lastSelectedPosition).isSelected=true
-//                notifyDataSetChanged();
-//
-//
-//
-//            })
-
-//            if(listVistor!!.get(position).isSelected){
-//                holder.rb_unit.setChecked(true)
-//                holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-//            }else{
-//                holder.rb_unit.isChecked = false;
-//                holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
-//            }
-//
-//            holder.rb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
-//                // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
-//
-////                listVistor!!.get(position).isSelected=true
-////                lastSelectedPosition = getAdapterPosition();
-////                notifyDataSetChanged();
-//
-//
-//
-//
-//                if(isChecked) {
-//                    holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-//                    listVistor!!.get(position).isSelected=isChecked
-//                    lastSelectedPosition=position
-//                }else{
-//
-//                    holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
-//
-//                }
-//               // checkListener(listVistor!!.get(position),isChecked)
-//
-//            }
-            //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
 
             holder.iv_unit.setOnClickListener {
                 if (orderData!!.owner.size == 0 && orderData!!.tenant.size == 0) {
@@ -533,7 +505,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                     if (orderData!!.tenant.size != 0) {
 
-                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                        val alertadd = AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -600,7 +572,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                         if (orderData!!.owner.size != 0) {
 
-                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                            val alertadd =AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -737,10 +709,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
 
                                 })
-                            // negative button text and action
-//                        .setNegativeButton("Cancel", DialogInterface.OnClickListener {
-//                                dialog, id -> dialog.cancel()
-//                        })
+
 
                             // create dialog box
                             val alert = dialogBuilder.create()
@@ -763,20 +732,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
                 intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
-//                mcontext.startActivity(intent)
-//                (mcontext as Activity).finish()
 
-
-                if( listVistor!!.get(position).isSelected){
-                    listVistor!!.get(position).isSelected=false
-                    holder.cb_unit.setChecked(false)
-                }else{
-                    listVistor!!.get(position).isSelected=true
-                    holder.cb_unit.setChecked(true)
-                }
-
-
-                //checkListener(listVistor!!.get(position))
 
             })
         }
@@ -785,78 +741,20 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             return listVistor?.size ?: 0
         }
 
-        inner class MenuHolder(private val view: View) :
-            androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
-            val cb_unit: CheckBox
+            val rb_unit: RadioButton
             val apartmentNamee: TextView
             val lv_itemrecyclerview: RelativeLayout
 
             init {
 
                 iv_unit = view.findViewById(R.id.iv_unit)
-                cb_unit = view.findViewById(R.id.cb_unit)
+                rb_unit = view.findViewById(R.id.rb_unit)
                 apartmentNamee = view.findViewById(R.id.tv_unit)
                 lv_itemrecyclerview=view.findViewById(R.id.lv_itemrecyclerview)
 
-//                rb_unit.setOnCheckedChangeListener { buttonView, isChecked ->
-//                    lastSelectedPosition = getAdapterPosition();
-//                    listVistor!!.get(lastSelectedPosition).isSelected=true
-//
-//                    if (lastSelectedPosition != -1) {
-//                        listVistor.removeAt(lastSelectedPosition);
-//                        lastSelectedPosition = -1;//after removing selectedPosition set it back to -1
-//                        notifyDataSetChanged();
-//                    }
-//
-//                    notifyDataSetChanged();
-//
-//                }
-
-//                rb_unit.setOnClickListener(View.OnClickListener {
-//
-//
-//
-//
-//
-//
-//                        lastSelectedPosition = getAdapterPosition();
-//                        listVistor!!.get(lastSelectedPosition).isSelected=true
-//                        notifyDataSetChanged();
-//
-//
-//
-////                                        lastSelectedPosition = getAdapterPosition();
-////                    listVistor!!.get(lastSelectedPosition).isSelected=true
-////                    notifyDataSetChanged();
-////
-////                    if (lastSelectedPosition != -1) {
-////                        listVistor!!.get(lastSelectedPosition).isSelected=false
-////                        Toast.makeText(mcontext,
-////                            "Hi",
-////                            Toast.LENGTH_LONG).show();
-//////                        listVistor.removeAt(lastSelectedPosition);
-//////                        lastSelectedPosition = -1;//after removing selectedPosition set it back to -1
-//////                        notifyDataSetChanged();
-////                   }
-////                        else{
-////
-////                        Toast.makeText(mcontext,
-////                            "Byw",
-////                            Toast.LENGTH_LONG).show();
-////                        }
-//
-//
-////                    lastSelectedPosition = getAdapterPosition();
-////                    listVistor!!.get(lastSelectedPosition).isSelected=true
-////                    notifyDataSetChanged();
-//
-//
-////                    Toast.makeText(mcontext,
-////                        "selected offer is " + listVistor[lastSelectedPosition].unUniName,
-////                        Toast.LENGTH_LONG).show();
-//                })
 
             }
 

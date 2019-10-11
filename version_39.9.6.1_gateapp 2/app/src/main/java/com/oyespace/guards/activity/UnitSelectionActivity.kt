@@ -294,6 +294,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
             try {
                 arrayList = ArrayList(arrayFullList.subList(start, end + 1))
             }catch (e:Exception){
+                arrayList = ArrayList(arrayFullList.subList(start, end))
 
             }
             rv_unit.showProgress()

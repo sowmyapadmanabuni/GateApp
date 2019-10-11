@@ -91,31 +91,22 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var arrayList: ArrayList<VisitorLogExitResp.Data.VisitorLog>? = null
     lateinit var cd: ConnectionDetector
     var timer:Timer?=null
-    private val mInterval = 96000 // 5 seconds by default, can be changed later
     private var mHandlerr: Handler? = null
-    var counter:Int?=0
-    //  internal var database: DBHelper?=null
-
     var audioclip: String? = null
     lateinit var mp:  MediaPlayer
-
     internal var newAl: ArrayList<VisitorEntryLog>? = ArrayList()
     var mHandler: Handler? = null
     lateinit var btn_in:Button
     lateinit var btn_out:Button
     lateinit var btn_mic: Button
-
     private var audiofile: File? = null
     var vistorEntryListAdapter: VistorEntryListAdapter?=null
     var vistorListAdapter: VistorListAdapter? = null
     private var mFileName = ""
     private var myAudioRecorder: MediaRecorder? = null
-
     var iv_settings: ImageView?=null
     lateinit var tv_nodata: TextView
-    // LinearLayout lyt_settings;
     var clickable = 0
-    var clickable1 = 0
     var re_resident: RelativeLayout? = null
     var re_vehicle: RelativeLayout?=null
     var re_staff: RelativeLayout?=null
@@ -131,11 +122,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     var txt_device_name: TextView?=null
     var txt_gate_name: TextView?=null
     var subscriptionDate: String?=null
-    internal var stringNumber: String? = null
-    internal var stringCode: String? = null
     internal var dbh: DataBaseHelper?=null
     internal var language: String? = ""
-    internal var wvvalue:String?=""
     var walk1: Button ?=null
     var walk2: ImageView?=null
     internal var telMgr: TelephonyManager?=null
@@ -151,8 +139,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     internal var nnnn = 0
     internal var autoooooo = 0
     private var swipeContainer: androidx.swiperefreshlayout.widget.SwipeRefreshLayout? = null
-    ///Start Added by Rajesh
-    private val imageUri: Uri? = null
     private var mPermissionIntent: PendingIntent? = null
     private var mVerifyImage: ByteArray? = null
     private var mVerifyTemplate: ByteArray? = null
@@ -172,10 +158,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var usbPermissionRequested: Boolean = false
     private var usbConnected = true
     private var sgfplib: JSGFPLib? = null
-    //a separate thread.
-
-
-
 
     var fingerDetectedHandler: Handler = object : Handler() {
         // @Override
@@ -555,8 +537,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     Log.e("CELLINFO","LAC: "+lac+" - SID: "+cid+" - MCC: "+mcc+" - MNC: "+mnc+" - STRENGTH: "+str+" - TIMIN: "+tim)
                 }
             }
-//            registerReceiver(wifircvr, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
-//            wifiManager.startScan()
+
 
 
         }
@@ -2652,95 +2633,6 @@ try {
 
     }
 
-    private fun getUnitLog(
-        unitId: Int, personName: String, mobileNumb: String, desgn: String,
-        workerType: String, staffID: Int, unitName: String, vlVisLgID: Int
-    ) {
-
-        RetrofitClinet.instance
-            .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
-
-                override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
-
-                    if (UnitList.success == true) {
-
-                        if (UnitList.data.unit.unOcStat.equals("Sold Owner Occupied Unit")) {
-                            unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                        } else if (UnitList.data.unit.unOcStat.equals("Sold Tenant Occupied Unit ")) {
-
-                            unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-
-                        } else if (UnitList.data.unit.unOcStat.equals("UnSold Tenant Occupied Unit")) {
-
-                            unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
-
-                        } else if (UnitList.data.unit.unOcStat.equals("UnSold Vacant Unit")) {
-                            unAccountID = "0"
-
-                        } else if (UnitList.data.unit.unOcStat.equals("Sold Vacant Unit")) {
-                            unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                        } else {
-
-                        }
-
-                        Toast.makeText(this@Dashboard, unAccountID, Toast.LENGTH_LONG).show()
-
-
-                        val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-                        ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                        ddc.putExtra(
-                            "msg",
-                            "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
-                        )
-                        ddc.putExtra("mobNum", mobileNumb)
-                        ddc.putExtra("name", personName)
-                        ddc.putExtra("nr_id", vlVisLgID.toString())
-                        ddc.putExtra("unitname", unitName)
-                        ddc.putExtra("memType", "Owner")
-                        ddc.putExtra(UNITID, unitId.toString())
-                        ddc.putExtra(COMPANY_NAME, "Staff")
-                        ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
-                        ddc.putExtra("VLVisLgID", vlVisLgID)
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        sendBroadcast(ddc);
-
-
-//                        val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
-//                        d.putExtra(BSR_Action, VisitorEntryFCM)
-//                        d.putExtra("msg", "$personName $desgn "+" is coming to your home"+"("+unitName+")")
-//                        d.putExtra("mobNum", mobileNumb)
-//                        d.putExtra("name", personName)
-//                        d.putExtra("nr_id", "0")
-//                        d.putExtra("unitname",unitName)
-//                        d.putExtra("memType", "Owner")
-//                        d.putExtra(UNITID,unitId.toString())
-//                        d.putExtra(COMPANY_NAME,"Staff")
-//                        d.putExtra(UNIT_ACCOUNT_ID,"0")
-//                        d.putExtra("VLVisLgID",0)
-//                        sendBroadcast(d);
-
-
-                    } else {
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd", e.message);
-
-
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
-
-    }
 
     fun Speak() {
 
@@ -2770,7 +2662,6 @@ try {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                     tv.setText(result[0] + "".replace(" ", ""))
 
-                    //tv.text.toString().replace(" ","")
                 }
             }
         }

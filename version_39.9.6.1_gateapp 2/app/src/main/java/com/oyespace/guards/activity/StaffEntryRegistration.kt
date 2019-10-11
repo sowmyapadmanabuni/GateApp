@@ -26,14 +26,12 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.NumberUtils.toInteger
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
+import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -49,6 +47,7 @@ import java.io.FileOutputStream
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.schedule
 
 class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
@@ -87,6 +86,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                     unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                     if(unitname_dataList.size>0) {
+                        // Toast.makeText(this@StaffEntryRegistration,intent.getStringExtra(UNITNAME),Toast.LENGTH_LONG).show()
 
                         for (i in 0 until unitname_dataList.size) {
 
@@ -96,15 +96,17 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                             showProgress()
 
+                            fixedRateTimer("timer",false,0,30000){
+                                this@StaffEntryRegistration.runOnUiThread {
+                                    visitorLog(
+                                        unitname_dataList.get(i).replace(" ", ""),
+                                        unitid_dataList.get(i).replace(" ", ""),
+                                        unitAccountId_dataList.get(i).replace(" ", "")
+                                    );
+                                }
+                            }
 
 
-                                visitorLog(
-                                    unitname_dataList.get(i).replace(" ", ""),
-                                    unitid_dataList.get(i).replace(" ", ""),
-                                    unitAccountId_dataList.get(i).replace(" ", ""),
-                                    i
-
-                                );
 
                         }
 
@@ -117,7 +119,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     visitorLog(
                         intent.getStringExtra(UNITNAME),
                         intent.getStringExtra(UNITID),
-                        intent.getStringExtra(UNIT_ACCOUNT_ID),1
+                        intent.getStringExtra(UNIT_ACCOUNT_ID)
 
                     );
                 }
@@ -130,11 +132,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+STAFF_REGISTRATION+" "+FLOW_TYPE.equals( STAFF_REGISTRATION,true))
                 val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
                 if(wrrw!=null) {
-//            var mBitmap: Bitmap;
-//                    val d = Intent(this@StaffEntryRegistration, ImageBigView::class.java)
-//                    d.putExtra(PERSON_PHOTO, intent.getByteArrayExtra(PERSON_PHOTO))
-//                    startActivity(d)
-
 
                     val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
                     val factory = LayoutInflater.from(this@StaffEntryRegistration)
@@ -203,11 +200,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             tv_from.text=intent.getStringExtra(COMPANY_NAME)+" "+intent.getStringExtra(FLOW_TYPE)
         }
 
-//        Log.d("intentdata StaffEntry",""+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-//                +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
-//                +intent.getStringExtra(PERSONNAME)+" "
-//                +" "+intent.getStringExtra(FLOW_TYPE)+" "
-//                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME));
+
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
@@ -238,15 +231,12 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
 
         tv_for.setText(resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME))
-       // tv_totalperson.setText(resources.getString(R.string.textperson))
-        //tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
 
         menuAdd.setOnClickListener {
             minteger++
             menuCount.setText(""+minteger)
 
         }
-
         menuRemove.setOnClickListener {
             if (minteger>1) {
                 minteger--
@@ -269,7 +259,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
         if(wrrw!=null) {
-//            var mBitmap: Bitmap;
 
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
@@ -279,7 +268,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         list=intent.getStringArrayListExtra(ITEMS_PHOTO_LIST);
 
         for (i in list.indices) {
-            Log.d("CreateVisitorLogResp","for destination "+i+" "+list.size)
+
 
             when (i) {
 
@@ -316,8 +305,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     }
 
 
-    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String,pos:Int) {
-      //  var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
+    private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
 
         var imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
         var memID:Int=410;
@@ -330,7 +318,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
 
 
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0,UNUniName,
+        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0),0,UNUniName,
             UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
@@ -346,7 +334,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
 
-
+                        Log.d("VISItor id",globalApiObject.data.visitorLog.vlVisLgID.toString())
 
                         for (i in list.indices) {
                             val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
@@ -381,7 +369,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         // var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +globalApiObject.data.visitorLog.vlVisLgID  + ".jpg"
 
 
-                        uploadImage(imgName,mBitmap)
+                       uploadImage(imgName,mBitmap)
 
                         finish()
 
@@ -426,7 +414,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                     if (globalApiObject.success == true) {
                        // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                        uploadAccountImage(imgName.toString(),mBitmap)
+                        uploadImage(imgName.toString(),mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                     } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -450,258 +438,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onDismissProgress() {
                 }
             }))
-    }
-
-    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-
-
-        val imageFile = File(mPath)
-
-        //  Log.v("FILENamen vmxc vmc11",imageFile)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-                //    incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-//
-//        val imageFileOS: OutputStream?
-//        try {
-//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-//            imageFileOS!!.write(byteArrayProfile!!)
-//            imageFileOS.flush()
-//            imageFileOS.close()
-//
-//            Log.d("uploadImage Path bf", uriTarget.toString())
-//        } catch (e: FileNotFoundException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        } catch (e: IOException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-                    file.delete()
-                   // Toast.makeText(getApplicationContext(),"Uploaded Successfully",Toast.LENGTH_SHORT).show();
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                    //  Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
-                }
-
-
-//             val d = Intent(this@StaffEntryRegistration,Dashboard::class.java)
-//                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                startActivity(d)
-//                val i_delivery = Intent(this@StaffEntryRegistration, Dashboard::class.java)
-//                startActivity(i_delivery)
-//                finish()
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-                //  Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
-//                finish()
-            }
-        })
-
-
-    }
-
-    fun uploadAccountImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-                //    incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-//
-//        val imageFileOS: OutputStream?
-//        try {
-//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-//            imageFileOS!!.write(byteArrayProfile!!)
-//            imageFileOS.flush()
-//            imageFileOS.close()
-//
-//            Log.d("uploadImage Path bf", uriTarget.toString())
-//        } catch (e: FileNotFoundException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        } catch (e: IOException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-
-            }
-        })
-
-
-    }
-
-/*    override fun onBackPressed() {
-        super.onBackPressed()
-        val d = Intent(this@StaffEntryRegistration, AddCarFragment::class.java)
-
-        Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-                +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" "+intent.getStringExtra(PERSONNAME));
-        d.putExtra(UNITID,intent.getStringExtra(UNITID) )
-        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-        d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
-        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
-        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-        d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-        d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
-        d.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID, 0))
-
-        startActivity(d);
-        finish();
-    }*/
-
-
-
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-        Log.v("Ankitaaa",visitorLogID.toString())
-        try {
-           // val req = VisitorEntryReq(getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
-            val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
-
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-
-
-                            dismissProgress()
-                        finish();
-
-
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-//                   showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            }))
-        }
-        catch (e:NullPointerException){
-
-        }
     }
 
 
@@ -739,13 +475,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             startActivityForResult(intent, TAKE_PHOTO_REQUEST)
         }
     }
-//    val intent =  Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//    // val photoUri = Uri.fromFile(getOutputPhotoFile());
-//    //intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
-//    intent.putExtra("android.intent.extras.CAMERA_FACING", 1);
-//    intent.putExtra("android.intent.extra.quickCapture",true);
-//    startActivityForResult(intent, CAMERA_PHOTO_REQUEST_CODE);
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int,
                                   data: Intent?) {
