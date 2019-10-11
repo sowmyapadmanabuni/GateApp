@@ -6,10 +6,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RelativeLayout
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.cardview.widget.CardView
+import com.airbnb.lottie.LottieAnimationView
 import com.oyespace.guards.R
 import com.oyespace.guards.models.PatrolShift
 import com.oyespace.guards.pojo.BlocksData
 import com.oyespace.guards.utils.AppUtils
+import com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_SCHEDULE
+import com.oyespace.guards.utils.Prefs
 
 
 class PatrolShiftsAdapter(private val mcontext: Context, private val arrayList: ArrayList<PatrolShift>, val clickListener:(PatrolShift, Int) -> Unit):
@@ -17,7 +21,12 @@ class PatrolShiftsAdapter(private val mcontext: Context, private val arrayList: 
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
-
+        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1);
+        if(ongoingSchedule != -1 && ongoingSchedule == arrayList[p1].psPtrlSID){
+            p0.mWarning.visibility = View.VISIBLE
+        }else{
+            p0.mWarning.visibility = View.GONE
+        }
         p0.mScheduleName.text = arrayList[p1].psSltName
         p0.mScheduleTime.isSelected = true
         p0.mScheduleDays.text = arrayList[p1].psRepDays
@@ -44,12 +53,15 @@ class PatrolShiftsAdapter(private val mcontext: Context, private val arrayList: 
         val mScheduleName: AppCompatTextView
         val mScheduleTime: AppCompatTextView
         val mScheduleDays:AppCompatTextView
-
+        val mWarning: LottieAnimationView
+        val mScheduleCard:CardView
 
         init {
             mScheduleName = itemView.findViewById(R.id.schedule_name)
             mScheduleTime = itemView.findViewById(R.id.schedule_time)
             mScheduleDays = itemView.findViewById(R.id.schedule_days)
+            mWarning = itemView.findViewById(R.id.warning_pending)
+            mScheduleCard = itemView.findViewById(R.id.schedule_card)
         }
     }
 
