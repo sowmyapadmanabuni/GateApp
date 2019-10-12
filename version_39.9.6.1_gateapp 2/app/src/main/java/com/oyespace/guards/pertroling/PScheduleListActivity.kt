@@ -75,10 +75,21 @@ class PScheduleListActivity:BaseKotlinActivity(){
     }
 
     private fun onPageClick(selectedShift:PatrolShift, index:Int){
-        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1);
+        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
+        var scheduleExist:Boolean = false
+        if(ongoingSchedule != -1) {
+            for (shift: PatrolShift in mPatrolShiftArray) {
+                if(shift.psPtrlSID == ongoingSchedule){
+                    scheduleExist = true;
+                }
+            }
+        }
         if(ongoingSchedule == -1 || ongoingSchedule == selectedShift.psPtrlSID){
             navigateToScanView(selectedShift)
-        }else{
+        }else if(ongoingSchedule != -1 && !scheduleExist){
+            navigateToScanView(selectedShift)
+        }
+        else{
             showAnimatedDialog("Please complete the pending patrolling",R.raw.error_alert,true,"OK")
         }
     }

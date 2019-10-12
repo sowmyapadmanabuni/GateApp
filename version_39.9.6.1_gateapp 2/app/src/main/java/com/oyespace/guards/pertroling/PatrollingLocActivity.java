@@ -55,7 +55,9 @@ import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -72,6 +74,7 @@ import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_DISTANCE_THRESH
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
+import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_COMPLETED_ON;
 import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
 
 public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void> {
@@ -215,7 +218,6 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         });
         alertBuilder.setNegativeButton("Continue", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                Toast.makeText(PatrollingLocActivity.this,"Please go to the first checkpoint",Toast.LENGTH_LONG).show();
                 dialog.cancel();
             }
         });
@@ -380,6 +382,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     @Override
     public void handleResult(final Result result) {
         //showProgressrefreshWithText("Calibrating.. please wait for 5 seconds");
+        Log.e("SCANNED",""+result);
         //Toast.makeText(PatrollingLocActivity.this,"Reached result",Toast.LENGTH_SHORT).show();
         try {
             String qrResultTemp = result.getText();
@@ -397,10 +400,11 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         String patrolingdata = result.getText();
                         Log.e("ACTUAL", "" + result.getText());
                         String[] patrolingdataList = patrolingdata.split(",");
+                        mScannerView.startCamera();
                         if (patrolingdataList.length > 4) {
                             getCheckPoint(patrolingdataList);
                         }else{
-                            mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
+
                         }
                     }
                 }, 6000);
@@ -499,6 +503,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 }else {
                     toSpeech.speak("You missed the starting checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                     showAnimatedDialog("Wrong Starting Checkpoint", R.raw.error, true, "OK");
+                    Prefs.remove(ACTIVE_PATROLLING_SCHEDULE);
+                    Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
                     return false;
                 }
             }
@@ -523,8 +529,9 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
                         toSpeech.speak("Patrolling Completed", TextToSpeech.QUEUE_FLUSH, null);
                         showAnimatedDialog("Patrolling Completed", R.raw.done, true, "OK");
+                        Prefs.putString(PATROLLING_COMPLETED_ON+mActiveSchedule,new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date()));
                         stopSiren();
-                        onBackPressed();
+                        //onBackPressed();
                     }else{
                         Prefs.putInt(ACTIVE_PATROLLING_SCHEDULE, mActiveSchedule);
                         Prefs.putInt(ACTIVE_PATROLLING_LAST_CP, checkPointData.getCpChkPntID());
@@ -539,7 +546,15 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     return false;
                 }
 
-            } else {
+            }else if(nextCP == -1){
+                toSpeech.speak("Please scan from first checkpoint", TextToSpeech.QUEUE_FLUSH, null);
+                Prefs.remove(ACTIVE_PATROLLING_SCHEDULE);
+                Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
+                showAnimatedDialog("Something went wrong. Start from beginning", R.raw.error, true, "OK");
+                finish();
+                return false;
+            }
+            else {
                 toSpeech.speak("You are scanning the wrong checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                 showAnimatedDialog("Missed a checkpoint", R.raw.error, true, "OK");
                 return false;
@@ -566,7 +581,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //0 = No more checkpoints (Reached Last Checkpoint)
 
         if(scheduleCheckPoints.size() > 0){
-
+            boolean isCheckPointFound = false;
             if(lastCheckPoint == -1){
                 return scheduleCheckPoints.get(0).getPsChkPID();
             }
@@ -577,18 +592,25 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 ScheduleCheckPointsData cp = scheduleCheckPoints.get(i);
                 if(cp.getPsChkPID() == lastCheckPoint){
                     currentIndex = i;
+                    isCheckPointFound = true;
                     break;
                 }
             }
-            if(scheduleCheckPoints.size() == currentIndex+1){
-                return 0;
-            }else{
-                try{
-                    return scheduleCheckPoints.get(currentIndex+1).getPsChkPID();
-                }catch (Exception e){
-                    e.printStackTrace();
+
+            if(isCheckPointFound) {
+                if (scheduleCheckPoints.size() == currentIndex + 1) {
                     return 0;
+                } else {
+                    try {
+                        return scheduleCheckPoints.get(currentIndex + 1).getPsChkPID();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return 0;
+                    }
                 }
+            }else{
+                return -1;
+                //showAnimatedDialog("Checkpoint not found. Please go to starting point",R.raw.error_alert,true,"OK");
             }
 
         }
@@ -598,7 +620,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     private boolean isValidDistance(Double mCPLatitude, Double mCPLongitude) {
         float result = calculateDistance(mCPLatitude, mCPLongitude);
-        return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
+        return true;
+        //return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
 
 //        if (results[0] < CHECKPOINT_DISTANCE_THRESHOLD) {
 //            //toSpeech.speak("Checkpoint scanned successfully. Move to next checkpoint", TextToSpeech.QUEUE_FLUSH, null);
@@ -614,6 +637,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private float calculateDistance(Double mCPLatitude, Double mCPLongitude) {
         float[] results = new float[2];
         //calculateWifiSignalWeightage();
+        Log.e("CALUCLAUTAING",""+mPredictedLocation.getLatitude()+" - "+mPredictedLocation.getLongitude()+" - "+ mCPLatitude+" - "+ mCPLongitude);
         Location.distanceBetween(mPredictedLocation.getLatitude(), mPredictedLocation.getLongitude(), mCPLatitude, mCPLongitude, results);
         //Toast.makeText(PatrollingLocActivity.this, "Distance: " + results[0], Toast.LENGTH_LONG).show();
         return results[0];
@@ -706,15 +730,18 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                         @Override
                         public void onErrorResponse(@NotNull Throwable e) {
-
+                            //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
                         }
 
                         @Override
                         public void onSuccessResponse(GetCheckPointResponse<CheckPointData> checkPointResponse) {
                             try {
+                                //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
                                 if (checkPointResponse.getData().getCheckPointListByChkPntID() != null) {
                                     CheckPointData cpData = checkPointResponse.getData().getCheckPointListByChkPntID();
                                     parseCheckPoint(cpData);
+                                }else{
+                                    showAnimatedDialog("Checkpoint does not exist",R.raw.error,true,"OK");
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
