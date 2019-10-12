@@ -82,6 +82,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                 d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
+                d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
 

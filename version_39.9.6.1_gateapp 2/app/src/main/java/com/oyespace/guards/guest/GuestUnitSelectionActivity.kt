@@ -10,10 +10,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.AppCompatCheckBox
 import com.google.gson.Gson
 import com.oyespace.guards.R
@@ -26,6 +23,7 @@ import com.oyespace.guards.pojo.UnitPojo
 import com.oyespace.guards.pojo.UnitsList
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.vehicle_guest.Vehicle_guest_UnitSelectionActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_unit_list.*
@@ -98,7 +96,15 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
                         if (arrayFullList.get(j).isSelected) {
                             val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(arrayFullList.get(j).unUnitID)) index else null}
                             if(indices == null || indices.size == 0) {
-                                selectedUnits.add(arrayFullList[j])
+                               // selectedUnits.add(arrayFullList[j])
+
+                                if(selectedUnits!=null){
+                                    selectedUnits.clear()
+                                    selectedUnits.add(arrayFullList[j])
+                                }else{
+                                    selectedUnits.add(arrayFullList[j])
+                                }
+
                             }
                         }
                     }
@@ -293,7 +299,8 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
             try {
                 arrayList = ArrayList(arrayFullList.subList(start, end + 1))
-            } catch (e: IndexOutOfBoundsException) {
+            }catch (e:Exception){
+                arrayList = ArrayList(arrayFullList.subList(start, end))
 
             }
             rv_unit.showProgress()
@@ -398,7 +405,12 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context, val checkListener:(UnitPojo, Boolean) -> Unit) :
         androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
+
         private val mInflater: LayoutInflater
+        private var lastSelectedPosition = -1
+        private var lastCheckedRB: RadioButton? = null
+        var pos=0
+
 
 
         init {
@@ -406,36 +418,56 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuHolder {
-            val mainGroup = mInflater.inflate(R.layout.layout_unit_adapter_row, parent, false) as ViewGroup
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UnitListAdapter.MenuHolder {
+            val mainGroup = mInflater.inflate(R.layout.layout_unit_adapter_row_radiobutton, parent, false) as ViewGroup
             return MenuHolder(mainGroup)
         }
 
 
-        override fun onBindViewHolder(holder: MenuHolder, position: Int) {
+        override fun onBindViewHolder(holder:UnitListAdapter.MenuHolder, position: Int) {
             val orderData = listVistor?.get(position)
             val vistordate = orderData?.asAssnID
             holder.apartmentNamee.text = orderData?.unUniName
-            if(listVistor!!.get(position).isSelected){
-                holder.cb_unit.setChecked(true)
-                holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-            }else{
-                holder.cb_unit.isChecked = false;
-                holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
-            }
 
-            holder.cb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
-                // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
-                listVistor!!.get(position).isSelected=isChecked
-                if(isChecked) {
-                    holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-                }else{
-                    holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+            holder.rb_unit.setChecked(lastSelectedPosition == position);
+
+
+
+
+
+            holder.rb_unit.setOnClickListener(View.OnClickListener {
+
+
+                lastSelectedPosition = position;
+                listVistor!!.get(lastSelectedPosition).isSelected=true
+                if (lastSelectedPosition == position){
+                    holder.rb_unit.setChecked(true)
+                    listVistor!!.get(pos).isSelected=false
                 }
-                checkListener(listVistor!!.get(position),isChecked)
+                else{
+                    listVistor!!.get(pos).isSelected=false
+                    holder.rb_unit.setChecked(false)
 
+                }
+
+                notifyDataSetChanged();
+
+
+
+            })
+
+
+
+            if(listVistor!!.get(position).isSelected){
+                pos=position
+
+                holder.rb_unit.setChecked(true)
+                holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
+            }else{
+                holder.rb_unit.isChecked = false;
+                holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
             }
-            //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
+
 
             holder.iv_unit.setOnClickListener {
                 if (orderData!!.owner.size == 0 && orderData!!.tenant.size == 0) {
@@ -476,7 +508,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
                     if (orderData!!.tenant.size != 0) {
 
-                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                        val alertadd = AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -543,7 +575,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
                         if (orderData!!.owner.size != 0) {
 
-                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                            val alertadd =AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -680,10 +712,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
 
                                 })
-                            // negative button text and action
-//                        .setNegativeButton("Cancel", DialogInterface.OnClickListener {
-//                                dialog, id -> dialog.cancel()
-//                        })
+
 
                             // create dialog box
                             val alert = dialogBuilder.create()
@@ -700,23 +729,13 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             holder.lv_itemrecyclerview.setOnClickListener({
                 val mcontextintent = (mcontext as Activity).intent
 
-                val intent = Intent(mcontext, GuestMobileNumberScreen::class.java)
+                val intent = Intent(mcontext, Vehicle_guest_UnitSelectionActivity::class.java)
                 intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
                 intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
                 intent.putExtra(UNITID, orderData?.unUnitID)
                 intent.putExtra(UNITNAME, orderData?.unUniName)
-//                mcontext.startActivity(intent)
-//                (mcontext as Activity).finish()
 
-                if( listVistor!!.get(position).isSelected){
-                    listVistor!!.get(position).isSelected=false
-                    holder.cb_unit.setChecked(false)
-                }else{
-                    listVistor!!.get(position).isSelected=true
-                    holder.cb_unit.setChecked(true)
-                }
-                //checkListener(listVistor!!.get(position))
 
             })
         }
@@ -729,14 +748,14 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
-            val cb_unit: AppCompatCheckBox
+            val rb_unit: RadioButton
             val apartmentNamee: TextView
             val lv_itemrecyclerview: RelativeLayout
 
             init {
 
                 iv_unit = view.findViewById(R.id.iv_unit)
-                cb_unit = view.findViewById(R.id.cb_unit)
+                rb_unit = view.findViewById(R.id.rb_unit)
                 apartmentNamee = view.findViewById(R.id.tv_unit)
                 lv_itemrecyclerview=view.findViewById(R.id.lv_itemrecyclerview)
 

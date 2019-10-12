@@ -303,7 +303,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
         try {
             val outputStream = FileOutputStream(imageFile)
-            val quality = 50
+            val quality = 80
             if (incidentPhoto != null) {
                 incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
             }
@@ -312,7 +312,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
             val bosProfile = ByteArrayOutputStream()
             if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
+                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, bosProfile)
             }
             // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
             //InputStream in = new ByteArrayInputStream(bos.toByteArray());
@@ -684,6 +684,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                 }
                             })
+
+
+
                         }
                         LocalDb.saveEnteredVisitorLog(arrayListVisitors);
 
@@ -880,23 +883,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 override fun onSuccessResponse(any: Any) {
 
-//                    if (workerListResponse.data.checkPointListByAssocID !=null) {
-//                        Log.d("WorkerList success",workerListResponse.data.toString())
-//                        var arrayList: ArrayList<CheckPointByAssocID>? = null
-//                        arrayList=ArrayList()
-//                        arrayList = workerListResponse.data.checkPointListByAssocID
-//
-//                        Collections.sort(arrayList, object : Comparator<CheckPointByAssocID>{
-//                            override  fun compare(lhs: CheckPointByAssocID, rhs: CheckPointByAssocID): Int {
-//                                return lhs.cpCkPName.compareTo(rhs.cpCkPName)
-//                            }
-//                        })
-//
-//                        LocalDb.saveCheckPointList(arrayList);
-//
-//                    } else {
-//
-//                    }
+
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -910,24 +897,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-
-
-//    {
-//        "ACAccntID"  : 1,
-//        "ASAssnID"   : 2,
-//        "NTType"     : "Join",
-//        "NTDesc"     : "Joining as Owner",
-//        "SBUnitID" : 23,
-//        "SBMemID"  : 3,
-//        "SBSubID"  : 2,
-//        "SBRoleID" : 2,
-//        "ASAsnName" : "AssociationName",
-//        "MRRolName" : "Owner",
-//        "NTDUpdated" : "2019-09-12 12:00:00",
-//        "NTDCreated" : "2019-01-29 11:11:11"
-//
-//
-//    }
 
 
     private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {

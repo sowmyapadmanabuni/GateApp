@@ -82,8 +82,11 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d);
                 finish();
+
 
             }
             R.id.buttonSkip -> {

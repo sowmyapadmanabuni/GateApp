@@ -37,10 +37,11 @@ android {
         applicationId "com.oyespace.guards"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 61
+        versionCode 64
         versionName "10.17"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+
 
     }
     buildTypes {
