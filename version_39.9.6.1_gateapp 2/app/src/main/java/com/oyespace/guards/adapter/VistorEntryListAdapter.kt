@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -22,12 +21,12 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
-import com.oyespace.guards.realm.VisitorEntryLogRealm
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils
 import com.oyespace.guards.utils.Utils
+import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -36,18 +35,17 @@ import java.util.*
 
 
 class VistorEntryListAdapter(
-    private var listVistor: ArrayList<VisitorLog>,
-    private val mcontext: Context
+    private var visitorList: ArrayList<VisitorLog>,
+    private val mcontext: Context,
+    private val onDeleteListener: EntryDeleteListener?
 ) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
 
     private var searchList: ArrayList<VisitorLog>? = null
-    private val mInflater: LayoutInflater
     var number: String? = null
-    var mobnumber: String? = null
+    var searchString: String = ""
 
     init {
-        this.searchList = listVistor
-        mInflater = LayoutInflater.from(mcontext)
+        this.searchList = visitorList
     }
     //var mTTS: TextToSpeech?=null
 
@@ -56,7 +54,7 @@ class VistorEntryListAdapter(
 
     // animBlink.setAnimationListener(this)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuHolder {
-        val mainGroup = mInflater.inflate(R.layout.layout_dashboard_adapter_row, parent, false) as ViewGroup
+        val mainGroup = LayoutInflater.from(mcontext).inflate(R.layout.layout_dashboard_adapter_row, parent, false) as ViewGroup
         return MenuHolder(mainGroup)
     }
 
@@ -64,7 +62,12 @@ class VistorEntryListAdapter(
 
         val position = holder.adapterPosition
 
-        val orderData = searchList!!.get(position)
+        var orderData: VisitorLog? = null
+        try {
+            orderData = searchList!!.get(position)
+        } catch (e: Exception) {
+            return
+        }
         Log.e("orderData", "" + orderData)
         if (orderData != null && orderData.isValid) {
 
@@ -102,6 +105,7 @@ class VistorEntryListAdapter(
             holder.btn_makeexit.setOnClickListener {
                 holder.btn_makeexit.visibility = View.GONE
                 exitVisitor(orderData, position)
+                onDeleteListener?.onINEntryDelete()
             }
 
             if (orderData.vlMobile.length > 5) {
@@ -129,6 +133,7 @@ class VistorEntryListAdapter(
                     Picasso.with(mcontext)
                         .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                        .memoryPolicy(MemoryPolicy.NO_CACHE)
                         .into(holder.iv_user)
                 } else {
 
@@ -136,6 +141,7 @@ class VistorEntryListAdapter(
                     Picasso.with(mcontext)
                         .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                        .memoryPolicy(MemoryPolicy.NO_CACHE)
                         .into(holder.iv_user)
                 }
 
@@ -148,26 +154,19 @@ class VistorEntryListAdapter(
                     Picasso.with(mcontext)
                         .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                        .memoryPolicy(MemoryPolicy.NO_CACHE)
                         .into(holder.iv_user)
                 } else {
                     Picasso.with(mcontext)
                         .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                        .memoryPolicy(MemoryPolicy.NO_CACHE)
                         .into(holder.iv_user)
 
                 }
             }
 
             holder.iv_user.setOnClickListener {
-
-                try {
-
-                    mobnumber = orderData.vlMobile.substring(3)
-
-
-                } catch (e: StringIndexOutOfBoundsException) {
-                }
-
 
                 val alertadd = AlertDialog.Builder(mcontext)
                 val factory = LayoutInflater.from(mcontext)
@@ -247,19 +246,30 @@ class VistorEntryListAdapter(
 
     private fun exitVisitor(orderData: VisitorLog, position: Int) {
 
-        val lgid = orderData.vlVisLgID
-
-        makeExitCall(lgid)
-        VisitorEntryLogRealm.deleteVisitor(lgid)
         try {
-            listVistor.removeAt(position)
+            val lgid = orderData.vlVisLgID
+            VisitorLogRepo.exitVisitor(mcontext, lgid)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        val log = VisitorLogRepo.get_IN_VisitorLog()
+        if (log != null) {
+            visitorList = log
+        }
+
+
+        try {
+            searchList!!.removeAt(position)
         } catch (e: IndexOutOfBoundsException) {
             e.printStackTrace()
         }
+        applySearch(searchString)
 
     }
 
 
+    // sends the time of exit for the entry to the backend
     private fun makeExitCall(visitorLogID: Int) {
 
         val req = VisitorExitReq(getCurrentTimeLocal(), 0, visitorLogID, Prefs.getString(GATE_NO, ""))
@@ -270,7 +280,10 @@ class VistorEntryListAdapter(
                 .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
                     override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
                         if (globalApiObject.success == true) {
-//                            Utils.showToast(mcontext, "Success")
+
+                            // update exit log from backend
+                            VisitorLogRepo.get_OUT_VisitorLog(true)
+
                             val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
                             intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
                             mcontext.sendBroadcast(intentAction1)
@@ -298,50 +311,19 @@ class VistorEntryListAdapter(
                 })
         )
 
-        val filteredList = ArrayList<VisitorLog>()
-
-        //looping through existing elements
-        for (s in listVistor) {
-            //if the existing elements contains the search input
-            Log.d(
-                "button_done ",
-                "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals(
-                    "0001-01-01T00:00:00",
-                    true
-                ) + " "
-            )
-
-            if (s.vlExitT.equals("0001-01-01T00:00:00", true)) {
-                Log.d("vlExitT ", "visitorlogbydate " + s.vlExitT + " " + s.vlfName + " ")
-                filteredList.add(s)
-
-                //adding the element to filtered list
-            } else {
-
-            }
-        }
-        listVistor = RandomUtils.getSortedVisitorLog(listVistor)
-
     }
 
     override fun getItemCount(): Int {
         return searchList?.size ?: 0
     }
 
-    private fun refresh(milliseconds: Long) {
-        val handler: Handler = Handler()
-        val runnable: Runnable = Runnable {
-            run {
-                content()
-            }
+    fun setVisitorLog(visitorLog: ArrayList<VisitorLog>?) {
+        if (visitorLog == null) {
+            this.searchList = visitorList
+        } else {
+            this.searchList = visitorLog
         }
-
-        handler.postDelayed(runnable, milliseconds)
-
-    }
-
-    private fun content() {
-        refresh(1000)
+        notifyDataSetChanged()
     }
 
     inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
@@ -390,13 +372,16 @@ class VistorEntryListAdapter(
 
     fun applySearch(search: String) {
 
-        if (search.isEmpty()) {
-            searchList = listVistor
-        } else {
-            searchList = VisitorEntryLogRealm.searchVisitorLog(search)
-        }
+        this.searchString = search
+
+        searchList = VisitorLogRepo.search_IN_Visitors(search)
+
         notifyDataSetChanged()
 
+    }
+
+    interface EntryDeleteListener {
+        fun onINEntryDelete()
     }
 
 }

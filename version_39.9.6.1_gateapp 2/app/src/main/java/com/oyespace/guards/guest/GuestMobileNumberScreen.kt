@@ -37,7 +37,7 @@ import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.realm.VisitorEntryLogRealm
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -124,7 +124,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 //                    d.putExtra(MOBILENUMBER, mobileNumber)
 //                    d.putExtra(COUNTRYCODE, ccd)
 
-                    if (VisitorEntryLogRealm.entryExists(ccd + mobileNumber)) {
+                    if (VisitorLogRepo.check_IN_VisitorByPhone(ccd + mobileNumber)) {
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)

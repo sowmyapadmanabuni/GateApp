@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.ExitVisitorLog
-import com.oyespace.guards.realm.VisitorExitLogRealm
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
 import com.oyespace.guards.utils.DateTimeUtils
@@ -357,11 +357,8 @@ class VistorOutListAdapter(
 
     fun applySearch(search: String) {
 
-        if (search.isEmpty()) {
-            searchList = listVistor
-        } else {
-            searchList = VisitorExitLogRealm.searchVisitorLog(search)
-        }
+        searchList = VisitorLogRepo.search_OUT_Visitors(search)
+
         notifyDataSetChanged()
 
     }

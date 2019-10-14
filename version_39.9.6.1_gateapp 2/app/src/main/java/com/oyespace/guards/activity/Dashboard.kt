@@ -63,12 +63,9 @@ import com.oyespace.guards.pertroling.PatrollingActivitynew
 import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.realm.RealmDB
-import com.oyespace.guards.realm.VisitorEntryLogRealm
-import com.oyespace.guards.realm.VisitorExitLogRealm
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.request.VisitorEntryReqJv
-import com.oyespace.guards.request.VisitorExitReqJv
 import com.oyespace.guards.resident.ResidentIdActivity
-import com.oyespace.guards.responce.RequestDTO
 import com.oyespace.guards.responce.SubscriptionResponse
 import com.oyespace.guards.responce.VisitorLogCreateResp
 import com.oyespace.guards.responce.VisitorLogExitResp
@@ -79,9 +76,7 @@ import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
 import com.oyespace.guards.utils.Utils.showToast
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import io.realm.kotlin.createObject
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -95,7 +90,7 @@ import java.util.*
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,
     ResponseHandler, Runnable,
-    SGFingerPresentEvent {
+    SGFingerPresentEvent, VistorEntryListAdapter.EntryDeleteListener {
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
     var unAccountID: String? = null
@@ -148,6 +143,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     var subscriptionDate: String? = null
     internal var stringNumber: String? = null
     internal var stringCode: String? = null
+
+    var showingOutLog = false
 
     internal var language: String? = ""
     internal var wvvalue: String? = ""
@@ -230,35 +227,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 val message = intent.getStringExtra("message")
 
                 if (message.equals(VISITOR_ENTRY_SYNC, ignoreCase = true)) {
-                    Log.e("VISITOR_ENTRY_SYNC", "VISITOR_ENTRY_SYNC")
-                    var newAl: ArrayList<VisitorLog>? = ArrayList()
-                    if (VisitorEntryLogRealm.getVisitorEntryLog() != null) {
-                        newAl = VisitorEntryLogRealm.getVisitorEntryLog()
-                        // LocalDb.saveAllVisitorLog(newAl);
 
-                        if ((newAl)!!.isEmpty()) {
-                            rv_dashboard!!.visibility = View.GONE
-                            tv_nodata.visibility = View.VISIBLE
-                            dismissProgressrefresh()
-                        } else {
-                            rv_dashboard!!.visibility = View.VISIBLE
-                            tv_nodata.visibility = View.GONE
-                        }
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl, this@Dashboard)
-                        rv_dashboard?.adapter = vistorEntryListAdapter
-                        dismissProgressrefresh()
-                        btn_in.setBackgroundColor(resources.getColor(R.color.orange))
-                        btn_out.setBackgroundColor(resources.getColor(R.color.grey))
-                    } else {
-                        dismissProgress()
-                        rv_dashboard!!.visibility = View.GONE
-                        tv_nodata.visibility = View.VISIBLE
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
-                        rv_dashboard?.adapter = vistorEntryListAdapter
-                        btn_in.setBackgroundColor(resources.getColor(R.color.orange))
-                        btn_out.setBackgroundColor(resources.getColor(R.color.grey))
+                    loadEntryVisitorLog(false)
 
-                    }
                 }
 
             }
@@ -320,30 +291,27 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         Prefs.putString("BUTTON", "IN")
         tv.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-
-
             }
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
 
-            }
-
-            override fun afterTextChanged(editable: Editable) {
                 try {
-                    if (Prefs.getString("BUTTON", null).contains("IN")) {
-                        if (vistorEntryListAdapter != null) {
-                            vistorEntryListAdapter!!.applySearch(editable.toString())
+                    if (showingOutLog) {
+                        if (vistorOutListAdapter != null) {
+                            vistorOutListAdapter!!.applySearch(charSequence.toString())
 
                         }
                     } else {
-                        if (vistorOutListAdapter != null) {
-                            vistorOutListAdapter!!.applySearch(editable.toString())
-
+                        if (vistorEntryListAdapter != null) {
+                            vistorEntryListAdapter!!.applySearch(charSequence.toString())
                         }
                     }
                 } catch (e: KotlinNullPointerException) {
 
                 }
+            }
+
+            override fun afterTextChanged(editable: Editable) {
             }
         })
         language = Prefs.getString(LANGUAGE, null)
@@ -498,6 +466,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         }
 
+        LocalBroadcastManager.getInstance(this)
+            .registerReceiver(receiver, IntentFilter("SYNC"))//constant
+
     }
 
     fun stopSiren() {
@@ -582,48 +553,10 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         updateHandler.postDelayed(runnable, 1000)
         //  stopRepeatingTask()
 
-        LocalBroadcastManager.getInstance(this)
-            .registerReceiver(receiver, IntentFilter("SYNC"))//constant
         super.onResume()
 
-        val log = VisitorEntryLogRealm.getVisitorEntryLog()
-        for (vlog in log) {
-            Log.d("taaag", "~~~~~ ${vlog.vlfName}")
-        }
-
-        if (log != null) {
-            dismissProgressrefresh()
-            newAl = log
-            // LocalDb.saveAllVisitorLog(newAl);
-
-            if ((newAl)!!.isEmpty()) {
-                rv_dashboard!!.visibility = View.GONE
-                tv_nodata.visibility = View.VISIBLE
-                dismissProgressrefresh()
-
-            } else {
-                rv_dashboard!!.visibility = View.VISIBLE
-                tv_nodata.visibility = View.GONE
-                dismissProgressrefresh()
-            }
-            if (vistorEntryListAdapter != null) {// it works second time and later
-                vistorEntryListAdapter!!.notifyDataSetChanged()
-                btn_in.setBackgroundColor(resources.getColor(R.color.orange))
-                btn_out.setBackgroundColor(resources.getColor(R.color.grey))
-            } else {
-                dismissProgressrefresh()
-                vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
-                rv_dashboard?.adapter = vistorEntryListAdapter
-                btn_in.setBackgroundColor(resources.getColor(R.color.orange))
-                btn_out.setBackgroundColor(resources.getColor(R.color.grey))
-            }
-        } else {
-            dismissProgressrefresh()
-        }
-
-        val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-        intentAction1.putExtra(BSR_Action, VISITOR_ENTRY_SYNC)
-        sendBroadcast(intentAction1)
+        dismissProgressrefresh()
+        loadEntryVisitorLog(true)
 
         if (isTimeAutomatic(application)) {
 
@@ -764,6 +697,91 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 .show()
         }
 
+
+    }
+
+    private fun loadEntryVisitorLog(pullFromBackend: Boolean) {
+        if (showingOutLog) {
+            return
+        }
+
+        VisitorLogRepo.get_IN_VisitorLog(pullFromBackend, object : VisitorLogRepo.VisitorLogFetchListener {
+            override fun onFetch(visitorLog: ArrayList<VisitorLog>?) {
+
+                rv_dashboard!!.visibility = View.GONE
+                tv_nodata.visibility = View.VISIBLE
+
+                if (visitorLog != null) {
+                    newAl = visitorLog
+
+                    if (newAl!!.isEmpty()) {
+                        rv_dashboard!!.visibility = View.GONE
+                        tv_nodata.visibility = View.VISIBLE
+
+                    } else {
+                        rv_dashboard!!.visibility = View.VISIBLE
+                        tv_nodata.visibility = View.GONE
+                    }
+
+                    if (vistorEntryListAdapter != null) {// it works second time and later
+                        vistorEntryListAdapter!!.setVisitorLog(newAl)
+                    } else {
+                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard, this@Dashboard)
+                        rv_dashboard?.adapter = vistorEntryListAdapter
+                    }
+
+                    val searchString = tv.text.toString()
+                    if (!searchString.isEmpty()) {
+                        vistorEntryListAdapter!!.applySearch(searchString)
+                    }
+
+                }
+
+            }
+
+        })
+
+    }
+
+    private fun loadExitVisitorLog(pullFromBackend: Boolean) {
+
+        if (!showingOutLog) {
+            return
+        }
+
+        VisitorLogRepo.get_OUT_VisitorLog(pullFromBackend, object : VisitorLogRepo.ExitVisitorLogFetchListener {
+            override fun onFetch(visitorLog: ArrayList<ExitVisitorLog>?) {
+
+                if (visitorLog != null) {
+
+
+                    if (!visitorLog.isEmpty()) {
+                        rv_dashboard!!.visibility = View.VISIBLE
+                        tv_nodata.visibility = View.GONE
+                    } else {
+                        rv_dashboard!!.visibility = View.GONE
+                        tv_nodata.visibility = View.VISIBLE
+                    }
+
+                    vistorOutListAdapter = VistorOutListAdapter(visitorLog, this@Dashboard)
+                    rv_dashboard?.adapter = vistorOutListAdapter
+
+                    val searchString = tv.text.toString()
+                    if (!searchString.isEmpty()) {
+                        vistorOutListAdapter!!.applySearch(searchString)
+                    }
+
+                }
+            }
+
+        })
+
+
+    }
+
+    override fun onINEntryDelete() {
+
+        loadEntryVisitorLog(true)
 
     }
 
@@ -910,217 +928,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     }
 
-    private fun reloadVisitorsList() {
-        newAl = VisitorEntryLogRealm.getVisitorEntryLog()
-        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
-        rv_dashboard?.adapter = vistorEntryListAdapter
-        vistorEntryListAdapter!!.notifyDataSetChanged()
-    }
-
-    private fun visitorLog(
-        unitId: Int, personName: String, mobileNumb: String, desgn: String,
-        workerType: String, staffID: Int, unitName: String, wkEntryImg: String
-    ) {
-
-        try {
-            var memID = 410
-            if (BASE_URL.contains("dev", true)) {
-                memID = 64
-            } else if (BASE_URL.contains("uat", true)) {
-                memID = 64
-            }
-//            Toast.makeText(this@Dashboard, "VISITORLOG ", Toast.LENGTH_LONG)
-//                .show()
-            //realm.executeTransaction {
-
-            if (!realm.isInTransaction) {
-                realm.beginTransaction()
-            }
-            pkeyString = "" + staffID
-            val pkey = pkeyString.toInt()
-
-            val lgId = pkey
-            val vlog = realm.createObject<VisitorLog>(lgId)
-            vlog.asAssnID = LocalDb.getAssociation()!!.asAssnID
-            vlog.mEMemID = memID
-            vlog.reRgVisID = staffID
-            vlog.uNUnitID = unitId
-            vlog.vlfName = personName
-            vlog.vlMobile = mobileNumb
-            vlog.vlComName = desgn
-            vlog.vlVisType = workerType
-            vlog.unUniName = unitName
-            vlog.vlVisCnt = 1
-            vlog.vlEntryT = getCurrentTimeLocal()
-            vlog.vlExitT = "0001-01-01T00:00:00"
-            vlog.vlEntryImg = wkEntryImg
-            realm.commitTransaction()
-            //}
-            reloadVisitorsList()
-
-            t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
-            Prefs.putString(BIOMETRICPERSONNAME, personName)
-
-
-            val restClient = RestClient.getInstance()
-
-            val loginReq = RequestDTO()
-
-//        var memID = 64
-//        if (!BASE_URL.contains("dev")) {
-//            memID = 410
-//        }
-
-
-            loginReq.aSAssnID = LocalDb.getAssociation()!!.asAssnID
-            loginReq.mEMemID = memID
-            loginReq.rERgVisID = staffID
-            loginReq.uNUnitID = unitId
-            loginReq.vLFName = personName
-            loginReq.vLMobile = mobileNumb
-            loginReq.vLComName = desgn
-            loginReq.vLVisType = workerType
-            loginReq.uNUniName = unitName
-            loginReq.vLVisCnt = 1
-            loginReq.VLEntryImg = wkEntryImg
-
-
-
-            Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
-
-
-            restClient.addHeader(OYE247KEY, OYE247TOKEN)
-            restClient.post<Any>(
-                this,
-                loginReq,
-                VisitorLogCreateResp::class.java,
-                this,
-                URLData.URL_VISITOR_LOG
-            )
-            t1?.speak("Welcome $personName", TextToSpeech.QUEUE_FLUSH, null)
-            Prefs.putString(BIOMETRICPERSONNAME, personName)
-
-//        dbh!!.insertStaffWorker(LocalDb.getAssociation()!!.asAssnID,memID,staffID,unitId,personName,mobileNumb,desgn,workerType,unitName,1,
-//            getCurrentTimeLocal(),"")
-
-
-            //@Todo
-
-//        var id: Long  =  dbh!!.insertVisitorData(unitName,LocalDb.getAssociation()!!.asAssnID.toString(),personName,memID,staffID,
-//            unitId,mobileNumb,"Staff",workerType,1,getCurrentTimeLocal(),"" )
-//
-//
-//        if(id<=0)
-//        {
-//            //  Toast.makeText(this@Dashboard,"Insertion Unsuccessful",Toast.LENGTH_LONG).show()
-//        } else
-//        {
-//            // Toast.makeText(this@Dashboard,"Insertion Successful",Toast.LENGTH_LONG).show()
-//
-//        }
-
-
-//        d.putExtra(BSR_Action, VisitorEntryFCM)
-//        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
-//        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-//        d.putExtra("name", intent.getStringExtra(PERSONNAME))
-//        d.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-//        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-//        d.putExtra("memType", "Owner")
-//        d.putExtra(UNITID,intent.getStringExtra(UNITID))
-//        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-
-
-            val d = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-            d.putExtra(BSR_Action, VisitorEntryFCM)
-            d.putExtra("msg", "$personName $desgn " + " is coming to your home")
-            d.putExtra("mobNum", mobileNumb)
-            d.putExtra("name", personName)
-            d.putExtra("nr_id", "0")
-            d.putExtra("unitname", unitName)
-            d.putExtra("memType", "Owner")
-            d.putExtra(UNITID, unitId.toString())
-            d.putExtra(COMPANY_NAME, "Staff")
-            d.putExtra(UNIT_ACCOUNT_ID, "0")
-            d.putExtra("VLVisLgID", 0)
-            sendBroadcast(d)
-
-
-//        val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-//        ddc.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
-////        ddc.putExtra("msg", "$personName $desgn is coming to your home")
-////        ddc.putExtra("mobNum", mobileNumb)
-////        ddc.putExtra("name", personName)
-////        ddc.putExtra("nr_id", "0")
-////        ddc.putExtra("unitname", unitName)
-////        ddc.putExtra("memType", "Owner")
-//        sendBroadcast(ddc)
-        } catch (e: Exception) {
-            e.printStackTrace()
-//            Toast.makeText(this@Dashboard, "VISITORLOG ERROR "+e.toString(), Toast.LENGTH_LONG)
-//                .show()
-        }
-
-
-    }
-
-    fun VisitorExit(vlVisLgID: Int, vlfName: String) {
-
-        try {
-            // val total = realm.where(VisitorLog::class.java).count();
-//            Toast.makeText(this@Dashboard, "VISITORLOG BEFORE "+total, Toast.LENGTH_LONG)
-//                .show()
-            val visitor =
-                realm.where(VisitorLog::class.java).equalTo("vlVisLgID", vlVisLgID).findFirst()
-            if (!realm.isInTransaction) {
-                realm.beginTransaction()
-            }
-            visitor!!.deleteFromRealm()
-            realm.commitTransaction()
-            // val _total = realm.where(VisitorLog::class.java).count();
-//            Toast.makeText(this@Dashboard, "VISITORLOG AFTER "+_total+" "+total, Toast.LENGTH_LONG)
-//                .show()
-            // vistorEntryListAdapter!!.notifyDataSetChanged()
-            reloadVisitorsList()
-
-            val restClient = RestClient.getInstance()
-
-            val loginReq = VisitorExitReqJv()
-
-            loginReq.VLVisLgID = vlVisLgID
-            loginReq.VLExitT = getCurrentTimeLocal()
-            loginReq.VLExitWID = RealmDB.getStaffs()!![0].wkWorkID.toInt()
-
-            Log.d("CreateVisitorLogResp", "StaffEntry ${loginReq.VLVisLgID}")
-            //  showToast(this, loginReq.ASAssnID + " fmid " + loginReq.FMID+" "+loginReq.FPImg1);
-
-            restClient.addHeader(OYE247KEY, OYE247TOKEN)
-            restClient.post<Any>(
-                this,
-                loginReq,
-                VisitorLogCreateResp::class.java,
-                this,
-                URLData.URL_VISITOR_MAKE_EXIT
-            )
-            // t1?.speak("Thank You " + vlfName, TextToSpeech.QUEUE_FLUSH, null)
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-    }
-
-    public override fun onPause() {
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
-        super.onPause()
-
-
-    }
 
     public override fun onDestroy() {
         // clearApplicationData()
 
 
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(receiver)
         if (bSecuGenDeviceOpened) {
             autoOn!!.stop()
             sgfplib!!.CloseDevice()
@@ -1149,7 +962,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 //        try {
 //            trimCache(this)
 //        } catch (e: Exception) {
-//            // TODO Auto-generated catch block
 //            e.printStackTrace()
 //        }
     }
@@ -1207,12 +1019,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 if (id > 0) {
 
                     // check if staff has already entered
-                    val staff: VisitorLog? = VisitorEntryLogRealm.getVisitorForId(id)
+                    val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
                     // if yes, then make exit call
                     if (staff != null) {
                         t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        makeExitCall(staff.vlVisLgID)
+                        VisitorLogRepo.exitVisitor(this, staff.vlVisLgID)
+                        loadEntryVisitorLog(false)
                     } else {
 
                         // get staff for id
@@ -1463,7 +1276,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         mp = MediaPlayer.create(this@Dashboard, R.raw.walkietalkiestart)
 
         walk1?.setOnTouchListener(View.OnTouchListener { v, event ->
-            // TODO Auto-generated method stub
+
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
 
@@ -1546,7 +1359,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         swipeContainer!!.setOnRefreshListener {
 
 
-            fetchTimelineAsync(0)
+            if (!showingOutLog) {
+                loadEntryVisitorLog(true)
+            } else {
+                loadExitVisitorLog(true)
+            }
             swipeContainer!!.isRefreshing = false
         }
 
@@ -1565,14 +1382,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 })
                 btn_in.setOnClickListener {
 
+                    showingOutLog = false
                     tv.setText("")
                     Prefs.putString("BUTTON", "IN")
                     btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                     btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
-                    if (VisitorEntryLogRealm.getVisitorEntryLog() != null) {
+                    val visitorLog = VisitorLogRepo.get_IN_VisitorLog()
+                    if (visitorLog != null) {
 
-                        newAl = VisitorEntryLogRealm.getVisitorEntryLog()
+                        newAl = visitorLog
                         // LocalDb.saveAllVisitorLog(newAl);
                         if ((newAl)!!.isEmpty()) {
                             rv_dashboard!!.visibility = View.GONE
@@ -1584,7 +1403,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         }
 
 
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard, this@Dashboard)
                         rv_dashboard?.adapter = vistorEntryListAdapter
                         btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                         btn_out.setBackgroundColor(resources.getColor(R.color.grey))
@@ -1598,15 +1417,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                     }
 
+
                 }
                 btn_out.setOnClickListener {
 
-                    //refresh ( 1000 )
+                    showingOutLog = true
                     tv.setText("")
                     Prefs.putString("BUTTON", "OUT")
                     btn_in.setBackgroundColor(resources.getColor(R.color.grey))
                     btn_out.setBackgroundColor(resources.getColor(R.color.orange))
-                    getExitVisitorLog()
+                    loadExitVisitorLog(false)
                 }
 
 
@@ -1656,44 +1476,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         val uri = Uri.fromParts("package", packageName, null)
         intent.data = uri
         startActivityForResult(intent, 101)
-    }
-
-    fun getExitVisitorLog() {
-
-        RetrofitClinet.instance
-            .getVisitorLogExitList(OYE247TOKEN, Prefs.getInt(ASSOCIATION_ID, 0))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : CommonDisposable<GetExitVisitorsResponse<ArrayList<com.oyespace.guards.pojo.VisitorLog>>>() {
-                override fun onSuccessResponse(visitorlist: GetExitVisitorsResponse<ArrayList<com.oyespace.guards.pojo.VisitorLog>>) {
-
-                    rv_dashboard!!.visibility = View.GONE
-                    tv_nodata.visibility = View.VISIBLE
-
-                    if (visitorlist.success) {
-                        val visitorlog = visitorlist.data.visitorLog
-                        if (visitorlog != null) {
-                            VisitorExitLogRealm.addVisitorLogs(visitorlog)
-                            val visitorList = VisitorExitLogRealm.getVisitorExitLog()
-                            vistorOutListAdapter = VistorOutListAdapter(visitorList, this@Dashboard)
-                            rv_dashboard?.adapter = vistorOutListAdapter
-                            rv_dashboard!!.visibility = View.VISIBLE
-                            tv_nodata.visibility = View.GONE
-                        }
-                    }
-
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-
-                }
-
-                override fun noNetowork() {
-
-                }
-
-            })
-
     }
 
     internal fun getLatestSubscription() {
@@ -1754,11 +1536,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 call.cancel()
             }
         })
-
-    }
-
-    fun fetchTimelineAsync(page: Int) {
-        onResume()
 
     }
 
@@ -2041,7 +1818,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     deleteDir1(dir)
                 }
             } catch (e: Exception) {
-                // TODO: handle exception
             }
 
         }
@@ -2459,51 +2235,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         )
     }
 
-    private fun makeExitCall(visitorLogID: Int) {
-
-
-        val req = VisitorExitReq(
-            getCurrentTimeLocal(),
-            LocalDb.getStaffList()!![0].wkWorkID,
-            visitorLogID,
-            Prefs.getString(GATE_NO, "")
-        )
-        CompositeDisposable().add(
-            RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                        if (globalApiObject.success == true) {
-//                            Utils.showToast(mcontext, "Success")
-
-                            val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-                            intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
-                            sendBroadcast(intentAction1)
-
-                        } else {
-                            Utils.showToast(this@Dashboard, "Failed")
-                        }
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        Utils.showToast(this@Dashboard, "Error visitor exit")
-                    }
-
-                    override fun noNetowork() {
-                        Utils.showToast(this@Dashboard, "no_internet visitor exit")
-                    }
-
-                    override fun onShowProgress() {
-                    }
-
-                    override fun onDismissProgress() {
-                    }
-                })
-        )
-
-    }
-
     private fun getUnitLog(
         unitId: Int, personName: String, mobileNumb: String, desgn: String,
         workerType: String, staffID: Int, unitName: String, vlVisLgID: Int
@@ -2622,7 +2353,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                     tv.setText(result[0] + "".replace(" ", ""))
 
-                    //tv.text.toString().replace(" ","")
+
                 }
             }
         }

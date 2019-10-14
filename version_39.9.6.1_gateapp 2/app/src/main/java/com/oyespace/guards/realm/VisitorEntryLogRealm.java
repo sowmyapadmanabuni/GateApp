@@ -45,13 +45,15 @@ public class VisitorEntryLogRealm {
 
         });
 
+
     }
 
-    public static void addVisitorLogs(RealmList<VisitorLog> visitorsList) {
+    public static void updateVisitorLogs(RealmList<VisitorLog> visitorsList) {
         Realm realm = Realm.getDefaultInstance();
         if (!realm.isInTransaction()) {
             realm.beginTransaction();
         }
+        realm.delete(VisitorLog.class);
         for (VisitorLog v : visitorsList) {
             Log.i("taaag", "about to put in realm -> " + v.getVlVisLgID());
         }
@@ -61,18 +63,22 @@ public class VisitorEntryLogRealm {
 
     public static ArrayList<VisitorLog> searchVisitorLog(String searchQuery) {
 
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<VisitorLog> results = new ArrayList<>();
-        results.addAll(realm.where(VisitorLog.class)
-                .contains("vlfName", searchQuery, Case.INSENSITIVE)
-                .or()
-                .contains("vlComName", searchQuery, Case.INSENSITIVE)
-                .or()
-                .contains("vlMobile", searchQuery)
-                .or()
-                .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
-                .findAll());
-        return results;
+        if (searchQuery.isEmpty()) {
+            return getVisitorEntryLog();
+        } else {
+            Realm realm = Realm.getDefaultInstance();
+            ArrayList<VisitorLog> results = new ArrayList<>();
+            results.addAll(realm.where(VisitorLog.class)
+                    .contains("vlfName", searchQuery, Case.INSENSITIVE)
+                    .or()
+                    .contains("vlComName", searchQuery, Case.INSENSITIVE)
+                    .or()
+                    .contains("vlMobile", searchQuery)
+                    .or()
+                    .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
+                    .findAll());
+            return results;
+        }
 
     }
 
@@ -82,6 +88,13 @@ public class VisitorEntryLogRealm {
 
         return realm.where(VisitorLog.class)
                 .equalTo("vlMobile", mobile).count() != 0;
+
+    }
+
+    public static void deleteAllVisitorLogs() {
+        Realm r = Realm.getDefaultInstance();
+
+        r.executeTransaction(realm -> realm.delete(VisitorLog.class));
 
     }
 }

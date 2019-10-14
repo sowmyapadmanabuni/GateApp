@@ -14,8 +14,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
-import com.oyespace.guards.models.GetVisitorsResponse
 import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
@@ -23,7 +23,7 @@ import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.realm.RealmDB
-import com.oyespace.guards.realm.VisitorEntryLogRealm
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -43,6 +43,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
+import kotlin.collections.ArrayList
 
 class
 
@@ -161,8 +162,20 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             getUnitList()
             getCheckPointList()
         } else if (intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)) {
+
             Log.d("SYCNCHECK", "in 86")
-            getVisitorLogEntryList()
+            VisitorLogRepo.get_OUT_VisitorLog(true)
+            VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                override fun onFetch(visitorLog: ArrayList<VisitorLog>?) {
+
+                    val smsIntent = Intent(SYNC)
+                    smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(smsIntent)
+
+                }
+
+            })
+
         } else if (intent.getStringExtra(BSR_Action).equals(UPLOAD_GUARD_PHOTO)) {
             Log.d("uploadImage", "in " + intent.getStringExtra("imgName"))
             val wrrw = intent.getByteArrayExtra("GUARD_PHOTO")
@@ -544,43 +557,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //        })
 //
 //    }
-
-    private fun getVisitorLogEntryList() {
-        Log.e("SYCNCHECK", "in 408: " + Prefs.getInt(ASSOCIATION_ID, 0))
-        RetrofitClinet.instance
-            .getVisitorLogEntryList(OYE247TOKEN, Prefs.getInt(ASSOCIATION_ID, 0))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object :
-                CommonDisposable<GetVisitorsResponse<ArrayList<VisitorLog>>>() {
-
-                override fun onSuccessResponse(visitorList: GetVisitorsResponse<ArrayList<VisitorLog>>) {
-
-                    Log.i("SYCNCHECK", "visitor-> " + visitorList.data.visitorLog)
-
-                    if (visitorList.success == true && visitorList.data.visitorLog != null) {
-                        val visitorsList = visitorList.data.visitorLog
-                        VisitorEntryLogRealm.addVisitorLogs(visitorsList)
-                    } else {
-                        Log.d("SYCNCHECK", "in 437")
-                    }
-                    val smsIntent = Intent(ConstantUtils.SYNC)
-                    smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                    LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-//                    Log.d("cdvd",e.message);
-//                    Log.d("SYCNCHECK","in 441")
-
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
-
-    }
 
     fun sendFCM_toSyncNonreg() {
 

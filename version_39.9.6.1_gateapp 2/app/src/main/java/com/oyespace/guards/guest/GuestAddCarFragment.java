@@ -43,7 +43,6 @@ import com.oyespace.guards.constants.PrefKeys;
 import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -226,8 +225,6 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
 
        // iamgeLyt.removeAllViews();
         list.clear();
-
-        Picasso.with(this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
 
 //        Picasso.with(this)

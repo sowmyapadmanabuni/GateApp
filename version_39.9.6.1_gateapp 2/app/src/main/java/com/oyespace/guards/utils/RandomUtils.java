@@ -3,7 +3,7 @@ package com.oyespace.guards.utils;
 import android.util.Log;
 
 import com.oyespace.guards.models.VisitorLog;
-import com.oyespace.guards.realm.VisitorEntryLogRealm;
+import com.oyespace.guards.repo.VisitorLogRepo;
 import com.oyespace.guards.responce.VisitorLogExitResp;
 
 import java.util.ArrayList;
@@ -123,6 +123,6 @@ public class RandomUtils {
 
 
     public static boolean entryExists(String isdCode ,String mobNum ) {
-        return VisitorEntryLogRealm.entryExists(isdCode + mobNum);
+        return VisitorLogRepo.Companion.check_IN_VisitorByPhone(isdCode + mobNum);
     }
 }

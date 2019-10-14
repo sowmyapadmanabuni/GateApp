@@ -245,10 +245,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //        if(!BASE_URL.contains("dev",true)){
 //            memID=410;
 //        }
-        var imgName = "PERSON" + "Association" + Prefs.getInt(
-            ASSOCIATION_ID,
-            0
-        ) + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+//        var imgName = "PERSONAssociation" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
         var memID: Int = 410
         if(BASE_URL.contains("dev",true)){
             memID = 64
@@ -261,7 +258,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName,Prefs.getString(ConstantUtils.GATE_NO, ""))
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, "", imageName!!, Prefs.getString(ConstantUtils.GATE_NO, "")
+        )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)

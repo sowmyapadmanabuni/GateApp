@@ -262,7 +262,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity(), View.OnClickListener
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
             intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST, SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, "", imgName.toString(), Prefs.getString(ConstantUtils.GATE_NO, "")
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, "", imageName!!, Prefs.getString(ConstantUtils.GATE_NO, "")
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
 
