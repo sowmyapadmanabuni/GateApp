@@ -105,7 +105,7 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 19.0f;
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 16.0f;
     public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
