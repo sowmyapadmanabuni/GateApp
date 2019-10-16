@@ -32,6 +32,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
+import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -45,6 +46,7 @@ import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
+import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.PatrolShift
 import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.*
@@ -83,6 +85,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
+
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
     var unAccountID: String? = null
@@ -228,7 +231,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                             rv_dashboard!!.setVisibility(View.VISIBLE)
                             tv_nodata!!.setVisibility(View.GONE)
                         }
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!,this@Dashboard)
                         rv_dashboard?.adapter = vistorEntryListAdapter
                         dismissProgressrefresh()
                         btn_in.setBackgroundColor(resources.getColor(R.color.orange))
@@ -237,7 +240,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         dismissProgress()
                         rv_dashboard!!.setVisibility(View.GONE)
                         tv_nodata!!.setVisibility(View.VISIBLE)
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!,this@Dashboard)
                         rv_dashboard?.adapter = vistorEntryListAdapter
                         btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                         btn_out.setBackgroundColor(resources.getColor(R.color.grey))
@@ -295,7 +298,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
-
 
      //   getSubscriptionData()
 
@@ -610,6 +612,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     override fun onResume() {
         runTimerCheck()
 
+
         fixedRateTimer("timer",false,0,60000){
             this@Dashboard.runOnUiThread {
               //  getSubscriptionData()
@@ -666,7 +669,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             }
             else {
                 dismissProgressrefresh()
-                vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                vistorEntryListAdapter = VistorEntryListAdapter(newAl!!,this@Dashboard)
                 rv_dashboard?.adapter = vistorEntryListAdapter
                 btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 btn_out.setBackgroundColor(resources.getColor(R.color.grey))
@@ -1674,7 +1677,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 }
 
 
-                vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                vistorEntryListAdapter = VistorEntryListAdapter(newAl!!,this@Dashboard)
                 rv_dashboard?.adapter = vistorEntryListAdapter
                 btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 btn_out.setBackgroundColor(resources.getColor(R.color.grey))
@@ -2303,7 +2306,8 @@ try {
             unitId, desgn, personName,
             LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb, "1", "", "", "",
             1, "Staff Biometric Entry", "", "", "", "", ""
-            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""),getCurrentTimeLocal()
+            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""),getCurrentTimeLocal(),
+            "","","","","","","","","",""
         )
 
         Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())

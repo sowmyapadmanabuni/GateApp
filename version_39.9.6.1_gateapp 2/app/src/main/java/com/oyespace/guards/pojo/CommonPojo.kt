@@ -586,7 +586,17 @@ data class CreateVisitorLogReq(
   //  val VLEntryGPS: String,
     val VLEntryImg: String,
     val VLENGName: String,
-    val VLEntryT: String
+    val VLEntryT: String,
+    val SPPrdImg: String,
+val SPPrdImg12 :String,
+val SPPrdImg13 : String,
+val SPPrdImg14 : String,
+val SPPrdImg15 : String,
+val SPPrdImg16:String,
+val SPPrdImg17 : String,
+val SPPrdImg18 : String,
+val SPPrdImg19 : String,
+val SPPrdImg20 : String
 
 
 

@@ -1030,7 +1030,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             "",
             intent.getStringExtra("Image"),
             Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal()
+            DateTimeUtils.getCurrentTimeLocal(),
+            "" ,"","","","","","","","",""
         );
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 

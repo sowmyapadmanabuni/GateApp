@@ -1003,7 +1003,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                         }
 
-                        try {     getNotificationCreate(unAccountID.toString(),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",msg,unitId.toString(),vlVisLgID.toString(),unitId.toString()+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
+                        try {     getNotificationCreate(unAccountID.toString(),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",msg,unitId.toString(),vlVisLgID.toString(),vlVisLgID.toString()+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
                             DateTimeUtils.getCurrentTimeLocal(),
                             DateTimeUtils.getCurrentTimeLocal(),
                             vlVisLgID.toString()
@@ -1021,7 +1021,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 msg,
                                 desgn,
                                 "gate_app",
-                                unitId.toString() + "admin",
+                                vlVisLgID.toString() + "admin",
                                 unAccountID!!.toInt(),
                                 unAccountID.toString()
                             )
@@ -1084,7 +1084,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     msg,
                                     unitId.toString(),
                                     vlVisLgID.toString(),
-                                    unitId.toString() + "admin",
+                                    vlVisLgID.toString() + "admin",
                                     "gate_app",
                                     LocalDb.getAssociation()!!.asAsnName,
                                     "gate_app",
@@ -1101,7 +1101,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 msg,
                                 desgn,
                                 "gate_app",
-                                unitId.toString() + "admin",
+                                vlVisLgID.toString() + "admin",
                                 getdata.data.familyMembers[i].acAccntID,
                                 getdata.data.familyMembers[i].acAccntID.toString()
                             )

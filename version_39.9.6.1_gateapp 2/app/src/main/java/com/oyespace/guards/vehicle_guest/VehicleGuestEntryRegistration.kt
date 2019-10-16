@@ -253,7 +253,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity() , View.OnClickListene
             SPPrdImg10,
             "",
             imageName.toString(),
-            Prefs.getString(ConstantUtils.GATE_NO, ""), DateTimeUtils.getCurrentTimeLocal()
+            Prefs.getString(ConstantUtils.GATE_NO, ""), DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 

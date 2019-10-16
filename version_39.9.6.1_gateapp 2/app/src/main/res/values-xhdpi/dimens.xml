@@ -4,6 +4,7 @@
     <dimen name="dpw_00">70dp</dimen>
     <dimen name="_12sdp">12.00dp</dimen>
     <dimen name="dp_30">30dp</dimen>
+<!--    <dimen name="dp_36">36dp</dimen>-->
 
 
 </resources>

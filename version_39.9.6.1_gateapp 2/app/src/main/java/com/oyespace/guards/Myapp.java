@@ -8,6 +8,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.database.FirebaseDatabase;
 import com.oyespace.guards.broadcastreceiver.NetworkChangeReceiver;
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel;
@@ -46,6 +47,7 @@ public class Myapp extends MultiDexApplication {
         IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         this.registerReceiver(new NetworkChangeReceiver(), intentFilter);
 
+        FirebaseApp.initializeApp(mApplicationContext);
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
        // Fabric.with(this, new Crashlytics());

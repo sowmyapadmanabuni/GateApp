@@ -61,6 +61,16 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
     var SPPrdImg8=""
     var SPPrdImg9=""
     var SPPrdImg10=""
+    var SPPrdImg11=""
+    var SPPrdImg12=""
+    var SPPrdImg13=""
+    var SPPrdImg14=""
+    var SPPrdImg15=""
+    var SPPrdImg16=""
+    var SPPrdImg17=""
+    var SPPrdImg18=""
+    var SPPrdImg19=""
+    var SPPrdImg20=""
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -239,6 +249,16 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                 7 -> SPPrdImg8=list[i]
                 8 -> SPPrdImg9=list[i]
                 9 -> SPPrdImg10=list[i]
+                10 -> SPPrdImg11=list[i]
+                11 -> SPPrdImg12=list[i]
+                12 -> SPPrdImg13=list[i]
+                13 -> SPPrdImg14=list[i]
+                14 -> SPPrdImg15=list[i]
+                15 -> SPPrdImg16=list[i]
+                16 -> SPPrdImg17=list[i]
+                17 -> SPPrdImg18=list[i]
+                18 -> SPPrdImg19=list[i]
+                19 -> SPPrdImg20=list[i]
 
                 else -> { // Note the block
                     print("x is neither 1 nor 2")
@@ -279,7 +299,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             intToString(minteger),intent.getStringExtra(VEHICLE_NUMBER),"","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal())
+            DateTimeUtils.getCurrentTimeLocal(),SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
+            , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20)
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)

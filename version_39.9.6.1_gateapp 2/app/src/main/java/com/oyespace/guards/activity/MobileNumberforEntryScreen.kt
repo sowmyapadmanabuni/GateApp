@@ -827,8 +827,8 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             SPPrdImg4,
             SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",intent.getStringExtra("Image"),Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal()
-        );
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","",""
+,""        );
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(
