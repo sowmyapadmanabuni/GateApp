@@ -21,6 +21,7 @@ import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -41,62 +42,62 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListener{
+class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListener {
 
 
-    var s_dob:String?=null
-    var date:String?=null
-    var inputt:SimpleDateFormat?=null
-    var output:SimpleDateFormat?=null
-    var oneWayTripDate:Date?=null
-    var out= arrayOf(String())
-    var y:Int?=0
-    var m:Int?=0
-    var d:Int?=0
-    var token:Double?=0.0
-    lateinit var txt_assn_name:TextView
-    lateinit var txt_gate_name:TextView
+    var s_dob: String? = null
+    var date: String? = null
+    var inputt: SimpleDateFormat? = null
+    var output: SimpleDateFormat? = null
+    var oneWayTripDate: Date? = null
+    var out = arrayOf(String())
+    var y: Int? = 0
+    var m: Int? = 0
+    var d: Int? = 0
+    var token: Double? = 0.0
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    var receiver:BroadcastReceiver?=null
-    var datepickerdialog:DatePickerDialog?=null
-    var ccd:String?=null
-    var mobileNumber:String?=null
-    var imgName: String?=null
+    var receiver: BroadcastReceiver? = null
+    var datepickerdialog: DatePickerDialog? = null
+    var ccd: String? = null
+    var mobileNumber: String? = null
+    var imgName: String? = null
     internal var personPhoto: Bitmap? = null
-    var tv_name:TextView?=null
-    var designation = arrayOf("Assistant Manager", "Assistant Security Officer", "CareTaker", "Cook", "Driver","Electrician","Gardener","Gym Trainer","Head Guard","Health Instructor","Lady Head Guard","Lady Supervisor","Lady Senior Security Guard","Lady Security Guard","Maid","Manager","Nurse","Others","Plumber","Stay at Home Maid","Security Guard","Security Officer","Senior Security","Security Supervisor","Senior Supervisor","Sweeper","Tuition Teacher")
+    var tv_name: TextView? = null
+    var designation = arrayOf("Assistant Manager", "Assistant Security Officer", "CareTaker", "Cook", "Driver", "Electrician", "Gardener", "Gym Trainer", "Head Guard", "Health Instructor", "Lady Head Guard", "Lady Supervisor", "Lady Senior Security Guard", "Lady Security Guard", "Maid", "Manager", "Nurse", "Others", "Plumber", "Stay at Home Maid", "Security Guard", "Security Officer", "Senior Security", "Security Supervisor", "Senior Supervisor", "Sweeper", "Tuition Teacher")
     var tv_designation: TextView? = null
-    var overlapImage:ImageView?=null
+    var overlapImage: ImageView? = null
     internal val CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034
     var iv_personphoto: ImageView? = null
-    var calender:ImageView?=null
+    var calender: ImageView? = null
     private val datePicker: DatePicker? = null
     private var cal: Calendar? = null
     private var year: Int = 0
     var month: Int = 0
     var day: Int = 0
-    var ed_dob:TextView?=null
-    var btn_update:Button?=null
-    var tv_mobilenumber:TextView?=null
+    var ed_dob: TextView? = null
+    var btn_update: Button? = null
+    var tv_mobilenumber: TextView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_staff)
 
 
-        btn_update=findViewById(R.id.btn_update)
+        btn_update = findViewById(R.id.btn_update)
 
-        ed_dob=findViewById(R.id.ed_dob)
-       // ed_dob.text=intent.getStringExtra("DOB")
+        ed_dob = findViewById(R.id.ed_dob)
+        // ed_dob.text=intent.getStringExtra("DOB")
 //        calendar = Calendar.getInstance();
 //        year = calendar!!.get(Calendar.YEAR);
-      val sDOB=intent.getStringExtra("DOB")
+        val sDOB = intent.getStringExtra("DOB")
         sDOB.substring(0, 10)
 
         cal = Calendar.getInstance()
-         y = cal!!.get(Calendar.YEAR)
-         m = cal!!.get(Calendar.MONTH)
-         d = cal!!.get(Calendar.DAY_OF_MONTH)
+        y = cal!!.get(Calendar.YEAR)
+        m = cal!!.get(Calendar.MONTH)
+        d = cal!!.get(Calendar.DAY_OF_MONTH)
 
 
         date = sDOB.substring(0, 10)
@@ -106,46 +107,45 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         output = SimpleDateFormat("dd-MM-yyyy")
         try {
             oneWayTripDate = inputt!!.parse(date)                 // parse input
-    //0001-01-01
+            //0001-01-01
 
-    if(output!!.format(oneWayTripDate).equals("01-01-0001")){
-        ed_dob?.hint = resources.getString(R.string.textselectdob)    // format output
-    }else
-    {
-        ed_dob?.text = output!!.format(oneWayTripDate)    // format output
+            if (output!!.format(oneWayTripDate).equals("01-01-0001")) {
+                ed_dob?.hint = resources.getString(R.string.textselectdob)    // format output
+            } else {
+                ed_dob?.text = output!!.format(oneWayTripDate)    // format output
 
-        out = output!!.format(oneWayTripDate).split(",").toTypedArray()
+                out = output!!.format(oneWayTripDate).split(",").toTypedArray()
 
-        try {
-            System.out.println("Year = " + out[2])
-            System.out.println("Month = " + out[0])
-            System.out.println("Day = " + out[1])
-            y = out[2].toInt()
-            m = out[0].toInt()
-            d = out[1].toInt()
-        }catch (e:IndexOutOfBoundsException){
+                try {
+                    System.out.println("Year = " + out[2])
+                    System.out.println("Month = " + out[0])
+                    System.out.println("Day = " + out[1])
+                    y = out[2].toInt()
+                    m = out[0].toInt()
+                    d = out[1].toInt()
+                } catch (e: IndexOutOfBoundsException) {
 
+                }
+
+
+            }
+
+        } catch (e: ParseException) {
+            e.printStackTrace()
         }
 
-
-    }
-
-} catch (e: ParseException) {
-            e.printStackTrace()
-}
-
 //
-     //  ed_dob?.setText(sDOB.substring(0,10))
+        //  ed_dob?.setText(sDOB.substring(0,10))
 //        month = calendar!!.get(Calendar.MONTH);
 //        day = calendar!!.get(Calendar.DAY_OF_MONTH);
 
-       // showDate(year, month+1, day);
+        // showDate(year, month+1, day);
 
-        tv_name= findViewById(R.id.tv_name)
-        overlapImage=findViewById(R.id.overlapImage)
-        iv_personphoto=findViewById(R.id.iv_personphoto)
-        tv_mobilenumber=findViewById(R.id.tv_mobilenumber)
-        tv_mobilenumber!!.text=intent.getStringExtra(ConstantUtils.MOBILENUMBER)
+        tv_name = findViewById(R.id.tv_name)
+        overlapImage = findViewById(R.id.overlapImage)
+        iv_personphoto = findViewById(R.id.iv_personphoto)
+        tv_mobilenumber = findViewById(R.id.tv_mobilenumber)
+        tv_mobilenumber!!.text = intent.getStringExtra(ConstantUtils.MOBILENUMBER)
 //        calendar = Calendar.getInstance();
 //        year = calendar!!.get(Calendar.YEAR);
 
@@ -153,40 +153,36 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
             //setDate()
 
 
-
-
-             datepickerdialog = DatePickerDialog(this@EditStaffActivity, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+            datepickerdialog = DatePickerDialog(this@EditStaffActivity, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
 
                 // Display Selected date in textbox
 
-                 var userAge = GregorianCalendar(year, month, day)
-                 var minAdultAge = GregorianCalendar()
-                 minAdultAge.add(Calendar.YEAR, -18)
-                 if (minAdultAge.before(userAge)) {
-                     Toast.makeText(this, "Age is below 18.", Toast.LENGTH_LONG).show()
-                }
-                else{
-                  //  ed_dob!!.setText("" + dayOfMonth + "-" + (monthOfYear+1) + "-" + year)
-                     ed_dob!!.text = "" + dayOfMonth + "-" + (monthOfYear + 1) + "-" + year
-                    s_dob=(""+year+"-"+(monthOfYear+1)+"-"+dayOfMonth)
+                var userAge = GregorianCalendar(year, month, day)
+                var minAdultAge = GregorianCalendar()
+                minAdultAge.add(Calendar.YEAR, -18)
+                if (minAdultAge.before(userAge)) {
+                    Toast.makeText(this, "Age is below 18.", Toast.LENGTH_LONG).show()
+                } else {
+                    //  ed_dob!!.setText("" + dayOfMonth + "-" + (monthOfYear+1) + "-" + year)
+                    ed_dob!!.text = "" + dayOfMonth + "-" + (monthOfYear + 1) + "-" + year
+                    s_dob = ("" + year + "-" + (monthOfYear + 1) + "-" + dayOfMonth)
 
                 }
             }, y!!, m!!, d!!)
             try {
-               // datepickerdialog!!.getDatePicker().setMinDate(1919, 5, 23));
+                // datepickerdialog!!.getDatePicker().setMinDate(1919, 5, 23));
                 datepickerdialog!!.datePicker.maxDate = cal!!.timeInMillis
-            }
-            catch (e:KotlinNullPointerException){
+            } catch (e: KotlinNullPointerException) {
 
             }
             datepickerdialog!!.show()
         }
-        val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
+        val input = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
         // val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
         tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
-        receiver =  object : BroadcastReceiver() {
+        receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
 
                 val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -202,14 +198,35 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (tv_mobilenumber != null && number != null) {
                                 // textview.text = number.replace("+91", "")
-                                tv_mobilenumber!!.text=number.toString()
-                                ccd= number.substring(0,3)
+                                tv_mobilenumber!!.text = number.toString()
+                                ccd = number.substring(0, 3)
 
-                                mobileNumber=number.substring(3,13)
+                                mobileNumber = number.substring(3, 13)
 
-                             GetWorkersListByMobileNumberAndAssocID(
-                         tv_mobilenumber!!.text.toString(),
-                           Prefs.getInt(ASSOCIATION_ID, 0))
+                                if (StaffRepo.checkExistingStaffForPhone(tv_mobilenumber!!.text.toString())) {
+
+                                    if (output!!.format(oneWayTripDate).equals("01-01-0001")) {
+                                        ed_dob?.hint =
+                                            resources.getString(R.string.textselectdob)    // format output
+                                    } else {
+                                        ed_dob?.text = output!!.format(oneWayTripDate)
+                                    }
+                                    val builder = AlertDialog.Builder(this@EditStaffActivity)
+                                    // builder.setTitle("Vendor Entry already done")
+                                    builder.setMessage("Mobile number already exists. Please Try again")
+                                    builder.setPositiveButton("Ok") { dialog, which ->
+                                        tv_mobilenumber!!.text = intent.getStringExtra(ConstantUtils.MOBILENUMBER)
+                                        dialog.dismiss()
+                                    }
+                                    builder.setCancelable(false)
+                                    builder.show()
+
+                                }
+
+//                                GetWorkersListByMobileNumberAndAssocID(
+//                                    tv_mobilenumber!!.text.toString(),
+//                                    Prefs.getInt(ASSOCIATION_ID, 0)
+//                                )
                             }
                         }
                     }
@@ -220,14 +237,14 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
             }
         }
 
-        tv_name?.text= intent.getStringExtra("FIRSTNAME")
-        tv_designation=findViewById(R.id.tv_designation)
-        tv_designation!!.text=intent.getStringExtra("DESIGNATION")
-       // sp_designation?.setOnItemSelectedListener(this);
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
-        if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
+        tv_name?.text = intent.getStringExtra("FIRSTNAME")
+        tv_designation = findViewById(R.id.tv_designation)
+        tv_designation!!.text = intent.getStringExtra("DESIGNATION")
+        // sp_designation?.setOnItemSelectedListener(this);
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
             txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
@@ -250,11 +267,11 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         //Setting the ArrayAdapter data on the Spinner
         //sp_designation?.setAdapter(aa)
-       // selectSpinnerValue(sp_designation!!,intent.getStringExtra("DESIGNATION"))
+        // selectSpinnerValue(sp_designation!!,intent.getStringExtra("DESIGNATION"))
 
         overlapImage!!.setOnClickListener {
 
-            imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" +intent.getIntExtra(ConstantUtils.WORKER_ID,0)+token+ ".jpg"
+            imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" + intent.getIntExtra(ConstantUtils.WORKER_ID, 0) + token + ".jpg"
 
 
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -268,34 +285,32 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
             .load(
                 IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE")
             )
-            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(iv_personphoto)
+            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+            .into(iv_personphoto)
 
         btn_update!!.setOnClickListener {
 
-//            if(personPhoto== null){
+            //            if(personPhoto== null){
 //               // Toast.makeText(applicationContext, "Capture Photo ", Toast.LENGTH_SHORT).show()
 //            }
 //            else
-                if(tv_name!!.text.trim().length==0){
-                Toast.makeText(this,"Enter Name", Toast.LENGTH_SHORT).show()
+            if (tv_name!!.text.trim().length == 0) {
+                Toast.makeText(this, "Enter Name", Toast.LENGTH_SHORT).show()
 
-            }
-            else if(ed_dob!!.length()==0){
-                Toast.makeText(this,"Select DOB", Toast.LENGTH_SHORT).show()
-            }
-            else {
+            } else if (ed_dob!!.length() == 0) {
+                Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
+            } else {
 
-                   // if(tv_mobilenumber!!.length()==0){
-                        showProgress()
+                // if(tv_mobilenumber!!.length()==0){
+                showProgress()
 
-                        if(imgName!=null) {
-                            editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), imgName!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
+                if (imgName != null) {
+                    editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), imgName!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
 
-                        }
-                        else{
-                            editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
+                } else {
+                    editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
 
-                        }
+                }
 //                    }else {
 //                        GetWorkersListByMobileNumberAndAssocID(
 //                            tv_mobilenumber!!.text.toString(),
@@ -305,8 +320,8 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 //                    }
 
 
-
-            }  }
+            }
+        }
 
 
     }
@@ -338,7 +353,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 //
 //        } else null
 //    }
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -378,8 +392,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 //    }
 
 
-
-//    {
+    //    {
 //        "WKFName"	 : "knlk",
 //        "WKMobile"   : "+919490791523",
 //        "WKImgName"  : "sdsd",
@@ -390,10 +403,20 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 //        "WKIsActive" : "true",
 //        "WKWorkID"   : 8
 //    }
-    private fun editStaff(WKFName: String, WKMobile: String, WKImgName: String,WKWrkType:String,WKDesgn:String,WKIDCrdNo:String,WKDOB:String,WKIsActive:Boolean,WKWorkID:Int) {
+    private fun editStaff(
+        WKFName: String,
+        WKMobile: String,
+        WKImgName: String,
+        WKWrkType: String,
+        WKDesgn: String,
+        WKIDCrdNo: String,
+        WKDOB: String,
+        WKIsActive: Boolean,
+        WKWorkID: Int
+    ) {
 
         val req = StaffEditRequest(
-            WKFName, WKMobile, WKImgName, WKWrkType, WKDesgn,WKIDCrdNo,WKDOB,WKIsActive,WKWorkID
+            WKFName, WKMobile, WKImgName, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID
 
         )
 
@@ -454,7 +477,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
     }
 
     fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
+        Log.d("uploadImage", localImgName)
         var byteArrayProfile: ByteArray?
         val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
         val imageFile = File(mPath)
@@ -519,10 +542,10 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 
                     if (imgName != null) {
 
-                        updateStaffImage(imgName.toString(), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0),intent.getStringExtra("FIRSTNAME"))
+                        updateStaffImage(imgName.toString(), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("FIRSTNAME"))
 
-                    }else{
-                        updateStaffImage(intent.getStringExtra("IMAGE"), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0),intent.getStringExtra("FIRSTNAME"))
+                    } else {
+                        updateStaffImage(intent.getStringExtra("IMAGE"), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("FIRSTNAME"))
 
                     }
                     file.delete()
@@ -531,7 +554,8 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                 } catch (ex: Exception) {
                     Log.d("uploadImage", "errr:" + ex.toString())
 
-                    Toast.makeText(this@EditStaffActivity, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@EditStaffActivity, "Image Not Uploaded", Toast.LENGTH_SHORT)
+                        .show()
                 }
 
             }
@@ -547,7 +571,12 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 
     }
 
-    private fun updateStaffImage(WKEntryImg: String, WKEntryGPS: String, WKWorkID: Int,WKFName:String) {
+    private fun updateStaffImage(
+        WKEntryImg: String,
+        WKEntryGPS: String,
+        WKWorkID: Int,
+        WKFName: String
+    ) {
 
 
         val req = SendStaffImageReq(WKEntryImg, WKEntryGPS, WKWorkID)
@@ -563,16 +592,15 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                             dismissProgress()
 
 
-
-                            val intent = Intent(this@EditStaffActivity,EditBiometric::class.java)
-                            intent.putExtra(WORKER_ID,WKWorkID)
+                            val intent = Intent(this@EditStaffActivity, EditBiometric::class.java)
+                            intent.putExtra(WORKER_ID, WKWorkID)
                             intent.putExtra(PERSONNAME, WKFName)
                             intent.putExtra(UNITID, getIntent().getStringExtra(UNITID))
                             intent.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME))
                             intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
                             intent.putExtra(VISITOR_TYPE, "STAFF")
-                            intent.putExtra(COMPANY_NAME,  getIntent().getStringExtra(COMPANY_NAME))
-                            intent.putExtra(COUNTRYCODE,"")
+                            intent.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME))
+                            intent.putExtra(COUNTRYCODE, "")
                             intent.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
                             startActivity(intent)
                             finish()
@@ -602,6 +630,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                 })
         )
     }
+
     override fun onPause() {
 
         unregisterReceiver(receiver)
@@ -615,7 +644,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         registerReceiver(receiver, IntentFilter(action))
     }
 
-    private fun GetWorkersListByMobileNumberAndAssocID(WKMobile: String,ASAssnID: Int) {
+    private fun GetWorkersListByMobileNumberAndAssocID(WKMobile: String, ASAssnID: Int) {
 
 
         val req = GetWorkersListByMobileNumberReq(WKMobile, ASAssnID)
@@ -628,7 +657,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                     override fun onSuccessResponse(globalApiObject: GetWorkersListByMobileNumberResp) {
                         if (globalApiObject.success == true) {
 
-                            if(globalApiObject.data.message.equals("Invalid MobileNumber")){
+                            if (globalApiObject.data.message.equals("Invalid MobileNumber")) {
 
 //                            showProgress()
 //
@@ -641,22 +670,22 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 //
 //                            }
 
-                        } else {
+                            } else {
 
-                                if(output!!.format(oneWayTripDate).equals("01-01-0001")){
+                                if (output!!.format(oneWayTripDate).equals("01-01-0001")) {
                                     ed_dob?.hint =
                                         resources.getString(R.string.textselectdob)    // format output
-                                }else {
+                                } else {
                                     ed_dob?.text = output!!.format(oneWayTripDate)
                                 }
                                 val builder = AlertDialog.Builder(this@EditStaffActivity)
                                 // builder.setTitle("Vendor Entry already done")
-                                builder.setMessage(globalApiObject.data.message+". Please Try again")
+                                builder.setMessage(globalApiObject.data.message + ". Please Try again")
                                 builder.setPositiveButton("Ok") { dialog, which ->
 
 
                                     dialog.dismiss()
-                                 tv_mobilenumber!!.text=intent.getStringExtra(ConstantUtils.MOBILENUMBER)
+                                    tv_mobilenumber!!.text = intent.getStringExtra(ConstantUtils.MOBILENUMBER)
 
 
 //                                    val d = Intent(this@MobileNumberScreen, Dashboard::class.java)
@@ -665,9 +694,9 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                                 }
                                 builder.setCancelable(false)
                                 builder.show()
-                           // Toast.makeText(this@EditStaffActivity,globalApiObject.data.message,Toast.LENGTH_LONG).show()
+                                // Toast.makeText(this@EditStaffActivity,globalApiObject.data.message,Toast.LENGTH_LONG).show()
 
-                        }
+                            }
                         }
                     }
 

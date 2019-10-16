@@ -1,12 +1,10 @@
 package com.oyespace.guards.realm;
 
 import com.oyespace.guards.models.FingerPrint;
-import com.oyespace.guards.models.Worker;
 
 import java.util.ArrayList;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class RealmDB {
@@ -19,27 +17,6 @@ public class RealmDB {
                 .equalTo("ASAssnID", AssociationID)
                 .findAll();
 //        return fingerPrints;
-    }
-
-    public static ArrayList<Worker> getStaffs() {
-        Realm realm = Realm.getDefaultInstance();
-        ArrayList<Worker> list = new ArrayList<>();
-        list.addAll(realm.where(Worker.class).findAll());
-        realm.close();
-        return list;
-
-    }
-
-    public static Worker getStaffForId(int id) {
-
-
-        Realm realm = Realm.getDefaultInstance();
-
-        return realm.where(Worker.class)
-                .equalTo("wkWorkID", id)
-                .findFirst();
-
-
     }
 
     public static void insertFingerPrints(int fpId, String uname, String finger_type, byte[] photo1, byte[] photo2, byte[] photo3, String MemberType, int aid) {
@@ -115,16 +92,6 @@ public class RealmDB {
         long avail = realm.where(FingerPrint.class).count();
         available = (int) avail;
         return available;
-    }
-
-    public static void saveStaffsList(RealmList<Worker> arrayList) {
-        Realm realm = Realm.getDefaultInstance();
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
-        }
-        realm.copyToRealmOrUpdate(arrayList);
-        realm.commitTransaction();
-        realm.close();
     }
 
 }

@@ -16,18 +16,12 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.StaffAdapter
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.models.GetWorkersResponse
-import com.oyespace.guards.models.WorkersList
-import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.models.Worker
 import com.oyespace.guards.pojo.WorkerDetails
-import com.oyespace.guards.realm.RealmDB
-import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_staff_list.*
 import java.io.File
 import java.util.*
@@ -69,8 +63,19 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_staff_list)
-        initRealm()
-        getServiceProviderList()
+        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
+            override fun onFetch(staff: ArrayList<Worker>?) {
+
+                if (staff == null || staff.isEmpty()) {
+                    tv_nodata.visibility = View.VISIBLE
+                } else {
+                    tv_nodata.visibility = View.INVISIBLE
+                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
+                    rv_staff!!.adapter = WorkerAdapter
+                }
+            }
+
+        })
 
         tv_nodata = findViewById(R.id.tv_nodata)
         tv = findViewById<EditText>(R.id.edt_search_text1)
@@ -122,80 +127,6 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         btn_mic.setOnClickListener {
             Speak()
         }
-    }
-
-    private fun getServiceProviderList() {
-
-        RetrofitClinet.instance
-            .workerList(
-                "7470AD35-D51C-42AC-BC21-F45685805BBE",
-                intToString(LocalDb.getAssociation().asAssnID)
-            )
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
-
-
-                override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
-                    if (workerListResponse.data.worker != null) {
-                        tv_nodata.visibility = View.INVISIBLE
-                        Log.d("getServiceProviderList", "" + workerListResponse.data.worker.size)
-                        if (workerListResponse.data.worker != null) {
-                            //Log.d("WorkerList success", workerListResponse.data.toString())
-
-                            val _arrayList = workerListResponse.data.worker
-                            RealmDB.saveStaffsList(_arrayList)
-                            WorkerAdapter = StaffAdapter(RealmDB.getStaffs(), this@StaffListActivity)
-                            rv_staff!!.adapter = WorkerAdapter
-                        }
-//                        Collections.sort(arrayList, object : Comparator<WorkerDetails> {
-//                            override fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-//                                return lhs.wkfName.compareTo(rhs.wkfName)
-//                            }
-//                        })
-//
-//                        LocalDb.saveStaffList(arrayList);
-//
-
-
-                    } else {
-
-                        tv_nodata.visibility = View.VISIBLE
-                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
-//                        Toast.makeText(this@StaffListActivity, "No Data", Toast.LENGTH_LONG)
-//                            .show()
-//                        LovelyStandardDialog(this@StaffListActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
-//                            .setTopColorRes(R.color.google_red)
-//                            .setIcon(R.drawable.ic_info_black_24dp)
-//                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-//                            .setTitle("No Staff Data")
-//                            .setTitleGravity(Gravity.CENTER)
-//                            .setMessage("No Staff Data")
-//                            .setMessageGravity(Gravity.CENTER)
-//                            .setPositiveButton("Add") {
-//                                val mainIntent = Intent(this@StaffListActivity, WorkersTypeList::class.java)
-//                                startActivity(mainIntent)
-//                            }
-//
-//                            .show()
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-
-                    //rv_staff.setEmptyAdapter(getString(R.string.some_wrng), false, 0)
-                    Toast.makeText(this@StaffListActivity, e.toString(), Toast.LENGTH_LONG)
-                        .show()
-                    Log.d("Error WorkerList", e.toString())
-
-                }
-
-                override fun noNetowork() {
-                    Toast.makeText(this@StaffListActivity, "No network call ", Toast.LENGTH_LONG)
-                        .show()
-                }
-            })
-
     }
 
     fun setLocale(lang: String?) {

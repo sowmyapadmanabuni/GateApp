@@ -30,6 +30,7 @@ class VistorOutListAdapter(
     private val mcontext: Context
 ) : RecyclerView.Adapter<VistorOutListAdapter.MenuHolder>() {
 
+    private var refreshImages: Boolean = true
     private var searchList: ArrayList<ExitVisitorLog>? = null
 
     private val mInflater: LayoutInflater
@@ -136,33 +137,25 @@ class VistorOutListAdapter(
         } catch (e: StringIndexOutOfBoundsException) {
         }
 
+        var imgPath = IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg
+
         if (orderData.vlVisType.equals("STAFF", true)) {
 
-            if (orderData.vlEntryImg.equals("")) {
-                Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg")
-                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                    .into(holder.iv_user)
-            } else {
-
-
-                Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
-                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                    .into(holder.iv_user)
+            if (orderData.vlEntryImg.isEmpty()) {
+                imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg"
             }
 
-
-        } else {
-
-
-            Picasso.with(mcontext)
-                .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                .into(holder.iv_user)
-
-
         }
+
+        if (refreshImages) {
+            Picasso.with(mcontext).invalidate(imgPath)
+        }
+
+        Picasso.with(mcontext)
+            .load(imgPath)
+            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+            .into(holder.iv_user)
+
         holder.iv_user.setOnClickListener {
             try {
 
@@ -177,9 +170,6 @@ class VistorOutListAdapter(
             val view = factory.inflate(R.layout.dialog_big_image, null)
             var dialog_imageview: ImageView? = null
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
-
-
-
 
 
             if (orderData.vlVisType.equals("STAFF", true)) {
@@ -202,12 +192,10 @@ class VistorOutListAdapter(
             } else {
 
 
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
-
-
+                Picasso.with(mcontext)
+                    .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
+                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                    .into(dialog_imageview)
 
 
             }
@@ -235,79 +223,15 @@ class VistorOutListAdapter(
 
     }
 
-//    private fun makeExitCall(visitorLogID: Int) {
-//
-//        val req = VisitorExitReq(
-//            getCurrentTimeLocal(),
-//            0,
-//            visitorLogID,
-//            LocalDb.getAssociation()!!.asAsnName
-//        )
-//        CompositeDisposable().add(
-//            RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-//                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-//                        if (globalApiObject.success == true) {
-////                            Utils.showToast(mcontext, "Success")
-//                        } else {
-//                            Utils.showToast(mcontext, "Failed")
-//                        }
-//                    }
-//
-//                    override fun onErrorResponse(e: Throwable) {
-//                        Utils.showToast(mcontext, "Error visitor exit")
-//                    }
-//
-//                    override fun noNetowork() {
-//                        Utils.showToast(mcontext, "no_internet visitor exit")
-//                    }
-//
-//                    override fun onShowProgress() {
-////                        showProgress()
-//                    }
-//
-//                    override fun onDismissProgress() {
-////                        dismissProgress()
-//                    }
-//                })
-//        )
-//
-//        val filteredList = java.util.ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-//
-//        //looping through existing elements
-//        for (s in listVistor) {
-//            //if the existing elements contains the search input
-//            Log.d(
-//                "button_done ",
-//                "visitorlogbydate " + s.vlExitT + " " + s.vlExitT.equals(
-//                    "0001-01-01T00:00:00",
-//                    true
-//                ) + " "
-//            )
-//
-//            if (s.vlExitT.equals("0001-01-01T00:00:00", true)) {
-//                Log.d("vlExitT ", "visitorlogbydate " + s.vlExitT + " " + s.vlfName + " ")
-//                filteredList.add(s)
-//
-//                //adding the element to filtered list
-//            } else {
-//
-//            }
-//        }
-//        LocalDb.saveEnteredVisitorLog_old(filteredList)
-//
-////        Collections.sort(listVistor, object : Comparator<Visitorlogbydate> {
-////            override  fun compare(lhs: Visitorlogbydate, rhs: Visitorlogbydate): Int {
-////                return rhs.vlExitT.compareTo(lhs.vlExitT)
-////            }
-////        })
-//        listVistor = RandomUtils.getSortedVisitorLog_old(listVistor)
-//
-//        notifyDataSetChanged()
-//
-//    }
+    fun setVisitorLog(visitorLog: ArrayList<ExitVisitorLog>?) {
+        refreshImages = true
+        if (visitorLog == null) {
+            this.searchList = listVistor
+        } else {
+            this.searchList = visitorLog
+        }
+        notifyDataSetChanged()
+    }
 
     override fun getItemCount(): Int {
         return searchList?.size ?: 0
@@ -355,7 +279,14 @@ class VistorOutListAdapter(
 
     }
 
-    fun applySearch(search: String) {
+    fun applySearch(search: String, forceImageRefresh: Boolean = false) {
+
+        if (forceImageRefresh) {
+            refreshImages = forceImageRefresh
+        } else {
+            refreshImages = search.isEmpty()
+        }
+
 
         searchList = VisitorLogRepo.search_OUT_Visitors(search)
 
@@ -363,35 +294,4 @@ class VistorOutListAdapter(
 
     }
 
-//    override fun getFilter(): Filter {
-//        return object : Filter() {
-//            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-//                searchList = results?.values as ArrayList<VisitorLogExitResp.Data.VisitorLog>
-//                notifyDataSetChanged()
-//            }
-//
-//            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
-//                val charString = charSequence.toString()
-//                if (charString.isEmpty()) {
-//                    searchList = listVistor
-//                } else {
-//                    val filteredList = ArrayList<VisitorLogExitResp.Data.VisitorLog>()
-//                    for (row in listVistor) {
-//                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-//                        if (row.vlfName!!.toLowerCase().contains(charString.toLowerCase()) || row.vlComName!!.toLowerCase().contains(
-//                                charString.toLowerCase()
-//                            ) || row.vlMobile!!.toLowerCase().contains(charString.toLowerCase()) || row.vlpOfVis
-//                            !!.toLowerCase().contains(charString.toLowerCase())
-//                        ) {
-//                            filteredList.add(row)
-//                        }
-//                    }
-//                    searchList = filteredList
-//                }
-//                val filterResults = Filter.FilterResults()
-//                filterResults.values = searchList
-//                return filterResults
-//            }
-//        }
-//    }
 }

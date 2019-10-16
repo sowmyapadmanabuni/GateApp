@@ -63,6 +63,7 @@ import com.oyespace.guards.pertroling.PatrollingActivitynew
 import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.resident.ResidentIdActivity
@@ -90,7 +91,7 @@ import java.util.*
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,
     ResponseHandler, Runnable,
-    SGFingerPresentEvent, VistorEntryListAdapter.EntryDeleteListener {
+    SGFingerPresentEvent {
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
     var unAccountID: String? = null
@@ -228,7 +229,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                 if (message.equals(VISITOR_ENTRY_SYNC, ignoreCase = true)) {
 
-                    loadEntryVisitorLog(false)
+                    loadEntryVisitorLog()
 
                 }
 
@@ -278,6 +279,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     internal var rb_hindi: RadioButton? = null
     internal var rg_language: RadioGroup? = null
     internal var dialogs: Dialog? = null
+    lateinit var textWatcher: TextWatcher
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -289,7 +291,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         cd.isConnectingToInternet(this@Dashboard)
         init()
         Prefs.putString("BUTTON", "IN")
-        tv.addTextChangedListener(object : TextWatcher {
+        showingOutLog = false
+        textWatcher = object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
             }
 
@@ -313,7 +316,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
             override fun afterTextChanged(editable: Editable) {
             }
-        })
+        }
+        tv.addTextChangedListener(textWatcher)
         language = Prefs.getString(LANGUAGE, null)
         if (language != null) {
             Log.v("language", language)
@@ -556,7 +560,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         super.onResume()
 
         dismissProgressrefresh()
-        loadEntryVisitorLog(true)
+        loadEntryVisitorLog()
 
         if (isTimeAutomatic(application)) {
 
@@ -700,12 +704,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     }
 
-    private fun loadEntryVisitorLog(pullFromBackend: Boolean) {
+    private fun loadEntryVisitorLog() {
         if (showingOutLog) {
             return
         }
 
-        VisitorLogRepo.get_IN_VisitorLog(pullFromBackend, object : VisitorLogRepo.VisitorLogFetchListener {
+        VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
             override fun onFetch(visitorLog: ArrayList<VisitorLog>?) {
 
                 rv_dashboard!!.visibility = View.GONE
@@ -726,7 +730,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     if (vistorEntryListAdapter != null) {// it works second time and later
                         vistorEntryListAdapter!!.setVisitorLog(newAl)
                     } else {
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard, this@Dashboard)
+                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
                         rv_dashboard?.adapter = vistorEntryListAdapter
                     }
 
@@ -763,12 +767,17 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         tv_nodata.visibility = View.VISIBLE
                     }
 
-                    vistorOutListAdapter = VistorOutListAdapter(visitorLog, this@Dashboard)
+                    if (vistorOutListAdapter == null) {
+                        vistorOutListAdapter = VistorOutListAdapter(visitorLog, this@Dashboard)
+                    } else {
+                        vistorOutListAdapter!!.setVisitorLog(visitorLog)
+                    }
                     rv_dashboard?.adapter = vistorOutListAdapter
 
                     val searchString = tv.text.toString()
                     if (!searchString.isEmpty()) {
-                        vistorOutListAdapter!!.applySearch(searchString)
+                        // force refresh images if pulled to refresh on searched list
+                        vistorOutListAdapter!!.applySearch(searchString, true)
                     }
 
                 }
@@ -776,12 +785,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         })
 
-
-    }
-
-    override fun onINEntryDelete() {
-
-        loadEntryVisitorLog(true)
 
     }
 
@@ -912,7 +915,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
         loginReq.VLVisLgID = vlVisLgID
         loginReq.VLEntryT = getCurrentTimeLocal()
-        loginReq.VLEntyWID = RealmDB.getStaffs()!![0].wkWorkID.toInt()
+        loginReq.VLEntyWID = StaffRepo.getStaffList()!![0].wkWorkID
 
         Log.d("CreateVisitorLogResp", "StaffEntry $loginReq")
         //  showToast(this, "StaffEntry $loginReq");
@@ -1025,11 +1028,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                     if (staff != null) {
                         t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
                         VisitorLogRepo.exitVisitor(this, staff.vlVisLgID)
-                        loadEntryVisitorLog(false)
+                        loadEntryVisitorLog()
                     } else {
 
                         // get staff for id
-                        val worker: Worker? = RealmDB.getStaffForId(id)
+                        val worker: Worker? = StaffRepo.getStaffForId(id)
                         Log.d("taaag", "worker found: $worker")
                         if (worker == null) {
                             showToast(this, "No staff found")
@@ -1156,12 +1159,12 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             R.id.iv_settings ->
 
                 if (clickable == 0) {
-                    tv.setText("")
+                    clearSearchText()
                     lyt_settings?.visibility = View.VISIBLE
                     iv_settings?.setBackgroundResource(R.drawable.cancel)
                     clickable = 1
                 } else if (clickable == 1) {
-                    tv.setText("")
+                    clearSearchText()
                     lyt_settings?.visibility = View.GONE
                     iv_settings?.setBackgroundResource(R.drawable.settings)
                     clickable = 0
@@ -1177,17 +1180,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     internal fun onTabClicked(v: View) {
         Log.d("clcik", "view " + v.id)
+        clearSearchText()
         when (v.id) {
 
             R.id.re_delivery -> {
-                tv.setText("")
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
 
             }
 
             R.id.re_staff -> {
-                tv.setText("")
                 val i_staff = Intent(this@Dashboard, StaffListActivity::class.java)
                 startActivity(i_staff)
 
@@ -1195,8 +1197,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
             R.id.re_vehicle -> {
 
-
-                tv.setText("")
                 val i_vehicle = Intent(this@Dashboard, CaptureImageOcr::class.java)
                 startActivity(i_vehicle)
 
@@ -1204,7 +1204,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
 
             R.id.re_guest -> {
-                tv.setText("")
                 val i_guest =
                     Intent(this@Dashboard, GuestCustomViewFinderScannerActivity::class.java)
                 startActivity(i_guest)
@@ -1212,7 +1211,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             }
 
             R.id.re_resident -> {
-                tv.setText("")
                 val i_staff = Intent(this@Dashboard, ResidentIdActivity::class.java)
                 startActivity(i_staff)
             }
@@ -1224,7 +1222,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     fun downloadBiometricData_Loop() {
-        RealmDB.getStaffs().forEach {
+        StaffRepo.getStaffList()!!.forEach {
             if (RealmDB.fingercount(it.wkWorkID) <= 3) {
                 val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
                 Log.d("btn_biometric", "af " + it.wkWorkID)
@@ -1360,7 +1358,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
 
             if (!showingOutLog) {
-                loadEntryVisitorLog(true)
+                loadEntryVisitorLog()
             } else {
                 loadExitVisitorLog(true)
             }
@@ -1383,7 +1381,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 btn_in.setOnClickListener {
 
                     showingOutLog = false
-                    tv.setText("")
+                    clearSearchText()
                     Prefs.putString("BUTTON", "IN")
                     btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                     btn_out.setBackgroundColor(resources.getColor(R.color.grey))
@@ -1402,8 +1400,11 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                             tv_nodata.visibility = View.GONE
                         }
 
-
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard, this@Dashboard)
+                        if (vistorOutListAdapter == null) {
+                            vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                        } else {
+                            vistorEntryListAdapter!!.setVisitorLog(newAl)
+                        }
                         rv_dashboard?.adapter = vistorEntryListAdapter
                         btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                         btn_out.setBackgroundColor(resources.getColor(R.color.grey))
@@ -1422,7 +1423,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 btn_out.setOnClickListener {
 
                     showingOutLog = true
-                    tv.setText("")
+                    clearSearchText()
                     Prefs.putString("BUTTON", "OUT")
                     btn_in.setBackgroundColor(resources.getColor(R.color.grey))
                     btn_out.setBackgroundColor(resources.getColor(R.color.orange))
@@ -2322,6 +2323,14 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
                 }
             })
+
+    }
+
+    private fun clearSearchText() {
+
+        tv.removeTextChangedListener(textWatcher)
+        tv.setText("")
+        tv.addTextChangedListener(textWatcher)
 
     }
 

@@ -13,33 +13,24 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.VisitorLog
-import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.VisitorExitReq
-import com.oyespace.guards.pojo.VisitorExitResp
 import com.oyespace.guards.repo.VisitorLogRepo
-import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.ConstantUtils.DELIVERY
+import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
-import com.squareup.picasso.MemoryPolicy
 import com.squareup.picasso.Picasso
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 
 class VistorEntryListAdapter(
     private var visitorList: ArrayList<VisitorLog>,
-    private val mcontext: Context,
-    private val onDeleteListener: EntryDeleteListener?
+    private val mcontext: Context
 ) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
 
+    private var refreshImages: Boolean = true
     private var searchList: ArrayList<VisitorLog>? = null
     var number: String? = null
     var searchString: String = ""
@@ -47,7 +38,6 @@ class VistorEntryListAdapter(
     init {
         this.searchList = visitorList
     }
-    //var mTTS: TextToSpeech?=null
 
     internal var animBlink: Animation =
         AnimationUtils.loadAnimation(mcontext, R.anim.animation_blink)
@@ -105,7 +95,6 @@ class VistorEntryListAdapter(
             holder.btn_makeexit.setOnClickListener {
                 holder.btn_makeexit.visibility = View.GONE
                 exitVisitor(orderData, position)
-                onDeleteListener?.onINEntryDelete()
             }
 
             if (orderData.vlMobile.length > 5) {
@@ -123,48 +112,27 @@ class VistorEntryListAdapter(
             }
             // Log.v("Image URL",IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+number+".jpg")
 
-//        ImageHelper.loadImage(mcontext, IMAGE_BASE_URL+"Images/PERSONAssociation"+ASSOCIATIONID+"NONREGULAR"+orderData?.vlVisLgID+".jpg", holder.iv_user)
+
+            var imgPath = IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg
+
             if (orderData.vlVisType.equals("STAFF", true)) {
-//            Picasso.with(mcontext)
-//                .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+ Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+orderData?.reRgVisID+".jpg")
-//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
-
-                if (orderData.vlEntryImg.equals("")) {
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .memoryPolicy(MemoryPolicy.NO_CACHE)
-                        .into(holder.iv_user)
-                } else {
-
-
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .memoryPolicy(MemoryPolicy.NO_CACHE)
-                        .into(holder.iv_user)
+                if (orderData.vlEntryImg.isEmpty()) {
+                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg"
                 }
-
             } else {
-//            Picasso.with(mcontext)
-//                .load(IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+number+".jpg")
-//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(holder.iv_user)
-
-                if (orderData.vlEntryImg.equals("")) {
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .memoryPolicy(MemoryPolicy.NO_CACHE)
-                        .into(holder.iv_user)
-                } else {
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .memoryPolicy(MemoryPolicy.NO_CACHE)
-                        .into(holder.iv_user)
-
+                if (orderData.vlEntryImg.isEmpty()) {
+                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"
                 }
             }
+
+            if (refreshImages) {
+                Picasso.with(mcontext).invalidate(imgPath)
+            }
+
+            Picasso.with(mcontext)
+                .load(imgPath)
+                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                .into(holder.iv_user)
 
             holder.iv_user.setOnClickListener {
 
@@ -253,10 +221,10 @@ class VistorEntryListAdapter(
             e.printStackTrace()
         }
 
-        val log = VisitorLogRepo.get_IN_VisitorLog()
-        if (log != null) {
-            visitorList = log
-        }
+//        val log = VisitorLogRepo.get_IN_VisitorLog()
+//        if (log != null) {
+//            visitorList = log
+//        }
 
 
         try {
@@ -264,52 +232,6 @@ class VistorEntryListAdapter(
         } catch (e: IndexOutOfBoundsException) {
             e.printStackTrace()
         }
-        applySearch(searchString)
-
-    }
-
-
-    // sends the time of exit for the entry to the backend
-    private fun makeExitCall(visitorLogID: Int) {
-
-        val req = VisitorExitReq(getCurrentTimeLocal(), 0, visitorLogID, Prefs.getString(GATE_NO, ""))
-        CompositeDisposable().add(
-            RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                    override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                        if (globalApiObject.success == true) {
-
-                            // update exit log from backend
-                            VisitorLogRepo.get_OUT_VisitorLog(true)
-
-                            val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
-                            intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
-                            mcontext.sendBroadcast(intentAction1)
-
-                        } else {
-                            Utils.showToast(mcontext, "Failed")
-                        }
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        Utils.showToast(mcontext, "Error visitor exit")
-                    }
-
-                    override fun noNetowork() {
-                        Utils.showToast(mcontext, "no_internet visitor exit")
-                    }
-
-                    override fun onShowProgress() {
-//                        showProgress()
-                    }
-
-                    override fun onDismissProgress() {
-//                        dismissProgress()
-                    }
-                })
-        )
 
     }
 
@@ -318,6 +240,7 @@ class VistorEntryListAdapter(
     }
 
     fun setVisitorLog(visitorLog: ArrayList<VisitorLog>?) {
+        refreshImages = true
         if (visitorLog == null) {
             this.searchList = visitorList
         } else {
@@ -372,16 +295,13 @@ class VistorEntryListAdapter(
 
     fun applySearch(search: String) {
 
-        this.searchString = search
+        refreshImages = search.isEmpty()
 
+        this.searchString = search
         searchList = VisitorLogRepo.search_IN_Visitors(search)
 
         notifyDataSetChanged()
 
-    }
-
-    interface EntryDeleteListener {
-        fun onINEntryDelete()
     }
 
 }

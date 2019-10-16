@@ -1,6 +1,5 @@
 package com.oyespace.guards
 
-import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,15 +13,14 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
-import com.oyespace.guards.models.GetWorkersResponse
 import com.oyespace.guards.models.VisitorLog
-import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils
@@ -156,7 +154,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 Log.d("uploadImage", "else " + intent.getStringExtra("imgName"))
             }
         } else if (intent.getStringExtra(BSR_Action).equals(SYNC_STAFF_LIST)) {
-            getStaffList()
+            StaffRepo.getStaffList(true)
             getCheckPointList()
         } else if (intent.getStringExtra(BSR_Action).equals(SYNC_UNIT_LIST)) {
             getUnitList()
@@ -417,44 +415,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
             }
         })
-
-    }
-
-    @SuppressLint("CheckResult")
-    private fun getStaffList() {
-
-        try {
-            RetrofitClinet.instance
-                .workerList(OYE247TOKEN, intToString(LocalDb.getAssociation().asAssnID))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
-
-                    override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
-
-
-                        if (workerListResponse.data.worker != null) {
-                            Log.d("WorkerList success", workerListResponse.data.toString())
-
-                            val arrayList = workerListResponse.data.worker
-                            RealmDB.saveStaffsList(arrayList)
-
-                        } else {
-
-                        }
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        Log.d("Error WorkerList", e.toString())
-                    }
-
-                    override fun noNetowork() {
-
-                    }
-                })
-        } catch (e: Exception) {
-
-        }
 
     }
 

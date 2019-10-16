@@ -36,6 +36,7 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -49,7 +50,7 @@ import kotlinx.android.synthetic.main.activity_mobile_number.*
 import java.util.*
 
 
-class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, ResponseHandler,CountryCodePicker.OnCountryChangeListener {
+class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, CountryCodePicker.OnCountryChangeListener {
     override fun onSuccess(response: String?, data: Any?, urlId: Int, position: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -57,24 +58,24 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     override fun onFailure(e: java.lang.Exception?, urlId: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-    var receiver:BroadcastReceiver?=null
+
+    var receiver: BroadcastReceiver? = null
     val workType: ArrayList<String> = ArrayList()
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
     private var countryName: String? = null
     lateinit var pDialog: ProgressDialog
     var phonenumber: String? = null
-    lateinit var txt_assn_name:TextView
-    lateinit var txt_gate_name:TextView
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    val laststate:Int?=null
-    var buttonSkip:Button?=null
+    val laststate: Int? = null
+    var buttonSkip: Button? = null
     var btn_manualentry: Button? = null
-    var ccd:String?=null
-    var mobileNumber:String?=null
-    lateinit var btn_nobalance:Button
-    lateinit var timer:TextView
-
+    var ccd: String? = null
+    var mobileNumber: String? = null
+    lateinit var btn_nobalance: Button
+    lateinit var timer: TextView
 
 
     // private var Ed_phoneNum:String?=null
@@ -85,7 +86,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
         when (v?.id) {
 
-            R.id.btn_nobalance->{
+            R.id.btn_nobalance -> {
 
                 val d = Intent(this@MobileNumberforEntryScreen, MobileNumberEntryScreenwithOTP::class.java)
                 d.putExtra("UNITID", intent.getStringExtra("UNITID"))
@@ -93,9 +94,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
                 d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
-                d.putExtra("WORKTYPE",  intent.getStringExtra("WORKTYPE"))
-                d.putExtra("WORKERID",  intent.getIntExtra("WORKERID",0))
-                d.putExtra("UNITNAME",  intent.getStringExtra("UNITNAME"))
+                d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                d.putExtra("WORKERID", intent.getIntExtra("WORKERID", 0))
+                d.putExtra("UNITNAME", intent.getStringExtra("UNITNAME"))
                 d.putExtra("Image", intent.getStringExtra("Image"))
                 startActivity(d)
                 finish()
@@ -106,17 +107,24 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             R.id.buttonNext -> {
                 if (textview.text.length > 0) {
 
-                    Log.v("NUMBER MATCH",intent.getStringExtra(MOBILENUMBER)+".."+textview.text)
+                    Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
+                    val phoneNumber = textview.text.toString()
                     if (intent.getStringExtra(MOBILENUMBER).equals(textview.text)) {
 
-                        getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("UNITNAME"), intent.getStringExtra("Image"))
+                        if (VisitorLogRepo.check_IN_VisitorByPhone(phoneNumber)) {
+                            Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("UNITID"), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("UNITNAME"), intent.getStringExtra("Image"))
+                        }
+
 
                     } else {
                         buttonNext.isEnabled = true
                         buttonNext.isClickable = true
-                        textview.text=""
-                      Toast.makeText(this, "Enter valid staff number", Toast.LENGTH_SHORT).show()
-                   }
+                        textview.text = ""
+                        Toast.makeText(this, "Enter valid staff number", Toast.LENGTH_SHORT).show()
+                    }
 
                 }
 
@@ -133,9 +141,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_mobilenumberforentry)
-        btn_nobalance=findViewById(R.id.btn_nobalance)
+        btn_nobalance = findViewById(R.id.btn_nobalance)
         btn_manualentry = findViewById(R.id.btn_manualentry)
-        timer=findViewById(R.id.timer)
+        timer = findViewById(R.id.timer)
 
         btn_manualentry!!.setOnClickListener {
 
@@ -155,7 +163,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
         }
 
-        receiver =  object : BroadcastReceiver() {
+        receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 telephony.listen(object : PhoneStateListener() {
@@ -172,11 +180,11 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                 // textview.text = number.replace("+91", "")
                                 textview.text = number
 
-                                ccd= number.substring(0,3)
+                                ccd = number.substring(0, 3)
 
-                                mobileNumber=number.substring(3,13)
+                                mobileNumber = number.substring(3, 13)
 
-                               // GetWorkersListByMobileNumberAndAssocID(ccd.toString()+mobileNumber.toString(),Prefs.getInt(ASSOCIATION_ID, 0))
+                                // GetWorkersListByMobileNumberAndAssocID(ccd.toString()+mobileNumber.toString(),Prefs.getInt(ASSOCIATION_ID, 0))
                             }
                             LocalDb.disconnectCall(context)
                         }
@@ -188,12 +196,12 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             }
         }
 
-        buttonSkip=findViewById(R.id.buttonSkip)
-        buttonSkip?.visibility=View.INVISIBLE
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
-        if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
+        buttonSkip = findViewById(R.id.buttonSkip)
+        buttonSkip?.visibility = View.INVISIBLE
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
             txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
@@ -211,7 +219,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             txt_device_name.text = " "
 
         }
-        val timer = object: CountDownTimer(60000,1000){
+        val timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
                 val remainedSecs: Long = millisUntilFinished / 1000
@@ -226,14 +234,11 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         timer.start()
 
 
+        val mobilePHONEDATA: String = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
 
 
-        val mobilePHONEDATA:String = Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
-
-
-
-        val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
-        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
+        val input = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
+        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE, "")
 
         val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
 
@@ -481,7 +486,6 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     }
 
 
-
     override fun onCountrySelected() {
         countryCode = ccp!!.selectedCountryCode
         countryName = ccp!!.selectedCountryName
@@ -500,6 +504,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             }
         }
     }
+
     fun setLocale(lang: String?) {
         var lang = lang
         if (lang == null) {
@@ -521,6 +526,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
         super.onPause()
     }
+
     override fun onResume() {
         super.onResume()
 
@@ -593,31 +599,31 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
 
         var memID: Int = 410
-        if(BASE_URL.contains("dev",true)){
+        if (BASE_URL.contains("dev", true)) {
             memID = 64
-        }
-        else if(BASE_URL.contains("uat",true)){
+        } else if (BASE_URL.contains("uat", true)) {
             memID = 64
         }
 //        var memID:Int=64;
 //        if(!BASE_URL.contains("dev",true)){
 //            memID=410;
 //        }
-        var SPPrdImg1=""
-        var SPPrdImg2=""
-        var SPPrdImg3=""
-        var SPPrdImg4=""
-        var SPPrdImg5=""
-        var SPPrdImg6=""
-        var SPPrdImg7=""
-        var SPPrdImg8=""
-        var SPPrdImg9=""
-        var SPPrdImg10=""
-        val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
-            unitName,unitId ,desgn,
-            personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
-            "","","","",
-            1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+        var SPPrdImg1 = ""
+        var SPPrdImg2 = ""
+        var SPPrdImg3 = ""
+        var SPPrdImg4 = ""
+        var SPPrdImg5 = ""
+        var SPPrdImg6 = ""
+        var SPPrdImg7 = ""
+        var SPPrdImg8 = ""
+        var SPPrdImg9 = ""
+        var SPPrdImg10 = ""
+        val req = CreateVisitorLogReq(
+            Prefs.getInt(ASSOCIATION_ID, 0), staffID,
+            unitName, unitId, desgn,
+            personName, LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb,
+            "", "", "", "",
+            1, workerType, SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             ,
             SPPrdImg6,
             SPPrdImg7,
@@ -628,10 +634,10 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             intent.getStringExtra("Image"),
             Prefs.getString(ConstantUtils.GATE_NO, "")
         )
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
+        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
 
         CompositeDisposable().add(
-            RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
+            RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
@@ -742,11 +748,11 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 //
 
 
-                            Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
+                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
                         } else {
-                            Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.toString())
+                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.toString())
 
-                            Utils.showToast(this@MobileNumberforEntryScreen, "Entry not Saved"+globalApiObject.toString())
+                            Utils.showToast(this@MobileNumberforEntryScreen, "Entry not Saved" + globalApiObject.toString())
                         }
 
                         finish()
@@ -754,7 +760,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     }
 
                     override fun onErrorResponse(e: Throwable) {
-                        Log.d("onErrorResponse","StaffEntry "+e.toString())
+                        Log.d("onErrorResponse", "StaffEntry " + e.toString())
 
                         Utils.showToast(this@MobileNumberforEntryScreen, "Something went wrong")
 //                    dismissProgress()
@@ -782,7 +788,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         finish()
     }
 
-    private fun GetWorkersListByMobileNumberAndAssocID(WKMobile: String,ASAssnID: Int) {
+    private fun GetWorkersListByMobileNumberAndAssocID(WKMobile: String, ASAssnID: Int) {
 
 
         val req = GetWorkersListByMobileNumberReq(WKMobile, ASAssnID)
@@ -795,9 +801,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     override fun onSuccessResponse(globalApiObject: GetWorkersListByMobileNumberResp) {
                         if (globalApiObject.success == true) {
 
-                            if(globalApiObject.data.message.equals("Invalid MobileNumber")){
+                            if (globalApiObject.data.message.equals("Invalid MobileNumber")) {
 
-                               // getAccountDetails(ccd.toString(), mobileNumber.toString());
+                                // getAccountDetails(ccd.toString(), mobileNumber.toString());
 
 
                             } else {
@@ -805,12 +811,12 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
                                 val builder = AlertDialog.Builder(this@MobileNumberforEntryScreen)
                                 // builder.setTitle("Vendor Entry already done")
-                                builder.setMessage(globalApiObject.data.message+". Please Try again")
+                                builder.setMessage(globalApiObject.data.message + ". Please Try again")
                                 builder.setPositiveButton("Ok") { dialog, which ->
 
 
                                     dialog.cancel()
-                                    textview!!.text=""
+                                    textview!!.text = ""
 
 //                                    val d = Intent(this@MobileNumberScreen, Dashboard::class.java)
 //                                    startActivity(d)
@@ -842,8 +848,10 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         )
     }
 
-    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int) {
+    private fun getUnitLog(
+        unitId: Int, personName: String, mobileNumb: String, desgn: String,
+        workerType: String, staffID: Int, unitName: String, vlVisLgID: Int
+    ) {
 
         RetrofitClinet.instance
             .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
@@ -855,18 +863,18 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
                     if (UnitList.success == true) {
 
-                        val ddc  =  Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
+                        val ddc = Intent(this@MobileNumberforEntryScreen, BackgroundSyncReceiver::class.java)
                         ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                        ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+                        ddc.putExtra("msg", personName + " " + desgn + " is coming to your home")
                         ddc.putExtra("mobNum", mobileNumb)
                         ddc.putExtra("name", personName)
                         ddc.putExtra("nr_id", vlVisLgID.toString())
                         ddc.putExtra("unitname", unitName)
                         ddc.putExtra("memType", "Owner")
-                        ddc.putExtra(UNITID,unitId.toString())
-                        ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                        ddc.putExtra(UNITID, unitId.toString())
+                        ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                         // ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
-                        ddc.putExtra("VLVisLgID",vlVisLgID)
+                        ddc.putExtra("VLVisLgID", vlVisLgID)
                         ddc.putExtra(VISITOR_TYPE, "Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
@@ -891,11 +899,21 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
     }
 
-    fun getVisitorByWorkerId(assnID: Int,workerID:Int, unitId: String, personName: String, mobileNumb: String, desgn: String,
-                             workerType: String, staffID: Int, unitName: String,wkEntryImg:String){
+    fun getVisitorByWorkerId(
+        assnID: Int,
+        workerID: Int,
+        unitId: String,
+        personName: String,
+        mobileNumb: String,
+        desgn: String,
+        workerType: String,
+        staffID: Int,
+        unitName: String,
+        wkEntryImg: String
+    ) {
 
         // showToast(this@Dashboard,assnID.toString()+".."+workerID+"..."+personName)
-        RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID,assnID)
+        RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID, assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
@@ -903,7 +921,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
 
                     if (getdata.success == true) {
-                         showToast(this@MobileNumberforEntryScreen,"Duplicate Entry not allowed")
+                        showToast(this@MobileNumberforEntryScreen, "Duplicate Entry not allowed")
                         //  showToast(this@Dashboard,workerID.toString())
 
                     }
@@ -919,7 +937,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                         intent.getStringExtra("DESIGNATION"),
                         intent.getStringExtra("WORKTYPE"),
                         workerID.toInt(),
-                            intent.getStringExtra("UNITNAME")
+                        intent.getStringExtra("UNITNAME")
                     )
                     //   }
 
