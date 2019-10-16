@@ -85,7 +85,7 @@ public class PatrollingAlert extends AppCompatActivity {
                     Prefs.putInt(ConstantUtils.SNOOZE_COUNT+scheduleId,snoozed);
                     Prefs.putString(ConstantUtils.SNOOZE_TIME+scheduleId,new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date()));
                     stopSiren();
-                    Toast.makeText(PatrollingAlert.this,"Snoozed for next 1 minute",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PatrollingAlert.this,"Snoozed for next 5 minutes",Toast.LENGTH_SHORT).show();
                 }else{
                     Intent patrolIntent = new Intent(PatrollingAlert.this, PScheduleListActivity.class);
                     startActivity(patrolIntent);

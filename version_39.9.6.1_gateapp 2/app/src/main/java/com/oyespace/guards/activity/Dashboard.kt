@@ -579,11 +579,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         pTimerChecker = fixedRateTimer("patroll_timer_checker",false,6000,20000){
             this@Dashboard.runOnUiThread {
                 val activeAlert = Prefs.getBoolean("ACTIVE_ALERT",false)
-                Log.e("activeAlert","RUN_TIMER_CHCKER "+activeAlert)
                 if(!activeAlert){
-                    Log.e("activeAlert","pTIMER "+pTimer)
                     if(pTimer == null){
-                        Log.e("activeAlert","pTIMER is null")
                         runPatrollingTimer()
                     }
                 }

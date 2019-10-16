@@ -376,7 +376,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                             val d:Date = Date()
                             val day = sdf.format(d)
                             Log.e("ALARM_DAY",""+day);
-                            if(schedules.psRepDays.contains(day)){
+                            if(schedules.psRepDays.contains(day,ignoreCase = true)){
                                 Log.e("ALARM_DAYFOUND",""+day);
                                 val timeFormat = SimpleDateFormat("yyyy-MM-dd")
                                 var currentTimeObj = timeFormat.format(Date())
@@ -398,8 +398,24 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 val diff = startTimeObj.time-Date().time
                                 val seconds = diff / 1000;
                                 val minutes = seconds / 60;
+                                val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
+                                val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+schedules.psPtrlSID,0)
+                                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+schedules.psPtrlSID,"")
+                                val snoozeMins:Long = getTimeDifference(snoozedTime)
+                                val completedTime = Prefs.getString(PATROLLING_COMPLETED_ON+schedules.psPtrlSID,"")
+                                var isPatrollingCompleted = false
+                                if(!completedTime.equals("")){
+                                    val completedMins:Long = getTimeDifference(completedTime)
+                                    if(completedMins<6){
+                                        isPatrollingCompleted = true
+                                    }else{
+                                        isPatrollingCompleted = false
+                                    }
+                                }
 
-                                if(minutes <= 5 && minutes > -1){
+                                Log.e("THE_DIFF",""+minutes+" - "+isSnoozed+" - "+snoozeMins+"  - "+isPatrollingCompleted)
+
+                                if(((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount<3 && snoozeMins>=5 && snoozeMins<17)) && !isPatrollingCompleted){
 
                                     if(schedules.psSnooze){
                                         //Snooze enabled
@@ -409,6 +425,22 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     }
                                     break;
 
+                                }else if(isSnoozed && snoozeCount>=3 && snoozeMins>=20){
+                                    Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_IS_ACTIVE+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_TIME+schedules.psPtrlSID)
+
+                                    if(minutes <= 5 && minutes > -1 && !isPatrollingCompleted){
+
+                                        if(schedules.psSnooze){
+                                            //Snooze enabled
+                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"Snooze",schedules.psPtrlSID);
+                                        }else{
+                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
+                                        }
+                                        break;
+
+                                    }
                                 }
                                 Log.e("TIME_DIFF",""+ minutes)
 
@@ -447,30 +479,37 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
             if(isSnoozed){
                 val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+id,0)
-                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+id,null)
-
-
-
-                val snoozedTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(snoozedTime)
-                val currentTimeStr = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(Date())
-                val currentTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(currentTimeStr)
-
-
-                val diff = currentTimeObj.time-snoozedTimeObj.time
-                val seconds = diff / 1000;
-                val minutes = seconds / 60;
-
+                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+id,"")
+                val minutes = getTimeDifference(snoozedTime)
 
                 Log.e(SNOOZE_COUNT+id,""+snoozeCount)
                 Log.e(SNOOZE_TIME+id,""+snoozedTime)
                 Log.e(SNOOZE_TIME+id,"DIFFERE: "+minutes)
 
-                if(snoozeCount < 3 && snoozedTime != null && minutes >= 1){
+                if(snoozeCount < 3 && snoozedTime != null && !snoozedTime.equals("") && minutes >= 5){
                     mcontext.startActivity(alertDlg)
                 }
             }else {
                 mcontext.startActivity(alertDlg)
             }
+        }
+    }
+
+
+    private fun getTimeDifference(dateTime:String):Long{
+
+        try {
+            val snoozedTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(dateTime)
+            val currentTimeStr = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(Date())
+            val currentTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(currentTimeStr)
+
+
+            val diff = currentTimeObj.time - snoozedTimeObj.time
+            val seconds = diff / 1000;
+            val minutes = seconds / 60;
+            return minutes
+        }catch (e:java.lang.Exception){
+            return 0
         }
     }
 
