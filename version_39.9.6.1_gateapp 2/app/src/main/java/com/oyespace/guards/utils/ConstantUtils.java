@@ -75,7 +75,7 @@ public class ConstantUtils {
 
     //http://mediaupload.oyespace.com/Images/
   public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
- // public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+  //public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
     //public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
 //public static final String BASE_URL="https://apidev.oyespace.com/";
     //public static final String BASE_URL="https://apiuat.oyespace.com/";

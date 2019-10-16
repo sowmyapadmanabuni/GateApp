@@ -20,16 +20,16 @@ android:gravity="center">
 
             <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/selected_unit_name"
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/dp_36"
                     android:layout_height="wrap_content"
-                    android:text="A10001"
-                    android:background="@color/color_divider"
-                    android:lines="1"
-                    android:layout_margin="8dp"
-                    android:padding="6dp"
                     android:layout_centerInParent="true"
                     android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"/>
+                    android:layout_centerVertical="true"
+                    android:layout_margin="8dp"
+                    android:background="@color/color_divider"
+                    android:lines="1"
+                    android:padding="6dp"
+                    android:text="A10001" />
 
         </FrameLayout>
 
@@ -39,7 +39,7 @@ android:gravity="center">
                 android:layout_width="16dp"
                 android:layout_height="16dp"
                 android:layout_gravity="right|top"
-                android:translationZ="90dp"
+
                 android:src="@drawable/close"/>
 
     </FrameLayout>

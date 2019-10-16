@@ -16,11 +16,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.firebase.database.FirebaseDatabase
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -164,6 +166,16 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     var SPPrdImg8=""
     var SPPrdImg9=""
     var SPPrdImg10=""
+    var SPPrdImg11=""
+    var SPPrdImg12=""
+    var SPPrdImg13=""
+    var SPPrdImg14=""
+    var SPPrdImg15=""
+    var SPPrdImg16=""
+    var SPPrdImg17=""
+    var SPPrdImg18=""
+    var SPPrdImg19=""
+    var SPPrdImg20=""
 
 
 
@@ -174,6 +186,9 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         //launchCamera()
 //        val service =  Intent(getBaseContext(), CapPhoto::class.java)
 //        startService(service);
+
+
+
         dbh = DataBaseHelper(applicationContext)
 
 //         imgName = "Selfie" + "Association" + Prefs.getInt(
@@ -286,6 +301,16 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 7 -> SPPrdImg8=list[i]
                 8 -> SPPrdImg9=list[i]
                 9 -> SPPrdImg10=list[i]
+                10 -> SPPrdImg11=list[i]
+                11 -> SPPrdImg12=list[i]
+                12 -> SPPrdImg13=list[i]
+                13 -> SPPrdImg14=list[i]
+                14 -> SPPrdImg15=list[i]
+                15 -> SPPrdImg16=list[i]
+                16 -> SPPrdImg17=list[i]
+                17 -> SPPrdImg18=list[i]
+                18 -> SPPrdImg19=list[i]
+                19 -> SPPrdImg20=list[i]
 
                 else -> { // Note the block
                     print("x is neither 1 nor 2")
@@ -323,7 +348,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             intToString(minteger),"","","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName,Prefs.getString(ConstantUtils.GATE_NO, ""),getCurrentTimeLocal())
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName,Prefs.getString(ConstantUtils.GATE_NO, ""),getCurrentTimeLocal(),SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
+            , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20)
 
         Log.d("CreateVisitorLogResp","StaffEntry destination "+req.toString())
 
@@ -335,6 +361,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     if (globalApiObject.success == true) {
 
                         Log.d("VISItor id",globalApiObject.data.visitorLog.vlVisLgID.toString())
+                        updatecolor(globalApiObject.data.visitorLog.vlVisLgID.toString(),"#ffb81a")
 
                         for (i in list.indices) {
                             val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
@@ -370,6 +397,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
 
                        uploadImage(imgName,mBitmap)
+
 
                         finish()
 
@@ -486,7 +514,14 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         }
     }
 
-
+fun updatecolor(visitorId:String,buttonColor:String){
+    val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
+    val id= ref.push().key
+    val notificationSyncModel= NotificationSyncModel(visitorId,buttonColor)
+    ref.child(visitorId).setValue(notificationSyncModel).addOnCompleteListener {
+        Toast.makeText(this@StaffEntryRegistration,"DONE",Toast.LENGTH_LONG).show()
+    }
+}
 
 
 }

@@ -23,9 +23,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.google.firebase.FirebaseError
+import com.google.firebase.database.*
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VendorPojo
@@ -43,13 +46,11 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-class VistorEntryListAdapter(
-    var listVistor: ArrayList<VisitorEntryLog>,
-    private val mcontext: Context
-
-) : androidx.recyclerview.widget.RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>(),
+class VistorEntryListAdapter(var listVistor: ArrayList<VisitorEntryLog>, private val mcontext: Context) : androidx.recyclerview.widget.RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>(),
     Filterable {
 
+    lateinit var firebasedataMapp : HashMap<String, String>
+    lateinit var ref: DatabaseReference
     private var searchList: ArrayList<VisitorEntryLog>? = null
     private val mInflater: LayoutInflater
     var number:String?=null
@@ -59,6 +60,8 @@ class VistorEntryListAdapter(
     init {
         this.searchList = listVistor
         mInflater = LayoutInflater.from(mcontext)
+        ref= FirebaseDatabase.getInstance().getReference("NotificationSync")
+        firebasedataMapp= hashMapOf()
     }
     //var mTTS: TextToSpeech?=null
 
@@ -119,16 +122,22 @@ class VistorEntryListAdapter(
 
             }
 
+
             if (orderData?.vlVisType.equals(DELIVERY) && deliveryTimeUp(
                     orderData?.vlEntryT,
                     getCurrentTimeLocal(),
                     1
                 )
             ) {
-                holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
-                holder.ll_card.startAnimation(animBlink)
+                
 
-                refresh(1000)
+
+
+                
+//                holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
+//                holder.ll_card.startAnimation(animBlink)
+
+               // refresh(1000)
 
 
                 // mTTS!!.speak("Overstaying "+orderData.vlfName+orderData.vllName, TextToSpeech.QUEUE_FLUSH, null)
@@ -138,8 +147,45 @@ class VistorEntryListAdapter(
 //                }
 
             } else {
-                holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
-                holder.ll_card.animation = null
+//                holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
+//                holder.ll_card.animation = null
+
+
+                ref.addValueEventListener(object :ValueEventListener{
+                    override fun onCancelled(p0: DatabaseError) {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+
+                    override fun onDataChange(p0: DataSnapshot) {
+
+                        if(p0.exists()){
+                            for(h in p0.children){
+
+                                var data= h.getValue(NotificationSyncModel::class.java)
+
+                                firebasedataMapp.put(data!!.visitorlogId,data!!.buttonColor)
+                                //  firebasedatalist.add(data!!)
+                                try {
+                                    if (firebasedataMapp.containsKey(orderData?.vlVisLgID.toString())) {
+
+                                        Toast.makeText(mcontext,"mcv",Toast.LENGTH_LONG).show()
+                                        holder.ll_card.setBackgroundColor(Color.parseColor(firebasedataMapp[orderData?.vlVisLgID.toString()]))
+                                    }
+                                }catch (e:IndexOutOfBoundsException){
+
+                                }
+
+                                Toast.makeText(mcontext, firebasedataMapp.get(data!!.visitorlogId), Toast.LENGTH_LONG).show()
+
+                            }
+                        }
+
+                    }
+
+                })
+
+
+
 
             }
 

@@ -341,7 +341,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
             "","","","",
             1, "Staff Manaual Entry", SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal()
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
         );
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 

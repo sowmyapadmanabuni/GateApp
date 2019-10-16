@@ -313,7 +313,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),
             imgName!!,Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal())
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","")
 
         Log.d("CreateVisitorLogResp","StaffEntry destination "+req.toString())
 
