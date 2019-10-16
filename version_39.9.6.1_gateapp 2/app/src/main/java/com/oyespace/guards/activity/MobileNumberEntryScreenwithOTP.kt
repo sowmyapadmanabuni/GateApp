@@ -1029,7 +1029,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             SPPrdImg10,
             "",
             intent.getStringExtra("Image"),
-            Prefs.getString(ConstantUtils.GATE_NO, "")
+            Prefs.getString(ConstantUtils.GATE_NO, ""),
+            DateTimeUtils.getCurrentTimeLocal()
         );
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
@@ -1041,7 +1042,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+                           // visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
                             val ddc  =  Intent(this@MobileNumberEntryScreenwithOTP, BackgroundSyncReceiver::class.java)
                             ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
@@ -1056,6 +1057,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                             this@MobileNumberEntryScreenwithOTP.sendBroadcast(ddc);
+
+                            finish()
 
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                         } else {

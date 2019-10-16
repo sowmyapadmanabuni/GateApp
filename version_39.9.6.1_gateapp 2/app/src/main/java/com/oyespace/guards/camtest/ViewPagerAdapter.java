@@ -14,48 +14,7 @@ import com.oyespace.guards.R;
 import java.util.ArrayList;
 
 public class ViewPagerAdapter extends PagerAdapter {
-//     Context mContext;
-//    int pos;
-//    ArrayList<String>imagesList;
-//
-//    public ViewPagerAdapter(Context context,int pos) {
-//        mContext = context;
-//        pos=pos;
-//        imagesList=new ArrayList<>();
-//        imagesList=AddCarFragment.list;
-//    }
-//
-//    @Override
-//    public Object instantiateItem(ViewGroup collection, int position) {
-//       // ModelObject modelObject = ModelObject.values()[position];
-//        LayoutInflater inflater = LayoutInflater.from(mContext);
-//        ViewGroup layout = (ViewGroup) inflater.inflate(R.layout.layout_viewpager_iem, collection, false);
-//        collection.addView(layout);
-//        return layout;
-//    }
-//
-//    @Override
-//    public void destroyItem(ViewGroup collection, int position, Object view) {
-//        collection.removeView((View) view);
-//    }
-//
-//    @Override
-//    public int getCount() {
-//       // return ModelObject.values().length;
-//        return imagesList.size();
-//    }
-//
-//    @Override
-//    public boolean isViewFromObject(View view, Object object) {
-//        return view == object;
-//    }
-//
-//    @Override
-//    public CharSequence getPageTitle(int position) {
-////        ModelObject customPagerEnum = ModelObject.values()[position];
-////       return mContext.getString(customPagerEnum.getTitleResId());
-//        return "kjbkc";
-//    }
+
 
     Context mContext;
     LayoutInflater mLayoutInflater;

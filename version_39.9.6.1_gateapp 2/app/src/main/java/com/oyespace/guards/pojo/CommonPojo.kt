@@ -520,6 +520,41 @@ data class Courier(
 
 //visitor log req
 data class CreateVisitorLogReq(
+//    val ASAssnID: Int,
+//  //  val MEMemID: Int,
+//    val RERgVisID: Int,
+//    val UNUniName: String,
+//    val UNUnitID: String,
+//    val VLComName: String,
+//    val VLFName: String,
+//    val VLGtName: String,
+//    val VLItmCnt: Int,
+//    val VLLName: String,
+//    val VLMobile: String,
+//    val VLPOfVis: String,
+//    val VLVehNum: String,
+//    val VLVehType: String,
+//    val VLVerStat: String,
+//    val VLVisCnt: Int,
+//    val VLVisType: String,
+//    val SPPrdImg1: String,
+//    val SPPrdImg2: String,
+//    val SPPrdImg3: String,
+//    val SPPrdImg4: String,
+//    val SPPrdImg5: String,
+//    val SPPrdImg6: String,
+//    val SPPrdImg7: String,
+//    val SPPrdImg8: String,
+//    val SPPrdImg9: String,
+//    val SPPrdImg10: String,
+//    val WKSelfImg:String,
+//    val VLEntryImg:String,
+//    val VLENGName:String,
+//    val VLEntryT: String
+
+
+
+
     val ASAssnID: Int,
   //  val MEMemID: Int,
     val RERgVisID: Int,
@@ -548,8 +583,16 @@ data class CreateVisitorLogReq(
     val SPPrdImg9: String,
     val SPPrdImg10: String,
     val WKSelfImg:String,
-    val VLEntryImg:String,
-    val VLENGName:String
+  //  val VLEntryGPS: String,
+    val VLEntryImg: String,
+    val VLENGName: String,
+    val VLEntryT: String
+
+
+
+
+
+
 
 
 )
@@ -1087,7 +1130,10 @@ data class VisitorEntryLog(
     val vlfName: String,
     val vlgpsPnt: String,
     val vllName: String,
-    val vlpOfVis: String
+    val vlpOfVis: String,
+    val vlVenImg:String,
+    val vlVoiceNote:String
+
 )
 
 ///Ticketing Responses
@@ -1169,7 +1215,9 @@ data class VisitorExitLog(
     val vlfName: String,
     val vlgpsPnt: String,
     val vllName: String,
-    val vlpOfVis: String
+    val vlpOfVis: String,
+    val vlVoiceNote:String,
+    val vlVenImg:String
 )
 
 
@@ -1753,6 +1801,36 @@ data class SOSUpdateResp(
     val success: Boolean
 )
 
+data class SubscriptionResp(
+    val apiVersion: String,
+    val `data`: SubscriptionData,
+    val success: Boolean
+)
+
+data class SubscriptionData(
+    val subscription: Subscription
+)
+
+data class Subscription(
+    val asAssnID: Int,
+    val discountPerc: Double,
+    val discountVal: Double,
+    val oyeLivingSubs: Boolean,
+    val oyeSafeSubs: Boolean,
+    val pdid: Int,
+    val prid: Int,
+    val suIsActive: Boolean,
+    val suNofGDev: Int,
+    val suNofPDev: Int,
+    val suNoofBio: Int,
+    val suTotVal: Double,
+    val sudCreated: String,
+    val sudUpdated: String,
+    val sueDate: String,
+    val sugTotVal: Double,
+    val suid: Int,
+    val susDate: String
+)
 
 
 

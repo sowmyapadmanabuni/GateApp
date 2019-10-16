@@ -11,19 +11,19 @@ import android.util.Log
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.gson.Gson
+import com.oyespace.guards.activity.PatrollingAlert
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
+import com.oyespace.guards.models.PatrolShift
+import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -36,6 +36,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.text.SimpleDateFormat
 import java.util.*
 
 class
@@ -175,6 +176,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 val sosObj: SOSUpdateReq = SOSUpdateReq(sosId, gateNumber, gateMob, sosStatus)
                 updateSOS(sosObj)
             }
+        }else if(intent.getStringExtra(BSR_Action).equals(BGS_PATROLLING_ALARM)){
+            getPatrollingSchedules()
         }
 
     }
@@ -300,7 +303,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
         try {
             val outputStream = FileOutputStream(imageFile)
-            val quality = 50
+            val quality = 80
             if (incidentPhoto != null) {
                 incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
             }
@@ -309,7 +312,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
             val bosProfile = ByteArrayOutputStream()
             if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
+                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, bosProfile)
             }
             // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
             //InputStream in = new ByteArrayInputStream(bos.toByteArray());
@@ -355,6 +358,159 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             }
         })
 
+    }
+
+    private fun getPatrollingSchedules(){
+        RetrofitClinet.instance
+            .patrolScheduleList(OYE247TOKEN,(Prefs.getString(GATE_NO, "")), AppUtils.intToString(Prefs.getInt(ASSOCIATION_ID, 0)))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<ShiftsListResponse<ArrayList<PatrolShift>>>() {
+
+                override fun onSuccessResponse(PatrolList: ShiftsListResponse<ArrayList<PatrolShift>>) {
+
+                    if (PatrolList.success == true) {
+                        Log.e("ALARM_PATR",""+PatrolList.data.patrollingShifts);
+                        for(schedules:PatrolShift in PatrolList.data.patrollingShifts){
+                            val sdf:SimpleDateFormat = SimpleDateFormat("EEEE")
+                            val d:Date = Date()
+                            val day = sdf.format(d)
+                            Log.e("ALARM_DAY",""+day);
+                            if(schedules.psRepDays.contains(day,ignoreCase = true)){
+                                Log.e("ALARM_DAYFOUND",""+day);
+                                val timeFormat = SimpleDateFormat("yyyy-MM-dd")
+                                var currentTimeObj = timeFormat.format(Date())
+
+
+                                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                                val formatter = SimpleDateFormat("HH:mm:ss")
+                                val formattedDate = formatter.format(parser.parse(schedules.pssTime))
+
+                                currentTimeObj = currentTimeObj+"T"+formattedDate
+
+                                //val startTime:String = AppUtils.getTimeFromDate(schedules.pssTime)
+                                //var startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(schedules.pssTime)
+                                val startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(currentTimeObj)
+
+                                Log.e("startTimeObj_NEW",""+ currentTimeObj)
+                                Log.e("startTimeObj",""+ startTimeObj.time)
+                                Log.e("endTime",""+ Date().time)
+                                val diff = startTimeObj.time-Date().time
+                                val seconds = diff / 1000;
+                                val minutes = seconds / 60;
+                                val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
+                                val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+schedules.psPtrlSID,0)
+                                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+schedules.psPtrlSID,"")
+                                val snoozeMins:Long = getTimeDifference(snoozedTime)
+                                val completedTime = Prefs.getString(PATROLLING_COMPLETED_ON+schedules.psPtrlSID,"")
+                                var isPatrollingCompleted = false
+                                if(!completedTime.equals("")){
+                                    val completedMins:Long = getTimeDifference(completedTime)
+                                    if(completedMins<6){
+                                        isPatrollingCompleted = true
+                                    }else{
+                                        isPatrollingCompleted = false
+                                    }
+                                }
+
+                                Log.e("THE_DIFF",""+minutes+" - "+isSnoozed+" - "+snoozeMins+"  - "+isPatrollingCompleted)
+
+                                if(((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount<3 && snoozeMins>=5 && snoozeMins<17)) && !isPatrollingCompleted){
+
+                                    if(schedules.psSnooze){
+                                        //Snooze enabled
+                                        showDialog("Active patrolling starts in few minutes","Patrolling",true,"Snooze",schedules.psPtrlSID);
+                                    }else{
+                                        showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
+                                    }
+                                    break;
+
+                                }else if(isSnoozed && snoozeCount>=3 && snoozeMins>=20){
+                                    Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_IS_ACTIVE+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_TIME+schedules.psPtrlSID)
+
+                                    if(minutes <= 5 && minutes > -1 && !isPatrollingCompleted){
+
+                                        if(schedules.psSnooze){
+                                            //Snooze enabled
+                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"Snooze",schedules.psPtrlSID);
+                                        }else{
+                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
+                                        }
+                                        break;
+
+                                    }
+                                }
+                                Log.e("TIME_DIFF",""+ minutes)
+
+                            }
+                        }
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+
+                }
+
+                override fun noNetowork() {
+                }
+            })
+    }
+
+    fun showDialog(desc: String, title: String, isCancellable: Boolean, btnText: String, id:Int) {
+        val isSOS:Boolean = Prefs.getBoolean("ACTIVE_SOS",false)
+        val isActiveAlert:Boolean = Prefs.getBoolean("ACTIVE_ALERT",false)
+        val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+id,false)
+
+
+        Log.e("IS_SNOOZED_"+id,""+isSnoozed)
+
+        if(!isSOS && !isActiveAlert) {
+            val alertDlg =
+                Intent(mcontext, PatrollingAlert::class.java)
+            alertDlg.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            alertDlg.putExtra("MSG",desc);
+            alertDlg.putExtra("BTN_TEXT",btnText)
+            alertDlg.putExtra("ANIM",R.raw.alarm)
+            alertDlg.putExtra("TYPE","PATROLLING_ALARM")
+            alertDlg.putExtra("SCHEDULEID",id)
+
+            if(isSnoozed){
+                val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+id,0)
+                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+id,"")
+                val minutes = getTimeDifference(snoozedTime)
+
+                Log.e(SNOOZE_COUNT+id,""+snoozeCount)
+                Log.e(SNOOZE_TIME+id,""+snoozedTime)
+                Log.e(SNOOZE_TIME+id,"DIFFERE: "+minutes)
+
+                if(snoozeCount < 3 && snoozedTime != null && !snoozedTime.equals("") && minutes >= 5){
+                    mcontext.startActivity(alertDlg)
+                }
+            }else {
+                mcontext.startActivity(alertDlg)
+            }
+        }
+    }
+
+
+    private fun getTimeDifference(dateTime:String):Long{
+
+        try {
+            val snoozedTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(dateTime)
+            val currentTimeStr = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(Date())
+            val currentTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(currentTimeStr)
+
+
+            val diff = currentTimeObj.time - snoozedTimeObj.time
+            val seconds = diff / 1000;
+            val minutes = seconds / 60;
+            return minutes
+        }catch (e:java.lang.Exception){
+            return 0
+        }
     }
 
     private fun getStaffList() {
@@ -528,6 +684,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                 }
                             })
+
+
+
                         }
                         LocalDb.saveEnteredVisitorLog(arrayListVisitors);
 
@@ -724,23 +883,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 override fun onSuccessResponse(any: Any) {
 
-//                    if (workerListResponse.data.checkPointListByAssocID !=null) {
-//                        Log.d("WorkerList success",workerListResponse.data.toString())
-//                        var arrayList: ArrayList<CheckPointByAssocID>? = null
-//                        arrayList=ArrayList()
-//                        arrayList = workerListResponse.data.checkPointListByAssocID
-//
-//                        Collections.sort(arrayList, object : Comparator<CheckPointByAssocID>{
-//                            override  fun compare(lhs: CheckPointByAssocID, rhs: CheckPointByAssocID): Int {
-//                                return lhs.cpCkPName.compareTo(rhs.cpCkPName)
-//                            }
-//                        })
-//
-//                        LocalDb.saveCheckPointList(arrayList);
-//
-//                    } else {
-//
-//                    }
+
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -754,24 +897,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-
-
-//    {
-//        "ACAccntID"  : 1,
-//        "ASAssnID"   : 2,
-//        "NTType"     : "Join",
-//        "NTDesc"     : "Joining as Owner",
-//        "SBUnitID" : 23,
-//        "SBMemID"  : 3,
-//        "SBSubID"  : 2,
-//        "SBRoleID" : 2,
-//        "ASAsnName" : "AssociationName",
-//        "MRRolName" : "Owner",
-//        "NTDUpdated" : "2019-09-12 12:00:00",
-//        "NTDCreated" : "2019-01-29 11:11:11"
-//
-//
-//    }
 
 
     private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {

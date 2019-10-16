@@ -3,6 +3,7 @@ package com.oyespace.guards.utils
 import android.util.Log
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
+import java.text.SimpleDateFormat
 
 
 /**
@@ -27,6 +28,17 @@ class AppUtils {
 
         fun intToString(price: Int?): String {
             return  ""+ price
+        }
+
+        fun getTimeFromDate(serverTime:String?):String{
+            try {
+                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                val formatter = SimpleDateFormat("hh:mm a")
+                val formattedDate = formatter.format(parser.parse(serverTime))
+                return formattedDate
+            }catch (e:Exception){
+                return serverTime!!
+            }
         }
 
 

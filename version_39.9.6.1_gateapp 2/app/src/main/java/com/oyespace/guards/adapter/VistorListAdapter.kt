@@ -3,7 +3,12 @@ package com.oyespace.guards.adapter
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.SoundPool
 import android.net.Uri
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +17,8 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
@@ -27,6 +34,7 @@ import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.io.File
 import java.util.*
 
 class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Data.VisitorLog>, private val mcontext: Context) :
@@ -37,6 +45,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
     private val mInflater: LayoutInflater
     var number: String? = null
     var mobnumber: String? = null
+    lateinit var mp:  MediaPlayer
 
     init {
         this.searchList = listVistor
@@ -70,6 +79,8 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         holder.entryTime.text = formatDateHM(orderData?.vlEntryT) + " "
         Log.d("ddd", formatDateHM(orderData?.vlEntryT))
         holder.entrydate.text = formatDateDMY(orderData?.vldCreated)
+
+
         if (orderData?.vlExitT.equals("0001-01-01T00:00:00", true)) {
             holder.exitTime.text = ""
             holder.exitdate.text = ""
@@ -82,7 +93,7 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
                     1
                 )
             )
-
+            holder.tv_comments.setText(orderData.vlCmnts)
             if (orderData?.vlVisType.equals(DELIVERY) && deliveryTimeUp(
                     orderData?.vlEntryT,
                     getCurrentTimeLocal(),
@@ -217,21 +228,65 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
 
         }
 
+        if(orderData?.vlVoiceNote.contains("")){
+            holder.iv_play.visibility=View.GONE
+        }else{
+            holder.iv_play.visibility=View.VISIBLE
+        }
+        holder.iv_play.setOnClickListener{
+            getAudio(orderData?.vlVoiceNote)
+        }
+        if(orderData?.vlVenImg.contains(",")){
+            var imageList: Array<String>
+            imageList = orderData?.vlVenImg.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+
+
+            holder.rv_images!!.setHasFixedSize(true)
+            val linearLayoutManager =
+                androidx.recyclerview.widget.LinearLayoutManager(mcontext,
+                    LinearLayoutManager.HORIZONTAL,true)
+            holder.rv_images.layoutManager = linearLayoutManager
+
+
+            val adapter = HorizontalImagesAdapter( mcontext,imageList)
+            holder.rv_images.adapter = adapter
+
+        }
+
         holder.iv_call.setOnClickListener {
 
             val intent = Intent(Intent.ACTION_CALL);
             intent.data = Uri.parse("tel:" + orderData?.vlMobile)
             mcontext.startActivity(intent)
         }
-
-        holder.lyt_text.setOnClickListener {
-
-            if (holder.expanded_view.visibility == View.GONE) {
-                holder.expanded_view.visibility = View.VISIBLE
-            } else {
-                holder.expanded_view.visibility = View.GONE
-            }
-        }
+//        if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
+//            holder.iv_attachment.visibility = View.GONE
+//
+//        }
+//
+//        else{
+//            holder.iv_attachment.visibility=View.VISIBLE
+//
+//        }
+//        holder.lyt_text.setOnClickListener {
+//
+//            if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
+//                holder.expanded_view.visibility = View.GONE
+//            }
+////            else if(orderData.vlCmnts.contains("")||orderData.vlVenImg.contains("")||orderData.vlVoiceNote.contains("")){
+////                if (holder.expanded_view.visibility == View.GONE) {
+////                    holder.expanded_view.visibility = View.VISIBLE
+////                }
+////            }
+//            else{
+//                if (holder.expanded_view.visibility == View.GONE) {
+//                    holder.expanded_view.visibility = View.VISIBLE
+//                } else {
+//                    holder.expanded_view.visibility = View.GONE
+//                }
+//            }
+//
+//        }
 
     }
 
@@ -329,6 +384,10 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
         val expanded_view: LinearLayout
 
         val lyt_text: LinearLayout
+        val rv_images: RecyclerView
+        val iv_play:ImageView
+        val tv_comments:TextView
+        val iv_attachment:ImageView
 
         init {
             entryTime = view.findViewById(R.id.tv_entrytime)
@@ -349,6 +408,10 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
             exitdate = view.findViewById(R.id.tv_exitdate)
             ll_card = view.findViewById(R.id.ll_card)
             lyt_text = view.findViewById(R.id.lyt_text)
+            rv_images=view.findViewById(R.id.rv_images)
+            iv_play=view.findViewById(R.id.iv_play)
+            tv_comments=view.findViewById(R.id.tv_comments)
+            iv_attachment=view.findViewById(R.id.iv_attachment)
 
 
         }
@@ -385,5 +448,49 @@ class VistorListAdapter(private var listVistor: ArrayList<VisitorLogExitResp.Dat
                 return filterResults
             }
         }
+    }
+    fun getAudio(filename:String) {
+
+
+
+        try {
+            if (mp.isPlaying()) {
+                mp.stop()
+                mp.release()
+
+            }
+
+            mp.start()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+
+
+        val mediaPlayer: MediaPlayer
+//
+        val am = mcontext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
+        mediaPlayer =  MediaPlayer();
+
+
+        var spb =  SoundPool.Builder();
+        spb.setMaxStreams(10);
+        var attrBuilder =  AudioAttributes.Builder();
+        attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC);
+        spb.setAudioAttributes(attrBuilder.build());
+        spb.build();
+
+        mediaPlayer.setDataSource("http://mediaupload.oyespace.com/"+filename);
+        mediaPlayer.prepare();
+
+        mediaPlayer.start();
+
+
+        val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            .getAbsolutePath();
+        val f = File(baseDir + filename);
+        f.delete();
+
     }
 }

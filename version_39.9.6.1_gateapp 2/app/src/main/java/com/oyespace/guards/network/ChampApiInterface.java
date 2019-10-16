@@ -50,7 +50,7 @@ public interface ChampApiInterface {
     Call<InvitationRequestResponse> updateInvitation(@Body InvitationUpdateReq invitationUpdateReq);
 
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
-    @Headers("X-OYE247-APIKey:7470AD35-D51C-42AC-BC21-F45685805BBE")
+    @Headers("X-OYE247-APIKey: 7470AD35-D51C-42AC-BC21-F45685805BBE")
     Call<ResidentValidationResponse>residentValidation(@Body ResidentValidationRequest residentValidationRequest);
 
 //

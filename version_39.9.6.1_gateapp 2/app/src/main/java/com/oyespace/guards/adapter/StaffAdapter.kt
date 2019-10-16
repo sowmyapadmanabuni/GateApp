@@ -340,7 +340,9 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
             personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
             1, "Staff Manaual Entry", SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""));
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""),
+            DateTimeUtils.getCurrentTimeLocal()
+        );
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(
@@ -351,7 +353,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+                         //   visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
 
 
                             if (unitId.contains(",")) {
@@ -462,6 +464,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 ////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
 //                            mcontext.sendBroadcast(ddc);
 
+                            (mcontext as Activity).finish()
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                         } else {
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.toString())

@@ -26,8 +26,10 @@ import android.telephony.*
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
 import com.google.firebase.messaging.FirebaseMessaging
@@ -43,11 +45,15 @@ import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
+import com.oyespace.guards.models.PatrolShift
+import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.*
 import com.oyespace.guards.ocr.CaptureImageOcr
+import com.oyespace.guards.pertroling.PScheduleListActivity
 import com.oyespace.guards.pertroling.PatrollingActivitynew
 import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.request.VisitorExitReqJv
 import com.oyespace.guards.residentidcard.ResidentIdActivity
@@ -73,6 +79,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,ResponseHandler, Runnable,
     SGFingerPresentEvent {
@@ -167,7 +174,13 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var usbPermissionRequested: Boolean = false
     private var usbConnected = true
     private var sgfplib: JSGFPLib? = null
+    var pTimer:Timer? = null;
+    var pTimerChecker:Timer? = null;
     //a separate thread.
+
+
+
+
     var fingerDetectedHandler: Handler = object : Handler() {
         // @Override
         override fun handleMessage(msg: Message) {
@@ -282,6 +295,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
+
+
+     //   getSubscriptionData()
 
         cd = ConnectionDetector()
         cd.isConnectingToInternet(this@Dashboard)
@@ -550,7 +566,53 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
     }
 
+    fun notifyPatrollingReminder(){
+        val intentAction1 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+        intentAction1.putExtra(BSR_Action, ConstantUtils.BGS_PATROLLING_ALARM)
+        sendBroadcast(intentAction1)
+    }
+
+
+    fun runTimerCheck(){
+        pTimerChecker = fixedRateTimer("patroll_timer_checker",false,6000,20000){
+            this@Dashboard.runOnUiThread {
+                val activeAlert = Prefs.getBoolean("ACTIVE_ALERT",false)
+                if(!activeAlert){
+                    if(pTimer == null){
+                        runPatrollingTimer()
+                    }
+                }
+            }
+        }
+    }
+
+    fun runPatrollingTimer(){
+        pTimer = fixedRateTimer("patroll_timer",false,60000,60000){
+            this@Dashboard.runOnUiThread {
+                notifyPatrollingReminder()
+            }
+        }
+    }
+
+    fun stopPatrollingTimer(){
+        if(pTimer != null){
+            Log.e("PTIMER","CANCELLED")
+            pTimer!!.cancel()
+            pTimer = null;
+        }
+    }
+
+
+
     override fun onResume() {
+        runTimerCheck()
+
+        fixedRateTimer("timer",false,0,60000){
+            this@Dashboard.runOnUiThread {
+              //  getSubscriptionData()
+              //  notifyPatrollingReminder()
+            }
+        }
 
         try {
 
@@ -569,7 +631,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         val updateHandler = Handler()
 
         val runnable = Runnable {
-            // openAlert() // some action(s)
         }
 
         updateHandler.postDelayed(runnable, 1000)
@@ -976,8 +1037,17 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     public override fun onPause() {
+        Log.e("DB_ONPAUSE","ONPAUSE"+pTimer);
+        if(pTimer != null){
+            Log.e("PTIMER","CANCELLED")
+            pTimer!!.cancel()
+            pTimer = null
+        }
         androidx.localbroadcastmanager.content.LocalBroadcastManager.getInstance(this)
             .unregisterReceiver(receiver)
+        if(pTimer != null){
+            pTimer!!.cancel()
+        }
         super.onPause()
 
 
@@ -986,6 +1056,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     public override fun onDestroy() {
         // clearApplicationData()
 
+        stopPatrollingTimer()
 
         if (bSecuGenDeviceOpened) {
             autoOn!!.stop()
@@ -1303,11 +1374,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     override fun onStart() {
         Prefs.putBoolean("ACTIVE_SOS",false);
+        Prefs.putBoolean("ACTIVE_ALERT",false);
         //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
         startService(Intent(this@Dashboard, FRTDBService::class.java))
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
 
         getDeviceList(LocalDb.getAssociation()!!.asAssnID)
+
+
+
+
         super.onStart()
 
 
@@ -1349,7 +1425,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 clickable = 0
             }
             R.id.tv_patrolling -> {
-                val i_vehicle = Intent(this@Dashboard, PatrollingLocActivity::class.java)
+                //PatrollingLocActivity
+                val i_vehicle = Intent(this@Dashboard, PScheduleListActivity::class.java)
                 startActivity(i_vehicle)
             }
             R.id.tv_emergency -> {
@@ -1728,27 +1805,16 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         LocalDb.saveAllVisitorLog(newAl)
 
 
-
-                        Collections.sort(
-                            arrayList,
-                            object : Comparator<VisitorLogExitResp.Data.VisitorLog> {
-                                override fun compare(
-                                    lhs: VisitorLogExitResp.Data.VisitorLog,
-                                    rhs: VisitorLogExitResp.Data.VisitorLog
-                                ): Int {
+                        Collections.sort(arrayList, object : Comparator<VisitorLogExitResp.Data.VisitorLog> {
+                            override fun compare(lhs:  VisitorLogExitResp.Data.VisitorLog, rhs: VisitorLogExitResp.Data.VisitorLog): Int {
 
 
-                                    return (formatDateDMY(rhs.vldUpdated) + " " + (rhs.vlExitT).replace(
-                                        "1900-01-01T",
-                                        ""
-                                    )).compareTo(
-                                        formatDateDMY(lhs.vldUpdated) + " " + (lhs.vlExitT).replace(
-                                            "1900-01-01T",
-                                            ""
-                                        )
-                                    )
+                                return (formatDateDMY(rhs.vldUpdated)+" "+(rhs.vlExitT).replace("1900-01-01T","")).compareTo(formatDateDMY(lhs.vldUpdated)+" "+(lhs.vlExitT).replace("1900-01-01T",""))
 
-                                }
+                            }
+
+
+
                             })
 
 
@@ -2234,7 +2300,7 @@ try {
             unitId, desgn, personName,
             LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb, "1", "", "", "",
             1, "Staff Biometric Entry", "", "", "", "", ""
-            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, "")
+            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""),getCurrentTimeLocal()
         )
 
         Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())
@@ -2281,31 +2347,134 @@ try {
 
 
                         //   getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,globalApiObject.data.visitorLog.vlVisLgID)
-                        visitorEntryLogBiometric(
-                            globalApiObject.data.visitorLog.vlVisLgID,
-                            unitId,
-                            personName,
-                            mobileNumb,
-                            desgn,
-                            workerType,
-                            staffID,
-                            unitName,
-                            wkEntryImg
-                        )
+//                        visitorEntryLogBiometric(
+//                            globalApiObject.data.visitorLog.vlVisLgID,
+//                            unitId,
+//                            personName,
+//                            mobileNumb,
+//                            desgn,
+//                            workerType,
+//                            staffID,
+//                            unitName,
+//                            wkEntryImg
+//                        )
 
-//                        val d  =  Intent(this@Dashboard,BackgroundSyncReceiver::class.java)
-//                        d.putExtra(BSR_Action, VisitorEntryFCM)
-//                        d.putExtra("msg", "$personName $desgn "+" is coming to your home"+"("+unitName+")")
-//                        d.putExtra("mobNum", mobileNumb)
-//                        d.putExtra("name", personName)
-//                        d.putExtra("nr_id", "0")
-//                        d.putExtra("unitname",unitName)
-//                        d.putExtra("memType", "Owner")
-//                        d.putExtra(UNITID,unitId.toString())
-//                        d.putExtra(COMPANY_NAME,"Staff")
-//                        d.putExtra(UNIT_ACCOUNT_ID,"0")
-//                        d.putExtra("VLVisLgID",0)
-//                        sendBroadcast(d);
+
+                        if (unitId.contains(",")) {
+
+                            var unitname_dataList: Array<String>
+                            var unitid_dataList: Array<String>
+
+                            unitname_dataList =
+                                unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                    .toTypedArray()
+                            unitid_dataList =
+                                unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                    .toTypedArray()
+                            // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                            if (unitid_dataList.size > 0) {
+                                for (i in 0 until unitid_dataList.size) {
+
+                                    val ddc = Intent(
+                                        this@Dashboard,
+                                        BackgroundSyncReceiver::class.java
+                                    )
+                                    ddc.putExtra(
+                                        ConstantUtils.BSR_Action,
+                                        ConstantUtils.VisitorEntryFCM
+                                    )
+                                    ddc.putExtra(
+                                        "msg",
+                                        "$personName $desgn " + " is coming to your home" + "(" + unitname_dataList.get(
+                                            i
+                                        ).replace(" ", "") + ")"
+                                    )
+                                    ddc.putExtra("mobNum", mobileNumb)
+                                    ddc.putExtra("name", personName)
+                                    ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID)
+                                    ddc.putExtra(
+                                        "unitname",
+                                        unitname_dataList.get(i).replace(" ", "")
+                                    )
+                                    ddc.putExtra("memType", "Owner")
+                                    ddc.putExtra(
+                                        UNITID,
+                                        unitid_dataList.get(i).replace(" ", "")
+                                    )
+                                    ddc.putExtra(COMPANY_NAME, "Staff")
+                                    ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                                    ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                    ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                    sendBroadcast(ddc);
+                                }
+                            }
+                        } else {
+                            val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+                            ddc.putExtra(
+                                ConstantUtils.BSR_Action,
+                                ConstantUtils.VisitorEntryFCM
+                            )
+                            ddc.putExtra(
+                                "msg",
+                                "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
+                            )
+                            ddc.putExtra("mobNum", mobileNumb)
+                            ddc.putExtra("name", personName)
+                            ddc.putExtra("nr_id", globalApiObject.data.visitorLog.vlVisLgID)
+                            ddc.putExtra("unitname", unitName)
+                            ddc.putExtra("memType", "Owner")
+                            ddc.putExtra(UNITID, unitId)
+                            ddc.putExtra(COMPANY_NAME, "Staff")
+                            ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                            ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                            ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                            sendBroadcast(ddc);
+                        }
+
+
+//                            if (unitName.toString().contains(",")) {
+//
+//                                var unitid_dataList: Array<String>
+//                                var unitname_dataList: Array<String>
+//
+//                                unitname_dataList = unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+//
+//
+//                                unitid_dataList =
+//                                    unitId.toString().split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+//                                        .toTypedArray()
+//                                if (unitname_dataList.size > 0) {
+//                                    for (i in 0 until unitid_dataList.size) {
+//                                        getUnitLog(
+//                                            unitid_dataList.get(i).replace(" ", "").toInt(),
+//                                            personName,
+//                                            mobileNumb,
+//                                            desgn,
+//                                            workerType,
+//                                            staffID,
+//                                            unitname_dataList.get(i).replace(" ",""),
+//                                            visitorLogID
+//                                        )
+//                                    }
+//                                }
+//                            } else {
+//                                getUnitLog(unitId, personName,  mobileNumb ,desgn, workerType,staffID, unitName,visitorLogID)
+//                            }
+
+
+                        val intentAction1 =
+                            Intent(applicationContext, BackgroundSyncReceiver::class.java)
+                        intentAction1.putExtra(BSR_Action, SENDFCM_toSYNC_VISITORENTRY)
+                        sendBroadcast(intentAction1)
+
+
+
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
@@ -2664,6 +2833,37 @@ try {
             }
         }
     }
+
+    fun getSubscriptionData(){
+        RetrofitClinet.instance.getSubscriptionData(OYE247TOKEN,LocalDb.getAssociation()!!.asAssnID.toString() )
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<SubscriptionResp>() {
+
+                override fun onSuccessResponse(getdata: SubscriptionResp) {
+
+                 //   CheckDates(getdata.data.subscription.sueDate,getCurrentTimeLocal(),this@Dashboard)
+
+
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+                    //  visitorLogBiometric(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
+
+
+                }
+                override fun noNetowork() {
+                    Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG).show()
+                }
+            })
+
+
+    }
+
+
+
 
 }
 

@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    xmlns:app="http://schemas.android.com/apk/res-auto"
-                                    android:layout_margin="5dp"
-                                    app:cardBackgroundColor="@color/orange"
-                                    app:contentPadding="1dp"
-                                    app:layout_constraintEnd_toEndOf="parent"
-                                    app:layout_constraintStart_toStartOf="parent"
-                                    app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_margin="5dp"
+        app:cardBackgroundColor="@color/orange"
+        app:contentPadding="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
     <LinearLayout android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
+            android:layout_height="wrap_content"
 
-                  android:orientation="vertical"
-    >
+            android:orientation="vertical"
+            >
         <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="match_parent"
-                      android:orientation="horizontal"
-                      android:background="@drawable/square_boder"
-                      android:id="@+id/ll_card"
-                      android:weightSum="10">
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:background="@drawable/square_boder"
+                android:id="@+id/ll_card"
+                android:weightSum="10">
             <LinearLayout android:layout_width="0dp"
-                          android:layout_height="match_parent"
-                          android:orientation="vertical"
-                          android:layout_weight="2.5">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="2.5">
                 <ImageView
                         android:id="@+id/iv_user"
                         android:layout_width="@dimen/_80sdp"
@@ -31,7 +31,7 @@
                         android:src="@drawable/user_icon_black"
                         android:layout_gravity="center_horizontal"
                         android:padding="2dp"
-                />
+                        />
                 <!--<TextView-->
                 <!--android:id="@+id/tv_entrytime"-->
                 <!--android:layout_width="wrap_content"-->
@@ -50,10 +50,10 @@
                 <!--/>-->
             </LinearLayout>
             <LinearLayout android:layout_width="0dp"
-                          android:layout_height="match_parent"
-                          android:orientation="vertical"
-                          android:id="@+id/lyt_text"
-                          android:layout_weight="4.3">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:id="@+id/lyt_text"
+                    android:layout_weight="4.3">
                 <TextView
                         android:id="@+id/tv_name"
                         android:layout_width="wrap_content"
@@ -64,7 +64,7 @@
                         android:paddingLeft="10dp"
                         android:textStyle="bold"
                         android:paddingTop="5dp"
-                />
+                        />
                 <TextView
                         android:id="@+id/tv_serviceprovider"
                         android:layout_width="wrap_content"
@@ -75,7 +75,7 @@
                         android:paddingLeft="10dp"
                         android:text="Service Provider"
                         android:paddingTop="2dp"
-                />
+                        />
                 <TextView
                         android:id="@+id/tv_unitname"
                         android:layout_width="wrap_content"
@@ -86,13 +86,13 @@
                         android:textStyle="bold"
                         android:text="Unit Name"
                         android:paddingTop="2dp"
-                />
+                        />
                 <RelativeLayout android:layout_width="match_parent"
-                                android:layout_height="1dp"
-                                android:background="@color/orange"></RelativeLayout>
+                        android:layout_height="1dp"
+                        android:background="@color/orange"></RelativeLayout>
                 <LinearLayout android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                >
+                        android:layout_height="wrap_content"
+                        >
                     <TextView
                             android:id="@+id/tv_entrytime"
                             android:layout_width="0dp"
@@ -102,7 +102,7 @@
                             android:textColor="@color/black"
                             android:paddingLeft="10dp"
                             android:text="Entry Time"
-                    />
+                            />
                     <TextView
                             android:id="@+id/tv_exittime"
                             android:layout_width="0dp"
@@ -112,7 +112,7 @@
                             android:textColor="@color/black"
                             android:paddingLeft="10dp"
                             android:text="Exit Time"
-                    />
+                            />
                 </LinearLayout>
                 <!-- <TextView
                          android:id="@+id/tv_entrytime"
@@ -123,8 +123,8 @@
                          android:text="Entry Time"
                  />-->
                 <LinearLayout android:layout_width="match_parent"
-                              android:layout_height="wrap_content"
-                >
+                        android:layout_height="wrap_content"
+                        >
                     <TextView
                             android:id="@+id/tv_entrydate"
                             android:layout_width="0dp"
@@ -134,7 +134,7 @@
                             android:textColor="@color/black"
                             android:paddingLeft="10dp"
                             android:text="Entry Date"
-                    />
+                            />
                     <TextView
                             android:id="@+id/tv_exitdate"
                             android:layout_width="0dp"
@@ -144,12 +144,12 @@
                             android:textColor="@color/black"
                             android:paddingLeft="10dp"
                             android:text="Exit Date"
-                    />
+                            />
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout android:layout_width="0dp"
-                          android:layout_height="match_parent"
-                          android:layout_weight="1.3">
+                    android:layout_height="match_parent"
+                    android:layout_weight="1.3">
                 <ImageButton
                         android:id="@+id/iv_call"
                         android:layout_width="@dimen/_40sdp"
@@ -162,8 +162,19 @@
                         android:layout_gravity="center"/>
             </LinearLayout>
             <LinearLayout android:layout_width="0dp"
-                          android:layout_height="match_parent"
-                          android:layout_weight="1.9">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_weight="1.9">
+
+                <ImageView
+                        android:id="@+id/iv_attachment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/attachment"
+                        android:visibility="gone" />
+
                 <Button
                         android:id="@+id/btn_makeexit"
                         android:layout_marginTop="@dimen/_20sdp"
@@ -179,59 +190,82 @@
             </LinearLayout>
         </LinearLayout>
         <RelativeLayout android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-        android:background="@color/white">
-        <LinearLayout android:layout_width="match_parent"
-                      android:layout_height="60dp"
-                      android:background="#FFCC80"
-                      android:paddingRight="10dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white">
+            <LinearLayout android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:background="#FFCC80"
+                    android:paddingRight="10dp"
 
-                      android:layout_centerHorizontal="true"
-                      android:orientation="horizontal"
-                      android:visibility="gone"
-                      android:id="@+id/expanded_view"
-        >
-            <ImageView
-                    android:id="@+id/iv_guard"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_centerHorizontal="true"
+                    android:orientation="vertical"
                     android:visibility="gone"
-                    android:paddingLeft="10dp"
-            />
+                    android:id="@+id/expanded_view"
+                    >
 
-            <ImageView
-                    android:id="@+id/iv_menu"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:paddingLeft="10dp"
-                    android:visibility="gone"
-                    android:src="@drawable/menu_vertical"
+                <TextView
+                        android:id="@+id/tv_comments"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:gravity="center"
+                        android:visibility="visible"
+                        android:layout_gravity="center_vertical|center"
+                        />
 
-            />
+                <ImageView
+                        android:id="@+id/iv_guard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:visibility="gone"
+                        android:paddingLeft="10dp"
+                        />
 
-            <ImageView
-                    android:id="@+id/iv_map"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:src="@drawable/googlemaps"
-                    android:visibility="gone"
-                    android:paddingLeft="10dp"
+                <ImageView
+                        android:id="@+id/iv_menu"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingLeft="10dp"
+                        android:visibility="gone"
+                        android:src="@drawable/menu_vertical"
+
+                        />
+
+                <ImageView
+                        android:id="@+id/iv_map"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@drawable/googlemaps"
+                        android:visibility="gone"
+                        android:paddingLeft="10dp"
 
 
-            />
-
-            <TextView android:layout_width="match_parent"
-                      android:layout_height="wrap_content"
-                      android:text="New Feature is coming soon"
-                      android:gravity="center"
-                      android:layout_gravity="center_vertical|center"
-            />
+                        />
 
 
-        </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal"
+                        android:id="@+id/rv_images"
+                        android:layout_height="wrap_content">
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <ImageView
+                        android:id="@+id/iv_play"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/play"
+                        android:visibility="gone"
+                        android:paddingLeft="10dp"/>
+
+
+
+
+            </LinearLayout>
         </RelativeLayout>
     </LinearLayout>
 

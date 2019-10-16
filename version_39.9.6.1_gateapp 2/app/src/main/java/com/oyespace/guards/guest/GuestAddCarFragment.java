@@ -229,7 +229,7 @@ public class GuestAddCarFragment extends Activity implements View.OnClickListene
        // iamgeLyt.removeAllViews();
         list.clear();
 
-        Picasso.with(this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+      //  Picasso.with(this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
 
 //        Picasso.with(this)

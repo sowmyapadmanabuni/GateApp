@@ -1,9 +1,11 @@
 package com.oyespace.guards.activity
 
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.speech.RecognizerIntent
+import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
@@ -24,6 +26,10 @@ import java.util.*
 /**
  * Created by Kalyan on 21-Oct-17.
  */
+
+interface DialogPress {
+    fun onDialogPress()
+}
 
 open class BaseKotlinActivity : AppCompatActivity(){
 
@@ -235,7 +241,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
     fun showAnimatedDialog(desc: String, json: Int, isCancellable: Boolean, btnText: String) {
         val dialogBuilder = AlertDialog.Builder(this)
 
-        val inflater = this.layoutInflater
+        val inflater:LayoutInflater = applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater//this.layoutInflater
         val dialogView = inflater.inflate(R.layout.animated_dialog, null)
         val text: TextView = dialogView.findViewById(R.id.animdlg_text)
         val animView: LottieAnimationView = dialogView.findViewById(R.id.animdlg_lottie)

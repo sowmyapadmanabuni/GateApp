@@ -332,7 +332,8 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
 
         Btn_SendOtp.setOnClickListener {
 
-            mobilenumber= Ed_phoneNum.text.toString()
+            mobilenumber= phone
+            phone = Ed_phoneNum.text.toString().replace(" ", "")
             if (TextUtils.isEmpty(Ed_phoneNum.text.toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
@@ -592,6 +593,7 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
                             )
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                            d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
 
                             startActivity(d);
                             finish();

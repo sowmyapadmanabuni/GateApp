@@ -72,16 +72,19 @@ public class ConstantUtils {
     public static final String SENDFCM_toSYNC_VISITORENTRY="SENDFCM_toSYNC_VISITORENTRY";
     public static final String BGS_SOS_STATUS="BGS_SOS_STATUS";
 
+
     //http://mediaupload.oyespace.com/Images/
-    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
-    //public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
-//public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+  public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+ // public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+    //public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
 //public static final String BASE_URL="https://apidev.oyespace.com/";
     //public static final String BASE_URL="https://apiuat.oyespace.com/";
     public static final String BASE_URL = "https://api.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT="Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT="Patrolling Start Point";
     public static final String PATROLLING_END_POINT="Patrolling End Point";
+    public static final String PATROLLING_SCHEDULE_ID = "PATROLLING_SCHEDULE_ID";
+
     public static final String BACKGROUND_SYNC="BACKGROUND_SYNC";
     public static final String NONREGULAR="NONREGULAR";
     public static final String SYNC="SYNC";
@@ -97,13 +100,22 @@ public class ConstantUtils {
 
     public static final String ACTIVE_PATROLLING_SCHEDULE = "ACTIVE_PATROLLING_SCHEDULE";
     public static final String ACTIVE_PATROLLING_LAST_CP = "ACTIVE_PATROLLING_LAST_CP";
+    public static final String PATROLLING_COMPLETED_ON = "PATROLLING_COMPLETED_ON_";
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 15.0f;
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 16.0f;
+    public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
+
+    public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
+    public static final String SNOOZE_COUNT = "SNOOZED_COUNT_";
+    public static final String SNOOZE_TIME = "SNOOZED_TIME_";
+    public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
+
+
 
 }

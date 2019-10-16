@@ -333,6 +333,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
         Btn_SendOtp.setOnClickListener {
 
             mobilenumber= phone
+            phone = Ed_phoneNum.text.toString().replace(" ", "")
             if (TextUtils.isEmpty(Ed_phoneNum.text.trim().toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
@@ -567,36 +568,20 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             Log.d("getAccountDetails", globalApiObject.data.toString())
                             Log.d("getAccountDetails", globalApiObject.data.accountByMobile.toString())
                             val d = Intent(this@MobileNumberScreenwithOTP, AddCarFragment::class.java)
-
-                            Log.d(
-                                "intentdata NameEntr",
-                                "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(
-                                    UNITID
-                                )
-                                        + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(
-                                    COUNTRYCODE
-                                ) + " "
-                                        + globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-                            );
                             d.putExtra(UNITID, intent.getStringExtra(UNITID))
                             d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                            d.putExtra(
-                                UNIT_ACCOUNT_ID,
-                                intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
-                            )
+                            d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                             d.putExtra(MOBILENUMBER, MobNumber)
                             d.putExtra(COUNTRYCODE, isdCode)
-                            d.putExtra(
-                                PERSONNAME,
-                                globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
-                            )
+                            d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
-
+                            d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                             startActivity(d);
                             finish();
+
 
                         } else {
                             progressBar?.visibility = View.GONE
@@ -891,7 +876,6 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
         Log.d("sdssds", "Verify otp " + countryCode.toString() + " " + Ed_phoneNum.text.trim().toString() + " " + number)
         val req = GetVerifyOTPRequest(countryCode.toString(), phone.toString(), number)
-        Log.d("sdssds", "Verify otp " + req.toString() + " " + Ed_phoneNum.text.toString() + " " + number)
 
         compositeDisposable.add(
             RetrofitClinet.instance.getVerifyOTP(ConstantUtils.CHAMPTOKEN, req)
