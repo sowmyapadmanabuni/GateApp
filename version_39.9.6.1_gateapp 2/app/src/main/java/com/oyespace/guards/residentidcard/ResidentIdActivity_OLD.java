@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 
 import com.google.zxing.Result;
 import com.oyespace.guards.R;
-
 import com.oyespace.guards.network.ChampApiClient;
 import com.oyespace.guards.network.ChampApiInterface;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
@@ -174,8 +172,8 @@ public class ResidentIdActivity_OLD extends BaseScannerActivity implements ZXing
 
         ResidentValidationRequest residentValidationRequest = new ResidentValidationRequest();
 
-        residentValidationRequest.FMMobile = mobileNumber;
-        residentValidationRequest.ASAssnID = associationId;
+        residentValidationRequest.MobileNumber = mobileNumber;
+        residentValidationRequest.AssociationID = associationId;
 
         Call<ResidentValidationResponse> call = champApiInterface.residentValidation(residentValidationRequest);
         call.enqueue(new Callback<ResidentValidationResponse>() {

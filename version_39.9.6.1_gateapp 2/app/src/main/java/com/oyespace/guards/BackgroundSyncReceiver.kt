@@ -16,11 +16,15 @@ import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
 import com.oyespace.guards.models.PatrolShift
 import com.oyespace.guards.models.ShiftsListResponse
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.repo.StaffRepo
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -179,7 +183,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             val gateNumber = Prefs.getString(ConstantUtils.GATE_NO, "")
             val gateMob = Prefs.getString(ConstantUtils.GATE_MOB, "")
             if(sosId != 0 && !sosStatus.equals("")) {
-                Log.e("BGS_SOS_STATUS",""+sosId+" "+gateNumber+" "+ gateMob+" "+ sosStatus);
+                Log.e("BGS_SOS_STATUS", "" + sosId + " " + gateNumber + " " + gateMob + " " + sosStatus)
                 val sosObj: SOSUpdateReq = SOSUpdateReq(sosId, gateNumber, gateMob, sosStatus)
                 updateSOS(sosObj)
             }
@@ -378,14 +382,14 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(PatrolList: ShiftsListResponse<ArrayList<PatrolShift>>) {
 
                     if (PatrolList.success == true) {
-                        Log.e("ALARM_PATR",""+PatrolList.data.patrollingShifts);
+                        Log.e("ALARM_PATR", "" + PatrolList.data.patrollingShifts)
                         for(schedules:PatrolShift in PatrolList.data.patrollingShifts){
                             val sdf:SimpleDateFormat = SimpleDateFormat("EEEE")
                             val d:Date = Date()
                             val day = sdf.format(d)
-                            Log.e("ALARM_DAY",""+day);
+                            Log.e("ALARM_DAY", "" + day)
                             if(schedules.psRepDays.contains(day,ignoreCase = true)){
-                                Log.e("ALARM_DAYFOUND",""+day);
+                                Log.e("ALARM_DAYFOUND", "" + day)
                                 val timeFormat = SimpleDateFormat("yyyy-MM-dd")
                                 var currentTimeObj = timeFormat.format(Date())
 
@@ -404,8 +408,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 Log.e("startTimeObj",""+ startTimeObj.time)
                                 Log.e("endTime",""+ Date().time)
                                 val diff = startTimeObj.time-Date().time
-                                val seconds = diff / 1000;
-                                val minutes = seconds / 60;
+                                val seconds = diff / 1000
+                                val minutes = seconds / 60
                                 val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
                                 val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+schedules.psPtrlSID,0)
                                 val snoozedTime:String = Prefs.getString(SNOOZE_TIME+schedules.psPtrlSID,"")
@@ -414,11 +418,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 var isPatrollingCompleted = false
                                 if(!completedTime.equals("")){
                                     val completedMins:Long = getTimeDifference(completedTime)
-                                    if(completedMins<6){
-                                        isPatrollingCompleted = true
-                                    }else{
-                                        isPatrollingCompleted = false
-                                    }
+                                    isPatrollingCompleted = completedMins < 6
                                 }
 
                                 Log.e("THE_DIFF",""+minutes+" - "+isSnoozed+" - "+snoozeMins+"  - "+isPatrollingCompleted)
@@ -427,11 +427,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                     if(schedules.psSnooze){
                                         //Snooze enabled
-                                        showDialog("Active patrolling starts in few minutes","Patrolling",true,"Snooze",schedules.psPtrlSID);
+                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID)
                                     }else{
                                         showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
                                     }
-                                    break;
+                                    break
 
                                 }else if(isSnoozed && snoozeCount>=3 && snoozeMins>=20){
                                     Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
@@ -442,11 +442,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                         if(schedules.psSnooze){
                                             //Snooze enabled
-                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"Snooze",schedules.psPtrlSID);
+                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID)
                                         }else{
                                             showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
                                         }
-                                        break;
+                                        break
 
                                     }
                                 }
@@ -479,7 +479,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             val alertDlg =
                 Intent(mcontext, PatrollingAlert::class.java)
             alertDlg.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            alertDlg.putExtra("MSG",desc);
+            alertDlg.putExtra("MSG", desc)
             alertDlg.putExtra("BTN_TEXT",btnText)
             alertDlg.putExtra("ANIM",R.raw.alarm)
             alertDlg.putExtra("TYPE","PATROLLING_ALARM")
@@ -513,51 +513,12 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
 
             val diff = currentTimeObj.time - snoozedTimeObj.time
-            val seconds = diff / 1000;
-            val minutes = seconds / 60;
+            val seconds = diff / 1000
+            val minutes = seconds / 60
             return minutes
         }catch (e:java.lang.Exception){
             return 0
         }
-    }
-
-    private fun getStaffList() {
-
-        RetrofitClinet.instance
-            .workerList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
-
-                override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
-
-                    if (workerListResponse.data.worker !=null) {
-                        Log.d("WorkerList success",workerListResponse.data.toString())
-                        var arrayList: ArrayList<WorkerDetails>? = null
-                        arrayList=ArrayList()
-                        arrayList = workerListResponse.data.worker
-
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
-                                return lhs.wkfName.compareTo(rhs.wkfName)
-                            }
-                        })
-
-                        LocalDb.saveStaffList(arrayList);
-
-                    } else {
-
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
     }
 
 

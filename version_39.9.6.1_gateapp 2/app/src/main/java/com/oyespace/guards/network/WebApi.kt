@@ -4,8 +4,6 @@ package com.oyespace.guards.network
 import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.pojo.VisitorLog
-import com.oyespace.guards.pojo.VisitorEntryLog
-import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY

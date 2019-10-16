@@ -1,5 +1,6 @@
 package com.oyespace.guards.residentidcard
 
+
 import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
@@ -12,7 +13,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.Settings
 import android.speech.RecognizerIntent
-
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -23,8 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-
-
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -40,8 +38,6 @@ import com.oyespace.guards.network.ChampApiInterface
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-
-
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -50,9 +46,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.*
 
 
@@ -116,8 +109,8 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                 }
 
                 else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -130,6 +123,7 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 
     val entries: ArrayList<String> = ArrayList()
     var receiver: BroadcastReceiver? = null
+    var champApiInterface: ChampApiInterface? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -204,8 +198,8 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
         val timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -520,7 +514,7 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                                 val dialog_imageview =
                                     dialogView.findViewById<ImageView>(R.id.dialog_imageview)
                                 val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
-                                tv_msg.setText("Valid")
+                            tv_msg.text = "Valid"
                                 val drawable = resources.getDrawable(R.drawable.valid_invi)
                                 dialog_imageview.setImageDrawable(drawable)
                                 val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)

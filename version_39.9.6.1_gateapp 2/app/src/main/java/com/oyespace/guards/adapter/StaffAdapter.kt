@@ -26,11 +26,8 @@ import com.oyespace.guards.pojo.CreateVisitorLogResp
 import com.oyespace.guards.pojo.UnitlistbyUnitID
 import com.oyespace.guards.pojo.VLRData
 import com.oyespace.guards.realm.RealmDB
-import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -352,7 +349,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             1, "Staff Manaual Entry", SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",vlEntryImage,Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
-        );
+        )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(

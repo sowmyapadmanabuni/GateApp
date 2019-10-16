@@ -22,8 +22,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -70,7 +68,6 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_LAST_CP;
 import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_SCHEDULE;
 import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
-import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_DISTANCE_THRESHOLD;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
@@ -102,9 +99,6 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         ADD, REMOVE, NONE
     }
 
-    private static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
-
-    static final String GEOFENCES_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
     private GeofencingClient mGeofencingClient;
     private ArrayList<Geofence> mGeofenceList = new ArrayList<>();
     private PendingIntent mGeofencePendingIntent;
@@ -753,29 +747,6 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         }
 
 
-    }
-
-    @Override
-    protected void onDestroy() {
-        try {
-
-            if (toSpeech != null) {
-                toSpeech.stop();
-                toSpeech.shutdown();
-            }
-            if (locationUpdateReceiver != null) {
-                unregisterReceiver(locationUpdateReceiver);
-            }
-
-            if (predictedLocationReceiver != null) {
-                unregisterReceiver(predictedLocationReceiver);
-            }
-        } catch (IllegalArgumentException ex) {
-            ex.printStackTrace();
-        }
-
-        removeGeofences();
-        super.onDestroy();
     }
 
     @Override

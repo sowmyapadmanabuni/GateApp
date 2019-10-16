@@ -9,7 +9,6 @@ import android.media.MediaPlayer
 import android.media.SoundPool
 import android.net.Uri
 import android.os.Environment
-import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -18,39 +17,20 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import androidx.recyclerview.widget.RecyclerView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.google.firebase.FirebaseError
 import com.google.firebase.database.*
-import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
-import com.oyespace.guards.models.NotificationSyncModel
-import com.oyespace.guards.network.CommonDisposable
-import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.VendorPojo
-import com.oyespace.guards.pojo.VisitorEntryLog
-import com.oyespace.guards.pojo.VisitorExitReq
-import com.oyespace.guards.pojo.VisitorExitResp
-import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 class VistorEntryListAdapter(
@@ -106,12 +86,13 @@ class VistorEntryListAdapter(
                 holder.exitdate.text = ""
                 holder.btn_makeexit.visibility = View.VISIBLE
 
-                if(orderData?.vlVenImg.contains(",")){
+                if (orderData.vlVenImg.contains(",")) {
                     var imageList: Array<String>
-                    imageList = orderData?.vlVenImg.split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    imageList = orderData.vlVenImg.split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
 
 
-                    holder.rv_images!!.setHasFixedSize(true)
+                    holder.rv_images.setHasFixedSize(true)
                     val linearLayoutManager =
                         androidx.recyclerview.widget.LinearLayoutManager(mcontext,
                             LinearLayoutManager.HORIZONTAL,true)
@@ -136,27 +117,27 @@ class VistorEntryListAdapter(
 
                         override fun onDataChange(p0: DataSnapshot) {
 
-                            if(p0.exists()){
-                                for(h in p0.children){
-
-                                    var data= h.getValue(NotificationSyncModel::class.java)
-
-                                    firebasedataMapp.put(data!!.visitorlogId,data!!.buttonColor)
-                                    //  firebasedatalist.add(data!!)
-                                    try {
-                                        if (firebasedataMapp.containsKey(orderData?.vlVisLgID.toString())) {
-
-                                            Toast.makeText(mcontext,"mcv",Toast.LENGTH_LONG).show()
-                                            holder.ll_card.setBackgroundColor(Color.parseColor(firebasedataMapp[orderData?.vlVisLgID.toString()]))
-                                        }
-                                    }catch (e:IndexOutOfBoundsException){
-
-                                    }
-
-                                    Toast.makeText(mcontext, firebasedataMapp.get(data!!.visitorlogId), Toast.LENGTH_LONG).show()
-
-                                }
-                            }
+//                            if(p0.exists()){
+//                                for(h in p0.children){
+//
+//                                    var data= h.getValue(NotificationSyncModel::class.java)
+//
+//                                    firebasedataMapp.put(data!!.visitorlogId,data!!.buttonColor)
+//                                    //  firebasedatalist.add(data!!)
+//                                    try {
+//                                        if (firebasedataMapp.containsKey(orderData?.vlVisLgID.toString())) {
+//
+//                                            Toast.makeText(mcontext,"mcv",Toast.LENGTH_LONG).show()
+//                                            holder.ll_card.setBackgroundColor(Color.parseColor(firebasedataMapp[orderData?.vlVisLgID.toString()]))
+//                                        }
+//                                    }catch (e:IndexOutOfBoundsException){
+//
+//                                    }
+//
+//                                    Toast.makeText(mcontext, firebasedataMapp.get(data!!.visitorlogId), Toast.LENGTH_LONG).show()
+//
+//                                }
+//                            }
 
                         }
 
@@ -274,16 +255,16 @@ class VistorEntryListAdapter(
         }
 
 
-        if(orderData?.vlVoiceNote.contains("")){
+            if (orderData.vlVoiceNote.contains("")) {
             holder.iv_play.visibility=View.GONE
         }else{
             holder.iv_play.visibility=View.VISIBLE
         }
         holder.iv_play.setOnClickListener{
-            getAudio(orderData?.vlVoiceNote)
+            getAudio(orderData.vlVoiceNote)
         }
 
-        holder.tv_comments.setText(orderData.vlCmnts)
+            holder.tv_comments.text = orderData.vlCmnts
 
         holder.iv_call.setOnClickListener {
 
@@ -430,7 +411,7 @@ class VistorEntryListAdapter(
 
 
         try {
-            if (mp.isPlaying()) {
+            if (mp.isPlaying) {
                 mp.stop()
                 mp.release()
 
@@ -447,26 +428,26 @@ class VistorEntryListAdapter(
 //
         val am = mcontext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-        mediaPlayer =  MediaPlayer();
+        mediaPlayer = MediaPlayer()
 
 
-        var spb =  SoundPool.Builder();
-        spb.setMaxStreams(10);
-        var attrBuilder =  AudioAttributes.Builder();
-        attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC);
-        spb.setAudioAttributes(attrBuilder.build());
-        spb.build();
+        var spb = SoundPool.Builder()
+        spb.setMaxStreams(10)
+        var attrBuilder = AudioAttributes.Builder()
+        attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
+        spb.setAudioAttributes(attrBuilder.build())
+        spb.build()
 
-        mediaPlayer.setDataSource("http://mediaupload.oyespace.com/"+filename);
-        mediaPlayer.prepare();
+        mediaPlayer.setDataSource("http://mediaupload.oyespace.com/" + filename)
+        mediaPlayer.prepare()
 
-        mediaPlayer.start();
+        mediaPlayer.start()
 
 
         val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            .getAbsolutePath();
-        val f = File(baseDir + filename);
-        f.delete();
+            .absolutePath
+        val f = File(baseDir + filename)
+        f.delete()
 
     }
 

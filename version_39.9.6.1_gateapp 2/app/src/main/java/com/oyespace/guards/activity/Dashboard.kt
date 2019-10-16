@@ -29,13 +29,10 @@ import android.telephony.TelephonyManager
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
-import com.google.firebase.database.*
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -56,9 +53,6 @@ import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
-import com.oyespace.guards.models.NotificationSyncModel
-import com.oyespace.guards.models.PatrolShift
-import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.models.*
 import com.oyespace.guards.models.FingerPrint
 import com.oyespace.guards.models.VisitorLog
@@ -67,15 +61,12 @@ import com.oyespace.guards.network.*
 import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pertroling.PScheduleListActivity
 import com.oyespace.guards.pertroling.PatrollingActivitynew
-import com.oyespace.guards.pertroling.PatrollingLocActivity
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration
 import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.resident.ResidentIdActivity
-import com.oyespace.guards.responce.SubscriptionResponse
 import com.oyespace.guards.responce.VisitorLogCreateResp
 import com.oyespace.guards.responce.VisitorLogExitResp
 import com.oyespace.guards.services.SOSSirenService
@@ -91,15 +82,13 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Call
 import retrofit2.Callback
-import retrofit2.Response
 import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener,
-    ResponseHandler, Runnable,
+class Dashboard : BaseKotlinActivity(), View.OnClickListener,
+    ResponseHandler,
     SGFingerPresentEvent {
 
 
@@ -197,11 +186,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     private var usbPermissionRequested: Boolean = false
     private var usbConnected = true
     private var sgfplib: JSGFPLib? = null
-    var pTimer:Timer? = null;
-    var pTimerChecker:Timer? = null;
+    var pTimer: Timer? = null
+    var pTimerChecker: Timer? = null
     //a separate thread.
-
-
 
 
     var fingerDetectedHandler: Handler = object : Handler() {
@@ -294,7 +281,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
 
-     //   getSubscriptionData()
+        //   getSubscriptionData()
 
         cd = ConnectionDetector()
         cd.isConnectingToInternet(this@Dashboard)
@@ -337,7 +324,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             startService(Intent(this@Dashboard, BGService::class.java))
 
         }
-        getLatestSubscription()
+//        getLatestSubscription()
         println("Shalini" + getCurrentTimeLocalYMD())
         Dexter.withActivity(this)
             .withPermissions(
@@ -523,8 +510,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         val scanResult: ScanResult = wifiList[0]
 
                     }
-                    Log.e("WIFILIST", "" + wifiList);
-                    Log.e("CELLINFO","LAC: "+lac+" - SID: "+cid+" - MCC: "+mcc+" - MNC: "+mnc+" - STRENGTH: "+str+" - TIMIN: "+tim)
+                    Log.e("WIFILIST", "" + wifiList)
+                    Log.e("CELLINFO", "LAC: " + lac + " - SID: " + cid + " - MCC: " + mcc + " - MNC: " + mnc + " - STRENGTH: " + str + " - TIMIN: " + tim)
                 }
             }
 //            registerReceiver(wifircvr, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
@@ -534,19 +521,19 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
     }
 
-    fun notifyPatrollingReminder(){
+    fun notifyPatrollingReminder() {
         val intentAction1 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         intentAction1.putExtra(BSR_Action, ConstantUtils.BGS_PATROLLING_ALARM)
         sendBroadcast(intentAction1)
     }
 
 
-    fun runTimerCheck(){
-        pTimerChecker = fixedRateTimer("patroll_timer_checker",false,6000,20000){
+    fun runTimerCheck() {
+        pTimerChecker = fixedRateTimer("patroll_timer_checker", false, 6000, 20000) {
             this@Dashboard.runOnUiThread {
-                val activeAlert = Prefs.getBoolean("ACTIVE_ALERT",false)
-                if(!activeAlert){
-                    if(pTimer == null){
+                val activeAlert = Prefs.getBoolean("ACTIVE_ALERT", false)
+                if (!activeAlert) {
+                    if (pTimer == null) {
                         runPatrollingTimer()
                     }
                 }
@@ -554,32 +541,31 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
     }
 
-    fun runPatrollingTimer(){
-        pTimer = fixedRateTimer("patroll_timer",false,60000,60000){
+    fun runPatrollingTimer() {
+        pTimer = fixedRateTimer("patroll_timer", false, 60000, 60000) {
             this@Dashboard.runOnUiThread {
                 notifyPatrollingReminder()
             }
         }
     }
 
-    fun stopPatrollingTimer(){
-        if(pTimer != null){
-            Log.e("PTIMER","CANCELLED")
+    fun stopPatrollingTimer() {
+        if (pTimer != null) {
+            Log.e("PTIMER", "CANCELLED")
             pTimer!!.cancel()
-            pTimer = null;
+            pTimer = null
         }
     }
-
 
 
     override fun onResume() {
         runTimerCheck()
 
 
-        fixedRateTimer("timer",false,0,60000){
+        fixedRateTimer("timer", false, 0, 60000) {
             this@Dashboard.runOnUiThread {
-              //  getSubscriptionData()
-              //  notifyPatrollingReminder()
+                //  getSubscriptionData()
+                //  notifyPatrollingReminder()
             }
         }
 
@@ -699,7 +685,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                         if (!usbPermissionRequested) {
                             //Log.d(TAG, "Call GetUsbManager().requestPermission()");
                             usbPermissionRequested = true
-                            sgfplib!!.GetUsbManager().requestPermission(usbDevice, mPermissionIntent)
+                            sgfplib!!.GetUsbManager()
+                                .requestPermission(usbDevice, mPermissionIntent)
                         } else {
                             //wait up to 20 seconds for the system to grant USB permission
                             hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
@@ -742,7 +729,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 }
             }
         } catch (ex: Exception) {
-            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT)
+                .show()
         }
 
 
@@ -974,9 +962,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
     }
 
     public override fun onPause() {
-        Log.e("DB_ONPAUSE","ONPAUSE"+pTimer);
-        if(pTimer != null){
-            Log.e("PTIMER","CANCELLED")
+        Log.e("DB_ONPAUSE", "ONPAUSE" + pTimer)
+        if (pTimer != null) {
+            Log.e("PTIMER", "CANCELLED")
             pTimer!!.cancel()
             pTimer = null
         }
@@ -1056,10 +1044,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         autoooooo++
 
         fingerDetectedHandler.sendMessage(Message())
-
-    }
-
-    override fun run() {
 
     }
 
@@ -1179,7 +1163,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
     override fun onStart() {
         Prefs.putBoolean("ACTIVE_SOS", false)
-        Prefs.putBoolean("ACTIVE_ALERT",false)
+        Prefs.putBoolean("ACTIVE_ALERT", false)
         //if(!LocalDb.isServiceRunning(FRTDBService::class.java,this)) {
         startService(Intent(this@Dashboard, FRTDBService::class.java))
         registerReceiver(mReceiver, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
@@ -1421,89 +1405,90 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             swipeContainer!!.isRefreshing = false
         }
 
-        Log.e("NOTIFICATION_SUB",""+"AllGuards" + LocalDb.getAssociation()!!.asAssnID);
-        FirebaseMessaging.getInstance().subscribeToTopic("AllGuards" + LocalDb.getAssociation()!!.asAssnID)
+        Log.e("NOTIFICATION_SUB", "" + "AllGuards" + LocalDb.getAssociation()!!.asAssnID)
+        FirebaseMessaging.getInstance()
+            .subscribeToTopic("AllGuards" + LocalDb.getAssociation()!!.asAssnID)
 
-                btn_mic.setOnClickListener(View.OnClickListener {
-                    Speak()
+        btn_mic.setOnClickListener(View.OnClickListener {
+            Speak()
 
-                })
-                btn_in.setOnClickListener {
+        })
+        btn_in.setOnClickListener {
 
-                    showingOutLog = false
-                    clearSearchText()
-                    Prefs.putString("BUTTON", "IN")
-                    btn_in.setBackgroundColor(resources.getColor(R.color.orange))
-                    btn_out.setBackgroundColor(resources.getColor(R.color.grey))
+            showingOutLog = false
+            clearSearchText()
+            Prefs.putString("BUTTON", "IN")
+            btn_in.setBackgroundColor(resources.getColor(R.color.orange))
+            btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
-                    val visitorLog = VisitorLogRepo.get_IN_VisitorLog()
-                    if (visitorLog != null) {
+            val visitorLog = VisitorLogRepo.get_IN_VisitorLog()
+            if (visitorLog != null) {
 
-                        newAl = visitorLog
-                        // LocalDb.saveAllVisitorLog(newAl);
-                        if ((newAl)!!.isEmpty()) {
-                            rv_dashboard!!.visibility = View.GONE
-                            tv_nodata.visibility = View.VISIBLE
-                            dismissProgressrefresh()
-                        } else {
-                            rv_dashboard!!.visibility = View.VISIBLE
-                            tv_nodata.visibility = View.GONE
-                        }
-
-                        if (vistorOutListAdapter == null) {
-                            vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
-                        } else {
-                            vistorEntryListAdapter!!.setVisitorLog(newAl)
-                        }
-                        rv_dashboard?.adapter = vistorEntryListAdapter
-                        btn_in.setBackgroundColor(resources.getColor(R.color.orange))
-                        btn_out.setBackgroundColor(resources.getColor(R.color.grey))
-                        dismissProgress()
-
-                    } else {
-                        rv_dashboard!!.visibility = View.GONE
-                        tv_nodata.visibility = View.VISIBLE
-                        dismissProgress()
-
-
-                    }
-
-
-                }
-                btn_out.setOnClickListener {
-
-                    showingOutLog = true
-                    clearSearchText()
-                    Prefs.putString("BUTTON", "OUT")
-                    btn_in.setBackgroundColor(resources.getColor(R.color.grey))
-                    btn_out.setBackgroundColor(resources.getColor(R.color.orange))
-                    loadExitVisitorLog(false)
+                newAl = visitorLog
+                // LocalDb.saveAllVisitorLog(newAl);
+                if ((newAl)!!.isEmpty()) {
+                    rv_dashboard!!.visibility = View.GONE
+                    tv_nodata.visibility = View.VISIBLE
+                    dismissProgressrefresh()
+                } else {
+                    rv_dashboard!!.visibility = View.VISIBLE
+                    tv_nodata.visibility = View.GONE
                 }
 
-
-
-
-                if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
-                    startService(Intent(this@Dashboard, BGService::class.java))
+                if (vistorOutListAdapter == null) {
+                    vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                } else {
+                    vistorEntryListAdapter!!.setVisitorLog(newAl)
                 }
+                rv_dashboard?.adapter = vistorEntryListAdapter
+                btn_in.setBackgroundColor(resources.getColor(R.color.orange))
+                btn_out.setBackgroundColor(resources.getColor(R.color.grey))
+                dismissProgress()
+
+            } else {
+                rv_dashboard!!.visibility = View.GONE
+                tv_nodata.visibility = View.VISIBLE
+                dismissProgress()
 
 
-                if (Prefs.getInt(PATROLLING_ID, 0) != 0) {
-                    startService(Intent(this@Dashboard, SGPatrollingService::class.java))
-                    val builder = AlertDialog.Builder(this@Dashboard)
-                    builder.setTitle("Patrolling Not Completed")
-                    builder.setMessage("Complete Now")
-                    builder.setPositiveButton("GOTO Patrolling") { dialog, which ->
-                        val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
-                        startActivity(i_vehicle)
-                        dialog.cancel()
-                    }
-                    builder.setNegativeButton(
-                        "Cancel"
-                    ) { dialog, which -> dialog.cancel() }
-                    builder.show()
-                }
             }
+
+
+        }
+        btn_out.setOnClickListener {
+
+            showingOutLog = true
+            clearSearchText()
+            Prefs.putString("BUTTON", "OUT")
+            btn_in.setBackgroundColor(resources.getColor(R.color.grey))
+            btn_out.setBackgroundColor(resources.getColor(R.color.orange))
+            loadExitVisitorLog(false)
+        }
+
+
+
+
+        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
+            startService(Intent(this@Dashboard, BGService::class.java))
+        }
+
+
+        if (Prefs.getInt(PATROLLING_ID, 0) != 0) {
+            startService(Intent(this@Dashboard, SGPatrollingService::class.java))
+            val builder = AlertDialog.Builder(this@Dashboard)
+            builder.setTitle("Patrolling Not Completed")
+            builder.setMessage("Complete Now")
+            builder.setPositiveButton("GOTO Patrolling") { dialog, which ->
+                val i_vehicle = Intent(this@Dashboard, PatrollingActivitynew::class.java)
+                startActivity(i_vehicle)
+                dialog.cancel()
+            }
+            builder.setNegativeButton(
+                "Cancel"
+            ) { dialog, which -> dialog.cancel() }
+            builder.show()
+        }
+
     }
 
     private fun showSettingsDialog() {
@@ -1529,70 +1514,62 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         startActivityForResult(intent, 101)
     }
 
-    internal fun getLatestSubscription() {
-
-        val call = champApiInterface?.getLatestSubscription(Prefs.getInt(ASSOCIATION_ID, 0).toString())
-        call?.enqueue(object : Callback<SubscriptionResponse> {
-            override fun onResponse(call: Call<SubscriptionResponse>, response: Response<SubscriptionResponse>) {
-
-                try {
-                    if (response.body()!!.getSuccess() == true) {
-                        val dateFormat_DMY = SimpleDateFormat("dd-MM-yyyy")
-                        val CurrentString = response.body()!!.data.getSubscription().sueDate
-                        val separated =
-                            CurrentString.split("T".toRegex()).dropLastWhile { it.isEmpty() }
-                                .toTypedArray()
-                        subscriptionDate = separated[0]
-
-                        tv_subscriptiondate?.text = "Valid till: $subscriptionDate"
-                        //  if(PrefManager.getValidityDate().length()>0) {
-                        try {
-                            val dt_dwnld_date =
-                                dateFormat_DMY.parse(response.body()!!.data.getSubscription().sueDate)
-                            val c1 = Calendar.getInstance()
-                            c1.time = dt_dwnld_date
-
-                            val days =
-                                (c1.timeInMillis - System.currentTimeMillis()) / (24 * 60 * 60 * 1000) + 1
-
-                            if (0 < days && days <= 7) {
-                                val alertDialog =
-                                    android.app.AlertDialog.Builder(this@Dashboard)
-                                alertDialog.setTitle("Your Association Subscription Expires in $days days")
-                                alertDialog.setPositiveButton(
-                                    "Ok"
-                                ) { dialog, which -> dialog.cancel() }
-                                // Showing Alert Message
-                                if (!this@Dashboard.isFinishing) {
-                                    alertDialog.show()
-                                }
-                            }
-
-                        } catch (ex: Exception) {
-
-                        }
-
-                    } else {
-                    }
-                } catch (e: KotlinNullPointerException) {
-
-                }
-            }
-
-            override fun onFailure(call: Call<SubscriptionResponse>, t: Throwable) {
-                call.cancel()
-            }
-        })
-
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>) {
-
-    }
+//    internal fun getLatestSubscription() {
+//
+//        val call = champApiInterface?.getLatestSubscription(Prefs.getInt(ASSOCIATION_ID, 0).toString())
+//        call?.enqueue(object : Callback<SubscriptionResponse> {
+//            override fun onResponse(call: Call<SubscriptionResponse>, response: Response<SubscriptionResponse>) {
+//
+//                try {
+//                    if (response.body()!!.getSuccess() == true) {
+//                        val dateFormat_DMY = SimpleDateFormat("dd-MM-yyyy")
+//                        val CurrentString = response.body()!!.data.getSubscription().sueDate
+//                        val separated =
+//                            CurrentString.split("T".toRegex()).dropLastWhile { it.isEmpty() }
+//                                .toTypedArray()
+//                        subscriptionDate = separated[0]
+//
+//                        tv_subscriptiondate?.text = "Valid till: $subscriptionDate"
+//                        //  if(PrefManager.getValidityDate().length()>0) {
+//                        try {
+//                            val dt_dwnld_date =
+//                                dateFormat_DMY.parse(response.body()!!.data.getSubscription().sueDate)
+//                            val c1 = Calendar.getInstance()
+//                            c1.time = dt_dwnld_date
+//
+//                            val days =
+//                                (c1.timeInMillis - System.currentTimeMillis()) / (24 * 60 * 60 * 1000) + 1
+//
+//                            if (0 < days && days <= 7) {
+//                                val alertDialog =
+//                                    android.app.AlertDialog.Builder(this@Dashboard)
+//                                alertDialog.setTitle("Your Association Subscription Expires in $days days")
+//                                alertDialog.setPositiveButton(
+//                                    "Ok"
+//                                ) { dialog, which -> dialog.cancel() }
+//                                // Showing Alert Message
+//                                if (!this@Dashboard.isFinishing) {
+//                                    alertDialog.show()
+//                                }
+//                            }
+//
+//                        } catch (ex: Exception) {
+//
+//                        }
+//
+//                    } else {
+//                    }
+//                } catch (e: KotlinNullPointerException) {
+//
+//                }
+//            }
+//
+//            override fun onFailure(call: Call<SubscriptionResponse>, t: Throwable) {
+//                call.cancel()
+//            }
+//        })
+//
+//    }
 
     private inner class BatteryBroadcastReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -1734,9 +1711,9 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
                 override fun onSuccessResponse(deviceListResponse: getDeviceList) {
 
 
-                    Log.e("WORKEESS",deviceListResponse.data.toString())
-                    if (deviceListResponse.data.deviceListByAssocID!= null) {
-                        Prefs.putInt("TOTAL_GUARDS",deviceListResponse.data.deviceListByAssocID.size)
+                    Log.e("WORKEESS", deviceListResponse.data.toString())
+                    if (deviceListResponse.data.deviceListByAssocID != null) {
+                        Prefs.putInt("TOTAL_GUARDS", deviceListResponse.data.deviceListByAssocID.size)
 
 
                         val arrayList = deviceListResponse.data.deviceListByAssocID
@@ -2131,8 +2108,8 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
             unitId, desgn, personName,
             LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb, "1", "", "", "",
             1, "Staff Biometric Entry", "", "", "", "", ""
-            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""),getCurrentTimeLocal(),
-            "","","","","","","","","",""
+            , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""), getCurrentTimeLocal(),
+            "", "", "", "", "", "", "", "", "", ""
         )
 
         Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())
@@ -2400,16 +2377,15 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
         }
     }
 
-    fun getSubscriptionData(){
-        RetrofitClinet.instance.getSubscriptionData(OYE247TOKEN,LocalDb.getAssociation()!!.asAssnID.toString() )
+    fun getSubscriptionData() {
+        RetrofitClinet.instance.getSubscriptionData(OYE247TOKEN, LocalDb.getAssociation()!!.asAssnID.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<SubscriptionResp>() {
 
                 override fun onSuccessResponse(getdata: SubscriptionResp) {
 
-                 //   CheckDates(getdata.data.subscription.sueDate,getCurrentTimeLocal(),this@Dashboard)
-
+                    //   CheckDates(getdata.data.subscription.sueDate,getCurrentTimeLocal(),this@Dashboard)
 
 
                 }
@@ -2420,6 +2396,7 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
 
                 }
+
                 override fun noNetowork() {
                     Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG).show()
                 }
@@ -2427,8 +2404,6 @@ class Dashboard : BaseKotlinActivity(), AdapterView.OnItemSelectedListener, View
 
 
     }
-
-
 
 
 }
