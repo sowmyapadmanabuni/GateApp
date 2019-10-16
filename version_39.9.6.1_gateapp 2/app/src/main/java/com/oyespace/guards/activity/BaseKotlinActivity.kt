@@ -36,11 +36,11 @@ open class BaseKotlinActivity : AppCompatActivity(){
     private var progressDialog: ProgressDialog? = null
 
     val LOCATION_REQ = 7446
-    val REQUEST_CODE_SPEECH = 101;
+    val REQUEST_CODE_SPEECH = 101
     private var callback: PermissionCallback? = null
     private var requestcode: Int = 0
     lateinit var realm: Realm
-    var alertDialog: AlertDialog? = null;
+    var alertDialog: AlertDialog? = null
 
     companion object {
         val TAG: String = javaClass.name
@@ -54,7 +54,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
 
     open fun closeRealm(){
         if(realm != null && !realm.isClosed){
-            realm.close();
+            realm.close()
         }
     }
 
@@ -245,7 +245,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
         val dialogView = inflater.inflate(R.layout.animated_dialog, null)
         val text: TextView = dialogView.findViewById(R.id.animdlg_text)
         val animView: LottieAnimationView = dialogView.findViewById(R.id.animdlg_lottie)
-        val btn: Button = dialogView.findViewById(R.id.animdlg_btn);
+        val btn: Button = dialogView.findViewById(R.id.animdlg_btn)
         if (!btnText.equals("") && btnText != null) {
 
             btn.visibility = View.VISIBLE
@@ -258,7 +258,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
         }
         animView.setAnimation(json)
         animView.playAnimation()
-        text.setText(desc)
+        text.text = desc
         dialogBuilder.setView(dialogView)
 
         alertDialog = dialogBuilder.create()
@@ -271,7 +271,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
             alertDialog?.dismiss()
         }
     }
-
 
 
 }

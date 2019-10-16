@@ -44,8 +44,8 @@ public class SGPatrollingService extends Service {
     public int onStartCommand(Intent intent2, int flags, int startId) {
         // Let it continue running until it is stopped.
 
-        handler = new Handler();
-        gpsTracker = new GPSTracker(SGPatrollingService.this);
+        //handler = new Handler();
+        //gpsTracker = new GPSTracker(SGPatrollingService.this);
 
         // check if GPS enabled
         //saveLatLongPoints();

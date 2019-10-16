@@ -26,7 +26,6 @@ import com.kodmap.app.library.PopopDialogBuilder
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.com.oyespace.guards.activity.EmergencyModel
-import com.oyespace.guards.com.oyespace.guards.activity.EmrgencyContactAdapter
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.pojo.GoogleMapDTO
@@ -36,7 +35,6 @@ import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
 import io.realm.kotlin.where
-import kotlinx.android.synthetic.main.activity_sos_recycle.*
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -91,9 +89,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
     private var lineoption = PolylineOptions()
     private var isResolving = false
     var userId: Int = 0
-    var emergencyImages: ArrayList<String> = ArrayList();
+    var emergencyImages: ArrayList<String> = ArrayList()
     internal var t1: TextToSpeech? = null
-    var mSosPath: String = "";
+    var mSosPath: String = ""
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -111,19 +109,19 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
     override fun onStart() {
         super.onStart()
-        Prefs.putBoolean("ACTIVE_SOS", true);
+        Prefs.putBoolean("ACTIVE_SOS", true)
         startSiren()
     }
 
     override fun onDestroy() {
         try {
             stopSiren()
-            Prefs.putBoolean("ACTIVE_SOS", false);
+            Prefs.putBoolean("ACTIVE_SOS", false)
             mSosReference!!.removeEventListener(sosListener)
 
         } catch (e: Exception) {
             stopSiren()
-            Prefs.putBoolean("ACTIVE_SOS", false);
+            Prefs.putBoolean("ACTIVE_SOS", false)
         }
         super.onDestroy()
     }
@@ -131,15 +129,15 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
     override fun onPause() {
         stopSiren()
         super.onPause()
-        Prefs.putBoolean("ACTIVE_SOS", false);
+        Prefs.putBoolean("ACTIVE_SOS", false)
     }
 
     override fun onResume() {
 
         try {
             if (currentSOS != null && currentSOS.isValid) {
-                var lng: Double = currentSOS.longitude.toDouble();
-                var lat: Double = currentSOS.latitude.toDouble();
+                var lng: Double = currentSOS.longitude.toDouble()
+                var lat: Double = currentSOS.latitude.toDouble()
                 sosLocation = LatLng(lat, lng)
                 getDirections()
             } else {
@@ -185,9 +183,9 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
     private fun showImages() {
         val urlList = ArrayList<String>()
-        urlList.addAll(emergencyImages);
-        val dialog = PopopDialogBuilder(this@SosGateAppActivity).setList(urlList).build();
-        dialog.show();
+        urlList.addAll(emergencyImages)
+        val dialog = PopopDialogBuilder(this@SosGateAppActivity).setList(urlList).build()
+        dialog.show()
     }
 
 
@@ -217,7 +215,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                 sendBroadcast(intentAction1)
             }
         } catch (e: java.lang.Exception) {
-            Log.e("sendSOSStatus", "" + status);
+            Log.e("sendSOSStatus", "" + status)
             e.printStackTrace()
         }
     }
@@ -241,7 +239,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
                             } else {
                                 //mSosReference
-                                btn_dismiss_sos.setVisibility(View.GONE)
+                                btn_dismiss_sos.visibility = View.GONE
                                 btn_attend_sos.text = "Resolved"
                                 isResolving = true
                                 try {
@@ -307,10 +305,10 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
             try {
                 //dataSnapshot.children.forEach {
-                val it = dataSnapshot;
-                val user_id = it.key;
+                val it = dataSnapshot
+                val user_id = it.key
                 //val sos = it.getValue()
-                var isActive: Boolean = true;//it.child("isActive").getValue(Boolean::class.java)
+                var isActive: Boolean = true//it.child("isActive").getValue(Boolean::class.java)
                 var unitName = ""
                 var unitId: Int = 0
                 var userName: String = ""
@@ -324,7 +322,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                 //var userId: Int = 0
                 var totalPassed: Int = 0
                 var passedBy: HashMap<String, String> = HashMap()
-                var isValidSOS: Boolean = true;
+                var isValidSOS: Boolean = true
 
                 if (it.hasChild("isActive") && it.hasChild("isActive") != null) {
                     isActive = it.child("isActive").getValue(Boolean::class.java)!!
@@ -357,7 +355,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                 }
                 if (it.hasChild("id")) {
                     id = it.child("id").getValue(Int::class.java)!!
-                    sosId = id;
+                    sosId = id
                 }
                 if (it.hasChild("userId")) {
                     userId = it.child("userId").getValue(Int::class.java)!!
@@ -384,11 +382,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                     attendedByMob = it.child("attendedByMobile").getValue(String::class.java)!!
                 }
 
-                Log.e("EMER_G", "" + emergencyImages);
+                Log.e("EMER_G", "" + emergencyImages)
                 if (isActive != null && isActive && userId != 0 && isValidSOS) {
                     runOnUiThread {
 
-                        val currentGate = Prefs.getString(PrefKeys.MOBILE_NUMBER, "");
+                        val currentGate = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
                         if (attendedByMob.equals("") || attendedByMob.equals(currentGate)) {
 
 
@@ -441,7 +439,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                                     TextToSpeech.QUEUE_FLUSH,
                                     null
                                 )
-                                Log.e("DEleted", "" + currentSOS);
+                                Log.e("DEleted", "" + currentSOS)
                                 val sosObj =
                                     realm.where<SOSModel>().equalTo("userId", userId).findFirst()
                                 if (sosObj != null) {
@@ -477,7 +475,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                     //  onBackPressed()
                 }
 
-                Log.e("CHILD", "" + isActive);
+                Log.e("CHILD", "" + isActive)
                 //}
 
 //                        val totalSOS = realm.where<SOSModel>().count()
@@ -493,8 +491,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
         } else {
             try {
 
-                Log.e("DEleted", "" + currentSOS);
-                Log.e("DEleted_USR", "" + userId);
+                Log.e("DEleted", "" + currentSOS)
+                Log.e("DEleted_USR", "" + userId)
                 if (userId == 0 && currentSOS.isValid && currentSOS != null && currentSOS.userId != 0) {
                     userId = currentSOS.userId
                 }
@@ -600,8 +598,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
     private fun updateSOSLocation() {
         try {
             if (currentSOS != null && currentSOS.latitude != "" && currentSOS.longitude != "") {
-                var lng: Double = currentSOS.longitude.toDouble();
-                var lat: Double = currentSOS.latitude.toDouble();
+                var lng: Double = currentSOS.longitude.toDouble()
+                var lat: Double = currentSOS.latitude.toDouble()
 
                 sosLocation = LatLng(lat, lng)
                 val markerOption: MarkerOptions =
@@ -641,7 +639,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
         try {
             sosId = 0
             val sosObj = realm.where<SOSModel>().findFirst()
-            Log.e("getSOS", "" + sosObj);
+            Log.e("getSOS", "" + sosObj)
             if (sosObj != null && sosObj.userName != null && !sosObj.userName.equals("")) {
                 currentSOS = sosObj
                 sosId = currentSOS.id
@@ -724,7 +722,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                 checkNextSOS()
             }
         } catch (e: java.lang.Exception) {
-            Log.e("ERRRRR", "" + e);
+            Log.e("ERRRRR", "" + e)
             if (isdismiss) {
                 checkNextSOS()
             }
@@ -757,7 +755,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                     Log.e("passedListener", "Error")
                 }
             }
-            passedReference!!.addValueEventListener(passedListener)
+            passedReference.addValueEventListener(passedListener)
             val sdf = SimpleDateFormat("dd/M/yyyy hh:mm:ss")
             val currentDate = sdf.format(Date())
 
@@ -796,12 +794,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
             )
         )
 
-        val ambulanceCard = findViewById<View>(R.id.call_ambulance);
-        val policeCard = findViewById<View>(R.id.call_police);
-        val fireCard = findViewById<View>(R.id.call_fire);
+        val ambulanceCard = findViewById<View>(R.id.call_ambulance)
+        val policeCard = findViewById<View>(R.id.call_police)
+        val fireCard = findViewById<View>(R.id.call_fire)
         for (emer in contacts) {
 
-            var view = policeCard;
+            var view = policeCard
             if (emer.phoneNum.equals("100")) {
                 view = policeCard
             } else if (emer.phoneNum.equals("101")) {
@@ -842,7 +840,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
     }
 
     fun onEmergencyClick(phone: String) {
-        val intent = Intent(Intent.ACTION_CALL);
+        val intent = Intent(Intent.ACTION_CALL)
         intent.data = Uri.parse("tel:" + phone)
         startActivity(intent)
     }
@@ -858,7 +856,7 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
     override fun onMapReady(p0: GoogleMap) {
         try {
             mMap = p0
-            mMap.getUiSettings().setZoomControlsEnabled(true)
+            mMap.uiSettings.isZoomControlsEnabled = true
             setUpMap()
             updateSOSLocation()
         } catch (e: Exception) {

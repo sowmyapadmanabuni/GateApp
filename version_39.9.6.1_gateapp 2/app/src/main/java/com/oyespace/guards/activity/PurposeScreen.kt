@@ -29,21 +29,21 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNextt -> {
-                buttonNextt.setEnabled(false)
-                buttonNextt.setClickable(false)
+                buttonNextt.isEnabled = false
+                buttonNextt.isClickable = false
                 if (Ed_Name_purp.text.length > 2) {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@PurposeScreen, MobileNumberScreen::class.java)
 
                     Log.d(
                         "intentdata NameEntr",
-                        "buttonNext " + getIntent().getStringExtra(ConstantUtils.UNITNAME) + " " + intent.getStringExtra(
+                        "buttonNext " + intent.getStringExtra(ConstantUtils.UNITNAME) + " " + intent.getStringExtra(
                             ConstantUtils.UNITID
                         )
-                                + " " + getIntent().getStringExtra(ConstantUtils.MOBILENUMBER) + " " + getIntent().getStringExtra(
+                                + " " + intent.getStringExtra(ConstantUtils.MOBILENUMBER) + " " + intent.getStringExtra(
                             ConstantUtils.COUNTRYCODE
                         ) + " " + Ed_Name_purp.text
-                    );
+                    )
                     d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
                     d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
                     d.putExtra(ConstantUtils.FLOW_TYPE, intent.getStringExtra(ConstantUtils.FLOW_TYPE))
@@ -57,8 +57,8 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                     startActivity(d)
                     finish()
                 } else {
-                    buttonNextt.setEnabled(true)
-                    buttonNextt.setClickable(true)
+                    buttonNextt.isEnabled = true
+                    buttonNextt.isClickable = true
                     Toast.makeText(this, "Enter Valid Purpose", Toast.LENGTH_SHORT).show()
 
                 }
@@ -93,19 +93,20 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
         }
 
         Btn_Mic.setOnClickListener {
-            Speak();
+            Speak()
         }
 //        supportActionBar!!.setTitle("Enter your Name")
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         Log.d(
-            "intentdata NameEntr", "" + getIntent().getStringExtra(ConstantUtils.UNITNAME) + " " + intent.getStringExtra(
+            "intentdata NameEntr",
+            "" + intent.getStringExtra(ConstantUtils.UNITNAME) + " " + intent.getStringExtra(
                 ConstantUtils.UNITID
             )
-                    + " " + getIntent().getStringExtra(ConstantUtils.MOBILENUMBER) + " " + getIntent().getStringExtra(
+                    + " " + intent.getStringExtra(ConstantUtils.MOBILENUMBER) + " " + intent.getStringExtra(
                 ConstantUtils.COUNTRYCODE
             )
-        );
+        )
 
     }
 //

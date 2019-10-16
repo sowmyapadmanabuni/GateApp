@@ -81,9 +81,9 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
 //        makeVisitorLog()
 //        makeUnitLog()
         rv_dashboard.setLayoutManager(
-            androidx.recyclerview.widget.LinearLayoutManager(
+            LinearLayoutManager(
                 this,
-                androidx.recyclerview.widget.LinearLayoutManager.VERTICAL,
+                LinearLayoutManager.VERTICAL,
                 false
             )
         )
@@ -103,9 +103,9 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
                     }
 
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                    if (report.isAnyPermissionPermanentlyDenied) {
                         // show alert dialog navigating to Settings
-                        showSettingsDialog();
+                        showSettingsDialog()
                     }
                 }
 
@@ -115,20 +115,21 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
                 ) {
                     if (token != null) {
                         token.continuePermissionRequest()
-                    };
+                    }
                 }
             }).
                 withErrorListener(object: PermissionRequestErrorListener {
 
                     override fun onError( error: DexterError) {
-                        Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 })
             .onSameThread()
-            .check();
+            .check()
 
-        txt_assn_name.setText("Society: " + LocalDb.getAssociation().asAsnName)
-        txt_device_name.setText("Gate: " )
+        txt_assn_name.text = "Society: " + LocalDb.getAssociation().asAsnName
+        txt_device_name.text = "Gate: "
 
     }
 
@@ -155,7 +156,7 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
@@ -205,7 +206,7 @@ class DashboardActivity : BaseKotlinActivity() , View.OnClickListener {
 
 //                        val orderListAdapter = VistorListAdapter(newAl, this@DashboardActivity)
 //                        rv_dashboard.adapter = orderListAdapter
-                        Log.d("dvd",""+globalApiObject.data);
+                        Log.d("dvd", "" + globalApiObject.data)
 
                         if (arrayList.size == 0) {
                             Toast.makeText(this@DashboardActivity, "No items", Toast.LENGTH_SHORT).show()

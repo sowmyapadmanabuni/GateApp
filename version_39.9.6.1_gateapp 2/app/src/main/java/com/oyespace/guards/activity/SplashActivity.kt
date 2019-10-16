@@ -1,4 +1,3 @@
-
 package com.oyespace.guards.activity
 
 import android.Manifest
@@ -25,6 +24,7 @@ import com.oyespace.guards.pojo.Device
 import com.oyespace.guards.pojo.GetDeviceInfobyMobImeiReq
 import com.oyespace.guards.pojo.GetDeviceInfobyMobImeiResp
 import com.oyespace.guards.pojo.SearchResult
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.LocationUtils
@@ -38,15 +38,15 @@ import java.util.*
 
 class SplashActivity : BaseLocationActivity() {
 
-  var app: Myapp?=null
-    var Mobile_IMEI_NO:String?=null
-    var getSimNumber:String?=null
+    var app: Myapp? = null
+    var Mobile_IMEI_NO: String? = null
+    var getSimNumber: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.splash_screen)
-        Prefs.putBoolean("ACTIVE_SOS", false);
-       // app = getApplication() as Myapp?;
+        Prefs.putBoolean("ACTIVE_SOS", false)
+        // app = getApplication() as Myapp?;
         val searchData = LocalDb.getSearchData()
 
         if (searchData == null) {
@@ -57,7 +57,9 @@ class SplashActivity : BaseLocationActivity() {
     }
 
     private fun handleLocation() {
-        requestPermission(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
+        requestPermission(
+            arrayOf(
+                Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.READ_PHONE_STATE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.CAMERA,
@@ -100,7 +102,7 @@ class SplashActivity : BaseLocationActivity() {
             }
         })
     } else {
-      //  launchLocationSelectionActivity()
+        //  launchLocationSelectionActivity()
         Toast.makeText(this, "location failed", Toast.LENGTH_SHORT).show()
     }
 
@@ -108,18 +110,19 @@ class SplashActivity : BaseLocationActivity() {
     private fun launchMainActivity() {
         // val mainIntent = Intent(this@SplashActivity, DashboardActivity::class.java)
 
+        VisitorLogRepo.get_OUT_VisitorLog(true)
 
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         Mobile_IMEI_NO = tm.deviceId
         //   Mobile_IMEI_NO=""
-        getSimNumber = tm.getLine1Number()
-        val modelno=android.os.Build.MODEL
-        Prefs.putString(PrefKeys.MODEL_NUMBER,modelno)
+        getSimNumber = tm.line1Number
+        val modelno = android.os.Build.MODEL
+        Prefs.putString(PrefKeys.MODEL_NUMBER, modelno)
 
-        if(getSimNumber?.length==0){
+        if (getSimNumber?.length == 0) {
 
 
-            if(Prefs.getString(PrefKeys.MOBILE_NUMBER,null)==null) {
+            if (Prefs.getString(PrefKeys.MOBILE_NUMBER, null) == null) {
 
 
                 val mainIntent = Intent(this@SplashActivity, LoginActivity::class.java)
@@ -127,7 +130,7 @@ class SplashActivity : BaseLocationActivity() {
                 finish()
 
 
-            }else {
+            } else {
                 if (LocalDb.getStaffList() == null) {
                     // Toast.makeText(this, " failed", Toast.LENGTH_SHORT).show()
                     val mainIntent = Intent(this@SplashActivity, MyRoleScreen::class.java)
@@ -143,7 +146,7 @@ class SplashActivity : BaseLocationActivity() {
             }
 
 
-        } else{
+        } else {
             Prefs.putString(PrefKeys.MOBILE_NUMBER, getSimNumber)
 
             getDeviceRegistrationInfo()
@@ -176,24 +179,21 @@ class SplashActivity : BaseLocationActivity() {
     private fun getDeviceRegistrationInfo() {
 
 
-
-
-
         // val req = GetDeviceInfobyMobImeiReq(Mobile_IMEI_NO, "+"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null))
-        val req = GetDeviceInfobyMobImeiReq(Mobile_IMEI_NO.toString(), "+"+getSimNumber)
+        val req = GetDeviceInfobyMobImeiReq(Mobile_IMEI_NO.toString(), "+" + getSimNumber)
 
 
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString()+"..."+getSimNumber)
+        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString() + "..." + getSimNumber)
 
         compositeDisposable.add(
-            RetrofitClinet.instance.getDeviceInfobyMobImeiCall(ConstantUtils.OYE247TOKEN,req)
+            RetrofitClinet.instance.getDeviceInfobyMobImeiCall(ConstantUtils.OYE247TOKEN, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<GetDeviceInfobyMobImeiResp<Device>>() {
                     override fun onSuccessResponse(globalApiObject: GetDeviceInfobyMobImeiResp<Device>) {
-                        if (globalApiObject.data.device!= null) {
+                        if (globalApiObject.data.device != null) {
                             // Utils.showToast(applicationContext, intToString( globalApiObject.data.workers.asAssnID))
-                            Log.d("getDeviceInfoCall","StaffEntry " +globalApiObject.data.toString())
+                            Log.d("getDeviceInfoCall", "StaffEntry " + globalApiObject.data.toString())
 
                             val exitedSort = ArrayList<Device>()
                             val arrayList = globalApiObject.data.device
@@ -201,10 +201,10 @@ class SplashActivity : BaseLocationActivity() {
                             //looping through existing elements
                             for (s in arrayList) {
                                 //if the existing elements contains the search input
-                                Log.d("button_done ","device "+" "+" "+s.deGateNo)
-                                Prefs.putString(ConstantUtils.GATE_NO,s.deGateNo)
+                                Log.d("button_done ", "device " + " " + " " + s.deGateNo)
+                                Prefs.putString(ConstantUtils.GATE_NO, s.deGateNo)
                                 if (s.deStatus) {
-                                    Log.d("device ","device "+s.deStatus+" "+s.deStatus+" ")
+                                    Log.d("device ", "device " + s.deStatus + " " + s.deStatus + " ")
 
 
                                     exitedSort.add(s)
@@ -213,16 +213,16 @@ class SplashActivity : BaseLocationActivity() {
                                     exitedSort.add(s)
                                 }
                             }
-                            if(exitedSort!=null) {
+                            if (exitedSort != null) {
 
-                                if(Prefs.getString(PrefKeys.MOBILE_NUMBER,null)==null) {
+                                if (Prefs.getString(PrefKeys.MOBILE_NUMBER, null) == null) {
 
                                     val mainIntent = Intent(this@SplashActivity, MyRoleScreen::class.java)
                                     startActivity(mainIntent)
                                     finish()
 
 
-                                }else {
+                                } else {
                                     if (LocalDb.getStaffList() == null) {
                                         // Toast.makeText(this, " failed", Toast.LENGTH_SHORT).show()
                                         val mainIntent = Intent(this@SplashActivity, MyRoleScreen::class.java)
@@ -240,7 +240,7 @@ class SplashActivity : BaseLocationActivity() {
 //                                getDeviceList(globalApiObject.data.device[0].asAssnID)
 
                                 //    LocalDb.saveDeviceInfo(globalApiObject.data.workers)
-                            }else{
+                            } else {
 
                                 LovelyStandardDialog(this@SplashActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                     .setTopColorRes(R.color.google_red)
@@ -277,12 +277,12 @@ class SplashActivity : BaseLocationActivity() {
                     }
 
                     override fun onErrorResponse(e: Throwable) {
-                        Log.d("onErrorResponse","StaffEntry "+e.toString())
+                        Log.d("onErrorResponse", "StaffEntry " + e.toString())
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
 
-                        Toast.makeText(this@SplashActivity,e.toString(),Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@SplashActivity, e.toString(), Toast.LENGTH_LONG).show()
 
-                        if(getSimNumber?.length==0) {
+                        if (getSimNumber?.length == 0) {
 
                             val input = Prefs.getString(PrefKeys.MOBILE_NUMBER, null)
                             LovelyStandardDialog(this@SplashActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
@@ -309,17 +309,17 @@ class SplashActivity : BaseLocationActivity() {
 
                                 .show()
                             dismissProgress()
-                       // }
-                        }else {
+                            // }
+                        } else {
 
 
                             LovelyStandardDialog(this@SplashActivity, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                 .setTopColorRes(R.color.google_red)
-                               //  .setIcon(R.drawable.google_red)
+                                //  .setIcon(R.drawable.google_red)
                                 //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
                                 .setTitle("Device is not registered as Gate device")
                                 .setTitleGravity(Gravity.CENTER)
-                                 .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
+                                .setMessage(Mobile_IMEI_NO + " and +" + Prefs.getString(PrefKeys.COUNTRY_CODE, null) + Prefs.getString(PrefKeys.MOBILE_NUMBER, null) + " is Not Registered as Gate Device")
                                 .setMessage(Mobile_IMEI_NO + " and " + getSimNumber + " is not registered as Gate Device")
 
                                 .setMessageGravity(Gravity.CENTER)
@@ -348,16 +348,19 @@ class SplashActivity : BaseLocationActivity() {
                             }
 
                             .show()
-                        dismissProgress()                    }
+                        dismissProgress()
+                    }
 
                     override fun onShowProgress() {
 //                        showProgress()
                     }
 
                     override fun onDismissProgress() {
-                     //   dismissProgress()
+                        //   dismissProgress()
                     }
-                }))
+                })
+        )
     }
+
 
 }

@@ -3,6 +3,8 @@ package com.oyespace.guards.vehicle_others
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -94,13 +96,9 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         }
 
-        val rv_serviceProvider =
-            findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_serviceProvider)
+        val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
         rv_serviceProvider.setHasFixedSize(true)
-        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(
-            this@VehicleOthersServiceProviderListActivity,
-            3
-        )
+        val gridLayoutManager = GridLayoutManager(this@VehicleOthersServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         //  val sectionModelArrayList: ArrayList<SectionModel> = ArrayList()
@@ -161,8 +159,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         for (i in 0 until vendor_names.size) {
             val vendorPojo = VendorPojo()
-            vendorPojo.setVendor_names(vendor_names[i])
-            vendorPojo.setImage_url(myImageList[i])
+            vendorPojo.vendor_names = vendor_names[i]
+            vendorPojo.image_url = myImageList[i]
             vendordata.add(vendorPojo)
         }
         return vendordata

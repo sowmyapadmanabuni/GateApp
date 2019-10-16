@@ -101,7 +101,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:layout_width="@dimen/_180sdp"
                 android:layout_height="match_parent"
-                android:id="@+id/incident_list"></androidx.recyclerview.widget.RecyclerView>
+                    android:id="@+id/incident_list"></androidx.recyclerview.widget.RecyclerView>
 
         </LinearLayout>
 

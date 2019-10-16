@@ -14,7 +14,7 @@ public class StaffRegistrationReqJv {
     public String WKDOB;
     public String WKISDCode;  
     public String WKLName;  
-    public String WKMobile;  
+    public String WKMobile;
     public String WKWrkType;
     public String UNUnitID;
     public String UNUniName ;

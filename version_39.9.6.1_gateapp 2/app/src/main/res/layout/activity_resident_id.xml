@@ -1,54 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+<layout>
 
-    <FrameLayout
-            android:id="@+id/content_frame"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
 
-    <TextView
-            android:id="@+id/toolbar"
-            android:layout_gravity="top"
-            android:minHeight="?attr/actionBarSize"
-            android:background="@color/actionbar_opacity"
-            app:theme="@style/TransparentToolbar"
-            android:layout_width="match_parent"
-            android:text="@string/textlookingforqr"
-            android:visibility="gone"
-            android:textStyle="bold"
-            android:textSize="@dimen/_23sdp"
-            android:gravity="center"
-            android:layout_height="wrap_content"/>
+        <FrameLayout
+                android:id="@+id/content_frame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-
-
-
-
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
         <TextView
-                android:id="@+id/scaneddata"
-                android:layout_width="300dp"
-                android:layout_height="173dp"
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:background="@color/actionbar_opacity"
+                android:gravity="center"
+                android:minHeight="?attr/actionBarSize"
+                android:text="@string/textlookingforqr"
+                android:textSize="@dimen/_23sdp"
+                android:textStyle="bold"
                 android:visibility="gone"
+                app:theme="@style/TransparentToolbar" />
+
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/scaneddata"
+                    android:layout_width="300dp"
+                    android:layout_height="173dp"
+                    android:layout_gravity="bottom"
+                    android:text="bvmvvhv"
+                    android:visibility="gone" />
+
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/missedCallBtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:text="bvmvvhv"
-                />
-
-    </LinearLayout>
-
-    <Button
-            android:id="@+id/btn_missedcall"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Missed Call"
-            android:layout_gravity="bottom"
-            />
-</FrameLayout>
+                android:layout_margin="10dp"
+                android:onClick="onMissedCallPress"
+                android:text="Missed Call" />
+    </FrameLayout>
+</layout>

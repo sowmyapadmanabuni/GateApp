@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="com.oyespace.guards">
+        package="com.oyespace.guards"
+        >
+
     <!-- NETWORK & WIFI -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -26,7 +28,6 @@
     <permission android:name="android.permission.CLEAR_APP_CACHE" /> <!-- CAMERA & RECORDING -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -49,32 +50,44 @@
                 android:theme="@style/noActionBar" />
         <activity
                 android:name=".residentidcard.ResidentIdActivity"
-                android:theme="@style/noActionBar" />
+                android:theme="@style/noActionBar"></activity>
+
         <activity
-                android:name=".staffManaualEntry.ManualStaffEntryRegistration"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualAddCarFragment"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualNameEntryScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManualMobileNumberScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-        <activity
-                android:name=".staffManaualEntry.ManulBlockSelectionActivity"
+                android:name=".residentidcard.ResidentIdActivity_OLD"
+                android:theme="@style/noActionBar"></activity>
+
+
+        <activity android:name=".staffManaualEntry.ManualStaffEntryRegistration"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".staffManaualEntry.ManualUnitSelectionActivity"
+                />
+
+        <activity android:name=".staffManaualEntry.ManualAddCarFragment"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
+                android:theme="@style/noActionBar"
+                />
+
+        <activity android:name=".staffManaualEntry.ManualNameEntryScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                />
+
+        <activity android:name=".staffManaualEntry.ManualMobileNumberScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                />
+
+        <activity android:name=".staffManaualEntry.ManulBlockSelectionActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                android:windowSoftInputMode="adjustPan"/>
+
+        <activity android:name=".staffManaualEntry.ManualUnitSelectionActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+              />
+
+
         <activity android:name=".activity.NewBiometric" />
         <activity
                 android:name=".activity.EditStaffActivity"
@@ -145,6 +158,7 @@
         <activity
                 android:name=".activity.SplashActivity"
                 android:screenOrientation="portrait"
+                android:noHistory="true"
                 android:theme="@style/splashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -229,8 +243,8 @@
         <activity
                 android:name=".Dashboard"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan" />
+                android:windowSoftInputMode="adjustPan"
+                android:theme="@style/noActionBar" />
         <activity
                 android:name=".activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
@@ -471,6 +485,17 @@
                 android:name=".vehicle_others.Vehicle_OthersUnitSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".resident.ResidentIdActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
+        <activity
+                android:name=".resident.ResidentMissedCallActivity"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
     </application>
 
 </manifest>

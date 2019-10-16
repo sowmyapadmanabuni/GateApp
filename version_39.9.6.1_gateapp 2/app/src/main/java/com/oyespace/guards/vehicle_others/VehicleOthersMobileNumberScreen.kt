@@ -84,14 +84,14 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                 d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                startActivity(d);
-                finish();
+                startActivity(d)
+                finish()
 
             }
 
             R.id.buttonNext ->{
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if(textview.text.length==13) {
 //                    val d = Intent(this@VehicleOthersMobileNumberScreen, VehicleOthersNameEntryScreen::class.java)
 ////                    Log.d("intentdata MobileNumber","buttonNext "+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
@@ -146,8 +146,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                     finish()
 //                    getAccountDetails("+"+countryCode.toString(),textview.getText().toString());
                 }else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this,"Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -177,8 +177,8 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.getExtras();
-                            val number = bundle?.getString("incoming_number");
+                            val bundle = intent?.extras
+                            val number = bundle?.getString("incoming_number")
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (textview != null && number != null) {
@@ -190,21 +190,21 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                                 mobileNumber=number.substring(3,13)
                             }
                         }
-                        LocalDb.disconnectCall(context);
+                        LocalDb.disconnectCall(context)
                     }
 
-                }, PhoneStateListener.LISTEN_CALL_STATE);
+                }, PhoneStateListener.LISTEN_CALL_STATE)
 
                 //
             }
-        };
+        }
         btn_nobalance=findViewById(R.id.btn_nobalance)
         timer=findViewById(R.id.timer)
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
         if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
-            txt_assn_name!!.setTextSize(5 * getResources().getDisplayMetrics().density);
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
@@ -224,8 +224,9 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
         val timer = object: CountDownTimer(60000,1000){
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text =
+                    ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -243,7 +244,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
 
         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
 //        tv_guardnumber.text =
 //            resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,"")

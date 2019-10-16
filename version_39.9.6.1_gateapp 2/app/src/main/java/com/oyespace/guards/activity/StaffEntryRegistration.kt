@@ -17,12 +17,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.google.firebase.database.FirebaseDatabase
+import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.models.NotificationSyncModel
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -36,6 +37,7 @@ import com.oyespace.guards.utils.NumberUtils.toInteger
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
@@ -52,17 +54,16 @@ import java.util.concurrent.TimeUnit
 import kotlin.concurrent.fixedRateTimer
 import kotlin.concurrent.schedule
 
-class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
+class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
-     var destination: File?=null
-    var imgName:String?=null
+    var destination: File? = null
+    var imgName: String? = null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
     lateinit var mBitmap: Bitmap
-    lateinit var txt_assn_name:TextView
-    lateinit var txt_gate_name:TextView
-    lateinit var txt_device_name:TextView
-    var dbh: DataBaseHelper?=null
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
+    lateinit var txt_device_name: TextView
     var visitorLogID:String=""
     var pos=0
 
@@ -70,31 +71,37 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         when (v?.id) {
 
-            R.id.button_done ->{
-                button_done.setEnabled(false)
-                button_done.setClickable(false)
+            R.id.button_done -> {
+                button_done.isEnabled = false
+                button_done.isClickable = false
 
-
-                Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+STAFF_REGISTRATION+" "+FLOW_TYPE.equals( STAFF_REGISTRATION,true))
-
-
-                if(intent.getStringExtra(UNITID).contains(",")){
+                if (intent.getStringExtra(UNITID).contains(",")) {
 
 
                     var unitname_dataList: Array<String>
                     var unitid_dataList: Array<String>
                     var unitAccountId_dataList: Array<String>
-                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    if(unitname_dataList.size>0) {
+                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitAccountId_dataList =
+                        intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex())
+                            .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    if (unitname_dataList.size > 0) {
                         // Toast.makeText(this@StaffEntryRegistration,intent.getStringExtra(UNITNAME),Toast.LENGTH_LONG).show()
 
                         for (i in 0 until unitname_dataList.size) {
 
                             pos=i
 
-                            Log.v("UNITS@@@..",unitname_dataList.size.toString()+" ..."+unitname_dataList.get(i).replace(" ",""))
+                            Log.v(
+                                "UNITS@@@..",
+                                unitname_dataList.size.toString() + " ..." + unitname_dataList.get(i).replace(
+                                    " ",
+                                    ""
+                                )
+                            )
 
                             showProgress()
 
@@ -115,15 +122,14 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
 
                     }
-                }else{
+                } else {
                     showProgress()
-                   
+
                     visitorLog(
                         intent.getStringExtra(UNITNAME),
                         intent.getStringExtra(UNITID),
                         intent.getStringExtra(UNIT_ACCOUNT_ID)
-
-                    );
+                    )
                 }
 
 
@@ -133,7 +139,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             R.id.profile_image ->{
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+STAFF_REGISTRATION+" "+FLOW_TYPE.equals( STAFF_REGISTRATION,true))
                 val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-                if(wrrw!=null) {
+                if (wrrw != null) {
 
                     val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
                     val factory = LayoutInflater.from(this@StaffEntryRegistration)
@@ -146,7 +152,7 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     alertadd.setView(view)
                     alertadd.show()
 
-                }else{
+                } else {
 
                 }
             }
@@ -156,16 +162,16 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
     var minteger = 1
     val entries: ArrayList<String> = ArrayList()
-    var SPPrdImg1=""
-    var SPPrdImg2=""
-    var SPPrdImg3=""
-    var SPPrdImg4=""
-    var SPPrdImg5=""
-    var SPPrdImg6=""
-    var SPPrdImg7=""
-    var SPPrdImg8=""
-    var SPPrdImg9=""
-    var SPPrdImg10=""
+    var SPPrdImg1 = ""
+    var SPPrdImg2 = ""
+    var SPPrdImg3 = ""
+    var SPPrdImg4 = ""
+    var SPPrdImg5 = ""
+    var SPPrdImg6 = ""
+    var SPPrdImg7 = ""
+    var SPPrdImg8 = ""
+    var SPPrdImg9 = ""
+    var SPPrdImg10 = ""
     var SPPrdImg11=""
     var SPPrdImg12=""
     var SPPrdImg13=""
@@ -178,7 +184,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     var SPPrdImg20=""
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
@@ -186,10 +191,6 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         //launchCamera()
 //        val service =  Intent(getBaseContext(), CapPhoto::class.java)
 //        startService(service);
-
-
-
-        dbh = DataBaseHelper(applicationContext)
 
 //         imgName = "Selfie" + "Association" + Prefs.getInt(
 //            ASSOCIATION_ID,
@@ -204,21 +205,22 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //                        front_translucent);
 
 
-        if(intent.getStringExtra(FLOW_TYPE).equals( STAFF_REGISTRATION,true)){
+        if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION, true)) {
 
             //  tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
-            txt_header.text= LocalDb.getAssociation()!!.asAsnName
-            tv_from.text=intent.getStringExtra(FLOW_TYPE)
+            txt_header.text = LocalDb.getAssociation()!!.asAsnName
+            tv_from.text = intent.getStringExtra(FLOW_TYPE)
 
-        }else{
-            txt_header.text= LocalDb.getAssociation()!!.asAsnName
-            tv_from.text=intent.getStringExtra(COMPANY_NAME)+" "+intent.getStringExtra(FLOW_TYPE)
+        } else {
+            txt_header.text = LocalDb.getAssociation()!!.asAsnName
+            tv_from.text =
+                intent.getStringExtra(COMPANY_NAME) + " " + intent.getStringExtra(FLOW_TYPE)
         }
 
 
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
         try {
@@ -235,35 +237,35 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         }
 
-       // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
-        tv_name.setText(intent.getStringExtra(PERSONNAME))
-       // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
+        // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
+        tv_name.text = intent.getStringExtra(PERSONNAME)
+        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
 
-        val input =intent.getStringExtra(MOBILENUMBER)
-      //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
+        val input = intent.getStringExtra(MOBILENUMBER)
+        //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.setText(getIntent().getStringExtra(COUNTRYCODE)+" "+number)
+        tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
 
 
         tv_for.setText(resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME))
 
         menuAdd.setOnClickListener {
             minteger++
-            menuCount.setText(""+minteger)
+            menuCount.text = "" + minteger
 
         }
         menuRemove.setOnClickListener {
-            if (minteger>1) {
+            if (minteger > 1) {
                 minteger--
-                menuCount.setText("" + minteger)
+                menuCount.text = "" + minteger
 
-            }else{
+            } else {
 
             }
         }
         if (intent.getStringExtra(FLOW_TYPE) == STAFF_REGISTRATION) {
-            tv_from.setText("Designation: "+intent.getStringExtra(COMPANY_NAME))
-            itemLyt.setVisibility(View.GONE)
+            tv_from.text = "Designation: " + intent.getStringExtra(COMPANY_NAME)
+            itemLyt.visibility = View.GONE
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
@@ -273,34 +275,33 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         }
 
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-        if(wrrw!=null) {
+        if (wrrw != null) {
 
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
 
         }
 
-        list=intent.getStringArrayListExtra(ITEMS_PHOTO_LIST);
+        list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
 
         for (i in list.indices) {
-
 
             when (i) {
 
                 0 -> {
-                                                                    Log.d("CreateVisitorLogResp","when destination "+i)
+                                                                    Log.d("CreateVisitorLogResp", "when destination " + i)
 
-                    SPPrdImg1=list[i]
+                    SPPrdImg1 = list[i]
                 }
-                1 -> SPPrdImg2=list[i]
-                2 -> SPPrdImg3=list[i]
-                3 -> SPPrdImg4=list[i]
-                4 -> SPPrdImg5=list[i]
-                5 -> SPPrdImg6=list[i]
-                6 -> SPPrdImg7=list[i]
-                7 -> SPPrdImg8=list[i]
-                8 -> SPPrdImg9=list[i]
-                9 -> SPPrdImg10=list[i]
+                1 -> SPPrdImg2 = list[i]
+                2 -> SPPrdImg3 = list[i]
+                3 -> SPPrdImg4 = list[i]
+                4 -> SPPrdImg5 = list[i]
+                5 -> SPPrdImg6 = list[i]
+                6 -> SPPrdImg7 = list[i]
+                7 -> SPPrdImg8 = list[i]
+                8 -> SPPrdImg9 = list[i]
+                9 -> SPPrdImg10 = list[i]
                 10 -> SPPrdImg11=list[i]
                 11 -> SPPrdImg12=list[i]
                 12 -> SPPrdImg13=list[i]
@@ -314,31 +315,28 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                 else -> { // Note the block
                     print("x is neither 1 nor 2")
-                    Log.d("CreateVisitorLogResp","else destination "+i)
+                    Log.d("CreateVisitorLogResp", "else destination " + i)
 
                 }
             }
             println(list[i])
         }
 
-        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
-        rv_image.layoutManager =
-            mLayoutManager as androidx.recyclerview.widget.RecyclerView.LayoutManager?
-        imageAdapter = ImageAdapter(list, this@StaffEntryRegistration,"Off")
+        val mLayoutManager = GridLayoutManager(applicationContext, 2)
+        rv_image.layoutManager = mLayoutManager
+        imageAdapter = ImageAdapter(list, this@StaffEntryRegistration, "Off")
         rv_image.adapter = imageAdapter
 
     }
 
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-
-        var imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
-        var memID:Int=410;
-        if(BASE_URL.contains("dev",true)){
-            memID=64;
-        }
-        else if(BASE_URL.contains("uat",true)){
-            memID=64;
+        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+        var memID: Int = 410
+        if (BASE_URL.contains("dev", true)) {
+            memID = 64
+        } else if (BASE_URL.contains("uat", true)) {
+            memID = 64
         }
 
 
@@ -351,33 +349,70 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),imgName,Prefs.getString(ConstantUtils.GATE_NO, ""),getCurrentTimeLocal(),SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20)
 
-        Log.d("CreateVisitorLogResp","StaffEntry destination "+req.toString())
+        Log.d("taaag", "request: " + req.toString())
 
-        compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
+        compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
-                    if (globalApiObject.success == true) {
+                    try {
+                        if (globalApiObject.success == true) {
 
-                        Log.d("VISItor id",globalApiObject.data.visitorLog.vlVisLgID.toString())
-                        updatecolor(globalApiObject.data.visitorLog.vlVisLgID.toString(),"#ffb81a")
+                            // TODO shift this realm code into ReamDB
+                            Log.d("taaag", "response for id: " + globalApiObject.data.visitorLog.vlVisLgID)
+                            updatecolor(globalApiObject.data.visitorLog.vlVisLgID.toString(),"#ffb81a")
 
-                        for (i in list.indices) {
-                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
-                            val dir = Environment.getExternalStorageDirectory().getPath()
-                            val file = File(dir, fileName)
-                            file.delete()
-                        }
 
-                        val dir =
-                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                        if (dir.isDirectory) {
-                            val children = dir.list()
-                            for (i in children!!.indices) {
-                                File(dir, children[i]).delete()
+                            //realm.executeTransaction {
+                            realm = Realm.getDefaultInstance()
+                            if (!realm.isInTransaction) {
+                                realm.beginTransaction()
                             }
-                        }
+
+                            var vlog = realm.where(VisitorLog::class.java)
+                                .equalTo("vlVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                .findFirst()
+
+                            val vlogCount = (realm.where(VisitorLog::class.java).equalTo(
+                                "vlVisLgID",
+                                globalApiObject.data.visitorLog.vlVisLgID
+                            ).count()).toInt()
+                            if (vlogCount == 0) {
+                                vlog = realm.createObject(
+                                    VisitorLog::class.java,
+                                    globalApiObject.data.visitorLog.vlVisLgID
+                                )
+                            }
+                            vlog!!.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
+                            vlog.mEMemID = memID
+                            vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
+                            vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
+                            vlog.vlfName = intent.getStringExtra(PERSONNAME)
+                            vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
+                            vlog.vlComName = intent.getStringExtra(COMPANY_NAME)
+                            vlog.vlVisType = intent.getStringExtra(VISITOR_TYPE)
+                            vlog.unUniName = intent.getStringExtra(UNITNAME)
+                            vlog.vlVisCnt = 1
+                            vlog.vlEntryT = getCurrentTimeLocal()
+                            realm.commitTransaction()
+                            //}
+
+                            for (i in list.indices) {
+                                val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
+                                val dir = Environment.getExternalStorageDirectory().getPath()
+                                val file = File(dir, fileName)
+                                file.delete()
+                            }
+
+                            val dir =
+                                File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                            if (dir.isDirectory) {
+                                val children = dir.list()
+                                for (i in children!!.indices) {
+                                    File(dir, children[i]).delete()
+                                }
+                            }
 
                         val d  =  Intent(this@StaffEntryRegistration,BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
@@ -396,20 +431,15 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         // var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +globalApiObject.data.visitorLog.vlVisLgID  + ".jpg"
 
 
-                       uploadImage(imgName,mBitmap)
-
-
+                        uploadImage(imgName,mBitmap)
                         finish()
-
-
-                        Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
                 }
                 override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng)+e.toString())
-                    Log.d("CreateVisitorLogResp","onErrorResponse  "+e.toString())
+                    Utils.showToast(applicationContext, getString(R.string.some_wrng) + e.toString())
+                    Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
 
                     dismissProgress()
                 }
@@ -425,47 +455,56 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onDismissProgress() {
 
                 }
-            }))
+            })
+        )
     }
 
-    private fun singUp(name :String, isdCode: String, mobNum : String) {
+    private fun singUp(name: String, isdCode: String, mobNum: String) {
 
         val req = SignUpReq("", "", "", "", "",
             name ,isdCode, "","","","",
             "",mobNum,"","", "","",imgName.toString())
         Log.d("singUp","StaffEntry "+req.toString())
 
-        compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<SignUpResp<Account>>() {
-                override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
-                    if (globalApiObject.success == true) {
-                       // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                        uploadImage(imgName.toString(),mBitmap)
-                        Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
-                    } else {
+        compositeDisposable.add(
+            RetrofitClinet.instance.signUpCall(CHAMPTOKEN, req)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<SignUpResp<Account>>() {
+                    override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
+                        if (globalApiObject.success == true) {
+                            // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
+                            uploadImage(imgName.toString(), mBitmap)
+                            Log.d(
+                                "CreateVisitorLogResp",
+                                "StaffEntry " + globalApiObject.data.toString()
+                            )
+                        } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                        Log.d("CreateVisitorLogResp","globalApiObject  "+globalApiObject.data.toString())
+                            Log.d(
+                                "CreateVisitorLogResp",
+                                "globalApiObject  " + globalApiObject.data.toString()
+                            )
 
+                        }
                     }
-                }
 
-                override fun onErrorResponse(e: Throwable) {
+                    override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    Log.d("CreateVisitorLogResp","onErrorResponse  "+e.toString())
-                }
+                        Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
+                    }
 
-                override fun noNetowork() {
+                    override fun noNetowork() {
 //                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
+                    }
 
-                override fun onShowProgress() {
-                }
+                    override fun onShowProgress() {
+                    }
 
-                override fun onDismissProgress() {
-                }
-            }))
+                    override fun onDismissProgress() {
+                    }
+                })
+        )
     }
 
 
@@ -491,8 +530,8 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 values)
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if(intent.resolveActivity(packageManager) != null) {
-           val mCurrentPhotoPath = fileUri.toString()
+        if (intent.resolveActivity(packageManager) != null) {
+            val mCurrentPhotoPath = fileUri.toString()
             intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
             intent.putExtra("android.intent.extras.CAMERA_FACING", android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT);
             intent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
@@ -507,8 +546,9 @@ class StaffEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int,
                                   data: Intent?) {
         if (resultCode == Activity.RESULT_OK
-            && requestCode == TAKE_PHOTO_REQUEST) {
-           // processCapturedPhoto()
+            && requestCode == TAKE_PHOTO_REQUEST
+        ) {
+            // processCapturedPhoto()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }

@@ -64,7 +64,8 @@ public class Myapp extends MultiDexApplication {
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder().name("oysepace.realm")
                 .schemaVersion(2)
-                .migration(new RealmDataMigration())
+//                .migration(new RealmDataMigration())
+                .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(config);
         Realm realm = Realm.getDefaultInstance();

@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -41,9 +42,9 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
+class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
-    var imgName:String?=null
+    var imgName: String? = null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: VehicleOthersImageAdapter
    // lateinit var mBitmap: Bitmap
@@ -75,20 +76,22 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
         when (v?.id) {
 
-            R.id.button_done ->
-            {
+            R.id.button_done -> {
 
-                button_done.setEnabled(false)
-                button_done.setClickable(false)
+                button_done.isEnabled = false
+                button_done.isClickable = false
 
-                if(intent.getStringExtra(UNITID).contains(",")){
+                if (intent.getStringExtra(UNITID).contains(",")) {
                     var unitname_dataList: Array<String>
                     var unitid_dataList: Array<String>
                     var unitAccountId_dataList: Array<String>
-                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    if(unitname_dataList.size>0) {
+                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID)
+                        .split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    if (unitname_dataList.size > 0) {
                         for (i in 0 until unitname_dataList.size) {
 
                             showProgress()
@@ -96,24 +99,22 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                                 unitname_dataList.get(i).replace(" ", ""),
                                 unitid_dataList.get(i).replace(" ", ""),
                                 unitAccountId_dataList.get(i).replace(" ", "")
-                            );
+                            )
                         }
                     }
-                }else{
+                } else {
                     showProgress()
                     visitorLog(
                         intent.getStringExtra(UNITNAME),
                         intent.getStringExtra(UNITID),
                         intent.getStringExtra(UNIT_ACCOUNT_ID)
                     ); }
-
-               // visitorLog()
             }
 
-            R.id.profile_image ->{
-                Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+STAFF_REGISTRATION+" "+FLOW_TYPE.equals( STAFF_REGISTRATION,true))
+            R.id.profile_image -> {
+                Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
                 val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-                if(wrrw!=null) {
+                if (wrrw != null) {
 //            var mBitmap: Bitmap;
                     val alertadd = AlertDialog.Builder(this@VehicleOthersEntryRegistration)
                     val factory = LayoutInflater.from(this@VehicleOthersEntryRegistration)
@@ -127,14 +128,14 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                     alertadd.setView(view)
                     alertadd.show()
 
-                }else{
+                } else {
                     val alertadd = AlertDialog.Builder(this@VehicleOthersEntryRegistration)
                     val factory = LayoutInflater.from(this@VehicleOthersEntryRegistration)
                     val view = factory.inflate(R.layout.dialog_big_image, null)
                     var dialog_imageview: ImageView? = null
                     dialog_imageview = view.findViewById(R.id.dialog_imageview)
-                 //   mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                    dialog_imageview.background = profile_image.getDrawable()
+                    //   mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+                    dialog_imageview.background = profile_image.drawable
 
 
                     alertadd.setView(view)
@@ -152,9 +153,9 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
 
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
 
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
@@ -172,83 +173,83 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
         }
 
-        txt_header.text= LocalDb.getAssociation()!!.asAsnName
+        txt_header.text = LocalDb.getAssociation()!!.asAsnName
 
-        tv_name.text = resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME)
-        val input =intent.getStringExtra(MOBILENUMBER)
+        tv_name.text = resources.getString(R.string.textname) + ": " + intent.getStringExtra(PERSONNAME)
+        val input = intent.getStringExtra(MOBILENUMBER)
         //val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.text = "+"+"91"+" "+number
-       // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
-       // tv_for.setText(resources.getString(R.string.textto) +intent.getStringExtra(UNITNAME))
-        tv_for.text = resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME)
+        tv_mobilenumber.text = "+" + "91" + " " + number
+        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
+        // tv_for.setText(resources.getString(R.string.textto) +intent.getStringExtra(UNITNAME))
+        tv_for.text = resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
 
         tv_totalperson.text = resources.getString(R.string.textperson)
-       // tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
-        tv_from.text=intent.getStringExtra(COMPANY_NAME)+" "+intent.getStringExtra(FLOW_TYPE)
+        // tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
+        tv_from.text = intent.getStringExtra(COMPANY_NAME) + " " + intent.getStringExtra(FLOW_TYPE)
 
 
         menuAdd.setOnClickListener {
             minteger++
-            menuCount.text = ""+minteger
+            menuCount.text = "" + minteger
 
         }
 
         menuRemove.setOnClickListener {
-            if (minteger>1) {
+            if (minteger > 1) {
                 minteger--
                 menuCount.text = "" + minteger
 
-            }else{
+            } else {
 
             }
         }
         if (intent.getStringExtra(FLOW_TYPE) == STAFF_REGISTRATION) {
-            tv_from.text = "Designation: "+intent.getStringExtra(COMPANY_NAME)
+            tv_from.text = "Designation: " + intent.getStringExtra(COMPANY_NAME)
             itemLyt.visibility = View.GONE
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
-                singUp(intent.getStringExtra(PERSONNAME),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(MOBILENUMBER))
+                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER))
 
             }
         }
 
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-        if(wrrw!=null) {
+        if (wrrw != null) {
 //            var mBitmap: Bitmap;
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
 
-        }
-        else{
+        } else {
             Picasso.with(this)
                 .load(
-                    IMAGE_BASE_URL + "Images/PERSON"  + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+                    IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
                 )
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
+                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                .into(profile_image)
         }
 
-        list=intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
+        list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
         for (i in list.indices) {
-            Log.d("CreateVisitorLogResp","for destination "+i+" "+list.size)
+            Log.d("CreateVisitorLogResp", "for destination " + i + " " + list.size)
 
             when (i) {
 
                 0 -> {
-                    Log.d("CreateVisitorLogResp","when destination "+i)
+                    Log.d("CreateVisitorLogResp", "when destination " + i)
 
-                    SPPrdImg1=list[i]
+                    SPPrdImg1 = list[i]
                 }
-                1 -> SPPrdImg2=list[i]
-                2 -> SPPrdImg3=list[i]
-                3 -> SPPrdImg4=list[i]
-                4 -> SPPrdImg5=list[i]
-                5 -> SPPrdImg6=list[i]
-                6 -> SPPrdImg7=list[i]
-                7 -> SPPrdImg8=list[i]
-                8 -> SPPrdImg9=list[i]
-                9 -> SPPrdImg10=list[i]
+                1 -> SPPrdImg2 = list[i]
+                2 -> SPPrdImg3 = list[i]
+                3 -> SPPrdImg4 = list[i]
+                4 -> SPPrdImg5 = list[i]
+                5 -> SPPrdImg6 = list[i]
+                6 -> SPPrdImg7 = list[i]
+                7 -> SPPrdImg8 = list[i]
+                8 -> SPPrdImg9 = list[i]
+                9 -> SPPrdImg10 = list[i]
                 10 -> SPPrdImg11=list[i]
                 11 -> SPPrdImg12=list[i]
                 12 -> SPPrdImg13=list[i]
@@ -262,13 +263,13 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
                 else -> { // Note the block
                     print("x is neither 1 nor 2")
-                    Log.d("CreateVisitorLogResp","else destination "+i)
+                    Log.d("CreateVisitorLogResp", "else destination " + i)
 
                 }
             }
             println(list[i])
         }
-        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
+        val mLayoutManager = GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
         imageAdapter = VehicleOthersImageAdapter(list, this@VehicleOthersEntryRegistration)
         rv_image.adapter = imageAdapter
@@ -276,9 +277,9 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-   //      imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
+        //      imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
-        imgName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
+        imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
 //        var memID:Int=64
 //        if(!BASE_URL.contains("dev",true)){
@@ -286,13 +287,6 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 //        }
 
 
-        var memID:Int=410;
-        if(BASE_URL.contains("dev",true)){
-            memID=64;
-        }
-        else if(BASE_URL.contains("uat",true)){
-            memID=64;
-        }
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, UNUniName,
             UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
@@ -303,7 +297,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20)
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
-        compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
+        compositeDisposable.add(
+            RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
@@ -312,51 +307,41 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
 
                         for (i in list.indices) {
-                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1);
-                            val dir = Environment.getExternalStorageDirectory().getPath()
+                            val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
+                            val dir = Environment.getExternalStorageDirectory().path
                             val file = File(dir, fileName)
                             file.delete()
                         }
 
+                        deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
 
-                        val d  =  Intent(this@VehicleOthersEntryRegistration, BackgroundSyncReceiver::class.java)
+                        val d = Intent(this@VehicleOthersEntryRegistration, BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
-                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home"+"("+UNUniName+")")
+                        d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + UNUniName + ")")
                         d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                         d.putExtra("name", intent.getStringExtra(PERSONNAME))
                         d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
                         d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-                        d.putExtra(UNITID,UNUnitID.toString())
+                        d.putExtra(UNITID, UNUnitID.toString())
                         d.putExtra("memType", "Owner")
-                        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-                        d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
-                        d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
+                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
+                        d.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-
                         sendBroadcast(d)
-                        uploadImage(imgName.toString(),mBitmap)
-                        Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
-
-
-                        val dir =
-                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                        if (dir.isDirectory) {
-                            val children = dir.list()
-                            for (i in children!!.indices) {
-                                File(dir, children[i]).delete()
-                            }
-                        }
-
-                        finish()
-                        dismissProgress()
+                        uploadImage(imgName.toString(), mBitmap)
+                        Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
 
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
+                    finish()
+                    dismissProgress()
                 }
+
                 override fun onErrorResponse(e: Throwable) {
                     Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    Log.d("CreateVisitorLogResp","onErrorResponse  "+e.toString())
+                    Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
 
                     dismissProgress()
                 }
@@ -372,35 +357,39 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
                 override fun onDismissProgress() {
                     dismissProgress()
                 }
-            }))
+            })
+        )
     }
 
-    private fun singUp(name :String, isdCode: String, mobNum : String) {
+    private fun singUp(name: String, isdCode: String, mobNum: String) {
 
-        val req = SignUpReq("", "", "", "", "",
+        val req = SignUpReq(
+            "", "", "", "", "",
             name, isdCode, "", "", "", "",
-            "",mobNum,"","", "","",imgName.toString())
+            "", mobNum, "", "", "", "", imgName.toString()
+        )
         Log.d("singUp", "StaffEntry " + req.toString())
 
-        compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
+        compositeDisposable.add(
+            RetrofitClinet.instance.signUpCall(CHAMPTOKEN, req)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<SignUpResp<Account>>() {
                 override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                     if (globalApiObject.success == true) {
-                      //  var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                        uploadImage(imgName.toString(),mBitmap)
-                        Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
+                        //  var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
+                        uploadImage(imgName.toString(), mBitmap)
+                        Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
                     } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                        Log.d("CreateVisitorLogResp","globalApiObject  "+globalApiObject.data.toString())
+                        Log.d("CreateVisitorLogResp", "globalApiObject  " + globalApiObject.data.toString())
 
                     }
                 }
 
                 override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    Log.d("CreateVisitorLogResp","onErrorResponse  "+e.toString())
+                    Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
                 }
 
                 override fun noNetowork() {
@@ -412,7 +401,8 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity() , View.OnClickListen
 
                 override fun onDismissProgress() {
                 }
-            }))
+            })
+        )
     }
 
 

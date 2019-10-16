@@ -11,6 +11,7 @@ import android.widget.CheckBox
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.MobileNumberScreen
 import com.oyespace.guards.pojo.UnitPojo
@@ -18,7 +19,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 
 
 class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+    RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
     private val mInflater: LayoutInflater
 
@@ -34,9 +35,9 @@ class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val m
 
 
     override fun onBindViewHolder(holder: MenuHolder, position: Int) {
-        val orderData = listVistor?.get(position)
-        val vistordate = orderData?.asAssnID
-        holder.apartmentNamee.text = orderData?.unUniName
+        val orderData = listVistor.get(position)
+        val vistordate = orderData.asAssnID
+        holder.apartmentNamee.text = orderData.unUniName
 //        holder.entryTime.text = orderData?.unCalType
 //        holder.exitTime.text = orderData?.unOcSDate
 //        holder.serviceProvider.text = orderData?.unOcSDate
@@ -48,7 +49,7 @@ class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val m
 
         }
         holder.iv_unit.setOnClickListener {
-            val intent = Intent(Intent.ACTION_CALL);
+            val intent = Intent(Intent.ACTION_CALL)
             intent.data = Uri.parse("tel:"+orderData.owner[0].uoisdCode+orderData.owner[0].uoMobile)
             mcontext.startActivity(intent)
         }
@@ -59,20 +60,19 @@ class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val m
             intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
             intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
             intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-            intent.putExtra(UNITID, orderData?.unUnitID)
-            intent.putExtra(UNITNAME, orderData?.unUniName)
+            intent.putExtra(UNITID, orderData.unUnitID)
+            intent.putExtra(UNITNAME, orderData.unUniName)
             mcontext.startActivity(intent)
-            (mcontext as Activity).finish()
+            mcontext.finish()
 
         })
     }
 
     override fun getItemCount(): Int {
-        return listVistor?.size ?: 0
+        return listVistor.size
     }
 
-    inner class MenuHolder(private val view: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 //        val entryTime: TextView
 //        val exitTime: TextView
         val iv_unit: ImageView

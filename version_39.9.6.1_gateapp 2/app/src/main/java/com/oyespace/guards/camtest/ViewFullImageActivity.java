@@ -21,7 +21,7 @@ public class ViewFullImageActivity extends AppCompatActivity {
         pos=getIntent().getIntExtra("pos",0);
         Log.i("List", "Passed Array List :: " + pos);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        ViewPager viewPager = findViewById(R.id.viewpager);
        viewPager.setAdapter(new ViewPagerAdapter(this));
        viewPager.setCurrentItem(pos);
 

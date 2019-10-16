@@ -2,6 +2,8 @@ package com.oyespace.guards.pojo
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
+import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import io.realm.RealmList
 import kotlinx.android.parcel.Parcelize
 
 @SuppressLint("ParcelCreator")
@@ -15,6 +17,7 @@ data class SearchResult(
 ) : Parcelable
 
 data class GlobalApiObject<T>(val success: Boolean?, val apiVersion: String?, val data: VisitorLog)
+
 data class VisitorLog(val visitorlogbydate: ArrayList<Visitorlogbydate>)
 
 data class Visitorlogbydate(
@@ -370,6 +373,9 @@ data class GetWorkerListbyAssnIDResp<T>(
 
 data class WorkerListbyAssnIDData(
     val worker: ArrayList<WorkerDetails>
+)
+data class WorkerListbyAssnIDData_(
+    val worker: RealmList<com.oyespace.guards.models.Worker>
 )
 
 data class WorkerDetails(
@@ -1378,9 +1384,9 @@ data class WorkerMultiEntryCheck(
     val vlMobile: String,
     val vlVisType: String,
     val vlComName: String,
-    val vlpOfVis : String,
-    val vlSelfImg : String,
-    val vlVisCnt : Int,
+    val vlpOfVis: String,
+    val vlSelfImg: String,
+    val vlVisCnt: Int,
     val vlVehNum: String,
     val vlVehType: String,
     val vlItmCnt: Int,
@@ -1481,50 +1487,50 @@ data class WorkerMobileData(
 
     val  wkWorkID:Int,
 
-    val  wkfName:String,
+    val wkfName: String,
 
-    val  wklName:String,
+    val wklName: String,
 
-    val  wkMobile:String,
+    val wkMobile: String,
 
-    val  wkEntryImg:String,
+    val wkEntryImg: String,
 
-    val  wkWrkType:String,
+    val wkWrkType: String,
 
-    val  wkDesgn:String,
+    val wkDesgn: String,
 
-    val  wkidCrdNo:String,
+    val wkidCrdNo: String,
 
-    val  vnVendorID:Int,
+    val vnVendorID: Int,
 
-    val  blBlockID:Int,
+    val blBlockID: Int,
 
     val unUnitID: String,
 
-    val  asAssnID:Int,
+    val asAssnID: Int,
 
-    val wkisdCode:Any,
+    val wkisdCode: Any,
 
-    val  wkdCreated:String,
+    val wkdCreated: String,
 
-    val  wkdUpdated:String,
+    val wkdUpdated: String,
 
-    val  wkdob:String,
+    val wkdob: String,
 
-    val  wkIsActive:Boolean,
-    val unUniName:String,
+    val wkIsActive: Boolean,
+    val unUniName: String,
 
-    val  wkExitImg:String,
+    val wkExitImg: String,
 
-    val  wkEntryGPS:String,
+    val wkEntryGPS: String,
 
-    val  wkExitGPS:String,
+    val wkExitGPS: String,
 
-    val  wkSelfImg:String,
+    val wkSelfImg: String,
 
-    val  fromDate:String,
+    val fromDate: String,
 
-    val  toDate:String
+    val toDate: String
 )
 //NotificatioCreateRequest
 data class NotificationCreateReq(
@@ -1742,34 +1748,36 @@ data class GetFamilyMemberResponse(
 data class FamilyMembersData(
     val familyMembers: ArrayList<FamilyMember>
 )
-data class FamilyMember (
-    val  fmid:Int,
-    val  fmName:String,
-    val  fmMobile:String,
-    val  meMemID:Int,
-    val  unUnitID:Int,
-    val  fmRltn:String,
-    val  fmisdCode:String,
-    val  asAssnID:Int,
-    val  acAccntID:Int,
-    val  fmImgName:String,
-    val  fmlName:String,
-    val  fmGurName:String,
-    val  fmMinor:Boolean,
-    val  fmdCreated:String,
-    val  fmdUpdated:String,
-    val  fmIsActive:Boolean,
-    val  pAccntID:Int
+
+data class FamilyMember(
+    val fmid: Int,
+    val fmName: String,
+    val fmMobile: String,
+    val meMemID: Int,
+    val unUnitID: Int,
+    val fmRltn: String,
+    val fmisdCode: String,
+    val asAssnID: Int,
+    val acAccntID: Int,
+    val fmImgName: String,
+    val fmlName: String,
+    val fmGurName: String,
+    val fmMinor: Boolean,
+    val fmdCreated: String,
+    val fmdUpdated: String,
+    val fmIsActive: Boolean,
+    val pAccntID: Int
 
 )
 
 
 data class ResidentValidationRequest(
 
-    val MobileNumber:String,
-    val AssociationID:Int
+    val MobileNumber: String,
+    val AssociationID: Int
 
 )
+
 
 data class ResidentValidationResponse(
 
@@ -1791,7 +1799,7 @@ data class ResidentObject(
 
 
     val code: Int,
-    val message:String
+    val message: String
 
 
 )
@@ -1801,7 +1809,7 @@ data class SOSUpdateReq(
     val SOSID: Int,
     val DEGate: String,
     val DEMobileNo: String,
-    val SOStatus:String
+    val SOStatus: String
 )
 
 
@@ -1809,6 +1817,28 @@ data class SOSUpdateResp(
     val apiVersion: String,
     val data: String,
     val success: Boolean
+)
+
+data class ResidentCheckReq(
+    val FMMobile: String,
+    val ASAssnID: Int
+)
+
+data class ResidentCheckObject(
+    val code: Int,
+    val message: String
+)
+
+data class ResidentCheckData(
+    val `object`: ResidentCheckObject
+)
+
+data class ResidentCheckResponse(
+
+    val apiVersion: String,
+    val `data`: ResidentCheckData,
+    val success: Boolean
+
 )
 
 data class SubscriptionResp(

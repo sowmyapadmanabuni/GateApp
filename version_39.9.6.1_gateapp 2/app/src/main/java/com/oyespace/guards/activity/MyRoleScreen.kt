@@ -9,26 +9,24 @@ import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
 import com.oyespace.guards.Dashboard
+import com.oyespace.guards.R
+import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.Worker
+import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.Utils
+import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import com.oyespace.guards.R
-import com.yarolegovich.lovelydialog.LovelyStandardDialog
-
-import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.utils.ConstantUtils.*
-import kotlinx.android.synthetic.main.activity_mobile_number.*
 import java.util.*
-
-
-
-
+import kotlin.collections.ArrayList
 
 
 class MyRoleScreen : BaseKotlinActivity() {
@@ -46,7 +44,7 @@ class MyRoleScreen : BaseKotlinActivity() {
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         var Mobile_IMEI_NO = tm.deviceId
      //   Mobile_IMEI_NO=""
-        val getSimNumber = tm.getLine1Number()
+        val getSimNumber = tm.line1Number
 
 
 //        if(getSimNumber.equals("")){
@@ -152,7 +150,7 @@ class MyRoleScreen : BaseKotlinActivity() {
                         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,null)
                         LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
                             .setTopColorRes(R.color.google_red)
-                             .setIcon(R.drawable.ic_info_black_24dp)
+                            .setIcon(R.drawable.ic_info_black_24dp)
                             //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
                             .setTitle("Device is not registered as Gate device")
                             .setTitleGravity(Gravity.CENTER)
@@ -253,22 +251,24 @@ class MyRoleScreen : BaseKotlinActivity() {
             .workerList(OYE247TOKEN, intToString(AssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>() {
+            .subscribeWith(object : CommonDisposable<GetWorkersResponse<WorkersList>>() {
 
-                override fun onSuccessResponse(workerListResponse: GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>) {
+                override fun onSuccessResponse(workerListResponse: GetWorkersResponse<WorkersList>) {
 
                     if (workerListResponse.data.worker!= null) {
                         Log.d("WorkerList success",workerListResponse.data.toString())
 
                         val arrayList = workerListResponse.data.worker
 
-                        Collections.sort(arrayList, object : Comparator<WorkerDetails>{
-                            override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
+                        Collections.sort(arrayList, object : Comparator<Worker> {
+                            override fun compare(lhs: Worker, rhs: Worker): Int {
                                 return lhs.wkfName.compareTo(rhs.wkfName)
                             }
                         })
 
-                        LocalDb.saveStaffList(arrayList);
+                        val arList = ArrayList<Worker>()
+                        arrayList.toCollection(arList)
+                        LocalDb.saveStaffList(arList)
                         val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
                         mainIntent.putExtra("STAFF","Available")
                         startActivity(mainIntent)
@@ -328,10 +328,9 @@ fun getDeviceList(AssnID: Int){
             override fun onSuccessResponse(deviceListResponse: getDeviceList) {
 
 
-
                 if (deviceListResponse.data.deviceListByAssocID!= null) {
-                    Prefs.putInt("TOTAL_GUARDS",deviceListResponse.data.deviceListByAssocID.size)
-                    Log.e("WorkerListsuccess",deviceListResponse.data.toString())
+                    Prefs.putInt("TOTAL_GUARDS", deviceListResponse.data.deviceListByAssocID.size)
+                    Log.e("WorkerListsuccess", deviceListResponse.data.toString())
 
                     val arrayList = deviceListResponse.data.deviceListByAssocID
 
@@ -356,7 +355,7 @@ fun getDeviceList(AssnID: Int){
 //                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
 //                    finish()
                 } else {
-                    Prefs.putInt("TOTAL_GUARDS",1)
+                    Prefs.putInt("TOTAL_GUARDS", 1)
 //                    val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
 //                    startActivity(mainIntent)
 //                    finish()

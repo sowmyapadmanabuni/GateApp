@@ -30,7 +30,6 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
@@ -38,11 +37,11 @@ import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -61,7 +60,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView
     lateinit var timer:TextView
-    private val REQUEST_CODE_SPEECH_INPUT = 100;
+    private val REQUEST_CODE_SPEECH_INPUT = 100
     var ccd:String?=null
     var mobileNumber:String?=null
 
@@ -82,10 +81,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                startActivity(d);
-                finish();
+                startActivity(d)
+                finish()
 
 
             }
@@ -105,14 +102,14 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                startActivity(d);
-                finish();
+                startActivity(d)
+                finish()
 
             }
 
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if (textview.text.length == 13) {
 //                    val d = Intent(this@GuestMobileNumberScreen, GuestNameEntryScreen::class.java)
 ////                    Log.d(
@@ -128,7 +125,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 //                    d.putExtra(MOBILENUMBER, mobileNumber)
 //                    d.putExtra(COUNTRYCODE, ccd)
 
-                    if (entryExists(ccd, mobileNumber)) {
+                    if (VisitorLogRepo.check_IN_VisitorByPhone(ccd + mobileNumber)) {
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)
@@ -166,8 +163,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 //                    finish()
 
                 } else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -190,8 +187,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.getExtras();
-                            val number = bundle?.getString("incoming_number");
+                            val bundle = intent?.extras
+                            val number = bundle?.getString("incoming_number")
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (textview != null && number != null) {
@@ -207,11 +204,11 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                         }
                     }
 
-                }, PhoneStateListener.LISTEN_CALL_STATE);
+                }, PhoneStateListener.LISTEN_CALL_STATE)
 
                 //
             }
-        };
+        }
         btn_nobalance=findViewById(R.id.btn_nobalance)
         txt_assn_name=findViewById(R.id.txt_assn_name)
         timer=findViewById(R.id.timer)
@@ -219,7 +216,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
         if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
-            txt_assn_name!!.setTextSize(5 * getResources().getDisplayMetrics().density);
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
@@ -240,8 +237,9 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         val timer = object: CountDownTimer(60000,1000){
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text =
+                    ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -253,7 +251,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         timer.start()
         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
        // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,""))
 
@@ -264,12 +262,12 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         }
 
         if (intent.getStringExtra(FLOW_TYPE).equals(GUEST_REGISTRATION)) {
-            buttonSkip.setVisibility(View.INVISIBLE)
-            Ed_phoneNum.setVisibility(View.GONE)
+            buttonSkip.visibility = View.INVISIBLE
+            Ed_phoneNum.visibility = View.GONE
             textview.visibility = View.VISIBLE
             img_logo.visibility=View.VISIBLE
         } else {
-            buttonSkip.setVisibility(View.INVISIBLE)
+            buttonSkip.visibility = View.INVISIBLE
         }
 
 //        Ed_phoneNum.addTextChangedListener(object : TextWatcher {
@@ -314,16 +312,16 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             fun DisplayProgressDialog() {
 
                 pDialog = ProgressDialog(this@GuestMobileNumberScreen)
-                pDialog!!.setMessage("Loading..")
-                pDialog!!.setCancelable(false)
-                pDialog!!.isIndeterminate = false
-                pDialog!!.show()
+                pDialog.setMessage("Loading..")
+                pDialog.setCancelable(false)
+                pDialog.isIndeterminate = false
+                pDialog.show()
             }
 
             if (TextUtils.isEmpty(Ed_phoneNum.text.toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
-                Ed_phoneNum.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength)))
+                Ed_phoneNum.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 
             } else if (countryCode!!.startsWith("+91") && Ed_phoneNum.length() <= 10) {
                 Toast.makeText(this, "number should be 10 digits", Toast.LENGTH_LONG).show()
@@ -363,9 +361,9 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                     }
 
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                    if (report.isAnyPermissionPermanentlyDenied) {
                         // show alert dialog navigating to Settings
-                        showSettingsDialog();
+                        showSettingsDialog()
                     }
                 }
 
@@ -376,7 +374,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 ) {
                     if (token != null) {
                         token.continuePermissionRequest()
-                    };
+                    }
                 }
             }).withErrorListener(object : PermissionRequestErrorListener {
 
@@ -385,7 +383,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 }
             })
             .onSameThread()
-            .check();
+            .check()
 
 //        val telephony = this@GuestMobileNumberScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 //        telephony.listen(object : PhoneStateListener() {
@@ -434,7 +432,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
@@ -530,8 +528,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                             d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
 
-                            startActivity(d);
-                            finish();
+                            startActivity(d)
+                            finish()
 
                         } else {
                             deliveryFlow_launchNameEntryScreen()
@@ -570,8 +568,8 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-        startActivity(d);
-        finish();
+        startActivity(d)
+        finish()
     }
 
     fun sendotp() {
@@ -643,7 +641,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.setText(result[0].trim() + "")
+                    Ed_phoneNum.text = result[0].trim() + ""
                 }
             }
         }

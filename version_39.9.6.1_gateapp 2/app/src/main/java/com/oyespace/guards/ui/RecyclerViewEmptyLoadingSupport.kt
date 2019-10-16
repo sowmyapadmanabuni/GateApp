@@ -3,9 +3,10 @@ package com.oyespace.guards.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.utils.RecyclerViewEnum
 
-class RecyclerViewEmptyLoadingSupport : androidx.recyclerview.widget.RecyclerView {
+class RecyclerViewEmptyLoadingSupport : RecyclerView {
 
     var stateView: RecyclerViewEnum? = RecyclerViewEnum.LOADING
         set(value) {
@@ -16,11 +17,15 @@ class RecyclerViewEmptyLoadingSupport : androidx.recyclerview.widget.RecyclerVie
     var loadingStateView: View? = null
 
 
-    constructor(context: Context) : super(context) {}
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {}
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
 
-    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {}
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    )
 
 
     private val dataObserver = object : AdapterDataObserver() {
@@ -40,7 +45,7 @@ class RecyclerViewEmptyLoadingSupport : androidx.recyclerview.widget.RecyclerVie
     }
 
 
-    override fun setAdapter(adapter: androidx.recyclerview.widget.RecyclerView.Adapter<*>?) {
+    override fun setAdapter(adapter: RecyclerView.Adapter<*>?) {
         super.setAdapter(adapter)
         adapter?.registerAdapterDataObserver(dataObserver)
         dataObserver.onChanged()

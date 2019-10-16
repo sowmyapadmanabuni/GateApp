@@ -11,30 +11,38 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.Dashboard
-import com.oyespace.guards.DataBaseHelper
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.Biometric
 import com.oyespace.guards.activity.EditStaffActivity
 import com.oyespace.guards.activity.MobileNumberforEntryScreen
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.Worker
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.pojo.CreateVisitorLogReq
+import com.oyespace.guards.pojo.CreateVisitorLogResp
+import com.oyespace.guards.pojo.UnitlistbyUnitID
+import com.oyespace.guards.pojo.VLRData
+import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 
-class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<StaffAdapter.StaffViewHolder>(), Filterable {
+class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
+    RecyclerView.Adapter<StaffAdapter.StaffViewHolder>(), Filterable {
 
-    private var searchList: ArrayList<WorkerDetails>? = null
-    val dbh:DataBaseHelper= DataBaseHelper(mcontext);
+    private var searchList: ArrayList<Worker>? = null
+
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): StaffViewHolder {
         return StaffViewHolder(LayoutInflater.from(mcontext).inflate(R.layout.layout_staff_adapter_row, parent, false))
     }
@@ -55,9 +63,9 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
 
 
-        if(staffdata?.wkMobile.toString().length > 0){
+        if (staffdata.wkMobile.toString().length > 0) {
             holder.iv_call.visibility=View.VISIBLE
-        } else{
+        } else {
             holder.iv_call.visibility=View.INVISIBLE
         }
         holder.lv_staff.setOnClickListener {
@@ -126,7 +134,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
             d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
             d.putExtra(COUNTRYCODE,"")
             d.putExtra(MOBILENUMBER, staffdata.wkMobile)
-            mcontext.startActivity(d);
+            mcontext.startActivity(d)
             Log.d("btn_biometric","af ")
 
         }
@@ -134,7 +142,8 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
         Picasso.with(mcontext)
             .load(IMAGE_BASE_URL +"Images/"+staffdata.wkEntryImg)
-            .placeholder(R.drawable.placeholder_dark_potrait).error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
+            .placeholder(R.drawable.placeholder_dark_potrait)
+            .error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
 
 //        Picasso.with(mcontext)
 //            .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF"+staffdata.wkWorkID+".jpg")
@@ -143,8 +152,8 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
         holder.btn_makeentry.setOnClickListener {
 
-            holder.btn_makeentry.setEnabled(false)
-            holder.btn_makeentry.setClickable(false)
+            holder.btn_makeentry.isEnabled = false
+            holder.btn_makeentry.isClickable = false
 
 //            if(holder.btn_biometric.visibility==View.VISIBLE){
 //                val dialogBuilder = AlertDialog.Builder(mcontext)
@@ -184,20 +193,20 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 //          else
             //   if(staffdata?.wkMobile.toString().length > 0){
 
-            val d=Intent(mcontext, MobileNumberforEntryScreen::class.java)
+            val d = Intent(mcontext, MobileNumberforEntryScreen::class.java)
             d.putExtra("UNITID", staffdata.unUnitID)
             d.putExtra("FIRSTNAME", staffdata.wkfName)
             d.putExtra("LASTNAME", staffdata.wklName)
             d.putExtra(MOBILENUMBER, staffdata.wkMobile)
-            d.putExtra("DESIGNATION",  staffdata.wkDesgn)
-            d.putExtra("WORKTYPE",  staffdata.wkWrkType)
-            d.putExtra(ConstantUtils.WORKER_ID,  staffdata.wkWorkID)
-            d.putExtra("UNITNAME",  staffdata.unUniName)
-            d.putExtra("Image",staffdata.wkEntryImg)
+            d.putExtra("DESIGNATION", staffdata.wkDesgn)
+            d.putExtra("WORKTYPE", staffdata.wkWrkType)
+            d.putExtra(ConstantUtils.WORKER_ID, staffdata.wkWorkID)
+            d.putExtra("UNITNAME", staffdata.unUniName)
+            d.putExtra("Image", staffdata.wkEntryImg)
             d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
             d.putExtra("BIRTHDAY", staffdata.wkdob)
 
-            mcontext.startActivity(d);
+            mcontext.startActivity(d)
             (mcontext as Activity).finish()
 
 //            }
@@ -277,19 +286,19 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
             intent.putExtra("DOB",staffdata.wkdob)
 
             // (mcontext as Activity).startActivityForResult(intent, 2)
-            mcontext.startActivity(intent);
+            mcontext.startActivity(intent)
             (mcontext as Activity).finish()
 
         }
 
         holder.iv_call.setOnClickListener {
 
-            val intent = Intent(Intent.ACTION_CALL);
-            intent.data = Uri.parse("tel:" + staffdata?.wkMobile)
+            val intent = Intent(Intent.ACTION_CALL)
+            intent.data = Uri.parse("tel:" + staffdata.wkMobile)
             mcontext.startActivity(intent)
         }
 
-        if(dbh.fingercount(staffdata.wkWorkID)>1){
+        if (RealmDB.fingercount(staffdata.wkWorkID) > 1) {
             holder.btn_biometric.visibility=View.INVISIBLE
         }else{
             if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 1") {
@@ -304,7 +313,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
                 ddc.putExtra(BSR_Action, SYNC_STAFF_BIOMETRIC)
                 ddc.putExtra("ID", staffdata.wkWorkID)
-                mcontext.sendBroadcast(ddc);
+                mcontext.sendBroadcast(ddc)
             }
         }
 
@@ -312,14 +321,15 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
     private fun visitorLog(
         unitId: String, personName: String, mobileNumb: String, desgn: String,
-        workerType:String, staffID:Int, unitName:String, vlEntryImage:String) {
+        workerType: String, staffID: Int, unitName: String, vlEntryImage: String
+    ) {
 
 
-        var memID:Int=410;
+        var memID: Int = 410
         if(BASE_URL.contains("dev",true)){
-            memID=64;
-        } else if(BASE_URL.contains("uat",true)){
-            memID=64;
+            memID = 64
+        } else if (BASE_URL.contains("uat", true)) {
+            memID = 64
         }
 //        var memID:Int=64;
 //        if(!BASE_URL.contains("dev",true)){
@@ -352,9 +362,6 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                 .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
-                            // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                         //   visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-
 
                             if (unitId.contains(",")) {
 
@@ -408,7 +415,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                                        mcontext.sendBroadcast(ddc);
+                                        mcontext.sendBroadcast(ddc)
 
                                     }
                                 }
@@ -438,7 +445,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                                mcontext.sendBroadcast(ddc);
+                                mcontext.sendBroadcast(ddc)
                             }
 
 
@@ -464,13 +471,13 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 ////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
 //                            mcontext.sendBroadcast(ddc);
 
-                            (mcontext as Activity).finish()
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                         } else {
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.toString())
 
                             Utils.showToast(mcontext, "Entry not Saved"+globalApiObject.toString())
                         }
+                        (mcontext as Activity).finish()
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -497,7 +504,8 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
     private fun getUnitLog(
         unitId: String, personName: String, mobileNumb: String, desgn: String,
-        workerType:String, staffID:Int, unitName:String, vlVisLgID:Int) {
+        workerType: String, staffID: Int, unitName: String, vlVisLgID: Int
+    ) {
 
         RetrofitClinet.instance
             .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId.toInt())
@@ -528,7 +536,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        mcontext.sendBroadcast(ddc);
+                        mcontext.sendBroadcast(ddc)
 
 
                     } else {
@@ -536,7 +544,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd", e.message);
+                    Log.d("cdvd", e.message)
 
 
                 }
@@ -546,50 +554,6 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                 }
             })
 
-    }
-
-    private fun visitorEntryLog( visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(DateTimeUtils.getCurrentTimeLocal(), LocalDb.getStaffList()[0].wkWorkID, visitorLogID)
-        Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
-
-        CompositeDisposable().add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        //(mcontext as Activity).finish()
-//                        val d = Intent(mcontext, Dashboard::class.java)
-//                        d.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-//                        mcontext.startActivity(d)
-                        (mcontext as Activity).finish()
-                    } else {
-                        Utils.showToast(mcontext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(mcontext, "Something went wrong")
-//                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(mcontext, "No Internet")
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-//                    dismissProgress()
-                }
-            }))
     }
 
 
@@ -603,7 +567,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
         return position
     }
 
-    class StaffViewHolder(view: View) : androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+    class StaffViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val tv_staff: TextView
         val iv_staff: ImageView
         val lv_staff: LinearLayout
@@ -632,7 +596,7 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
 
         return object : Filter() {
             override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                searchList = results?.values as ArrayList<WorkerDetails>
+                searchList = results?.values as ArrayList<Worker>
                 notifyDataSetChanged()
             }
 
@@ -641,10 +605,10 @@ class StaffAdapter(val items: ArrayList<WorkerDetails>, val mcontext: Context) :
                 if (charString.isEmpty()) {
                     searchList = items
                 } else {
-                    val filteredList = ArrayList<WorkerDetails>()
+                    val filteredList = ArrayList<Worker>()
                     for (row in items) {
                         // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-                        if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase())) {
+                        if (row.wkfName.toLowerCase().contains(charString.toLowerCase())) {
                             filteredList.add(row)
                         }
                     }

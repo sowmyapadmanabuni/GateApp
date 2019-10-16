@@ -167,4 +167,7 @@
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
     <string name="settings">Settings</string>
+    <string name="scan_res_id_here">"यहां पर रेजिडेंट आईडी स्कैन करें   "</string>
+    <string name="valid">वैध</string>
+    <string name="invalid">अमान्य</string>
 </resources>

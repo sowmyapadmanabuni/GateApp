@@ -9,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -33,7 +32,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -391,19 +389,6 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
         }
     }
 
-    private String getOriginalPath(Intent data, Context context) {
-        Uri selectedImageUri = data.getData();
-        Log.e("Select File", selectedImageUri.toString());
-        String[] projection = {MediaStore.MediaColumns.DATA};
-        CursorLoader cursorLoader = new CursorLoader(context, selectedImageUri, projection, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-        cursor.moveToFirst();
-
-        return cursor.getString(column_index);
-    }
-
     public void showViewPager() {
         Log.e("Data", "Recicved");
 //        image_Gallery.setVisibility(View.GONE);
@@ -412,28 +397,6 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
     }
 
     public void onCaptureImageResult(Intent data, Context context) {
-//        Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//        assert thumbnail != null;
-//        thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-//
-//        File destination = new File(Environment.getExternalStorageDirectory().getPath(),
-//                System.currentTimeMillis() + ".jpg");
-//
-//        // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
-//        setviewPager(String.valueOf(destination.getAbsoluteFile()), context);
-//
-//        FileOutputStream fo;
-//        try {
-//            destination.createNewFile();
-//            fo = new FileOutputStream(destination);
-//            fo.write(bytes.toByteArray());
-//            fo.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
         Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         byte[] byteArray = null;
@@ -461,10 +424,10 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
         setviewPager(String.valueOf(file.getAbsoluteFile()), context);
 //
         Intent ddc = new Intent(VehicleOthersAddCarFragment.this, BackgroundSyncReceiver.class);
-        Log.d("btn_biometric", "af " + String.valueOf(file.getAbsoluteFile()));
+        Log.d("btn_biometric", "af " + file.getAbsoluteFile());
 
         ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
-        ddc.putExtra("imgName", String.valueOf(imgName));
+        ddc.putExtra("imgName", imgName);
         ddc.putExtra(PERSON_PHOTO, byteArray);
         sendBroadcast(ddc);
 

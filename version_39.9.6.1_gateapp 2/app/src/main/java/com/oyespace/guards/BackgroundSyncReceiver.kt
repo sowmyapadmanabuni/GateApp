@@ -38,20 +38,21 @@ import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 
 class
 
 BackgroundSyncReceiver : BroadcastReceiver() {
-    var unAccountID:String?=null
+    var unAccountID: String? = null
     lateinit var mcontext: Context
     override fun onReceive(context: Context, intent: Intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         val action2 = intent.getStringExtra(BSR_Action)
-        mcontext=context
-        if(intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)){
+        mcontext = context
+        if (intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)) {
 
-            if(intent.getStringExtra("unitname").contains(",")){
+            if (intent.getStringExtra("unitname").contains(",")) {
 
                 var unitname_dataList: Array<String>
                 var unitid_dataList: Array<String>
@@ -93,12 +94,12 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //                            unitid_dataList.get(i).replace(" ","")+"admin",Prefs.getInt(DEVICE_ID,0),unitid_dataList.get(i).replace(" ",""))
                     }
                 }
-            }else{
+            } else {
 
                 try{
                     getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
 
-                }catch (e:Exception){
+                } catch (e: Exception) {
 
                 }
 //                sendFCM(intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
@@ -116,58 +117,64 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //                    intent.getStringExtra(UNITID)+"admin",Prefs.getInt(DEVICE_ID,0),intent.getStringExtra(UNITID))
             }
             sendFCM_toSyncNonreg()
-            Log.d("SYCNCHECK","in 65")
+            Log.d("SYCNCHECK", "in 65")
 
-        }else  if(intent.getStringExtra(BSR_Action).equals(SENDFCM_toSYNC_VISITORENTRY)){
-            sendFCM_toSyncNonreg();
-        }else  if(intent.getStringExtra(BSR_Action).equals("sendFCM_toStopEmergencyAlert")){
-            sendFCM_toStopEmergencyAlert();
-        }else  if(intent.getStringExtra(BSR_Action).equals(SYNC_STAFF_BIOMETRIC)){
-            downloadFingerPrint_newFunction(intent.getIntExtra("ID",0));
+        } else if (intent.getStringExtra(BSR_Action).equals(SENDFCM_toSYNC_VISITORENTRY)) {
+            sendFCM_toSyncNonreg()
+        } else if (intent.getStringExtra(BSR_Action).equals("sendFCM_toStopEmergencyAlert")) {
+            sendFCM_toStopEmergencyAlert()
+        } else if (intent.getStringExtra(BSR_Action).equals(SYNC_STAFF_BIOMETRIC)) {
+            downloadFingerPrint_newFunction(intent.getIntExtra("ID", 0))
 
-        }else  if(intent.getStringExtra(BSR_Action).equals(UPLOAD_STAFF_PHOTO)){
-            Log.d("uploadImage","in "+intent.getStringExtra("imgName"))
+        } else if (intent.getStringExtra(BSR_Action).equals(UPLOAD_STAFF_PHOTO)) {
+            Log.d("uploadImage", "in " + intent.getStringExtra("imgName"))
             val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-            if(wrrw!=null) {
-                var mBitmap: Bitmap;
+            if (wrrw != null) {
+                var mBitmap: Bitmap
                 mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                uploadImage(intent.getStringExtra("imgName"),mBitmap);
+                uploadImage(intent.getStringExtra("imgName"), mBitmap)
 
-            }else{
-                Log.d("uploadImage","else "+intent.getStringExtra("imgName"))
+            } else {
+                Log.d("uploadImage", "else " + intent.getStringExtra("imgName"))
             }
-        }else  if(intent.getStringExtra(BSR_Action).equals(SYNC_STAFF_LIST)){
-            getStaffList()
+        } else if (intent.getStringExtra(BSR_Action).equals(SYNC_STAFF_LIST)) {
+            StaffRepo.getStaffList(true)
             getCheckPointList()
-        }else  if(intent.getStringExtra(BSR_Action).equals(SYNC_UNIT_LIST)){
+        } else if (intent.getStringExtra(BSR_Action).equals(SYNC_UNIT_LIST)) {
             getUnitList()
             getCheckPointList()
-        }
-        else if(intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)){
-            Log.d("SYCNCHECK","in 86")
-            getVisitorLogEntryList()
-        }
+        } else if (intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)) {
 
+            Log.d("SYCNCHECK", "in 86")
+            VisitorLogRepo.get_OUT_VisitorLog(true)
+            VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                override fun onFetch(visitorLog: ArrayList<VisitorLog>?) {
 
-        else  if(intent.getStringExtra(BSR_Action).equals(UPLOAD_GUARD_PHOTO)) {
+                    val smsIntent = Intent(SYNC)
+                    smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
+                    LocalBroadcastManager.getInstance(context).sendBroadcast(smsIntent)
+
+                }
+
+            })
+
+        } else if (intent.getStringExtra(BSR_Action).equals(UPLOAD_GUARD_PHOTO)) {
             Log.d("uploadImage", "in " + intent.getStringExtra("imgName"))
             val wrrw = intent.getByteArrayExtra("GUARD_PHOTO")
             if (wrrw != null) {
-                var mBitmap: Bitmap;
+                var mBitmap: Bitmap
                 mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                uploadImage(intent.getStringExtra("imgName"), mBitmap);
+                uploadImage(intent.getStringExtra("imgName"), mBitmap)
 
             } else {
                 Log.d("uploadImage22", "else " + intent.getStringExtra("imgName"))
             }
-        }
-        else if(intent.getStringExtra(BSR_Action).equals(SENDAUDIO)){
+        } else if (intent.getStringExtra(BSR_Action).equals(SENDAUDIO)) {
             //Toast.makeText(context,"coming",Toast.LENGTH_LONG).show()
             sendFCM_forAudioMessage(intent.getStringExtra("FILENAME"))
-        }
-        else if(intent.getStringExtra(BSR_Action).equals(BGS_SOS_STATUS)){
-            Log.e("BGS_SOS_STATUS","BGS_SOS_STATUS");
-            val sosId = intent.getIntExtra("sos_id",0)
+        } else if (intent.getStringExtra(BSR_Action).equals(BGS_SOS_STATUS)) {
+            Log.e("BGS_SOS_STATUS", "BGS_SOS_STATUS")
+            val sosId = intent.getIntExtra("sos_id", 0)
             val sosStatus = intent.getStringExtra("sos_status")
             val gateNumber = Prefs.getString(ConstantUtils.GATE_NO, "")
             val gateMob = Prefs.getString(ConstantUtils.GATE_MOB, "")
@@ -182,13 +189,13 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     }
 
-    private  fun downloadFingerPrint_newFunction(  workerID:Int){
+    private fun downloadFingerPrint_newFunction(workerID: Int) {
         var ba_fp1: ByteArray
         var ba_fp2: ByteArray
         var ba_fp3: ByteArray
 
         RetrofitClinet.instance
-            .getStaffBiometric(OYE247TOKEN, workerID,"Regular")
+            .getStaffBiometric(OYE247TOKEN, workerID, "Regular")
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<StaffBiometricResp<StaffBiometricData>>() {
@@ -196,9 +203,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(staffBiometricResp: StaffBiometricResp<StaffBiometricData>) {
 
                     if (staffBiometricResp.success == true) {
-                        Log.d("getStaffBiometric",staffBiometricResp.data.toString())
+                        Log.d("getStaffBiometric", staffBiometricResp.data.toString())
                         try {
-                            var dbh: DataBaseHelper= DataBaseHelper(mcontext);
 
                             for (i in 0 until staffBiometricResp.data.fingerPrint.size) {
 
@@ -215,7 +221,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     ba_fp2 = Base64.decode(fp2, Base64.DEFAULT)
                                     ba_fp3 = Base64.decode(fp3, Base64.DEFAULT)
 
-                                    dbh.insertUserDetails(intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
+                                    RealmDB.insertFingerPrints(
+                                        staffBiometricResp.data.fingerPrint.get(i).fpid,
+                                        intToString(staffBiometricResp.data.fingerPrint.get(i).fmid),
                                         staffBiometricResp.data.fingerPrint.get(i).fpFngName,
                                         ba_fp1,
                                         ba_fp2,
@@ -223,6 +231,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         staffBiometricResp.data.fingerPrint.get(i).fpMemType,
                                         staffBiometricResp.data.fingerPrint.get(i).asAssnID
                                     )
+
                                 } catch (e: Exception) {
                                     Log.d("getStaffBiometric", "Exception$e")
                                 }
@@ -243,7 +252,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onErrorResponse(e: Throwable) {
 
                     //rv_staff.setEmptyAdapter(getString(R.string.some_wrng), false, 0)
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
 
                 }
 
@@ -268,7 +277,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         val compositeDisposable = CompositeDisposable()
 
         compositeDisposable.add(
-            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken,req)
+            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
@@ -278,7 +287,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                        Log.d("sendFCM","onErrorResponse  "+e.toString())
+                        Log.d("sendFCM", "onErrorResponse  " + e.toString())
                     }
 
                     override fun noNetowork() {
@@ -290,13 +299,14 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onDismissProgress() {
                     }
-                }))
+                })
+        )
 
 
     }
 
     fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
+        Log.d("uploadImage", localImgName)
         var byteArrayProfile: ByteArray?
         val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
         val imageFile = File(mPath)
@@ -329,8 +339,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             byteArrayProfile = null
             Log.d("uploadImage ererer bf", ex.toString())
         }
-
-
 
 
         val file = File(imageFile.toString())
@@ -556,25 +564,25 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun updateSOS(sosUpdateReq: SOSUpdateReq) {
 
         RetrofitClinet.instance
-            .updateSOS(OYE247TOKEN,sosUpdateReq)
+            .updateSOS(OYE247TOKEN, sosUpdateReq)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<SOSUpdateResp>() {
                 override fun onSuccessResponse(t: SOSUpdateResp) {
-                    Log.e("updateSOS","SUCCESS "+t)
+                    Log.e("updateSOS", "SUCCESS " + t)
                     Prefs.remove("PENDING_SOS")
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.e("updateSOS","ERROR "+e)
-                    val json:String =  Gson().toJson(sosUpdateReq)
-                    Prefs.putString("PENDING_SOS",json);
+                    Log.e("updateSOS", "ERROR " + e)
+                    val json: String = Gson().toJson(sosUpdateReq)
+                    Prefs.putString("PENDING_SOS", json)
                 }
 
                 override fun noNetowork() {
-                    Log.e("updateSOS","NONETWROK ")
-                    val json:String =  Gson().toJson(sosUpdateReq)
-                    Prefs.putString("PENDING_SOS",json);
+                    Log.e("updateSOS", "NONETWROK ")
+                    val json: String = Gson().toJson(sosUpdateReq)
+                    Prefs.putString("PENDING_SOS", json)
                 }
 
             })
@@ -585,7 +593,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun getUnitList() {
 
         RetrofitClinet.instance
-            .unitList(CHAMPTOKEN, intToString( Prefs.getInt(ASSOCIATION_ID,0)))
+            .unitList(CHAMPTOKEN, intToString(Prefs.getInt(ASSOCIATION_ID, 0)))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<UnitList<ArrayList<UnitPojo>>>() {
@@ -596,12 +604,12 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                         //  Log.d("cdvd",UnitList.toString());
                         var arrayListUnits = ArrayList<UnitPojo>()
 
-                        arrayListUnits=ArrayList()
+                        arrayListUnits = ArrayList()
                         arrayListUnits = UnitList.data.unit
 
-                        Collections.sort(arrayListUnits, object : Comparator<UnitPojo>{
-                            override  fun compare(lhs: UnitPojo, rhs: UnitPojo): Int {
-                                return lhs.unUniName.compareTo (rhs.unUniName,true)
+                        Collections.sort(arrayListUnits, object : Comparator<UnitPojo> {
+                            override fun compare(lhs: UnitPojo, rhs: UnitPojo): Int {
+                                return lhs.unUniName.compareTo(rhs.unUniName, true)
                             }
                         })
                         //  LocalDb.saveUnitList(arrayListUnits);
@@ -612,7 +620,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd",e.message);
+                    Log.d("cdvd", e.message)
 
                 }
 
@@ -653,65 +661,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //
 //    }
 
-    private fun getVisitorLogEntryList() {
-        Log.d("SYCNCHECK","in 408")
-        RetrofitClinet.instance
-            .getVisitorLogEntryList(OYE247TOKEN,  Prefs.getInt(ASSOCIATION_ID,0))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>() {
-
-                override fun onSuccessResponse(visitorList: VisitorLogEntryResp<ArrayList<VisitorEntryLog>>) {
-                    Log.d("SYCNCHECK","in 416")
-                    Log.d("SYCNCHECK","in 417"+visitorList.toString())
-
-                    if (visitorList.success == true) {
-                        Log.d("SYCNCHECK", "in 421")
-                        Log.d("cdvd", visitorList.toString());
-                        var arrayListVisitors = ArrayList<VisitorEntryLog>()
-                        arrayListVisitors = visitorList.data.visitorLog
-
-
-
-
-
-                        if(visitorList.data.visitorLog!=null) {
-
-                            Collections.sort(arrayListVisitors, object : Comparator<VisitorEntryLog> {
-                                override fun compare(lhs:  VisitorEntryLog, rhs:VisitorEntryLog): Int {
-                                    return (DateTimeUtils.formatDateDMY(rhs.vldCreated) +" "+(rhs.vlEntryT).replace("1900-01-01T","")).compareTo(
-                                        DateTimeUtils.formatDateDMY(lhs.vldCreated) +" "+(lhs.vlEntryT).replace("1900-01-01T",""))
-
-                                }
-                            })
-
-
-
-                        }
-                        LocalDb.saveEnteredVisitorLog(arrayListVisitors);
-
-                        val smsIntent = Intent(ConstantUtils.SYNC)
-                        smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)
-                        LocalBroadcastManager.getInstance(mcontext).sendBroadcast(smsIntent)
-
-                    } else {
-                        Log.d("SYCNCHECK","in 437")
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-//                    Log.d("cdvd",e.message);
-//                    Log.d("SYCNCHECK","in 441")
-
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
-
-    }
-
     fun sendFCM_toSyncNonreg() {
 
         Log.d("SYCNCHECK","in 452")
@@ -723,7 +672,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         val compositeDisposable = CompositeDisposable()
 
         compositeDisposable.add(
-            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken,req)
+            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
@@ -747,7 +696,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onDismissProgress() {
                     }
-                }))
+                })
+        )
     }
 
     fun sendFCM_toStopEmergencyAlert() {
@@ -761,7 +711,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         val compositeDisposable = CompositeDisposable()
 
         compositeDisposable.add(
-            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken,req)
+            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
@@ -772,8 +722,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                        Log.d("sendFCM","onErrorResponse  "+e.toString())
-                        Log.d("toStopEmergencyAlert","in 473")
+                        Log.d("sendFCM", "onErrorResponse  " + e.toString())
+                        Log.d("toStopEmergencyAlert", "in 473")
                     }
 
                     override fun noNetowork() {
@@ -785,10 +735,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onDismissProgress() {
                     }
-                }))
+                })
+        )
     }
 
-    fun sendFCM_forAudioMessage(filename:String) {
+    fun sendFCM_forAudioMessage(filename: String) {
 
 
         val dataReq = VisitorEntryFCMData("audiomessage", Prefs.getInt(ASSOCIATION_ID,0), filename, "", "", "" )
@@ -799,7 +750,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         val compositeDisposable = CompositeDisposable()
 
         compositeDisposable.add(
-            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken,req)
+            FCMRetrofitClinet.instance.sendFCM_VisitorEntry(ConstantUtils.FCMToken, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
@@ -810,8 +761,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                        Log.d("SENDAUDIO","onErrorResponse  "+e.toString())
-                        Log.d("SENDAUDIO","in 555")
+                        Log.d("SENDAUDIO", "onErrorResponse  " + e.toString())
+                        Log.d("SENDAUDIO", "in 555")
                     }
 
                     override fun noNetowork() {
@@ -823,27 +774,25 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     override fun onDismissProgress() {
                     }
-                }))
+                })
+        )
     }
-
-
-
 
 
     private fun getCheckPointList() {
 
         RetrofitClinet.instance
-            .getCheckPointList(OYE247TOKEN, intToString( LocalDb.getAssociation().asAssnID))
+            .getCheckPointList(OYE247TOKEN, intToString(LocalDb.getAssociation().asAssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<CheckpointListResp<CheckPointByAssocID>>() {
 
                 override fun onSuccessResponse(workerListResponse: CheckpointListResp<CheckPointByAssocID>) {
 
-                    if (workerListResponse.data.checkPointListByAssocID !=null) {
-                        Log.d("WorkerList success",workerListResponse.data.toString())
+                    if (workerListResponse.data.checkPointListByAssocID != null) {
+                        Log.d("WorkerList success", workerListResponse.data.toString())
                         var arrayList: ArrayList<CheckPointByAssocID>? = null
-                        arrayList=ArrayList()
+                        arrayList = ArrayList()
                         arrayList = workerListResponse.data.checkPointListByAssocID
 
                         Collections.sort(arrayList, object : Comparator<CheckPointByAssocID>{
@@ -852,7 +801,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                             }
                         })
 
-                        LocalDb.saveCheckPointList(arrayList);
+                        LocalDb.saveCheckPointList(arrayList)
 
                     } else {
 
@@ -860,7 +809,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
                 }
 
                 override fun noNetowork() {
@@ -887,7 +836,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
                 }
 
                 override fun noNetowork() {
@@ -917,7 +866,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
                 }
 
                 override fun noNetowork() {
@@ -939,11 +888,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
                     if (UnitList.success == true) {
 
-                        if(UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")){
+                        if (UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")) {
 
-                            if(!UnitList.data.unit.owner.isEmpty()){
+                            if (!UnitList.data.unit.owner.isEmpty()) {
 
-                                try{
+                                try {
                                     for (i in 0..UnitList.data.unit.owner.size) {
                                         unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
                                         getFamilyMemberData(
@@ -951,19 +900,17 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID
                                         )
                                     }
-                                }catch(e:IndexOutOfBoundsException){
+                                } catch (e: IndexOutOfBoundsException) {
 
                                 }
-                            }
-                            else{
-                                unAccountID="0"
+                            } else {
+                                unAccountID = "0"
                             }
 
 
-                        }
-                        else if(UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")){
-                            if(!UnitList.data.unit.tenant.isEmpty()) {
-                                try{
+                        } else if (UnitList.data.unit.unOcStat.contains("Sold Tenant Occupied Unit")) {
+                            if (!UnitList.data.unit.tenant.isEmpty()) {
+                                try {
                                     for (i in 0..UnitList.data.unit.tenant.size) {
 
                                         unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
@@ -973,47 +920,46 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         )
 
                                     }
-                                }catch(e:IndexOutOfBoundsException){
+                                } catch (e: IndexOutOfBoundsException) {
 
                                 }
+                            } else {
+                                unAccountID = "0"
                             }
-                            else{
-                                unAccountID="0"
-                            }
 
-                        }
-                        else if(UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")){
+                        } else if (UnitList.data.unit.unOcStat.contains("UnSold Tenant Occupied Unit")) {
 
-                            if(!UnitList.data.unit.tenant.isEmpty()) {
+                            if (!UnitList.data.unit.tenant.isEmpty()) {
 
-                                try{
+                                try {
                                     for (i in 0..UnitList.data.unit.tenant.size) {
 
-                                        unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
+                                        unAccountID =
+                                            UnitList.data.unit.tenant[i].acAccntID.toString()
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID
                                         )
 
                                     }
-                                }catch(e:IndexOutOfBoundsException){
+                                } catch (e: IndexOutOfBoundsException) {
 
                                 }
 
-                            } else{
-                                unAccountID="0"
+                            } else {
+                                unAccountID = "0"
                             }
 
-                        }else if(UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")){
+                        } else if (UnitList.data.unit.unOcStat.contains("UnSold Vacant Unit")) {
 //                                    if(!UnitList.data.unit.owner.isEmpty()) {
 //                                        unAccountID = "0"
 //                                    } else{
-                            unAccountID="0"
+                            unAccountID = "0"
                             // }
 
-                        }else if(UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")){
-                            if(!UnitList.data.unit.owner.isEmpty()) {
-                                try{
+                        } else if (UnitList.data.unit.unOcStat.contains("Sold Vacant Unit")) {
+                            if (!UnitList.data.unit.owner.isEmpty()) {
+                                try {
 
                                     for (i in 0..UnitList.data.unit.owner.size) {
                                         unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
@@ -1022,23 +968,26 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID
                                         )
                                     }
-                                }catch(e:IndexOutOfBoundsException){
+                                } catch (e: IndexOutOfBoundsException) {
 
                                 }
 
-                            } else{
-                                unAccountID="0"
+                            } else {
+                                unAccountID = "0"
                             }
-                        }else{
-                            unAccountID="0"
+                        } else {
+                            unAccountID = "0"
                         }
 
 
-                        try {      sendFCM(msg, mobileNumb,
-                            personName, nrId,
-                            unitName, "Owner");
+                        try {
+                            sendFCM(
+                                msg, mobileNumb,
+                                personName, nrId,
+                                unitName, "Owner"
+                            )
 
-                        }catch (e:KotlinNullPointerException){
+                        } catch (e: KotlinNullPointerException) {
 
                         }
 
@@ -1064,7 +1013,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 unAccountID!!.toInt(),
                                 unAccountID.toString()
                             )
-                        }catch (e:KotlinNullPointerException){
+                        } catch (e: KotlinNullPointerException) {
 
                         }
 
@@ -1091,7 +1040,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd", e.message);
+                    Log.d("cdvd", e.message)
 
 
                 }
@@ -1112,7 +1061,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 override fun onSuccessResponse(getdata: GetFamilyMemberResponse) {
 
-                    try{
+                    try {
 
                         for (i in 0..getdata.data.familyMembers.size) {
                             try {
@@ -1146,12 +1095,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                             )
 
                         }
-                    }catch(e:IndexOutOfBoundsException){
+                    } catch (e: IndexOutOfBoundsException) {
 
                     }
-
-
-
 
 
                 }
@@ -1162,6 +1108,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
 
                 }
+
                 override fun noNetowork() {
                     Toast.makeText(mcontext, "No network call ", Toast.LENGTH_LONG).show()
                 }

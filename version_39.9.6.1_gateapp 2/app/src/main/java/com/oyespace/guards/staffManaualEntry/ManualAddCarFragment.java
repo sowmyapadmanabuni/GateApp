@@ -11,7 +11,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -38,7 +37,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -192,7 +190,7 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
 
             AppOpsManager manager = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
             Class clazz = AppOpsManager.class;
-            Method dispatchMethod = clazz.getMethod("checkOp", new Class[]{int.class, int.class, String.class});
+            Method dispatchMethod = clazz.getMethod("checkOp", int.class, int.class, String.class);
             //AppOpsManager.OP_SYSTEM_ALERT_WINDOW = 24
             int mode = (Integer) dispatchMethod.invoke(manager, new Object[]{24, Binder.getCallingUid(), context.getApplicationContext().getPackageName()});
 
@@ -259,7 +257,7 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
         txt_assn_name = findViewById(R.id.txt_assn_name);
         txt_device_name = findViewById(R.id.txt_device_name);
         txt_gate_name = findViewById(R.id.txt_gate_name);
-        image_Gallery = (Button) findViewById(R.id.btnCaptureItemPhoto);
+        image_Gallery = findViewById(R.id.btnCaptureItemPhoto);
         //iamgeLyt = (LinearLayout) findViewById(R.id.imageLyt);
         rv_image = findViewById(R.id.rv_image);
 
@@ -537,7 +535,7 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
         if (urlId == URLData.URL_STAFF_REGISTRATION.getUrlId()) {
             StaffRegistrationRespJv workerResponce = (StaffRegistrationRespJv) data;
             if (workerResponce != null) {
-                Log.d("str3", "str3: " + urlId + " id " + position + " " + " " + " " + workerResponce.success.toString());
+                Log.d("str3", "str3: " + urlId + " id " + position + " " + " " + " " + workerResponce.success);
                 if (workerResponce.success.equalsIgnoreCase("true")) {
                     imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" + workerResponce.data.worker.wkWorkID + ".jpg";
 
@@ -653,19 +651,6 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
         }
     }
 
-    private String getOriginalPath(Intent data, Context context) {
-        Uri selectedImageUri = data.getData();
-        Log.e("Select File", selectedImageUri.toString());
-        String[] projection = {MediaStore.MediaColumns.DATA};
-        CursorLoader cursorLoader = new CursorLoader(context, selectedImageUri, projection, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-        cursor.moveToFirst();
-
-        return cursor.getString(column_index);
-    }
-
     public void showViewPager() {
         Log.e("Data", "Recicved");
 //        image_Gallery.setVisibility(View.GONE);
@@ -701,10 +686,10 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
         setviewPager(String.valueOf(file.getAbsoluteFile()), context);
 //
         Intent ddc = new Intent(ManualAddCarFragment.this, BackgroundSyncReceiver.class);
-        Log.d("btn_biometric", "af " + String.valueOf(file.getAbsoluteFile()));
+        Log.d("btn_biometric", "af " + file.getAbsoluteFile());
 
         ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
-        ddc.putExtra("imgName", String.valueOf(imgName));
+        ddc.putExtra("imgName", imgName);
         ddc.putExtra(PERSON_PHOTO, byteArray);
         sendBroadcast(ddc);
 
@@ -1047,18 +1032,6 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
             }
         });
 
-    }
-
-    public String getRealPathFromURI(Uri contentUri) {
-        String path = null;
-        String[] proj = {MediaStore.MediaColumns.DATA};
-        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
-        if (cursor.moveToFirst()) {
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-            path = cursor.getString(column_index);
-        }
-        cursor.close();
-        return path;
     }
 
     public void SaveImage(Bitmap showedImgae) {

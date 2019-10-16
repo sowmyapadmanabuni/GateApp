@@ -113,21 +113,21 @@ public class SuperRecyclerView extends FrameLayout {
             return;
         }
         View v = LayoutInflater.from(getContext()).inflate(mSuperRecyclerViewMainLayout, this);
-        mPtrLayout = (SwipeRefreshLayout) v.findViewById(R.id.ptr_layout);
+        mPtrLayout = v.findViewById(R.id.ptr_layout);
         mPtrLayout.setEnabled(false);
 
-        mProgress = (ViewStub) v.findViewById(R.id.progress);
+        mProgress = v.findViewById(R.id.progress);
 
         mProgress.setLayoutResource(mProgressId);
         mProgressView = mProgress.inflate();
 
-        mMoreProgress = (ViewStub) v.findViewById(R.id.more_progress);
+        mMoreProgress = v.findViewById(R.id.more_progress);
         mMoreProgress.setLayoutResource(mMoreProgressId);
         if (mMoreProgressId != 0)
             mMoreProgressView = mMoreProgress.inflate();
         mMoreProgress.setVisibility(View.GONE);
 
-        mEmpty = (ViewStub) v.findViewById(R.id.empty);
+        mEmpty = v.findViewById(R.id.empty);
         mEmpty.setLayoutResource(mEmptyId);
         if (mEmptyId != 0)
             mEmptyView = mEmpty.inflate();

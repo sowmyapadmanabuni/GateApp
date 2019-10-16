@@ -16,7 +16,7 @@ class NetworkAvailable {
     var connected = false
 
     fun getInstance(ctx: Context): NetworkAvailable {
-        context = ctx.getApplicationContext()
+        context = ctx.applicationContext
         return instance
     }
 

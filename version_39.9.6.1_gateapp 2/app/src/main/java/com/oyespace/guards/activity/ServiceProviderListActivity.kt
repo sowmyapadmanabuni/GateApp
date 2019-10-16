@@ -3,6 +3,8 @@ package com.oyespace.guards.activity
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.CompanyItemRVAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -99,54 +101,14 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
         //  getServiceProviderList()
-        val rv_serviceProvider =
-            findViewById(R.id.rv_serviceProvider) as androidx.recyclerview.widget.RecyclerView
-        rv_serviceProvider!!.setHasFixedSize(true)
-        val gridLayoutManager =
-            androidx.recyclerview.widget.GridLayoutManager(this@ServiceProviderListActivity, 3)
+        val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
+        rv_serviceProvider.setHasFixedSize(true)
+        val gridLayoutManager = GridLayoutManager(this@ServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         val data: ArrayList<VendorPojo> = prepareData()
         val adapter = CompanyItemRVAdapter( this@ServiceProviderListActivity,data)
         rv_serviceProvider.adapter = adapter
-
-//        val itemArrayList: ArrayList<String> = ArrayList()
-//        //for loop for items
-//        // for (j in 1..3) {
-//        //  itemArrayList.add("Item $j")
-//        // }
-//
-//
-//
-//
-//        itemArrayList.add("Zomato")
-//        itemArrayList.add("Swiggy")
-//        itemArrayList.add("FoodPanda")
-//        itemArrayList.add("BlueDart")
-//        itemArrayList.add("DTDC")
-//        itemArrayList.add("Fedex")
-//        itemArrayList.add("Jabong")
-//        itemArrayList.add("Flipkart")
-//        itemArrayList.add("Amazon")
-//        itemArrayList.add("BigBasket")
-//        itemArrayList.add("Grofers")
-//        itemArrayList.add("Godrej")
-//        itemArrayList.add("Carpenter")
-//        itemArrayList.add("Plumber")
-//        itemArrayList.add("electrician")
-//        itemArrayList.add("OLA")
-//        itemArrayList.add("Uber")
-//        itemArrayList.add("Meru")
-//        itemArrayList.add("Others")
-
-
-
-
-
-        // val linearLayoutManager = LinearLayoutManager(this)
-        //rv_serviceProvider!!.layoutManager = linearLayoutManager
-
-        //  val sectionModelArrayList: ArrayList<SectionModel> = ArrayList()
 
         //for loop for sections
         for (i in 1..4) {
@@ -164,48 +126,6 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         // rv_serviceProvider!!.adapter = adapter
 
     }
-
-
-//    private fun getServiceProviderList() {
-//
-//
-//        RetrofitClinet.instance
-//            .serviceProviderList("7470AD35-D51C-42AC-BC21-F45685805BBE")
-//            .subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribeWith(object : CommonDisposable<SeviceProviderListResponse>() {
-//
-//                override fun onSuccessResponse(serviceProviderlistresponse: SeviceProviderListResponse) {
-//
-//                    if (serviceProviderlistresponse.success == true) {
-//
-//                        Log.v("Service Provider data",serviceProviderlistresponse.data.toString())
-//
-//                        val arrayList = serviceProviderlistresponse.data.serviceProviders
-//                        val adapter = CompanyItemRVAdapter( this@ServiceProviderListActivity,arrayList)
-//                        rv_serviceProvider.adapter = adapter
-//                    } else {
-//                        // rv_serviceProvider.setEmptyAdapter("No items to show!", false, 0)
-//
-//                    }
-//                }
-//
-//                override fun onErrorResponse(e: Throwable) {
-//
-//                    //rv_dashboard.setEmptyAdapter(getString(R.string.some_wrng), false, 0)
-//                    Toast.makeText(this@ServiceProviderListActivity, e.toString(), Toast.LENGTH_LONG).show()
-//                    Log.v("Error Service Provider",e.toString())
-//
-//                }
-//
-//                override fun noNetowork() {
-//                    Toast.makeText(this@ServiceProviderListActivity, "No network call ", Toast.LENGTH_LONG).show()
-//
-//
-//                }
-//            })
-//
-//    }
 
     fun setLocale(lang: String?) {
         var lang = lang
@@ -225,8 +145,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
         for (i in 0 until vendor_names.size) {
             val vendorPojo = VendorPojo()
-            vendorPojo.setVendor_names(vendor_names[i])
-            vendorPojo.setImage_url(myImageList[i])
+            vendorPojo.vendor_names = vendor_names[i]
+            vendorPojo.image_url = myImageList[i]
             vendordata.add(vendorPojo)
         }
         return vendordata

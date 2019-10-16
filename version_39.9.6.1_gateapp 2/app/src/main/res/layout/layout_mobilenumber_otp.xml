@@ -250,8 +250,6 @@
                     </LinearLayout>
 
 
-
-
                     <EditText
                             android:id="@+id/Ed_phoneNum"
                             style="@style/EditTextCustomHolo"

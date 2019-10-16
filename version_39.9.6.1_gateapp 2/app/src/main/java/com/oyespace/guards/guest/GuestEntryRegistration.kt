@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -68,8 +69,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
             R.id.button_done ->{
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+GUEST_REGISTRATION+" "+FLOW_TYPE.equals( GUEST_REGISTRATION,true))
-                button_done.setEnabled(false)
-                button_done.setClickable(false)
+                button_done.isEnabled = false
+                button_done.isClickable = false
 
                 if(intent.getStringExtra(UNITID).contains(",")){
                     var unitname_dataList: Array<String>
@@ -86,7 +87,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                                 unitname_dataList.get(i).replace(" ", ""),
                                 unitid_dataList.get(i).replace(" ", ""),
                                 unitAccountId_dataList.get(i).replace(" ", "")
-                            );
+                            )
                         }
                     }
                 }else{
@@ -127,7 +128,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     var dialog_imageview: ImageView? = null
                     dialog_imageview = view.findViewById(R.id.dialog_imageview)
                     //   mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                    dialog_imageview.background = profile_image.getDrawable()
+                    dialog_imageview.background = profile_image.drawable
 
 
                     alertadd.setView(view)
@@ -169,30 +170,32 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 +" "+intent.getStringExtra(MOBILENUMBER)+" "+intent.getStringExtra(COUNTRYCODE)+" "
                 +intent.getStringExtra(PERSONNAME)+" "
                 +" "+intent.getStringExtra(FLOW_TYPE)+" "
-                +intent.getStringExtra(VISITOR_TYPE)+" "+intent.getStringExtra(COMPANY_NAME));
+                + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
+        )
 
-        tv_name.setText(intent.getStringExtra(PERSONNAME))
+        tv_name.text = intent.getStringExtra(PERSONNAME)
         val input =intent.getStringExtra(MOBILENUMBER)
         val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.setText(getIntent().getStringExtra(COUNTRYCODE)+" "+number)
+        tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": +"+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
        // tv_for.setText(resources.getString(R.string.textto)+intent.getStringExtra(UNITNAME))
-        tv_for.setText(resources.getString(R.string.textvisiting)+":  " +intent.getStringExtra(UNITNAME))
+        tv_for.text =
+            resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
 
-        tv_totalperson.setText(resources.getString(R.string.textperson))
-        tv_from.setText(intent.getStringExtra(COMPANY_NAME))
+        tv_totalperson.text = resources.getString(R.string.textperson)
+        tv_from.text = intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
             minteger++
-            menuCount.setText(""+minteger)
+            menuCount.text = "" + minteger
         }
 
         menuRemove.setOnClickListener {
             if (minteger>1) {
                 minteger--
-                menuCount.setText("" + minteger)
+                menuCount.text = "" + minteger
 
             }else{
 
@@ -219,9 +222,9 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         }
 
-        list=intent.getStringArrayListExtra(ITEMS_PHOTO_LIST);
+        list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
 
-        val mLayoutManager = androidx.recyclerview.widget.GridLayoutManager(applicationContext, 2)
+        val mLayoutManager = GridLayoutManager(applicationContext, 2)
         rv_image.layoutManager = mLayoutManager
         imageAdapter = ImageAdapter(list, this@GuestEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
@@ -277,13 +280,13 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             Prefs.getInt(ASSOCIATION_ID, 0),
                             false
                         )
-                      //  visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
+
+                        deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+
+
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)
-                        dd.putExtra(
-                            "msg",
-                            intent.getStringExtra(PERSONNAME) + " is coming to your home" + "(" + UNUniName + ")"
-                        )
+                        dd.putExtra("msg", intent.getStringExtra(PERSONNAME)+" is coming to your home" )
                         //dd.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
                         dd.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                         dd.putExtra("name", intent.getStringExtra(PERSONNAME))
@@ -298,7 +301,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        sendBroadcast(dd);
+                        sendBroadcast(dd)
                         uploadImage(imageName.toString(), mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
 
@@ -320,6 +323,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
+                    dismissProgress()
+                    finish()
                 }
 
 

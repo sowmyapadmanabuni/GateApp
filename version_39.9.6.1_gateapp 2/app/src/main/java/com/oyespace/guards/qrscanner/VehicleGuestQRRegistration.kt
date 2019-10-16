@@ -18,6 +18,9 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -46,8 +49,8 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.button_done -> {
-                button_done.setEnabled(false)
-                button_done.setClickable(false)
+                button_done.isEnabled = false
+                button_done.isClickable = false
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
                 invitationupdate("True", intent.getIntExtra(INVITATIONID, 0))
                 visitorLog()
@@ -94,27 +97,26 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         )
         txt_header.text=resources.getString(R.string.textidcard)+" "+ LocalDb.getAssociation()!!.asAsnName
 
-        tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
+        tv_name.text = resources.getString(R.string.textname) + ": " + intent.getStringExtra(PERSONNAME)
         val input =intent.getStringExtra(MOBILENUMBER)
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.setText("+"+91+" "+number)
+        tv_mobilenumber.text = "+" + 91 + " " + number
 
 
         //  tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER))
 
-        tv_totalperson.setText(
+        tv_totalperson.text =
             resources.getString(R.string.textperson) + ": " + intent.getStringExtra(
                 NUMBEROFPERSONS
             ).toInt()
-        )
-        tv_from.setText(resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME))
+        tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
 
 
             minteger++
             //  menuCount.setText("" + minteger)
-            tv_totalperson.setText(resources.getString(R.string.textperson) + ": " + minteger)
+            tv_totalperson.text = resources.getString(R.string.textperson) + ": " + minteger
 
         }
 
@@ -122,7 +124,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             if (minteger > 1) {
                 minteger--
                 //  menuCount.setText("" + minteger)
-                tv_totalperson.setText(resources.getString(R.string.textperson) + ": " + minteger)
+                tv_totalperson.text = resources.getString(R.string.textperson) + ": " + minteger
 
             } else {
 
@@ -130,10 +132,10 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         }
         tv_from.visibility = View.GONE
         if (intent.getStringExtra(FLOW_TYPE) == STAFF_REGISTRATION) {
-            tv_from.setText("Designation: " + intent.getStringExtra(COMPANY_NAME))
-            itemLyt.setVisibility(View.GONE)
+            tv_from.text = "Designation: " + intent.getStringExtra(COMPANY_NAME)
+            itemLyt.visibility = View.GONE
         } else {
-            itemLyt.setVisibility(View.VISIBLE)
+            itemLyt.visibility = View.VISIBLE
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 singUp(
                     intent.getStringExtra(PERSONNAME),
@@ -149,12 +151,12 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
     private fun visitorLog() {
         var imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER)+ ".jpg"
 
-        var memID:Int=410;
+        var memID: Int = 410
         if(BASE_URL.contains("dev",true)){
-            memID=64;
+            memID = 64
         }
         else if(BASE_URL.contains("uat",true)){
-            memID=64;
+            memID = 64
         }
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, unitName!!,
             intent.getStringExtra(UNITID),
@@ -174,23 +176,6 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
-                        // getInvitationCreate(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(PERSONNAME),"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),"","","","",getCurrentTimeLocal(),getCurrentTimeLocal(),"",true,Prefs.getInt(ASSOCIATION_ID,0),true)
-
-                       // visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
-//                        val d  =  Intent(this@VehicleGuestQRRegistration, BackgroundSyncReceiver::class.java)
-//                        d.putExtra(BSR_Action, VisitorEntryFCM)
-//                        d.putExtra("msg", intent.getStringExtra(PERSONNAME)+" from "+intent.getStringExtra(COMPANY_NAME)+" is coming to your home")
-//                        d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-//                        d.putExtra("name", intent.getStringExtra(PERSONNAME))
-//                        d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-//                        d.putExtra("unitname", intent.getStringExtra(UNITNAME))
-//                        d.putExtra(UNITID,intent.getStringExtra(UNITID))
-//                        d.putExtra("memType", "Owner")
-////                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-////                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-////                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-//                        sendBroadcast(d);
-
 
                         val d  =  Intent(this@VehicleGuestQRRegistration,BackgroundSyncReceiver::class.java)
                         d.putExtra(BSR_Action, VisitorEntryFCM)
@@ -210,18 +195,14 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra(UNIT_ACCOUNT_ID,accountId)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        sendBroadcast(d)
 
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        sendBroadcast(d);
-
-finish()
 
                         Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
+                    finish()
                 }
 
                 override fun onErrorResponse(e: Throwable) {
@@ -318,51 +299,6 @@ finish()
 //        finish();
    // }
 
-    private fun visitorEntryLog(visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(getCurrentTimeLocal(),0, visitorLogID)
-        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-
-
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-//                        val d = Intent(this@VehicleGuestQRRegistration, Dashboard::class.java)
-//                        startActivity(d)
-                        finish();
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            })
-        )
-    }
-
     fun setLocale(lang: String?) {
         var lang = lang
         if (lang == null) {
@@ -395,7 +331,7 @@ finish()
 
                     if (UnitList.success == true) {
 
-                        tv_for.setText(resources.getString(R.string.textto) + UnitList.data.unit.unUniName)
+                        tv_for.text = resources.getString(R.string.textto) + UnitList.data.unit.unUniName
                         accountId=UnitList.data.unit.acAccntID.toString()
                         unitName=UnitList.data.unit.unUniName
 //
@@ -422,7 +358,7 @@ finish()
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd", e.message);
+                    Log.d("cdvd", e.message)
 
 
                 }

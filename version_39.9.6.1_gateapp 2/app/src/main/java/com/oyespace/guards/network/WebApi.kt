@@ -3,6 +3,7 @@ package com.oyespace.guards.network
 
 import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.pojo.VisitorEntryLog
 import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
@@ -62,14 +63,9 @@ interface WebApi {
     @POST("oyesafe/api/v1/VisitorLogcreate/Create")
     fun createVisitorLogCall(@Header(OYE247KEY) token: String, @Body createVisitorLogReq: CreateVisitorLogReq): Single<CreateVisitorLogResp<VLRData>>
 
-    @POST("oyesafe/api/v1/VisitorEntryWIDAndTime/Update")
-    fun visitorEntryCall(@Header("X-OYE247-APIKey") token: String, @Body visitorExitReq: VisitorEntryReq)
-            : Single<VisitorExitResp>
-
-
     @GET("oye247/api/v1/GetWorkerListByAssocID/{id}")
     fun workerList(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String)
-            : Single<GetWorkerListbyAssnIDResp<WorkerListbyAssnIDData>>
+            : Single<GetWorkersResponse<WorkersList>>
 
     @POST("oyesafe/api/v1/SOS/SOSStopUpdate")
     fun updateSOS(@Header("X-OYE247-APIKey") token: String, @Body sosUpdateReq: SOSUpdateReq)
@@ -119,7 +115,11 @@ interface WebApi {
 
     @GET("oye247/api/v1/GetVisitorLogEntryListByAssocID/{id}")
     fun getVisitorLogEntryList(@Header(OYE247KEY) token: String, @Path("id") assnId: Int)
-            : Single<VisitorLogEntryResp<ArrayList<VisitorEntryLog>>>
+            : Single<GetVisitorsResponse<ArrayList<VisitorLog>>>
+
+    @GET("oye247/api/v1/GetVisitorLogExitListByAssocID/{id}")
+    fun getVisitorLogExitList(@Header(OYE247KEY) token: String, @Path("id") associationID: Int)
+            : Single<GetExitVisitorsResponse<ArrayList<VisitorLog>>>
 
     @GET("oye247/api/v1/TicketingResponse/GetTicketingResponseListByTicketingResID/{id}")
     fun getTicketingResponses(@Header(OYE247KEY) token: String, @Path("id") ticketID: String)
@@ -178,6 +178,10 @@ interface WebApi {
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
             : Single<ResidentValidationResponse>
+
+    @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
+    fun checkIfResident(@Header(OYE247KEY) token: String, @Body residentCheckReq: ResidentCheckReq): Single<ResidentCheckResponse>
+
 
     @GET("oye247/api/v1/GetCheckPointNamesByPatrollingSchedule/{schedId}")
     fun scheduleCheckPointsList(@Header("X-OYE247-APIKey") token: String, @Path("schedId") scheduleId: String)

@@ -10,38 +10,48 @@
             android:orientation="vertical">
 
         <!-- HEADER START -->
-        <RelativeLayout android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1.2"
-                android:padding="2dp"
-                android:layout_margin="0dp"
+        <RelativeLayout
                 android:id="@+id/rl_header"
-                android:background="@color/white">
-            <ImageView android:layout_width="150dp"
-                    android:layout_height="40dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="0dp"
+                android:layout_weight="1.2"
+                android:background="@color/white"
+                android:padding="2dp">
+
+            <ImageView
                     android:id="@+id/rl_header1"
+                    android:layout_width="150dp"
+                    android:layout_height="40dp"
                     android:layout_centerHorizontal="true"
                     android:layout_margin="@dimen/_2sdp"
-                    android:src="@drawable/oyespace_toolbar"/>
+                    android:src="@drawable/oyespace_toolbar" />
         </RelativeLayout>
-        <RelativeLayout android:layout_width="match_parent" android:layout_below="@+id/rl_header" android:layout_height="2dp" android:background="@color/orange" android:id="@+id/r1" />
+
+        <RelativeLayout
+                android:id="@+id/r1"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_below="@+id/rl_header"
+                android:background="@color/orange" />
         <!-- HEADER END -->
 
 
         <!-- MAP START -->
         <RelativeLayout
+                android:id="@+id/r1_imap"
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:layout_marginRight="10dp"
-                android:id="@+id/r1_imap"
                 android:background="@drawable/border">
+
             <fragment
                     android:id="@+id/map"
                     class="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
         </RelativeLayout>
         <!-- MAP END -->
 
@@ -50,49 +60,52 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:padding="10dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:padding="10dp">
 
             <ImageView
+                    android:id="@+id/sos_image"
                     android:layout_width="120dp"
                     android:layout_height="120dp"
-                    android:id="@+id/sos_image"
-                    android:scaleType="fitXY"
                     android:background="@drawable/border"
-                    android:src="@drawable/newicons_camera"/>
+                    android:scaleType="fitXY"
+                    android:src="@drawable/newicons_camera" />
+
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingLeft="15dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingLeft="15dp">
 
                 <TextView
+                        android:id="@+id/g1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Resident Details"
-                        android:textColor="@color/orangedark"
                         android:layout_marginBottom="8dp"
-                        android:id="@+id/g1" />
+                        android:text="Resident Details"
+                        android:textColor="@color/orangedark" />
 
                 <TextView
+                        android:id="@+id/sos_username"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
                         android:text="Resident Name:"
-                        android:textColor="@color/black"
-                        android:layout_marginBottom="4dp"
-                        android:id="@+id/sos_username"
-                        />
-                <TextView android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Resident Mobile No:"
-                        android:id="@+id/sos_usermobile"
-                        android:layout_marginBottom="4dp"
                         android:textColor="@color/black" />
 
-                <TextView android:layout_width="wrap_content"
+                <TextView
+                        android:id="@+id/sos_usermobile"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="4dp"
+                        android:text="Resident Mobile No:"
+                        android:textColor="@color/black" />
+
+                <TextView
+                        android:id="@+id/sos_unitname"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text=""
-                        android:id="@+id/sos_unitname"
                         android:textColor="@color/black" />
 
             </LinearLayout>
@@ -101,32 +114,48 @@
         <!-- PHOTO & SOS DETAILS END -->
 
 
-
         <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="18dp">
+                android:layout_marginTop="18dp"
+                android:orientation="vertical">
 
             <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textAlignment="center"
-                    android:textSize="18sp"
                     android:text="Emergency Contacts"
+                    android:textAlignment="center"
                     android:textColor="@color/orangedark"
-                     />
+                    android:textSize="18sp" />
 
 
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:weightSum="3"
+                    android:layout_marginTop="16dp"
                     android:orientation="horizontal"
-                    android:layout_marginTop="16dp">
-                <include android:id="@+id/call_ambulance" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
-                <include android:id="@+id/call_police" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
-                <include android:id="@+id/call_fire" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1" layout="@layout/activity_recycle_sos_items" />
+                    android:weightSum="3">
+
+                <include
+                        android:id="@+id/call_ambulance"
+                        layout="@layout/activity_recycle_sos_items"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                <include
+                        android:id="@+id/call_police"
+                        layout="@layout/activity_recycle_sos_items"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
+
+                <include
+                        android:id="@+id/call_fire"
+                        layout="@layout/activity_recycle_sos_items"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1" />
             </LinearLayout>
 
         </LinearLayout>
@@ -135,20 +164,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:gravity="center"
                 android:layout_marginTop="24dp"
+                android:gravity="center"
                 android:orientation="horizontal">
 
-            <Button android:layout_width="120dp"
-                    android:layout_height="35dp"
+            <Button
                     android:id="@+id/btn_dismiss_sos"
-                    android:layout_marginRight="30dp"
-                    android:text="Pass"
-                    android:background="@drawable/round_button_color_red" android:textColor="@color/white"/>
-
-            <Button android:layout_width="120dp"
+                    android:layout_width="120dp"
                     android:layout_height="35dp"
-                    android:id="@+id/btn_attend_sos"  android:text="Attend"  android:background="@drawable/round_button_color_orange"   android:textColor="@color/white"/>
+                    android:layout_marginRight="30dp"
+                    android:background="@drawable/round_button_color_red"
+                    android:text="Pass"
+                    android:textColor="@color/white" />
+
+            <Button
+                    android:id="@+id/btn_attend_sos"
+                    android:layout_width="120dp"
+                    android:layout_height="35dp"
+                    android:background="@drawable/round_button_color_orange"
+                    android:text="Attend"
+                    android:textColor="@color/white" />
         </LinearLayout>
 
     </LinearLayout>
