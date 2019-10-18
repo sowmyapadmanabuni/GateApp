@@ -10,6 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.staffManaualEntry.ManualMobileNumberScreen
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -32,30 +33,46 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                 buttonNextt.isEnabled = false
                 buttonNextt.isClickable = false
                 if (Ed_Name_purp.text.length > 2) {
-//                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
-                    val d = Intent(this@PurposeScreen, MobileNumberScreen::class.java)
 
-                    Log.d(
-                        "intentdata NameEntr",
-                        "buttonNext " + intent.getStringExtra(ConstantUtils.UNITNAME) + " " + intent.getStringExtra(
-                            ConstantUtils.UNITID
-                        )
-                                + " " + intent.getStringExtra(ConstantUtils.MOBILENUMBER) + " " + intent.getStringExtra(
-                            ConstantUtils.COUNTRYCODE
-                        ) + " " + Ed_Name_purp.text
-                    )
-                    d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
-                    d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
-                    d.putExtra(ConstantUtils.FLOW_TYPE, intent.getStringExtra(ConstantUtils.FLOW_TYPE))
-                    d.putExtra(ConstantUtils.VISITOR_TYPE, intent.getStringExtra(ConstantUtils.VISITOR_TYPE))
-                    d.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
-                    d.putExtra(ConstantUtils.MOBILENUMBER, intent.getStringExtra(ConstantUtils.MOBILENUMBER))
-                    d.putExtra(ConstantUtils.COUNTRYCODE, intent.getStringExtra(ConstantUtils.COUNTRYCODE))
-                    d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(UNIT_ACCOUNT_ID))
-                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                    d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
-                    startActivity(d)
-                    finish()
+                    if (Prefs.getString(TYPE, "").equals("Create")) {
+
+                        val d = Intent(this@PurposeScreen, MobileNumberScreen::class.java)
+                        d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
+                        d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
+                        d.putExtra(ConstantUtils.FLOW_TYPE, intent.getStringExtra(ConstantUtils.FLOW_TYPE))
+                        d.putExtra(ConstantUtils.VISITOR_TYPE, intent.getStringExtra(ConstantUtils.VISITOR_TYPE))
+                        d.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
+                        d.putExtra(ConstantUtils.MOBILENUMBER, intent.getStringExtra(ConstantUtils.MOBILENUMBER))
+                        d.putExtra(ConstantUtils.COUNTRYCODE, intent.getStringExtra(ConstantUtils.COUNTRYCODE))
+                        d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
+                        startActivity(d)
+                        finish()
+                    }else{
+                        val d = Intent(
+                            this@PurposeScreen, ManualMobileNumberScreen::class.java)
+                        d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
+                        d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
+                        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                        d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                        d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                        d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                        d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                        d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                        d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
+
+
+
+                        startActivity(d)
+                        finish()
+                    }
                 } else {
                     buttonNextt.isEnabled = true
                     buttonNextt.isClickable = true

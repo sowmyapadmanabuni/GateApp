@@ -323,7 +323,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             memID = 64
         }
 
-
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),

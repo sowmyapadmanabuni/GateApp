@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BlockSelectionActivity
@@ -39,7 +40,8 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
             if(arrayList[position].vendor_names.equals("Others")){
                 intent.putExtra(COMPANY_NAME, OTHERS)
             }else{
-                intent.putExtra(COMPANY_NAME, arrayList[position].vendor_names)
+               val data= arrayList[position].vendor_names
+                intent.putExtra(COMPANY_NAME, data)
 
             }
             mcontext.startActivity(intent)

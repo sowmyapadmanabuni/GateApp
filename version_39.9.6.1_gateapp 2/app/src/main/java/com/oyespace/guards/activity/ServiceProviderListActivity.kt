@@ -14,6 +14,15 @@ import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import java.util.*
 
+import java.util.Arrays.asList
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
+
+
 
 class ServiceProviderListActivity : BaseKotlinActivity() {
 
@@ -21,6 +30,11 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
+
+    lateinit var vendor_names: List<String>
+           // = Arrays.asList(resources.getStringArray(R.array.vendor_list))
+
+
     val myImageList = intArrayOf(
         R.drawable.zomoto,
         R.mipmap.sw,
@@ -47,37 +61,62 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
     )
-    val vendor_names = arrayOf(
-        "Zomato",
-        "Swiggy",
-        "FoodPanda",
-        "Uber Eats",
-        "Dominos",
-        "BlueDart",
-        "DTDC",
-        "Fedex",
-        "Jabong",
-        "Flipkart",
-        "Amazon",
-        "BigBasket",
-        "Grofers",
-        "Godrej",
-        "Carpenter",
-        "Plumber",
-        "Electrician",
-        "OLA",
-        "Uber",
-        "Meru",
-        "Gas Cylinder",
-        "Others"
-
-    )
+//    val vendor_names = arrayOf(
+//        resources.getString(R.string.textzomato),
+//        resources.getString(R.string.textswiggy),
+//        resources.getString(R.string.textfoodpanda),
+//        resources.getString(R.string.textubereats),
+//        resources.getString(R.string.textdominos),
+//        resources.getString(R.string.textbluedart),
+//        resources.getString(R.string.textdtdc),
+//        resources.getString(R.string.textfedex),
+//        resources.getString(R.string.textjabong),
+//        resources.getString(R.string.textflipkart),
+//        resources.getString(R.string.textamazon),
+//        resources.getString(R.string.textbigbasket),
+//        resources.getString(R.string.textgrofers),
+//        resources.getString(R.string.textgodrej),
+//        resources.getString(R.string.textcarpenter),
+//        resources.getString(R.string.textplumber),
+//        resources.getString(R.string.textelectrician),
+//        resources.getString(R.string.textola),
+//        resources.getString(R.string.textuber),
+//        resources.getString(R.string.textmeru),
+//        resources.getString(R.string.textgascylinde),
+//        resources.getString(R.string.textothers)
+//
+//    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
 
         setContentView(R.layout.activity_service_provider_list)
+
+       // vendor_names = Arrays.asList(resources.getStringArray(R.array.vendor_list))
+
+        vendor_names= listOf(resources.getString(R.string.textzomato),
+            resources.getString(R.string.textswiggy),
+            resources.getString(R.string.textfoodpanda),
+            resources.getString(R.string.textubereats),
+            resources.getString(R.string.textdominos),
+            resources.getString(R.string.textbluedart),
+            resources.getString(R.string.textdtdc),
+            resources.getString(R.string.textfedex),
+            resources.getString(R.string.textjabong),
+            resources.getString(R.string.textflipkart),
+            resources.getString(R.string.textamazon),
+            resources.getString(R.string.textbigbasket),
+            resources.getString(R.string.textgrofers),
+            resources.getString(R.string.textgodrej),
+            resources.getString(R.string.textcarpenter),
+            resources.getString(R.string.textplumber),
+            resources.getString(R.string.textelectrician),
+            resources.getString(R.string.textola),
+            resources.getString(R.string.textuber),
+            resources.getString(R.string.textmeru),
+            resources.getString(R.string.textgascylinde),
+            resources.getString(R.string.textothers))
 
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
@@ -145,7 +184,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
         for (i in 0 until vendor_names.size) {
             val vendorPojo = VendorPojo()
-            vendorPojo.vendor_names = vendor_names[i]
+            vendorPojo.vendor_names = vendor_names[i].toString()
             vendorPojo.image_url = myImageList[i]
             vendordata.add(vendorPojo)
         }

@@ -170,4 +170,54 @@
     <string name="scan_res_id_here">"यहां पर रेजिडेंट आईडी स्कैन करें   "</string>
     <string name="valid">वैध</string>
     <string name="invalid">अमान्य</string>
+
+    <string name="textzomato">जोमाटो</string>
+    <string name="textswiggy">स्विग्गी</string>
+    <string name="textfoodpanda">फूडपांडा</string>
+    <string name="textubereats">उबर ईट्स</string>
+    <string name="textdominos">डोमिनोज</string>
+    <string name="textbluedart">ब्लूडार्ट</string>
+    <string name="textdtdc">डीटीडीसी</string>
+    <string name="textjabong">जबॉन्ग</string>
+    <string name="textflipkart">फ्लिपकार्ट</string>
+    <string name="textamazon">अमेजन</string>
+    <string name="textbigbasket">बिगबास्केट</string>
+    <string name="textgrofers">ग्रोफर्स</string>
+    <string name="textgodrej">गोदरेज</string>
+    <string name="textcarpenter">कारपेंटर</string>
+    <string name="textplumber">प्लम्बर</string>
+    <string name="textelectrician">बिजली मिस्त्री</string>
+    <string name="textola">ओला</string>
+    <string name="textuber">उबर</string>
+    <string name="textmeru">मेरु</string>
+    <string name="textgascylinde">गैस सिलेंडर</string>
+    <string name="textothers">अन्य</string>
+    <string name="textfedex">फ़ेडेक्स</string>
+
+    <string-array name="vendor_list">
+        <item>जोमाटो</item>
+        <item>स्विग्गी</item>
+        <item>फूडपांडा</item>
+        <item>उबर ईट्स</item>
+        <item>डोमिनोज</item>
+        <item>ब्लूडार्ट</item>
+        <item>डीटीडीसी</item>
+        <item>जबॉन्ग</item>
+        <item>फ्लिपकार्ट</item>
+        <item>अमेजन</item>
+        <item>बिगबास्केट</item>
+        <item>ग्रोफर्स</item>
+        <item>गोदरेज</item>
+        <item>कारपेंटर</item>
+        <item>प्लम्बर</item>
+        <item>िजली मिस्त्र</item>
+        <item>ओला</item>
+        <item>उबर</item>
+        <item>मेरु</item>
+        <item>गैस सिलेंडर</item>
+        <item>अन्य</item>
+        <item>फ़ेडेक्स</item>
+
+    </string-array>
+
 </resources>

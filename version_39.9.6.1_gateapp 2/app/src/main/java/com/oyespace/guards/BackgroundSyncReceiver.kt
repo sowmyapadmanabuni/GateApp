@@ -1022,51 +1022,53 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 override fun onSuccessResponse(getdata: GetFamilyMemberResponse) {
 
-                    try {
+                    if(getdata.success.equals(true)) {
 
-                        for (i in 0..getdata.data.familyMembers.size) {
-                            try {
-                                getNotificationCreate(
-                                    getdata.data.familyMembers[i].acAccntID.toString(),
-                                    Prefs.getInt(ASSOCIATION_ID, 0).toString(),
-                                    "gate_app",
-                                    msg,
-                                    unitId.toString(),
-                                    vlVisLgID.toString(),
-                                    vlVisLgID.toString() + "admin",
-                                    "gate_app",
+
+                        try {
+
+                            for (i in 0..getdata.data.familyMembers.size) {
+                                try {
+                                    getNotificationCreate(
+                                        getdata.data.familyMembers[i].acAccntID.toString(),
+                                        Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                                        "gate_app",
+                                        msg,
+                                        unitId.toString(),
+                                        vlVisLgID.toString(),
+                                        vlVisLgID.toString() + "admin",
+                                        "gate_app",
+                                        LocalDb.getAssociation()!!.asAsnName,
+                                        "gate_app",
+                                        DateTimeUtils.getCurrentTimeLocal(),
+                                        DateTimeUtils.getCurrentTimeLocal(),
+                                        vlVisLgID.toString()
+                                    )
+                                } catch (e: KotlinNullPointerException) {
+
+                                }
+                                sendCloudFunctionNotification(
+                                    Prefs.getInt(ASSOCIATION_ID, 0),
                                     LocalDb.getAssociation()!!.asAsnName,
+                                    msg,
+                                    desgn,
                                     "gate_app",
-                                    DateTimeUtils.getCurrentTimeLocal(),
-                                    DateTimeUtils.getCurrentTimeLocal(),
-                                    vlVisLgID.toString()
+                                    vlVisLgID.toString() + "admin",
+                                    getdata.data.familyMembers[i].acAccntID,
+                                    getdata.data.familyMembers[i].acAccntID.toString()
                                 )
-                            } catch (e: KotlinNullPointerException) {
 
                             }
-                            sendCloudFunctionNotification(
-                                Prefs.getInt(ASSOCIATION_ID, 0),
-                                LocalDb.getAssociation()!!.asAsnName,
-                                msg,
-                                desgn,
-                                "gate_app",
-                                vlVisLgID.toString() + "admin",
-                                getdata.data.familyMembers[i].acAccntID,
-                                getdata.data.familyMembers[i].acAccntID.toString()
-                            )
+                        } catch (e: IndexOutOfBoundsException) {
 
                         }
-                    } catch (e: IndexOutOfBoundsException) {
-
                     }
-
 
                 }
 
                 override fun onErrorResponse(e: Throwable) {
                     // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
                     //  visitorLogBiometric(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
-
 
                 }
 
