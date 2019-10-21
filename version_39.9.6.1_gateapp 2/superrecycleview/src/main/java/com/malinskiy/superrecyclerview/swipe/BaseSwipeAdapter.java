@@ -79,7 +79,7 @@ public abstract class BaseSwipeAdapter<VH extends BaseSwipeAdapter.BaseSwipeable
         public BaseSwipeableViewHolder(View itemView) {
             super(itemView);
 
-            swipeLayout = (SwipeLayout) itemView.findViewById(R.id.recyclerview_swipe);
+            swipeLayout = itemView.findViewById(R.id.recyclerview_swipe);
         }
     }
 }

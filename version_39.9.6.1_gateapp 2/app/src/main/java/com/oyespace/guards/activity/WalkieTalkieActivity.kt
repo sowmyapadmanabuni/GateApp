@@ -43,7 +43,7 @@ class WalkieTalkieActivity : AppCompatActivity() {
         }
 
 
-        mFileName = audiofile!!.getAbsolutePath()
+        mFileName = audiofile!!.absolutePath
         Log.d("uploadAudio 51",mFileName )
 
         record.setOnClickListener {

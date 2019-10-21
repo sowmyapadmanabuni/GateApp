@@ -134,4 +134,5 @@
     <dimen name="btnstart">32dp</dimen>
     <dimen name="btntop">8dp</dimen>
     <dimen name="btnsize">17dp</dimen>
+    <dimen name="dp_36">56dp</dimen>
 </resources>

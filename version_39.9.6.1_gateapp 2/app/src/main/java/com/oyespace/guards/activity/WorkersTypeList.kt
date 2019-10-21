@@ -14,7 +14,7 @@ import java.util.*
 
 
 class WorkersTypeList: BaseKotlinActivity() {
-    val workType: ArrayList<String> = ArrayList();
+    val workType: ArrayList<String> = ArrayList()
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView

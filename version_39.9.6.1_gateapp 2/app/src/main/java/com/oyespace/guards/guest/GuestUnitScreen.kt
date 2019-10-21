@@ -13,6 +13,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -34,7 +36,7 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
     var arrayList = ArrayList<UnitPojo>()
     var orderListAdapter:UnitListAdapter?=null
     private val REQUEST_CODE_SPEECH_INPUT = 100
-    internal var unitNames = "";
+    internal var unitNames = ""
     internal var unitId = ""
     internal var acAccntID=""
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,18 +63,13 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
 
         if(LocalDb.getUnitList()!=null){
             arrayList = LocalDb.getUnitList()
-            orderListAdapter = UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@GuestUnitScreen)
+            orderListAdapter = UnitListAdapter(arrayList, this@GuestUnitScreen)
             rv_unit.adapter = orderListAdapter
         }else {
             makeUnitLog()
         }
 
-        rv_unit.setLayoutManager(
-            androidx.recyclerview.widget.GridLayoutManager(
-                this@GuestUnitScreen,
-                2
-            )
-        )
+        rv_unit.setLayoutManager(GridLayoutManager(this@GuestUnitScreen, 2))
 
         btn_mic.setOnClickListener {
             Speak()
@@ -84,10 +81,10 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
-                if (arrayList?.size > 0) {
+                if (arrayList.size > 0) {
                     for (j in arrayList.indices) {
                         if (arrayList.get(j).isSelected) {
                             if(unitNames.length!=0){
@@ -107,11 +104,13 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                         val d = Intent(this@GuestUnitScreen, GuestMobileNumberScreen::class.java)
                         Log.d(
                             "intentdata NameEntr",
-                            "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-                                    + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(
+                            "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(
+                                UNITID
+                            )
+                                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(
                                 COUNTRYCODE
                             ) + " "
-                        );
+                        )
                         d.putExtra(UNITID, unitId)
                         d.putExtra(UNITNAME, unitNames)
                         d.putExtra(FLOW_TYPE, GUEST_REGISTRATION)
@@ -119,12 +118,12 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra(COMPANY_NAME, GUEST)
                         d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
 
-                        startActivity(d);
+                        startActivity(d)
                         finish()
 
                     } else {
-                        buttonNext.setEnabled(true)
-                        buttonNext.setClickable(true)
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
                         Toast.makeText(applicationContext, "Select Unit", Toast.LENGTH_SHORT).show()
 
                     }
@@ -154,11 +153,11 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                 override fun onSuccessResponse(UnitList: UnitList<ArrayList<UnitPojo>>) {
 
                     if (UnitList.success == true) {
-                        Log.d("cdvd", UnitList.toString());
+                        Log.d("cdvd", UnitList.toString())
 
                         arrayList = UnitList.data.unit
 //                        TODO save unit list
-                        orderListAdapter = UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@GuestUnitScreen)
+                        orderListAdapter = UnitListAdapter(arrayList, this@GuestUnitScreen)
 
                         rv_unit.adapter = orderListAdapter
 //                        rv_unit.adapter = UnitAdapter(entries, this@UnitListActivity)
@@ -169,7 +168,7 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd", e.message);
+                    Log.d("cdvd", e.message)
 
                     Toast.makeText(this@GuestUnitScreen, "Error 8", Toast.LENGTH_LONG)
                         .show()
@@ -201,13 +200,13 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context) :
-        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
         private val mInflater: LayoutInflater
 
         init {
@@ -220,14 +219,14 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
         }
 
         override fun onBindViewHolder(holder: MenuHolder, position: Int) {
-            val orderData = listVistor?.get(position)
-            val vistordate = orderData?.asAssnID
-            holder.apartmentNamee.text = orderData?.unUniName
+            val orderData = listVistor.get(position)
+            val vistordate = orderData.asAssnID
+            holder.apartmentNamee.text = orderData.unUniName
 
 
             holder.cb_unit.setOnCheckedChangeListener { buttonView, isChecked ->
 
-                listVistor!!.get(position).isSelected = isChecked
+                listVistor.get(position).isSelected = isChecked
 
             }
 
@@ -235,9 +234,12 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
 //                val intent = Intent(Intent.ACTION_CALL);
 //                intent.data = Uri.parse("tel:" + orderData.owner.uoisdCode + orderData.owner.uoMobile)
 //                mcontext.startActivity(intent)
-                if(orderData!!.owner!=null) {
-                    Log.d("cdvd 2", "" + orderData?.owner[0].uoisdCode + " " + orderData?.owner[0].uoMobile);
-                    val intent = Intent(Intent.ACTION_CALL);
+                if (orderData.owner != null) {
+                    Log.d(
+                        "cdvd 2",
+                        "" + orderData.owner[0].uoisdCode + " " + orderData.owner[0].uoMobile
+                    )
+                    val intent = Intent(Intent.ACTION_CALL)
                     intent.data = Uri.parse("tel:"+ orderData.owner[0].uoMobile)
                     mcontext.startActivity(intent)
                 }else{
@@ -252,28 +254,27 @@ class GuestUnitScreen : BaseKotlinActivity(), View.OnClickListener {
                 intent.putExtra(FLOW_TYPE, GUEST_REGISTRATION)
                 intent.putExtra(VISITOR_TYPE, GUEST)
                 intent.putExtra(COMPANY_NAME, GUEST)
-                intent.putExtra(UNITID, orderData?.unUnitID)
-                intent.putExtra(UNITNAME, orderData?.unUniName)
+                intent.putExtra(UNITID, orderData.unUnitID)
+                intent.putExtra(UNITNAME, orderData.unUniName)
 
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
-                if (listVistor!!.get(position).isSelected) {
-                    listVistor!!.get(position).isSelected = false
-                    holder.cb_unit.setChecked(false)
+                if (listVistor.get(position).isSelected) {
+                    listVistor.get(position).isSelected = false
+                    holder.cb_unit.isChecked = false
                 } else {
-                    listVistor!!.get(position).isSelected = true
-                    holder.cb_unit.setChecked(true)
+                    listVistor.get(position).isSelected = true
+                    holder.cb_unit.isChecked = true
                 }
 
             })
         }
 
         override fun getItemCount(): Int {
-            return listVistor?.size ?: 0
+            return listVistor.size
         }
 
-        inner class MenuHolder(private val view: View) :
-            androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: CheckBox

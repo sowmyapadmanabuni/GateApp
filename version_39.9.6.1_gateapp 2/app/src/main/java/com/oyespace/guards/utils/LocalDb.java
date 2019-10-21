@@ -1,4 +1,3 @@
-
 package com.oyespace.guards.utils;
 
 import android.annotation.SuppressLint;
@@ -9,6 +8,7 @@ import android.telecom.TelecomManager;
 
 import com.google.gson.reflect.TypeToken;
 import com.oyespace.guards.constants.PrefKeys;
+import com.oyespace.guards.models.Worker;
 import com.oyespace.guards.pojo.Association;
 import com.oyespace.guards.pojo.CheckPointByAssocID;
 import com.oyespace.guards.pojo.SearchResult;
@@ -50,6 +50,7 @@ public class LocalDb {
         }
         Prefs.putString(PrefKeys.CheckPointList, tojson);
     }
+
     public static ArrayList<SearchResult> getRecentSearchData() {
         String cartData = Prefs.getString(PrefKeys.RECENT_SEARCH_DATA, null);
         if (cartData == null) {
@@ -189,7 +190,7 @@ public class LocalDb {
         }
     }
 
-    public static void saveStaffList(ArrayList<WorkerDetails> menuItems) {
+    public static void saveStaffList(ArrayList<Worker> menuItems) {
         String tojson;
         if (menuItems == null || menuItems.size() == 0) {
             // saveHotelId("");

@@ -31,30 +31,30 @@ interface DialogPress {
     fun onDialogPress()
 }
 
-open class BaseKotlinActivity : AppCompatActivity(){
+open class BaseKotlinActivity : AppCompatActivity() {
 
     private var progressDialog: ProgressDialog? = null
 
     val LOCATION_REQ = 7446
-    val REQUEST_CODE_SPEECH = 101;
+    val REQUEST_CODE_SPEECH = 101
     private var callback: PermissionCallback? = null
     private var requestcode: Int = 0
     lateinit var realm: Realm
-    var alertDialog: AlertDialog? = null;
+    var alertDialog: AlertDialog? = null
 
     companion object {
         val TAG: String = javaClass.name
-        val LOCATION_REQ: Int=10
+        val LOCATION_REQ: Int = 10
 
     }
 
-    open fun initRealm(){
+    open fun initRealm() {
         realm = Realm.getDefaultInstance()
     }
 
-    open fun closeRealm(){
-        if(realm != null && !realm.isClosed){
-            realm.close();
+    open fun closeRealm() {
+        if (realm != null && !realm.isClosed) {
+            realm.close()
         }
     }
 
@@ -77,7 +77,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
     ) {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        getSupportActionBar()!!.setDisplayShowTitleEnabled(false);
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
         val tv_appversion = findViewById<TextView>(R.id.tv_appversion)
         val tv_mobileno = findViewById<TextView>(R.id.tv_mobileno)
         val tv_association = findViewById<TextView>(R.id.tv_association)
@@ -123,11 +123,14 @@ open class BaseKotlinActivity : AppCompatActivity(){
 //            this.window.statusBarColor = this.getResources().getColor(R.color.orangedark);
 //        }
 //    }
-    fun showProgress() {
-        progressDialog = ProgressDialog(this)
+
+    fun showProgress(message: String = "Saving") {
+        if (progressDialog == null) {
+            progressDialog = ProgressDialog(this)
+        }
         progressDialog?.isIndeterminate = true
         progressDialog?.setCancelable(false)
-        progressDialog?.setMessage("Saving")
+        progressDialog?.setMessage(message)
         progressDialog?.setCanceledOnTouchOutside(false)
         progressDialog?.show()
     }
@@ -136,6 +139,14 @@ open class BaseKotlinActivity : AppCompatActivity(){
         progressDialog?.isShowing.let {
             progressDialog?.dismiss()
         }
+        progressDialog = null
+    }
+
+    fun setProgressValue(value: Int) {
+
+        progressDialog?.progress = value
+        progressDialog?.setMessage("${(value / progressDialog!!.max) * 100}% done")
+
     }
 
 
@@ -162,10 +173,11 @@ open class BaseKotlinActivity : AppCompatActivity(){
     }
 
     fun isPemissionAllowed(permission: String): Boolean {
-        return ContextCompat.checkSelfPermission(applicationContext,
-                permission) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            applicationContext,
+            permission
+        ) == PackageManager.PERMISSION_GRANTED
     }
-
 
 
     fun requestPermission(permission: String, requestcode: Int, callback: PermissionCallback) {
@@ -175,9 +187,11 @@ open class BaseKotlinActivity : AppCompatActivity(){
         } else {
             this.requestcode = requestcode
             this.callback = callback
-            ActivityCompat.requestPermissions(this,
-                    arrayOf(permission),
-                    requestcode)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(permission),
+                requestcode
+            )
         }
     }
 
@@ -193,9 +207,11 @@ open class BaseKotlinActivity : AppCompatActivity(){
                 }
                 this.requestcode = requestcode
                 this.callback = callback
-                ActivityCompat.requestPermissions(this,
-                        permissionList,
-                        requestcode)
+                ActivityCompat.requestPermissions(
+                    this,
+                    permissionList,
+                    requestcode
+                )
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -207,8 +223,10 @@ open class BaseKotlinActivity : AppCompatActivity(){
         val list = ArrayList<String>()
         try {
             for (permssion in permission) {
-                val isGranted = ContextCompat.checkSelfPermission(applicationContext,
-                        permssion) == PackageManager.PERMISSION_GRANTED
+                val isGranted = ContextCompat.checkSelfPermission(
+                    applicationContext,
+                    permssion
+                ) == PackageManager.PERMISSION_GRANTED
                 if (!isGranted) {
                     list.add(permssion)
                 }
@@ -241,11 +259,11 @@ open class BaseKotlinActivity : AppCompatActivity(){
     fun showAnimatedDialog(desc: String, json: Int, isCancellable: Boolean, btnText: String) {
         val dialogBuilder = AlertDialog.Builder(this)
 
-        val inflater:LayoutInflater = applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater//this.layoutInflater
+        val inflater: LayoutInflater = applicationContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater//this.layoutInflater
         val dialogView = inflater.inflate(R.layout.animated_dialog, null)
         val text: TextView = dialogView.findViewById(R.id.animdlg_text)
         val animView: LottieAnimationView = dialogView.findViewById(R.id.animdlg_lottie)
-        val btn: Button = dialogView.findViewById(R.id.animdlg_btn);
+        val btn: Button = dialogView.findViewById(R.id.animdlg_btn)
         if (!btnText.equals("") && btnText != null) {
 
             btn.visibility = View.VISIBLE
@@ -258,7 +276,7 @@ open class BaseKotlinActivity : AppCompatActivity(){
         }
         animView.setAnimation(json)
         animView.playAnimation()
-        text.setText(desc)
+        text.text = desc
         dialogBuilder.setView(dialogView)
 
         alertDialog = dialogBuilder.create()
@@ -271,7 +289,6 @@ open class BaseKotlinActivity : AppCompatActivity(){
             alertDialog?.dismiss()
         }
     }
-
 
 
 }

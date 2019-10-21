@@ -3,8 +3,7 @@ package com.oyespace.guards.responce;
 public class ResidentValidationResponse {
 
 
-
-        public ResidentData data;
+    public ResidentData data;
 
     public String apiVersion;
 

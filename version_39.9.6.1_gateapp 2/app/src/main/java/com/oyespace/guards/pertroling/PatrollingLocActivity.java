@@ -25,8 +25,6 @@ import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
@@ -94,6 +92,12 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     public Location mLocation, mPredictedLocation;
     public TextToSpeech toSpeech;
     public int scheduleId;
+    static final float GEOFENCE_RADIUS_IN_METERS = 40;
+    private static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
+    static final String GEOFENCES_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
+    private static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
+    static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
+            GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
     private BroadcastReceiver locationUpdateReceiver;
     private BroadcastReceiver predictedLocationReceiver;
     private ZXingScannerView mScannerView;
@@ -107,19 +111,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         ADD, REMOVE, NONE
     }
 
-    private static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
-
-    static final String GEOFENCES_ADDED_KEY = PACKAGE_NAME + ".GEOFENCES_ADDED_KEY";
     private GeofencingClient mGeofencingClient;
-    private ArrayList<Geofence> mGeofenceList=new ArrayList<>();
+    private ArrayList<Geofence> mGeofenceList = new ArrayList<>();
     private PendingIntent mGeofencePendingIntent;
     private PendingGeofenceTask mPendingGeofenceTask = PendingGeofenceTask.NONE;
-
-    private static final long GEOFENCE_EXPIRATION_IN_HOURS = 12;
-    static final long GEOFENCE_EXPIRATION_IN_MILLISECONDS =
-            GEOFENCE_EXPIRATION_IN_HOURS * 60 * 60 * 1000;
-    static final float GEOFENCE_RADIUS_IN_METERS = 40;
-
     //TextView loc;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
@@ -326,7 +321,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         mGeofencingClient.removeGeofences(getGeofencePendingIntent()).addOnCompleteListener(this);
     }
 
-    private GeofencingRequest getGeofencingRequest(){
+    private GeofencingRequest getGeofencingRequest() {
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL);
         builder.addGeofences(mGeofenceList);
@@ -368,11 +363,11 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 .putBoolean(GEOFENCES_ADDED_KEY, added)
                 .apply();
     }
+
     private boolean getGeofencesAdded() {
         return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
                 GEOFENCES_ADDED_KEY, false);
     }
-
 
     private void startLocationListener() {
         final Intent serviceStart = new Intent(this.getApplication(), LocationService.class);
@@ -420,7 +415,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     private void initScanner() {
 
-        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
+        ViewGroup contentFrame = findViewById(R.id.content_frame);
         mScannerView = new ZXingScannerView(this) {
             @Override
             protected IViewFinder createViewFinderView(Context context) {

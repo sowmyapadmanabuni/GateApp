@@ -92,7 +92,7 @@ public class CustomViewFinderScannerActivity extends BaseScannerActivity impleme
 
        // setupToolbar();
 
-        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
+        ViewGroup contentFrame = findViewById(R.id.content_frame);
         mScannerView = new ZXingScannerView(this) {
             @Override
             protected IViewFinder createViewFinderView(Context context) {

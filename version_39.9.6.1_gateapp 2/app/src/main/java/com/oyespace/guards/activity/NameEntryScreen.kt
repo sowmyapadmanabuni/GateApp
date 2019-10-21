@@ -40,11 +40,11 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNext ->{
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if(Ed_Name.text.length<2) {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this,"Enter Valid Name", Toast.LENGTH_SHORT).show()
 
 
@@ -53,8 +53,8 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
 
 
                     if (ed_dob!!.length() == 0) {
-                        buttonNext.setEnabled(true)
-                        buttonNext.setClickable(true)
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
                         Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
                     }
                     else{
@@ -66,12 +66,12 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                         d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                        d.putExtra(PERSONNAME, Ed_Name.getText().toString())
+                        d.putExtra(PERSONNAME, Ed_Name.text.toString())
                         d.putExtra("DOB",s_dob.toString())
                         d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                        startActivity(d);
-                        finish();
+                        startActivity(d)
+                        finish()
                     }
                 }
                 else{
@@ -86,13 +86,13 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                     d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                    d.putExtra(PERSONNAME, Ed_Name.getText().toString())
+                    d.putExtra(PERSONNAME, Ed_Name.text.toString())
                    // d.putExtra("DOB",ed_dob!!.getText().toString())
                     d.putExtra("DOB",s_dob.toString())
                     d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                    startActivity(d);
-                    finish();
+                    startActivity(d)
+                    finish()
 
                 }
             }
@@ -109,8 +109,8 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         ed_dob=findViewById(R.id.ed_dob)
         lyt_dob=findViewById(R.id.lyt_dob)
 
-        if (getIntent().getStringExtra(PERSONNAME) != null) {
-            Ed_Name.setText(getIntent().getStringExtra(PERSONNAME))
+        if (intent.getStringExtra(PERSONNAME) != null) {
+            Ed_Name.setText(intent.getStringExtra(PERSONNAME))
         }
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
             lyt_dob!!.visibility=View.VISIBLE
@@ -152,11 +152,11 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
 
                 // Display Selected date in textbox
 
-                var userAge =  GregorianCalendar(year,month,day);
-                var minAdultAge =  GregorianCalendar();
-                minAdultAge.add(Calendar.YEAR, -18);
-                if (minAdultAge.before(userAge)) {
-                    Toast.makeText(this,"Age is below 18.",Toast.LENGTH_LONG).show();
+                 var userAge = GregorianCalendar(year, month, day)
+                 var minAdultAge = GregorianCalendar()
+                 minAdultAge.add(Calendar.YEAR, -18)
+                 if (minAdultAge.before(userAge)) {
+                     Toast.makeText(this, "Age is below 18.", Toast.LENGTH_LONG).show()
                 }
                 else{
                     ed_dob!!.setText("" + dayOfMonth + "-" + (monthOfYear+1) + "-" + year)
@@ -164,7 +164,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                 }
             }, y, m, d)
             try {
-            datepickerdialog!!.getDatePicker().setMaxDate(calendar!!.getTimeInMillis());
+                datepickerdialog!!.datePicker.maxDate = calendar!!.timeInMillis
 
             }
                     catch (e:KotlinNullPointerException){
@@ -175,7 +175,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         }
 
         Btn_Mic.setOnClickListener{
-            Speak();
+            Speak()
         }
 //        supportActionBar!!.setTitle("Enter your Name")
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -218,7 +218,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
 
             val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN");
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN")
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
 
             try {

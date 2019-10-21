@@ -9,7 +9,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -32,7 +31,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
@@ -45,7 +43,6 @@ import com.oyespace.guards.constants.PrefKeys;
 import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
-import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -161,7 +158,7 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
         txt_assn_name=findViewById(R.id.txt_assn_name);
         txt_device_name=findViewById(R.id.txt_device_name);
         txt_gate_name=findViewById(R.id.txt_gate_name);
-        image_Gallery = (Button) findViewById(R.id.btnCaptureItemPhoto);
+        image_Gallery = findViewById(R.id.btnCaptureItemPhoto);
         //iamgeLyt = (LinearLayout) findViewById(R.id.imageLyt);
         rv_image = findViewById(R.id.rv_image);
         iv_delete = findViewById(R.id.iv_delete);
@@ -208,13 +205,6 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 dialog_imageview.setImageBitmap(photo);
 
-               // Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
-
-
-//                Picasso.with(VehicleGuestAddCarFragment.this)
-//                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
-
                 builder.setView(dialogView);
 
                 //finally creating the alert dialog and displaying it
@@ -229,16 +219,6 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
 
        // iamgeLyt.removeAllViews();
         list.clear();
-
-       // Picasso.with(VehicleGuestAddCarFragment.this).load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
-
-
-//        Picasso.with(this)
-//                .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-//        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-//                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
-
 
         if(getIntent().getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHOUTINVITATION)){
             image_Gallery.setVisibility(View.INVISIBLE);
@@ -362,19 +342,6 @@ public class VehicleGuestAddCarFragment extends Activity implements View.OnClick
                 break;
 
         }
-    }
-
-    private String getOriginalPath(Intent data, Context context) {
-        Uri selectedImageUri = data.getData();
-        Log.e("Select File", selectedImageUri.toString());
-        String[] projection = {MediaStore.MediaColumns.DATA};
-        CursorLoader cursorLoader = new CursorLoader(context, selectedImageUri, projection, null, null, null);
-        Cursor cursor = cursorLoader.loadInBackground();
-        int column_index = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-
-        cursor.moveToFirst();
-
-        return cursor.getString(column_index);
     }
 
 

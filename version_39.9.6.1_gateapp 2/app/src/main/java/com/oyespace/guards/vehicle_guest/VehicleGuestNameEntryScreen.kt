@@ -29,8 +29,8 @@ class VehicleGuestNameEntryScreen : BaseKotlinActivity() , View.OnClickListener 
         when (v?.id) {
 
             R.id.buttonNext ->{
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if(Ed_Name.text.length>2) {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@VehicleGuestNameEntryScreen, VehicleGuestAddCarFragment::class.java)
@@ -44,14 +44,14 @@ class VehicleGuestNameEntryScreen : BaseKotlinActivity() , View.OnClickListener 
                     d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                    d.putExtra(PERSONNAME, Ed_Name.getText().toString())
+                    d.putExtra(PERSONNAME, Ed_Name.text.toString())
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                    startActivity(d);
-                    finish();
+                    startActivity(d)
+                    finish()
                 }else{
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this,"Enter Valid Name", Toast.LENGTH_SHORT).show()
 
                 }
@@ -86,7 +86,7 @@ class VehicleGuestNameEntryScreen : BaseKotlinActivity() , View.OnClickListener 
         }
 
         Btn_Mic.setOnClickListener{
-            Speak();
+            Speak()
         }
 //        supportActionBar!!.setTitle("Enter your Name")
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)

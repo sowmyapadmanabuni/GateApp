@@ -23,7 +23,9 @@ class RetrofitClinet {
             Timber.d(TAG, "init")
             val httpLoggingInterceptor = HttpLoggingInterceptor()
             httpLoggingInterceptor.level = HttpLoggingInterceptor.Level.BODY
-            val okHttpClient = OkHttpClient.Builder().addInterceptor(httpLoggingInterceptor).build()
+            val okHttpClient = OkHttpClient.Builder()
+                .addInterceptor(httpLoggingInterceptor)
+                .build()
 
             val gson = GsonBuilder()
                     .setDateFormat("yyyy-MM-dd HH:mm:ss")

@@ -1,5 +1,6 @@
 package com.oyespace.guards.residentidcard
 
+
 import android.Manifest
 import android.app.Activity
 import android.app.ProgressDialog
@@ -12,7 +13,6 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.Settings
 import android.speech.RecognizerIntent
-
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.text.InputFilter
@@ -23,8 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-
-
 import com.hbb20.CountryCodePicker
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -40,8 +38,6 @@ import com.oyespace.guards.network.ChampApiInterface
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-
-
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -50,42 +46,42 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_mobile_number.*
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.*
 
 
-class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickListener, CountryCodePicker.OnCountryChangeListener {
-    val workType: ArrayList<String> = ArrayList();
-    internal lateinit var champApiInterface: ChampApiInterface
+class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickListener,
+    CountryCodePicker.OnCountryChangeListener {
+    val workType: ArrayList<String> = ArrayList()
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
     private var countryName: String? = null
     lateinit var pDialog: ProgressDialog
     var phonenumber: String? = null
-    lateinit var txt_assn_name:TextView
-    lateinit var txt_gate_name:TextView
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    lateinit var timer:TextView
-    val laststate:Int?=null
-    var progressBar: ProgressBar?=null
-    var ccd:String?=null
+    lateinit var timer: TextView
+    val laststate: Int? = null
+    var progressBar: ProgressBar? = null
+    var ccd: String? = null
     lateinit var btn_nobalance: Button
-    var mobileNumber:String?=null
-     var alertdialog: AlertDialog? = null;
+    var mobileNumber: String? = null
+    var alertdialog: AlertDialog? = null
     // private var Ed_phoneNum:String?=null
 
-    private val REQUEST_CODE_SPEECH_INPUT = 100;
+    private val REQUEST_CODE_SPEECH_INPUT = 100
 
     override fun onClick(v: View?) {
 
         when (v?.id) {
 
-            R.id.Btn_SendOtp ->
-            {
+            R.id.Btn_SendOtp -> {
 
-                Toast.makeText(this@ResidentIdCardMobileNumberActivity, "Coming soon", Toast.LENGTH_LONG)
+                Toast.makeText(
+                    this@ResidentIdCardMobileNumberActivity,
+                    "Coming soon",
+                    Toast.LENGTH_LONG
+                )
                     .show()
             }
 
@@ -94,15 +90,14 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 
             }
 
-            R.id.btn_nobalance->{
-
+            R.id.btn_nobalance -> {
 
 
             }
 
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
                 if (textview.text.length == 13) {
 
@@ -114,8 +109,8 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                 }
 
                 else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -127,7 +122,8 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 //TODO sumeeth has reomoved this fucntion for crashing porpose
 
     val entries: ArrayList<String> = ArrayList()
-    var receiver:BroadcastReceiver?=null
+    var receiver: BroadcastReceiver? = null
+    var champApiInterface: ChampApiInterface? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,11 +131,11 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
         setContentView(R.layout.activity_mobile_number)
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface::class.java)
         //  Toast.makeText(applicationContext, "coming", Toast.LENGTH_LONG).show();
-      //  Toast.makeText(this@MobileNumberScreen,intent.getStringExtra( "RESIDENT_NUMBER"),Toast.LENGTH_LONG).show()
-        buttonNext.setText(resources.getString(R.string.textdone))
-        buttonSkip.visibility=View.GONE
+        //  Toast.makeText(this@MobileNumberScreen,intent.getStringExtra( "RESIDENT_NUMBER"),Toast.LENGTH_LONG).show()
+        buttonNext.text = resources.getString(R.string.textdone)
+        buttonSkip.visibility = View.GONE
 
-        receiver =  object : BroadcastReceiver() {
+        receiver = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context?, intent: Intent?) {
                 val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
@@ -149,38 +145,38 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.getExtras();
-                            val number = bundle?.getString("incoming_number");
+                            val bundle = intent?.extras
+                            val number = bundle?.getString("incoming_number")
 
-                          //  Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
+                            //  Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (textview != null && number != null) {
-                               // textview.text = number.replace("+91", "")
+                                // textview.text = number.replace("+91", "")
                                 textview.text = number
 
-                                ccd= number.substring(0,3)
+                                ccd = number.substring(0, 3)
 
-                                mobileNumber=number.substring(3,13)
-                               // endCall(this@MobileNumberScreen)
+                                mobileNumber = number.substring(3, 13)
+                                // endCall(this@MobileNumberScreen)
 
                             }
                         }
                     }
 
-                }, PhoneStateListener.LISTEN_CALL_STATE);
+                }, PhoneStateListener.LISTEN_CALL_STATE)
 
                 //
             }
-        };
+        }
 
 
-        btn_nobalance=findViewById(R.id.btn_nobalance)
+        btn_nobalance = findViewById(R.id.btn_nobalance)
         progressBar = this.progressBar1
-        timer=findViewById(R.id.timer)
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
-        if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
-            txt_assn_name!!.setTextSize(5 * getResources().getDisplayMetrics().density);
+        timer = findViewById(R.id.timer)
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
@@ -199,11 +195,11 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
         }
 
 
-        val timer = object: CountDownTimer (60000,1000){
+        val timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -217,8 +213,8 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 
         Log.d(
             "intentdata MobileNumber",
-            "" + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-        );
+            "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
+        )
 
         btn_mic.setOnClickListener {
             Speak()
@@ -247,18 +243,17 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 //            textview.visibility = View.VISIBLE
 //        }
 
-        val mobilePHONEDATA:String = Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
+        val mobilePHONEDATA: String = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
 
 
+        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE, "")
 
-        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
-
-        val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
-       // val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
+        val input = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
+        // val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
-       // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+"+"+countrycode+" "+number)
+        // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+"+"+countrycode+" "+number)
 
 
 //        Ed_phoneNum.addTextChangedListener(object : TextWatcher {
@@ -303,16 +298,16 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
             fun DisplayProgressDialog() {
 
                 pDialog = ProgressDialog(this@ResidentIdCardMobileNumberActivity)
-                pDialog!!.setMessage("Loading..")
-                pDialog!!.setCancelable(false)
-                pDialog!!.isIndeterminate = false
-                pDialog!!.show()
+                pDialog.setMessage("Loading..")
+                pDialog.setCancelable(false)
+                pDialog.isIndeterminate = false
+                pDialog.show()
             }
 
             if (TextUtils.isEmpty(Ed_phoneNum.text.toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
-                Ed_phoneNum.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength)))
+                Ed_phoneNum.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 
             } else if (countryCode!!.startsWith("+91") && Ed_phoneNum.length() <= 10) {
                 Toast.makeText(this, "number should be 10 digits", Toast.LENGTH_LONG).show()
@@ -339,9 +334,9 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                     }
 
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                    if (report.isAnyPermissionPermanentlyDenied) {
                         // show alert dialog navigating to Settings
-                        showSettingsDialog();
+                        showSettingsDialog()
                     }
                 }
 
@@ -352,17 +347,17 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                 ) {
                     if (token != null) {
                         token.continuePermissionRequest()
-                    };
+                    }
                 }
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
+                        .show()
                 }
             })
             .onSameThread()
-            .check();
-
+            .check()
 
 
     }
@@ -384,24 +379,23 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
-
-
 
 
     fun getAccountDetails(isdCode: String, MobNumber: String) {
         progressBar?.visibility = View.VISIBLE
 
 
-        val req = GetAccountDetailsByMobReq( isdCode, MobNumber)
+        val req = GetAccountDetailsByMobReq(isdCode, MobNumber)
         Log.d("getAccountDetails", req.toString())
         compositeDisposable.add(
             RetrofitClinet.instance.GetAccountDetailsByMobCall(CHAMPTOKEN, req)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<GetAccountDetailsByMobResp<AccountByMobile>>() {
+                .subscribeWith(object :
+                    CommonDisposable<GetAccountDetailsByMobResp<AccountByMobile>>() {
                     override fun onSuccessResponse(globalApiObject: GetAccountDetailsByMobResp<AccountByMobile>) {
                         if (globalApiObject.data != null) {
                             progressBar?.visibility = View.GONE
@@ -428,8 +422,6 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
         )
 
     }
-
-
 
 
     fun Speak() {
@@ -461,11 +453,12 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.setText(result[0].trim() + "")
+                    Ed_phoneNum.text = result[0].trim() + ""
                 }
             }
         }
     }
+
     fun setLocale(lang: String?) {
         var lang = lang
         if (lang == null) {
@@ -489,17 +482,16 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
     }
 
     override fun onResume() {
-       // Toast.makeText(this@MobileNumberScreen,"Coming1",Toast.LENGTH_LONG).show()
+        // Toast.makeText(this@MobileNumberScreen,"Coming1",Toast.LENGTH_LONG).show()
         super.onResume()
         val action = "android.intent.action.PHONE_STATE"
         registerReceiver(receiver, IntentFilter(action))
     }
 
 
+    private fun getResidentValidation(ccd: String, mobilenumber: String) {
 
-    private fun getResidentValidation(ccd:String,mobilenumber: String) {
-
-        val req = ResidentValidationRequest(ccd+mobilenumber, LocalDb.getAssociation()!!.asAssnID)
+        val req = ResidentValidationRequest(ccd + mobilenumber, LocalDb.getAssociation()!!.asAssnID)
         CompositeDisposable().add(
             RetrofitClinet.instance.residentValidation("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
                 .subscribeOn(Schedulers.io())
@@ -522,7 +514,7 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                                 val dialog_imageview =
                                     dialogView.findViewById<ImageView>(R.id.dialog_imageview)
                                 val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
-                                tv_msg.setText("Valid")
+                            tv_msg.text = "Valid"
                                 val drawable = resources.getDrawable(R.drawable.valid_invi)
                                 dialog_imageview.setImageDrawable(drawable)
                                 val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)
@@ -607,18 +599,16 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 
                             val viewGroup = findViewById<ViewGroup>(android.R.id.content)
 
-                            val dialogView =
-                                LayoutInflater.from(this@ResidentIdCardMobileNumberActivity)
-                                    .inflate(R.layout.layout_qrcodedailog, viewGroup, false)
+                            val dialogView = LayoutInflater.from(this@ResidentIdCardMobileNumberActivity)
+                                .inflate(R.layout.layout_qrcodedailog, viewGroup, false)
 
 
                             val builder =
                                 androidx.appcompat.app.AlertDialog.Builder(this@ResidentIdCardMobileNumberActivity)
 
-                            val dialog_imageview =
-                                dialogView.findViewById<ImageView>(R.id.dialog_imageview)
+                            val dialog_imageview = dialogView.findViewById<ImageView>(R.id.dialog_imageview)
                             val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
-                            tv_msg.setText("Valid")
+                            tv_msg.text = "Valid"
                             val drawable = resources.getDrawable(R.drawable.valid_invi)
                             dialog_imageview.setImageDrawable(drawable)
                             val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)
@@ -656,7 +646,7 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
                         val drawable = resources.getDrawable(R.drawable.invalid_invi)
                         dialog_imageview.setImageDrawable(drawable)
                         val tv_msg = dialogView.findViewById<TextView>(R.id.tv_msg)
-                        tv_msg.setText("Invalid")
+                        tv_msg.text = "Invalid"
                         val btn_ok = dialogView.findViewById<Button>(R.id.btn_ok)
                         btn_ok.setOnClickListener(View.OnClickListener {
                             alertDialog!!.dismiss()
@@ -688,7 +678,6 @@ class ResidentIdCardMobileNumberActivity : BaseKotlinActivity(), View.OnClickLis
 
 
     }
-
 
 
 }

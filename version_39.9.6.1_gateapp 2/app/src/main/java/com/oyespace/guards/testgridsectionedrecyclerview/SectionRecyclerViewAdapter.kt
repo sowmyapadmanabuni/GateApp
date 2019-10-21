@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 
 
@@ -12,7 +14,7 @@ class SectionRecyclerViewAdapter(
     private val context: Context,
     private val recyclerViewType: RecyclerViewType?,
     private val sectionModelArrayList: ArrayList<SectionModel>
-) : androidx.recyclerview.widget.RecyclerView.Adapter<SectionRecyclerViewAdapter.SectionViewHolder>() {
+) : RecyclerView.Adapter<SectionRecyclerViewAdapter.SectionViewHolder>() {
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SectionViewHolder {
@@ -36,7 +38,7 @@ class SectionRecyclerViewAdapter(
         when (recyclerViewType) {
 
             RecyclerViewType.GRID -> {
-                val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(context, 3)
+                val gridLayoutManager = GridLayoutManager(context, 3)
                 holder.itemRecyclerView.layoutManager = gridLayoutManager
             }
         }
@@ -51,10 +53,9 @@ class SectionRecyclerViewAdapter(
         return sectionModelArrayList.size
     }
 
-    class SectionViewHolder(itemView: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class SectionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        val itemRecyclerView: androidx.recyclerview.widget.RecyclerView
+        val itemRecyclerView: RecyclerView
         val section_label: TextView
 
         init {

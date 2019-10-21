@@ -31,7 +31,8 @@ public class GeofenceErrorMessages {
     /**
      * Prevents instantiation.
      */
-    private GeofenceErrorMessages() {}
+    private GeofenceErrorMessages() {
+    }
 
     /**
      * Returns the error string for a geofencing exception.

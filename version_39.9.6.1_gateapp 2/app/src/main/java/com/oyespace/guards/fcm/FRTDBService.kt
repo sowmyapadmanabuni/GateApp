@@ -31,7 +31,7 @@ class FRTDBService : Service() {
     private val TAG = "SOS_SERVICE"
 
     override fun onCreate() {
-        Log.e(TAG, "Started");
+        Log.e(TAG, "Started")
         super.onCreate()
         this.getGuardsList()
         this.initFRTDB()
@@ -99,7 +99,7 @@ class FRTDBService : Service() {
 
                                 isGuardPassed = false
 
-                                val user_id = it.key;
+                                val user_id = it.key
                                 //val sos = it.getValue()
                                 val isActive = it.child("isActive").getValue(Boolean::class.java)
                                 var unitName = ""
@@ -115,7 +115,7 @@ class FRTDBService : Service() {
                                 var passedGuards: RealmList<PassesSOSGuards> = RealmList()
                                 var attendedBy: String = ""
                                 var attendedByMob: String = ""
-                                var isValidSOS: Boolean = true;
+                                var isValidSOS: Boolean = true
 
                                 if (it.hasChild("unitName") && it.hasChild("unitName") != null) {
                                     unitName = it.child("unitName").getValue(String::class.java)!!
@@ -125,10 +125,10 @@ class FRTDBService : Service() {
                                 }
                                 if (it.hasChild("userName") && it.hasChild("userName") != null) {
                                     userName = it.child("userName").getValue(String::class.java)!!
-                                    if(userName.equals("") || userName == null){
+                                    if (userName.equals("") || userName == null) {
                                         isValidSOS = false
                                     }
-                                }else{
+                                } else {
                                     isValidSOS = false
                                 }
                                 if (it.hasChild("userMobile") && it.hasChild("userMobile") != null) {
@@ -136,13 +136,13 @@ class FRTDBService : Service() {
                                         it.child("userMobile").getValue(String::class.java)!!
                                 }
 
-                                Log.e("LATITUDE", "" + it.child("latitude").getValue())
+                                Log.e("LATITUDE", "" + it.child("latitude").value)
 
                                 if (it.hasChild("latitude")) {
-                                    latitude = it.child("latitude").getValue().toString()
+                                    latitude = it.child("latitude").value.toString()
                                 }
                                 if (it.hasChild("longitude")) {
-                                    longitude = it.child("longitude").getValue().toString()
+                                    longitude = it.child("longitude").value.toString()
                                 }
                                 if (it.hasChild("sosImage")) {
                                     sosImage = it.child("sosImage").getValue(String::class.java)!!
@@ -168,8 +168,8 @@ class FRTDBService : Service() {
                                 }
 
 
-                                val currentGate = Prefs.getString(PrefKeys.MOBILE_NUMBER, "");
-                                Log.e("CURRENT_GATE_M",""+currentGate)
+                                val currentGate = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
+                                Log.e("CURRENT_GATE_M", "" + currentGate)
 
                                 if (isActive != null && isActive && userId != 0 && isValidSOS) {
 
@@ -181,7 +181,7 @@ class FRTDBService : Service() {
                                         passedBy = it.child("passedby").getValue(type)!!
 
 
-                                        var gates = passedBy.keys;
+                                        var gates = passedBy.keys
                                         for (gate in gates) {
                                             realm.executeTransaction {
                                                 val passedGuard =
@@ -198,7 +198,7 @@ class FRTDBService : Service() {
                                             }
                                         }
 
-                                        Log.e("passedby", "" + passedBy);
+                                        Log.e("passedby", "" + passedBy)
                                     }
 
                                     Log.e(
@@ -207,7 +207,7 @@ class FRTDBService : Service() {
                                             currentGate,
                                             true
                                         ) + " " + attendedBy.trim().length + " " + currentGate.trim().length
-                                    );
+                                    )
                                     if (!isGuardPassed) {
                                         Log.e("INSIDE", "GUARDPASSED")
                                         Log.e("INSIDE", "GUARDPASSED")
@@ -248,32 +248,32 @@ class FRTDBService : Service() {
 
                                 }
 
-                                Log.e("CHILD", "" + isActive);
+                                Log.e("CHILD", "" + isActive)
                             }
 
                             val totalSOS = realm.where<SOSModel>().count()
-                            Log.e("totalSOS", "" + totalSOS);
-                            val isSOSActive = Prefs.getBoolean("ACTIVE_SOS", false);
+                            Log.e("totalSOS", "" + totalSOS)
+                            val isSOSActive = Prefs.getBoolean("ACTIVE_SOS", false)
 
                             Log.e("ANY_SOS?", "" + isSOSActive)
 
 
 
                             if (totalSOS > 0 && !isSOSActive) {
-                                Log.e("STARTING", "SOS>STSRTSTS");
+                                Log.e("STARTING", "SOS>STSRTSTS")
                                 val i_vehicle =
                                     Intent(applicationContext, SosGateAppActivity::class.java)
-                                i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                i_vehicle.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                 startActivity(i_vehicle)
                             } else {
-                                Log.e("CLOSING", "SOS");
+                                Log.e("CLOSING", "SOS")
                             }
                         } catch (e: Exception) {
                             Log.e("ERROR", "" + e)
                             e.printStackTrace()
                         }
                     }
-                }catch (e:java.lang.Exception){
+                } catch (e: java.lang.Exception) {
                     e.printStackTrace()
                 }
             }
@@ -286,7 +286,7 @@ class FRTDBService : Service() {
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        return null;
+        return null
     }
 
 }

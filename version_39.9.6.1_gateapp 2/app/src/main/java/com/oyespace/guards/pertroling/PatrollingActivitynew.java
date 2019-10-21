@@ -127,45 +127,15 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         noQrcodeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Location location = gpsTracker.getLocation();
-//
-//
-//                Location startPoint=new Location("locationA");
-//                startPoint.setLatitude(location.getLatitude());
-//                startPoint.setLongitude(location.getLongitude());
-//
-//                Location endPoint=new Location("locationB");
-//                Double lat = Double.parseDouble(pat.get(0)[0]);
-//                Double lon = Double.parseDouble(pat.get(0)[1]);
-//                endPoint.setLatitude(9.6143583);
-//                endPoint.setLongitude(76.3208816);
-//
-//
-//                LatLng start = new LatLng(9.6143583,76.3208816);
-//                LatLng end = new LatLng(location.getLatitude(),location.getLongitude());
-//
-//                Double dis = distanceBetween(start,end);
-//
-//
-//                double distance=startPoint.distanceTo(endPoint);
-//
-//                Log.e("DISTT",""+startPoint.getLongitude()+","+startPoint.getLatitude()+" : "+endPoint.getLongitude()+","+endPoint.getLatitude());
-//                Log.e("DISTT2",""+start+" "+end);
-//                Log.e("DISTT3",""+dis);
-//
-//                req(""+location.getLatitude(),""+location.getLongitude());
-//
-//                haversine(location.getLatitude(),location.getLongitude(),9.6143583,76.3208816);
-//
-//                ((TextView)findViewById(R.id.scaneddata)).setText(""+distance);
-
 
             }
         });
 
 
+
+
         // setupToolbar();
-        ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
+        ViewGroup contentFrame = findViewById(R.id.content_frame);
         mScannerView = new ZXingScannerView(this) {
             @Override
             protected IViewFinder createViewFinderView(Context context) {
@@ -336,183 +306,6 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
 
     String currentCheckPoint="",nextCheckpoint="";
 
-//    @Override
-//    public void handleResult(Result rawResult) {
-////        Toast.makeText(this, "Contents = " + rawResult.getText(), Toast.LENGTH_SHORT).show();
-//        Log.d("handleResult patrolling","Contents = " + rawResult.getText() +
-//                ", Format = " + rawResult.getBarcodeFormat().toString());
-//        dataTextView.setText(rawResult.getText());
-//
-//        final String patrolingdata = rawResult.getText();
-//
-//        patrolingdataList = patrolingdata.split(",");
-//
-//        if(patrolingdataList.length>4) {
-//            System.out.println("Patroling Data " + patrolingdataList[0]+" " + patrolingdataList[1] + " " + patrolingdataList[2] + " " + patrolingdataList[3]);
-//            ((TextView)findViewById(R.id.scanned_text)).setText(""+patrolingdataList[0]);
-//
-//            if (!patrolingdataList[3].equalsIgnoreCase(Prefs.getInt(ASSOCIATION_ID, 0) + "")) {
-//                Toast.makeText(this, "Belongs to different Society / Association ", Toast.LENGTH_SHORT).show();
-//
-//
-//            } else if (Prefs.getInt(PATROLLING_ID, 0) == 0
-//                    && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT)
-//                    ||Prefs.getInt(PATROLLING_ID, 0) == 0
-//                    && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT_AND_END_POINT)) {
-//
-//                currentCheckPoint=patrolingdataList[0];
-//                if(LocalDb.getCheckPointList()!=null) {
-//                    for (int i=0;i<LocalDb.getCheckPointList().size();i++) {
-//                        //if the existing elements contains the search input
-//                        if (LocalDb.getCheckPointList().get(i).getCpCkPName().equalsIgnoreCase(PATROLLING_END_POINT)) {
-//                            //adding the element to filtered list
-//                            nextCheckpoint=LocalDb.getCheckPointList().get(i+1).getCpCkPName();
-//                        } else {
-//
-//                        }
-//                    }
-//                }
-//               // patrollingStart();
-//                if(gpsTracker.canGetLocation()) {
-//
-//                    try {
-//                        int diff = AppUtils.Companion.calGeoLocationDiff(gpsTracker.getLatitude(),
-//                                gpsTracker.getLongitude(),
-//                                Double.parseDouble(patrolingdataList[1]),
-//                                Double.parseDouble(patrolingdataList[2]));
-//
-//                        Log.d("xgdssd acc2",  " " + diff+" "+gpsTracker.getLatitude()+" "+gpsTracker.getLongitude());
-//                        if(diff>CHECKPOINT_ACCURACY){
-//                            Toast.makeText(this, diff+" meters away from Check Point", Toast.LENGTH_SHORT).show();
-//                        }else{
-//                            patrollingStart();
-//                        }
-//
-//                    } catch ( Exception  ex) {
-//                        Log.d("xgdssd acc2",  "ex " + ex.toString());
-//                        Toast.makeText(this, "Parsing error ", Toast.LENGTH_SHORT).show();
-//
-//                    }
-//
-//                }else {
-//                    Toast.makeText(this, "Unable to receive Location ", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            } else  if (Prefs.getInt(PATROLLING_ID, 0) != 0
-//                    && patrolingdataList[0].equalsIgnoreCase(PATROLLING_END_POINT)
-//                    || Prefs.getInt(PATROLLING_ID, 0) != 0
-//                    && patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT_AND_END_POINT)) {
-//                //patrollingStop();
-//                if(gpsTracker.canGetLocation()) {
-//
-//                    try {
-//                        int diff = AppUtils.Companion.calGeoLocationDiff(gpsTracker.getLatitude(),
-//                                gpsTracker.getLongitude(),
-//                                Double.parseDouble(patrolingdataList[1]),
-//                                Double.parseDouble(patrolingdataList[2]));
-//
-//                        Log.d("xgdssd acc2",  " " + diff);
-//                        if(diff>CHECKPOINT_ACCURACY){
-//                            Toast.makeText(this, diff+" meters away from Check Point", Toast.LENGTH_SHORT).show();
-//                        }else{
-//                            patrollingStop();
-//                        }
-//
-//                    } catch ( Exception  ex) {
-//                        Log.d("xgdssd acc2",  "ex " + ex.toString());
-//                        Toast.makeText(this, "Parsing error ", Toast.LENGTH_SHORT).show();
-//                    }
-//
-//                }else {
-//                    Toast.makeText(this, "Unable to receive Location ", Toast.LENGTH_SHORT).show();
-//                }
-//
-//            } else if(Prefs.getInt(PATROLLING_ID, 0) != 0){
-//                gpsTracker.getLocation();
-//                if(!patrolingdataList[0].equalsIgnoreCase(PATROLLING_START_POINT)) {
-//                    currentCheckPoint=patrolingdataList[0];
-//                    if(LocalDb.getCheckPointList()!=null) {
-//                        for (int i=0;i<LocalDb.getCheckPointList().size();i++) {
-//                            //if the existing elements contains the search input
-//                            if (LocalDb.getCheckPointList().get(i).getCpCkPName().equalsIgnoreCase(currentCheckPoint)) {
-//                                //adding the element to filtered list
-//                                nextCheckpoint=LocalDb.getCheckPointList().get(i+1).getCpCkPName();
-//                            } else {
-//
-//                            }
-//                        }
-//                    }
-////                    if (gpsTracker.canGetLocation()) {
-////                        saveCheckPoints(patrolingdataList[0], gpsTracker.getLatitude() + "," + gpsTracker.getLongitude());
-////                    }
-////                    Toast.makeText(this, "Check Point Saved ", Toast.LENGTH_SHORT).show();
-//
-//                    if(gpsTracker.canGetLocation()) {
-//
-//                        try {
-//                            int diff = AppUtils.Companion.calGeoLocationDiff(gpsTracker.getLatitude(),
-//                                    gpsTracker.getLongitude(),
-//                                    Double.parseDouble(patrolingdataList[1]),
-//                                    Double.parseDouble(patrolingdataList[2]));
-//
-//                            Log.d("xgdssd acc2",  " " + diff);
-//                            if(diff>CHECKPOINT_ACCURACY){
-//                                Toast.makeText(this, diff+" meters away from Check Point", Toast.LENGTH_SHORT).show();
-//                            }else{
-//                                saveCheckPoints(patrolingdataList[0], gpsTracker.getLatitude() + "," + gpsTracker.getLongitude());
-//                                Toast.makeText(this, "Check Point Saved ", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                        } catch ( Exception  ex) {
-//                            Log.d("xgdssd acc2",  "ex " + ex.toString());
-//                            Toast.makeText(this, "Parsing error ", Toast.LENGTH_SHORT).show();
-//                        }
-//
-//                    }else {
-//                        Toast.makeText(this, "Unable to receive Location ", Toast.LENGTH_SHORT).show();
-//                    }
-//                }else{
-//                    Toast.makeText(this, "Go To Next Check Point", Toast.LENGTH_SHORT).show();
-//                }
-//            } else if(Prefs.getInt(PATROLLING_ID, 0) == 0){
-//                Toast.makeText(this, "Invalid Start Point", Toast.LENGTH_SHORT).show();
-//            }else{
-//                Toast.makeText(this, "Invalid Check Point", Toast.LENGTH_SHORT).show();
-//            }
-//        }else{
-//            Toast.makeText(this, "Invalid Check Point QR Code ", Toast.LENGTH_SHORT).show();
-//
-//
-//        }
-//
-//     /*  new LovelyStandardDialog(PatrollingActivitynew.this, LovelyStandardDialog.ButtonLayout.VERTICAL)
-//                                .setTopColorRes(R.color.google_red)
-//                .setIcon(R.drawable.ic_info_black_24dp)
-//
-//                .setTitle(patrolingdataList[0])
-//                .setTitleGravity(Gravity.CENTER)
-//                .setMessage("")
-//                .setMessageGravity(Gravity.CENTER)
-//               .setPositiveButton(android.R.string.ok, new View.OnClickListener() {
-//                   @Override
-//                   public void onClick(View v) {
-//
-//                   }
-//               })
-//
-//               .show();
-//*/
-//
-//        Handler handler = new Handler();
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                mScannerView.resumeCameraPreview(PatrollingActivitynew.this);
-//            }
-//        }, 5000);
-//
-//    }
-
     @Override
     public void handleResult(Result rawResult) {
         final String patrolingdata = rawResult.getText();
@@ -600,7 +393,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         if (urlId == URLData.URL_PATROLLING_CREATE.getUrlId()) {
             PatrollingStartResp loginDetailsResponce = (PatrollingStartResp) data;
             if (loginDetailsResponce != null) {
-                Log.d("str3", "str3: " + urlId+" id "+position+" "+" "+" "+loginDetailsResponce.success.toString());
+                Log.d("str3", "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success);
                 if(loginDetailsResponce.success.equalsIgnoreCase("true")) {
                     Prefs.putInt(PATROLLING_ID,loginDetailsResponce.data.patrolling.ptPtrlID);
                     startService(new Intent(PatrollingActivitynew.this, SGPatrollingService.class));
@@ -616,7 +409,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         }else if (urlId == URLData.URL_PATROLLING_STOP.getUrlId()) {
             PatrollingStartResp loginDetailsResponce = (PatrollingStartResp) data;
             if (loginDetailsResponce != null) {
-                Log.d("str3", "str3: " + urlId+" id "+position+" "+" "+" "+loginDetailsResponce.success.toString());
+                Log.d("str3", "str3: " + urlId + " id " + position + " " + " " + " " + loginDetailsResponce.success);
                 if(loginDetailsResponce.success.equalsIgnoreCase("true")) {
                     Prefs.putInt(PATROLLING_ID,0);
                     showToast(this, "Patrollling stoped");

@@ -59,7 +59,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView
     lateinit var timer:TextView
-    private val REQUEST_CODE_SPEECH_INPUT = 100;
+    private val REQUEST_CODE_SPEECH_INPUT = 100
     var ccd:String?=null
     var mobileNumber:String?=null
     lateinit var btn_nobalance: Button
@@ -86,8 +86,8 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                     d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
-                    startActivity(d);
-                    finish();
+                startActivity(d)
+                finish()
 
             }
 
@@ -101,8 +101,8 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                startActivity(d);
-                finish();
+                startActivity(d)
+                finish()
 
 
 
@@ -110,8 +110,8 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
             }
 
             R.id.buttonNext ->{
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if(textview.text.length==13) {
 //                    val d = Intent(this@VehicleGuestMobileNumberScreen, VehicleGuestNameEntryScreen::class.java)
 ////                    Log.d("intentdata MobileNumber","buttonNext "+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
@@ -140,10 +140,10 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                             finish()
                             dialog.dismiss()
                         }
-                        builder.setCancelable(false);
+                        builder.setCancelable(false)
                         builder.show()
                     }else{
-                        getAccountDetails(ccd.toString(), mobileNumber.toString());
+                        getAccountDetails(ccd.toString(), mobileNumber.toString())
 
                     }
 
@@ -156,16 +156,16 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                     d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNITID, intent.getStringExtra(UNITID))
                     d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-                    d.putExtra(MOBILENUMBER, Ed_phoneNum.getText().toString())
+                    d.putExtra(MOBILENUMBER, Ed_phoneNum.text.toString())
                     d.putExtra(COUNTRYCODE, ccd)
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
 
-                    startActivity(d);
-                    finish();
+                    startActivity(d)
+                    finish()
 //                    getAccountDetails("+"+countryCode.toString(),textview.getText().toString());
                 }else {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this,"Invalid number captured", Toast.LENGTH_SHORT).show()
 
                 }
@@ -191,8 +191,8 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.getExtras();
-                            val number = bundle?.getString("incoming_number");
+                            val bundle = intent?.extras
+                            val number = bundle?.getString("incoming_number")
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
                             if (textview != null && number != null) {
@@ -206,11 +206,11 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                         }
                     }
 
-                }, PhoneStateListener.LISTEN_CALL_STATE);
+                }, PhoneStateListener.LISTEN_CALL_STATE)
 
                 //
             }
-        };
+        }
         timer=findViewById(R.id.timer)
         btn_nobalance=findViewById(R.id.btn_nobalance)
 
@@ -219,7 +219,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
         txt_device_name=findViewById(R.id.txt_device_name)
 
         if(Prefs.getString(PrefKeys.MODEL_NUMBER,null).equals("Nokia 1")) {
-            txt_assn_name!!.setTextSize(5 * getResources().getDisplayMetrics().density);
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
         }
 
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
@@ -240,8 +240,9 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
         val timer = object: CountDownTimer(60000,1000){
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text =
+                    ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -253,25 +254,25 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
         timer.start()
         Log.d("intentdata MobileNumber",""+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID));
 
-       // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,""))
+        // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,""))
 
         val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
         btn_mic.setOnClickListener {
             Speak()
         }
 
         if(intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHOUTINVITATION)){
-            buttonSkip.setVisibility(View.INVISIBLE)
+            buttonSkip.visibility = View.INVISIBLE
 //            Ed_phoneNum.setVisibility(View.VISIBLE)
 //            textview.visibility=View.GONE
 //            btn_mic.setVisibility(View.VISIBLE)
-            Ed_phoneNum.setVisibility(View.GONE)
+            Ed_phoneNum.visibility = View.GONE
             textview.visibility = View.VISIBLE
 
         }else{
-            buttonSkip.setVisibility(View.INVISIBLE)
+            buttonSkip.visibility = View.INVISIBLE
         }
 
 //        Ed_phoneNum.addTextChangedListener(object : TextWatcher {
@@ -316,16 +317,16 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
             fun DisplayProgressDialog() {
 
                 pDialog = ProgressDialog(this@VehicleGuestMobileNumberScreen)
-                pDialog!!.setMessage("Loading..")
-                pDialog!!.setCancelable(false)
-                pDialog!!.isIndeterminate = false
-                pDialog!!.show()
+                pDialog.setMessage("Loading..")
+                pDialog.setCancelable(false)
+                pDialog.isIndeterminate = false
+                pDialog.show()
             }
 
             if (TextUtils.isEmpty(Ed_phoneNum.text.toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
-                Ed_phoneNum.setFilters(arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength)))
+                Ed_phoneNum.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 
             } else if (countryCode!!.startsWith("+91") && Ed_phoneNum.length() <= 10) {
                 Toast.makeText(this, "number should be 10 digits", Toast.LENGTH_LONG).show()
@@ -365,9 +366,9 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                     }
 
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied()) {
+                    if (report.isAnyPermissionPermanentlyDenied) {
                         // show alert dialog navigating to Settings
-                        showSettingsDialog();
+                        showSettingsDialog()
                     }
                 }
 
@@ -377,16 +378,17 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                 ) {
                     if (token != null) {
                         token.continuePermissionRequest()
-                    };
+                    }
                 }
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT)
+                        .show()
                 }
             })
             .onSameThread()
-            .check();
+            .check()
 
 //        val telephony = this@VehicleGuestMobileNumberScreen.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 //        telephony.listen(object : PhoneStateListener() {
@@ -449,7 +451,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
     private fun openSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", packageName, null)
-        intent.setData(uri)
+        intent.data = uri
         startActivityForResult(intent, 101)
     }
 
@@ -541,8 +543,8 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
                             d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName+" "+globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                            startActivity(d);
-                            finish();
+                            startActivity(d)
+                            finish()
 
                         } else {
                             deliveryFlow_launchNameEntryScreen()
@@ -576,8 +578,8 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
         d.putExtra(MOBILENUMBER, mobileNumber)
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                    startActivity(d);
-                    finish();
+        startActivity(d)
+        finish()
     }
 
     fun sendotp(){
@@ -647,7 +649,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.setText(result[0].trim() + "")
+                    Ed_phoneNum.text = result[0].trim() + ""
                 }
             }
         }

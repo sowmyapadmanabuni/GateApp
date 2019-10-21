@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.camtest.ImageAdapter
@@ -24,6 +23,9 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.Utils
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -65,8 +67,8 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.button_done -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
                 visitorLog()
 
@@ -111,37 +113,37 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
 //        )
 
-        tv_name.setText(intent.getStringExtra(PERSONNAME))
+        tv_name.text = intent.getStringExtra(PERSONNAME)
 
         val input =intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-        tv_mobilenumber.setText(number)
+        tv_mobilenumber.text = number
 //        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
 //                + "" + intent.getStringExtra(MOBILENUMBER))
-        tv_for.setText(resources.getString(R.string.textto)+ intent.getStringExtra(UNITNAME))
-        tv_totalperson.setText(resources.getString(R.string.textperson))
-        tv_from.setText(resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME))
+        tv_for.text = resources.getString(R.string.textto) + intent.getStringExtra(UNITNAME)
+        tv_totalperson.text = resources.getString(R.string.textperson)
+        tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
             minteger++
-            menuCount.setText("" + minteger)
+            menuCount.text = "" + minteger
 
         }
 
         menuRemove.setOnClickListener {
             if (minteger > 1) {
                 minteger--
-                menuCount.setText("" + minteger)
+                menuCount.text = "" + minteger
 
             } else {
 
             }
         }
         if (intent.getStringExtra(FLOW_TYPE) == STAFF_REGISTRATION) {
-            tv_from.setText("Designation: " + intent.getStringExtra(COMPANY_NAME))
-            itemLyt.setVisibility(View.GONE)
+            tv_from.text = "Designation: " + intent.getStringExtra(COMPANY_NAME)
+            itemLyt.visibility = View.GONE
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 singUp(
@@ -156,9 +158,9 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun visitorLog() {
-        var memID:Int=64;
+        var memID: Int = 64
         if(!BASE_URL.contains("dev",true)){
-            memID=410;
+            memID = 410
         }
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0),
@@ -169,7 +171,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","",Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal()
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
@@ -199,7 +201,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
-                        sendBroadcast(d);
+                        sendBroadcast(d)
 
 //                        val intentdata = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
 //                        startActivity(intentdata)
@@ -364,72 +366,6 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         })
 
 
-    }
-//
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//        val d = Intent(this@GuestQRRegistrationSuccess, GuestCustomViewFinderScannerActivity::class.java)
-//
-///*        Log.d(
-//            "intentdata NameEntr",
-//            "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-//                    + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + intent.getStringExtra(
-//                PERSONNAME
-//            )
-//        );
-//        d.putExtra(UNITID, intent.getStringExtra(UNITID))
-//        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-//        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-//        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-//        d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-//        d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
-//        d.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID, 0))*/
-//
-//        startActivity(d);
-//        finish();
-//    }
-
-    private fun visitorEntryLog(visitorLogID: Int) {
-//        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-//        val currentDate = sdf.format(Date())
-//        System.out.println(" C DATE is  "+currentDate)
-
-        val req = VisitorEntryReq(getCurrentTimeLocal(), 0, visitorLogID)
-        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-        compositeDisposable.add(RetrofitClinet.instance.visitorEntryCall(OYE247TOKEN, req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<VisitorExitResp>() {
-                override fun onSuccessResponse(globalApiObject: VisitorExitResp) {
-                    if (globalApiObject.success == true) {
-//                        Log.d("VisitorEntryReq","StaffEntry "+globalApiObject.data.toString())
-                        //                      finish();
-                    } else {
-                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
-                    }
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                    dismissProgress()
-                }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-//                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            })
-        )
     }
 
     fun setLocale(lang: String?) {

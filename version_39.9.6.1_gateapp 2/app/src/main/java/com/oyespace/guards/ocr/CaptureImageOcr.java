@@ -62,14 +62,6 @@ import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
 import static com.oyespace.guards.utils.Utils.showToast;
 
-//import com.google.firebase.codelab.mlkit.R;
-//import com.google.firebase.ml.custom.FirebaseModelInputOutputOptions;
-//import com.google.firebase.ml.custom.FirebaseModelInterpreter;
-//import com.google.firebase.ml.vision.FirebaseVision;
-//import com.google.firebase.ml.vision.common.FirebaseVisionImage;
-//import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
-//import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
-
 public class  CaptureImageOcr extends Activity implements View.OnClickListener, ResponseHandler {
 
     String imgNamee;
@@ -209,12 +201,12 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
 
 
     private void initViews() {
-        vehicalnumber =(EditText) findViewById(R.id.txt_Vehical_otp);
-        iamgeLyt = (LinearLayout) findViewById(R.id.imageLyt);
-        resident = (Button)findViewById(R.id.resident);
-        guest = (Button)findViewById(R.id.guest);
-        other = (Button) findViewById(R.id.other_guest) ;
-        buttonNext = (Button)findViewById(R.id.buttonNext);
+        vehicalnumber = findViewById(R.id.txt_Vehical_otp);
+        iamgeLyt = findViewById(R.id.imageLyt);
+        resident = findViewById(R.id.resident);
+        guest = findViewById(R.id.guest);
+        other = findViewById(R.id.other_guest);
+        buttonNext = findViewById(R.id.buttonNext);
         buttonNext.setText(getResources().getString(R.string.textverify));
         resident.setVisibility(View.INVISIBLE);
         guest.setVisibility(View.INVISIBLE);

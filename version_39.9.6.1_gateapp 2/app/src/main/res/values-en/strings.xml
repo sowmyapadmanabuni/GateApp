@@ -136,7 +136,6 @@
     <string name="tvverifyotp">Verify OTP</string>
 
 
-
     <string name="geofence_not_available">Geofence service is not available now</string>
     <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
     <string name="geofence_too_many_pending_intents">
@@ -164,4 +163,59 @@
     <string name="permission_denied_explanation">Permission was denied, but is needed for core
         functionality.</string>
     <string name="settings">Settings</string>
+    <string name="scan_res_id_here">Scan Resident ID Here</string>
+    <string name="valid">valid</string>
+    <string name="invalid">invalid</string>
+    <string name="tvdynamicsearch">Dynamic Search</string>
+
+    <string name="textzomato">Zomato</string>
+    <string name="textswiggy">Swiggy</string>
+    <string name="textfoodpanda">FoodPanda</string>
+    <string name="textubereats">Uber Eats</string>
+    <string name="textdominos">Dominos</string>
+    <string name="textbluedart">BlueDart</string>
+    <string name="textdtdc">DTDC</string>
+    <string name="textjabong">Jabong</string>
+    <string name="textflipkart">Flipkart</string>
+    <string name="textamazon">Amazon</string>
+    <string name="textbigbasket">BigBasket</string>
+    <string name="textgrofers">Grofers</string>
+    <string name="textgodrej">Godrej</string>
+    <string name="textcarpenter">Carpenter</string>
+    <string name="textplumber">Plumber</string>
+    <string name="textelectrician">Electrician</string>
+    <string name="textola">OLA</string>
+    <string name="textuber">Uber</string>
+    <string name="textmeru">Meru</string>
+    <string name="textgascylinde">Gas Cylinder</string>
+    <string name="textothers">Others</string>
+    <string name="textfedex">Fedex</string>
+
+
+    <string-array name="vendor_list">
+        <item>Zomato</item>
+        <item>Swiggy</item>
+        <item>FoodPanda</item>
+        <item>Uber Eats</item>
+        <item>Dominos</item>
+        <item>BlueDart</item>
+        <item>DTDC</item>
+        <item>Jabong</item>
+        <item>Flipkart</item>
+        <item>Amazon</item>
+        <item>BigBasket</item>
+        <item>Grofers</item>
+        <item>Godrej</item>
+        <item>Carpenter</item>
+        <item>Plumber</item>
+        <item>Electrician</item>
+        <item>OLA</item>
+        <item>Uber</item>
+        <item>Meru</item>
+        <item>Gas Cylinder</item>
+        <item>Others</item>
+        <item>Fedex</item>
+    </string-array>
+
+
 </resources>

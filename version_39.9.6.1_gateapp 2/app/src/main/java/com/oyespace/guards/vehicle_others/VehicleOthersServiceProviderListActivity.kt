@@ -3,6 +3,8 @@ package com.oyespace.guards.vehicle_others
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -17,31 +19,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    val vendor_names = arrayOf(
-        "OLA",
-        "Uber",
-        "Meru",
-        "Zomato",
-        "Swiggy",
-        "FoodPanda",
-        "Uber Eats",
-        "Dominos",
-        "BlueDart",
-        "DTDC",
-        "Fedex",
-        "Jabong",
-        "Flipkart",
-        "Amazon",
-        "BigBasket",
-        "Grofers",
-        "Godrej",
-        "Carpenter",
-        "Plumber",
-        "electrician",
-        "Gas Cylinder",
-        "Others"
+    lateinit var vendor_names: List<String>
 
-    )
     val myImageList = intArrayOf(
         R.drawable.ola,
         R.drawable.uber,
@@ -74,6 +53,29 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         setContentView(R.layout.activity_service_provider_list)
 
+        vendor_names= listOf(resources.getString(R.string.textzomato),
+            resources.getString(R.string.textswiggy),
+            resources.getString(R.string.textfoodpanda),
+            resources.getString(R.string.textubereats),
+            resources.getString(R.string.textdominos),
+            resources.getString(R.string.textbluedart),
+            resources.getString(R.string.textdtdc),
+            resources.getString(R.string.textfedex),
+            resources.getString(R.string.textjabong),
+            resources.getString(R.string.textflipkart),
+            resources.getString(R.string.textamazon),
+            resources.getString(R.string.textbigbasket),
+            resources.getString(R.string.textgrofers),
+            resources.getString(R.string.textgodrej),
+            resources.getString(R.string.textcarpenter),
+            resources.getString(R.string.textplumber),
+            resources.getString(R.string.textelectrician),
+            resources.getString(R.string.textola),
+            resources.getString(R.string.textuber),
+            resources.getString(R.string.textmeru),
+            resources.getString(R.string.textgascylinde),
+            resources.getString(R.string.textothers))
+
         tv_selectdelivery.text=""
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
@@ -94,13 +96,9 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         }
 
-        val rv_serviceProvider =
-            findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rv_serviceProvider)
+        val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
         rv_serviceProvider.setHasFixedSize(true)
-        val gridLayoutManager = androidx.recyclerview.widget.GridLayoutManager(
-            this@VehicleOthersServiceProviderListActivity,
-            3
-        )
+        val gridLayoutManager = GridLayoutManager(this@VehicleOthersServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         //  val sectionModelArrayList: ArrayList<SectionModel> = ArrayList()
@@ -161,8 +159,8 @@ class VehicleOthersServiceProviderListActivity : BaseKotlinActivity() {
 
         for (i in 0 until vendor_names.size) {
             val vendorPojo = VendorPojo()
-            vendorPojo.setVendor_names(vendor_names[i])
-            vendorPojo.setImage_url(myImageList[i])
+            vendorPojo.vendor_names = vendor_names[i]
+            vendorPojo.image_url = myImageList[i]
             vendordata.add(vendorPojo)
         }
         return vendordata

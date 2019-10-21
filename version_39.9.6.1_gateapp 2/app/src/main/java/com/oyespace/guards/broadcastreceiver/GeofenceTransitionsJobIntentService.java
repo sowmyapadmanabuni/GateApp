@@ -17,7 +17,6 @@ package com.oyespace.guards.broadcastreceiver;
  */
 
 
-
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -26,11 +25,12 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
+import android.text.TextUtils;
+import android.util.Log;
+
 import androidx.core.app.JobIntentService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
-import android.text.TextUtils;
-import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  * Listener for geofence transition changes.
- *
+ * <p>
  * Receives geofence transition events from Location Services in the form of an Intent containing
  * the transition type and geofence id(s) that triggered the transition. Creates a notification
  * as the output.
@@ -65,6 +65,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
 
     /**
      * Handles incoming intents.
+     *
      * @param intent sent by Location Services. This Intent is provided to Location
      *               Services (inside a PendingIntent) when addGeofences() is called.
      */
@@ -96,8 +97,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
             // Send notification and log the transition details.
             sendNotification(geofenceTransitionDetails);
             Log.i(TAG, geofenceTransitionDetails);
-        }
-        else {
+        } else {
             // Log the error.
             Log.e(TAG, getString(R.string.geofence_transition_invalid_type, geofenceTransition));
         }
@@ -106,9 +106,9 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
     /**
      * Gets transition details and returns them as a formatted string.
      *
-     * @param geofenceTransition    The ID of the geofence transition.
-     * @param triggeringGeofences   The geofence(s) triggered.
-     * @return                      The transition details formatted as String.
+     * @param geofenceTransition  The ID of the geofence transition.
+     * @param triggeringGeofences The geofence(s) triggered.
+     * @return The transition details formatted as String.
      */
     private String getGeofenceTransitionDetails(
             int geofenceTransition,
@@ -121,7 +121,7 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
         for (Geofence geofence : triggeringGeofences) {
             triggeringGeofencesIdsList.add(geofence.getRequestId());
         }
-        String triggeringGeofencesIdsString = TextUtils.join(", ",  triggeringGeofencesIdsList);
+        String triggeringGeofencesIdsString = TextUtils.join(", ", triggeringGeofencesIdsList);
 
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
@@ -191,8 +191,8 @@ public class GeofenceTransitionsJobIntentService extends JobIntentService {
     /**
      * Maps geofence transition types to their human-readable equivalents.
      *
-     * @param transitionType    A transition type constant defined in Geofence
-     * @return                  A String indicating the type of transition
+     * @param transitionType A transition type constant defined in Geofence
+     * @return A String indicating the type of transition
      */
     private String getTransitionString(int transitionType) {
         switch (transitionType) {

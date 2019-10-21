@@ -17,7 +17,7 @@ class SectionedRecyclerView : AppCompatActivity() {
     }
 
     fun gridSectionedRecyclerView(view: View) {
-        startRecyclerViewActivity(RecyclerViewType.GRID);
+        startRecyclerViewActivity(RecyclerViewType.GRID)
     }
 
     private fun startRecyclerViewActivity(recyclerViewType: RecyclerViewType) {

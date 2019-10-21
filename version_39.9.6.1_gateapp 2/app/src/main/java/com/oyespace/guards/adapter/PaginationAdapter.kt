@@ -5,20 +5,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.pojo.PaginationData
 
-var activePage:Int = 0;
+var activePage: Int = 0
 
 class PaginationAdapter(private val mcontext: Context, private val arrayList: ArrayList<PaginationData>, val clickListener:(PaginationData, Int) -> Unit):
-    androidx.recyclerview.widget.RecyclerView.Adapter<PaginationAdapter.ItemViewHolder>() {
+    RecyclerView.Adapter<PaginationAdapter.ItemViewHolder>() {
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
-        p0.itemView.requestLayout();
-        p0.mPageNumber.text = arrayList[p1].pageNumber;
+        p0.itemView.requestLayout()
+        p0.mPageNumber.text = arrayList[p1].pageNumber
         if(arrayList[p1].isActive){
-            activePage = p1;
+            activePage = p1
             p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.orange))
             p0.mPageNumber.setTextColor(mcontext.resources.getColor(R.color.white))
         }else{
@@ -41,14 +43,13 @@ class PaginationAdapter(private val mcontext: Context, private val arrayList: Ar
     }
 
     override fun getItemCount(): Int {
-       return arrayList.size;
+        return arrayList.size
     }
 
 
-    class ItemViewHolder(itemView: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mPageNumber: AppCompatTextView
-        val mPageCard: androidx.cardview.widget.CardView
+        val mPageCard: CardView
 
 
         init {

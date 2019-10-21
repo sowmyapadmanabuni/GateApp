@@ -18,19 +18,19 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent intent) {
 
         int status = NetworkUtil.getConnectivityStatusString(context);
-        Log.e("NETWORK_STAT", ""+status);
+        Log.e("NETWORK_STAT", "" + status);
         if ("android.net.conn.CONNECTIVITY_CHANGE".equals(intent.getAction())) {
             if (status == NetworkUtil.NETWORK_STATUS_NOT_CONNECTED) {
-               // new ForceExitPause(context).execute();
-                Log.e("STATUS","OFFLINE");
+                // new ForceExitPause(context).execute();
+                Log.e("STATUS", "OFFLINE");
             } else {
-                Log.e("STATUS","ONLINE");
-                String sos = Prefs.getString("PENDING_SOS","");
-                Log.e("PENIDN",""+sos);
-                if(!sos.equals("") && sos != null){
+                Log.e("STATUS", "ONLINE");
+                String sos = Prefs.getString("PENDING_SOS", "");
+                Log.e("PENIDN", "" + sos);
+                if (!sos.equals("") && sos != null) {
 
-                    try{
-                        SOSUpdateReq sosUpdateReq = new Gson().fromJson(sos,SOSUpdateReq.class);
+                    try {
+                        SOSUpdateReq sosUpdateReq = new Gson().fromJson(sos, SOSUpdateReq.class);
                         Intent intentAction1 = new Intent(context, BackgroundSyncReceiver.class);
 
                         intentAction1.putExtra(
@@ -38,10 +38,10 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                                 ConstantUtils.BGS_SOS_STATUS
                         );
                         intentAction1.putExtra("sos_id", sosUpdateReq.getSOSID());
-                        intentAction1.putExtra("sos_status", ""+sosUpdateReq.getSOStatus());
+                        intentAction1.putExtra("sos_status", "" + sosUpdateReq.getSOStatus());
                         context.sendBroadcast(intentAction1);
-                    }catch (Exception e){
-                        Log.e("NETWRERR",""+e);
+                    } catch (Exception e) {
+                        Log.e("NETWRERR", "" + e);
                         e.printStackTrace();
                     }
 

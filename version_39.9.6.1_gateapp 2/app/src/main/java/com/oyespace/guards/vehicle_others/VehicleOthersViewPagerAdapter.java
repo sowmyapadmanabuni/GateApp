@@ -78,7 +78,7 @@ public class VehicleOthersViewPagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == ((RelativeLayout) object);
+        return view == object;
     }
 
     @Override
@@ -86,7 +86,7 @@ public class VehicleOthersViewPagerAdapter extends PagerAdapter {
         View itemView = mLayoutInflater.inflate(R.layout.layout_viewpager_iem, container, false);
 
 
-        ImageView imageView = (ImageView) itemView.findViewById(R.id.image);
+        ImageView imageView = itemView.findViewById(R.id.image);
         ImageHelper.loadImage(mContext, imagesList.get(position), imageView);
 
 

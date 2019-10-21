@@ -5,17 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.pojo.UnitPojo
 
 
 class UnitSearchResultAdapter(private val mcontext: Context, private val arrayList: ArrayList<UnitPojo>, val clickListener:(UnitPojo, Int) -> Unit):
-    androidx.recyclerview.widget.RecyclerView.Adapter<UnitSearchResultAdapter.ItemViewHolder>() {
+    RecyclerView.Adapter<UnitSearchResultAdapter.ItemViewHolder>() {
 
 
     override fun onBindViewHolder(p0: ItemViewHolder, p1: Int) {
-        p0.itemView.requestLayout();
-        p0.mPageNumber.text = arrayList[p1].unUniName;
+        p0.itemView.requestLayout()
+        p0.mPageNumber.text = arrayList[p1].unUniName
 
         p0.itemView.setOnClickListener(View.OnClickListener {
             //arrayList[activePage].isActive = false;
@@ -32,12 +33,11 @@ class UnitSearchResultAdapter(private val mcontext: Context, private val arrayLi
     }
 
     override fun getItemCount(): Int {
-       return arrayList.size;
+        return arrayList.size
     }
 
 
-    class ItemViewHolder(itemView: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val mPageNumber: AppCompatTextView
 
 

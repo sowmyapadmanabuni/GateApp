@@ -19,7 +19,7 @@ public enum URLData {
     URL_PATROLLING_STOP(BASE_URL+"oye247/api/v1/Patrolling/PatrollingEndDateUpdate",false,true,"",10),
     URL_SAVE_CHECK_POINT(BASE_URL+"oye247/api/v1/Tracking/Create",false,true,"",11),
     URL_STAFF_REGISTRATION(BASE_URL+"oye247/api/v1/Worker/Create",false,true,"",12),
-    URL_CREATE_TICKETING_RESPONSE(BASE_URL+"oye247/api/v1/TicketingResponse/Create",false,true,"",13);
+    URL_CREATE_TICKETING_RESPONSE(BASE_URL+"oye247/api/v1/TicketingResponse/Create",false,true,"",13),
    // URL_SEND_STAFF_IMAGE(BASE_URL+"oye247/api/v1/Worker/WorkerEntryImgGPSUpdate",false,true,"",14);
 
 
@@ -34,6 +34,8 @@ public enum URLData {
 //    URL_PAST_ORDER("https://goohungrry.com/stack/v1/getuserorders", true, true, "", 12),
 //    URL_ADD_DEVICEID("https://goohungrry.com/stack/v1/adddeviceid", false, true, "", 13);
 
+
+    URL_GET_CHECKPOINT_RESPONSE(BASE_URL+"oye247/api/v1/TicketingResponse/Create",false,true,"",14);
 
     private String mUrl;
     private boolean showProgress;

@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BlockSelectionActivity
 import com.oyespace.guards.staffManaualEntry.ManulBlockSelectionActivity
@@ -41,22 +42,22 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
             holder.lv_staff.setOnClickListener {
                 val d = Intent(mcontext, ManulBlockSelectionActivity::class.java)
                 d.putExtra("UNITID", (mcontext as Activity).intent.getIntExtra("UNITID", 0))
-                d.putExtra("FIRSTNAME", (mcontext as Activity).intent.getStringExtra("FIRSTNAME"))
-                d.putExtra("LASTNAME", (mcontext as Activity).intent.getStringExtra("LASTNAME"))
-                d.putExtra(MOBILENUMBER, (mcontext as Activity).intent.getStringExtra(MOBILENUMBER))
+                d.putExtra("FIRSTNAME", mcontext.intent.getStringExtra("FIRSTNAME"))
+                d.putExtra("LASTNAME", mcontext.intent.getStringExtra("LASTNAME"))
+                d.putExtra(MOBILENUMBER, mcontext.intent.getStringExtra(MOBILENUMBER))
                 d.putExtra(
                     "DESIGNATION",
-                    (mcontext as Activity).intent.getStringExtra("DESIGNATION")
+                    mcontext.intent.getStringExtra("DESIGNATION")
                 )
-                d.putExtra("WORKTYPE", (mcontext as Activity).intent.getStringExtra("WORKTYPE"))
-                d.putExtra(WORKER_ID, (mcontext as Activity).intent.getIntExtra(WORKER_ID, 0))
-                d.putExtra("UNITNAME", (mcontext as Activity).intent.getStringExtra("UNITNAME"))
-                d.putExtra("BIRTHDAY", (mcontext as Activity).intent.getStringExtra("BIRTHDAY"))
+                d.putExtra("WORKTYPE", mcontext.intent.getStringExtra("WORKTYPE"))
+                d.putExtra(WORKER_ID, mcontext.intent.getIntExtra(WORKER_ID, 0))
+                d.putExtra("UNITNAME", mcontext.intent.getStringExtra("UNITNAME"))
+                d.putExtra("BIRTHDAY", mcontext.intent.getStringExtra("BIRTHDAY"))
                 d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
                 d.putExtra(VISITOR_TYPE, "STAFF")
                 d.putExtra(COMPANY_NAME, items[position])
                 mcontext.startActivity(d)
-                (mcontext as Activity).finish()
+                mcontext.finish()
             }
         }
 
@@ -70,7 +71,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
     }
 
     class WorkerViewHolder(view: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        RecyclerView.ViewHolder(view) {
         val lv_staff : LinearLayout
         val tv_worktype : TextView
 

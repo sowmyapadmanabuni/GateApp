@@ -7,7 +7,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +15,9 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.PaginationAdapter
@@ -33,9 +35,9 @@ import kotlinx.android.synthetic.main.pager_view.*
 import kotlinx.android.synthetic.main.subtitle_bar.*
 import kotlinx.android.synthetic.main.title_bar.*
 
-class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
+class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
-    var orderListAdapter:UnitListAdapter?=null
+    var orderListAdapter: UnitListAdapter? = null
     var pageNumberAdapter: PaginationAdapter? = null
     var arrayList = ArrayList<UnitPojo>()
     var arrayFullList = ArrayList<UnitPojo>()
@@ -45,48 +47,42 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
     internal var unitId = 0
     internal var blockId = -1
     internal var blockName = ""
-    internal var unitNumber1=""
-    internal var unitNumber2=""
-    internal var unitNumber3=""
-    internal var unitNumber4=""
-    internal var unitNumber5=""
+    internal var unitNumber1 = ""
+    internal var unitNumber2 = ""
+    internal var unitNumber3 = ""
+    internal var unitNumber4 = ""
+    internal var unitNumber5 = ""
 
-    private val LIMIT = 10;
-    var PAGE_NUMBER = 0;
-
+    private val LIMIT = 10
+    var PAGE_NUMBER = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unit_selection)
 
-        header_title.setText(this.resources.getString(R.string.units_list_title));
-        header_subtitle.setText("A Block")
+        header_title.text = this.resources.getString(R.string.units_list_title)
+        header_subtitle.text = "A Block"
 
         /**
          * Setting status bar color (Only for Lollipop & above)
          */
         //setDarkStatusBar()
 
-        try{
-            blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK,-1);
-            blockName = ""+intent.getStringExtra(ConstantUtils.SELECTED_BLOCK_NAME);
-            header_subtitle.setText(blockName)
-            var json:String = (intent.getStringExtra(SELECTED_UNITS))
-            var selArray:Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)
+        try {
+            blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK, -1)
+            blockName = "" + intent.getStringExtra(ConstantUtils.SELECTED_BLOCK_NAME)
+            header_subtitle.text = blockName
+            var json: String = (intent.getStringExtra(SELECTED_UNITS))
+            var selArray: Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)
             selectedUnits = ArrayList(selArray.asList())
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
 
         getUnitsFromBlock()
 
-        rv_unit.setLayoutManager(
-            androidx.recyclerview.widget.GridLayoutManager(
-                this@UnitSelectionActivity,
-                2
-            )
-        )
+        rv_unit.setLayoutManager(GridLayoutManager(this@UnitSelectionActivity, 2))
     }
 
     override fun onClick(v: View?) {
@@ -94,45 +90,46 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
         when (v?.id) {
 
             R.id.buttonNext -> {
-                    for (j in arrayFullList.indices) {
-                        if (arrayFullList.get(j).isSelected) {
-                            val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(arrayFullList.get(j).unUnitID)) index else null}
-                            if(indices == null || indices.size == 0) {
-                                selectedUnits.add(arrayFullList[j])
-                            }
+                for (j in arrayFullList.indices) {
+                    if (arrayFullList.get(j).isSelected) {
+                        val indices = selectedUnits.mapIndexedNotNull { index, event ->
+                            if (event.unUnitID.equals(arrayFullList.get(j).unUnitID)) index else null
+                        }
+                        if (indices == null || indices.size == 0) {
+                            selectedUnits.add(arrayFullList[j])
                         }
                     }
-                    val _intent = Intent(this@UnitSelectionActivity, BlockSelectionActivity::class.java)
-                    var json = Gson().toJson(selectedUnits)
-                Log.v("JSONNN", json)
-                    _intent.putExtra(FLOW_TYPE, DELIVERY)
-                    _intent.putExtra(VISITOR_TYPE, DELIVERY)
-                    _intent.putExtra(SELECTED_UNITS,json);
-                    _intent.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                    _intent.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                    _intent.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                        startActivity(_intent)
-                    finish()
+                }
+                val _intent = Intent(this@UnitSelectionActivity, BlockSelectionActivity::class.java)
+                var json = Gson().toJson(selectedUnits)
+                _intent.putExtra(FLOW_TYPE, DELIVERY)
+                _intent.putExtra(VISITOR_TYPE, DELIVERY)
+                _intent.putExtra(SELECTED_UNITS, json)
+                _intent.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                _intent.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                _intent.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                startActivity(_intent)
+                finish()
 
             }
 
             R.id.btn_page_next -> {
-                btn_page_prev.isEnabled = true;
+                btn_page_prev.isEnabled = true
                 //var filtered = pageArrayList!!.filter { it.isActive.equals(true) }
                 var index = -1
-               // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
-                for(i in 0 until pageArrayList.size){
-                    if(pageArrayList[i].isActive == true){
-                        index = i;
-                        break;
+                // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
+                for (i in 0 until pageArrayList.size) {
+                    if (pageArrayList[i].isActive == true) {
+                        index = i
+                        break
                     }
                 }
-                if(index != -1){
-                    if((index+1) < pageArrayList.size) {
-                        pageArrayList[index].isActive = false;
-                        pageArrayList[index + 1].isActive = true;
+                if (index != -1) {
+                    if ((index + 1) < pageArrayList.size) {
+                        pageArrayList[index].isActive = false
+                        pageArrayList[index + 1].isActive = true
                         pageNumberAdapter!!.notifyDataSetChanged()
-                        PAGE_NUMBER+=1;
+                        PAGE_NUMBER += 1
                         setPageData()
                     }
 
@@ -141,22 +138,22 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
             }
 
             R.id.btn_page_prev -> {
-                btn_page_next.isEnabled = true;
+                btn_page_next.isEnabled = true
                 var index = -1
                 // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
-                for(i in 0 until pageArrayList.size){
-                    if(pageArrayList[i].isActive == true){
-                        index = i;
-                        break;
+                for (i in 0 until pageArrayList.size) {
+                    if (pageArrayList[i].isActive == true) {
+                        index = i
+                        break
                     }
                 }
-               // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
-                if(index != -1){
-                    if((index-1) >= 0) {
-                        pageArrayList[index].isActive = false;
-                        pageArrayList[index - 1].isActive = true;
+                // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
+                if (index != -1) {
+                    if ((index - 1) >= 0) {
+                        pageArrayList[index].isActive = false
+                        pageArrayList[index - 1].isActive = true
                         pageNumberAdapter!!.notifyDataSetChanged()
-                        PAGE_NUMBER-=1;
+                        PAGE_NUMBER -= 1
                         setPageData()
                     }
 
@@ -168,7 +165,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
     }
 
     override fun onBackPressed() {
-        Toast.makeText(this,"Tap next to continue",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Tap next to continue", Toast.LENGTH_SHORT).show()
     }
 
     /**
@@ -176,27 +173,27 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
      * This changes the active page number color and invokes setPageData
      * for setting the data based on page number
      */
-    fun onPageClick(selected:PaginationData, index:Int){
-        var arr = ArrayList<PaginationData>();
-        for(pageObj in pageArrayList){
-            if(selected.pageNumber.equals(pageObj.pageNumber)){
-                var obj = pageObj;
-                obj.isActive = true;
-                arr.add(obj);
-            }else{
-                var obj = pageObj;
-                obj.isActive = false;
-                arr.add(obj);
+    fun onPageClick(selected: PaginationData, index: Int) {
+        var arr = ArrayList<PaginationData>()
+        for (pageObj in pageArrayList) {
+            if (selected.pageNumber.equals(pageObj.pageNumber)) {
+                var obj = pageObj
+                obj.isActive = true
+                arr.add(obj)
+            } else {
+                var obj = pageObj
+                obj.isActive = false
+                arr.add(obj)
             }
         }
-        pageArrayList = arr;
-        pageNumberAdapter!!.notifyDataSetChanged();
+        pageArrayList = arr
+        pageNumberAdapter!!.notifyDataSetChanged()
 
         /**
          * PaginationData object indexes from 1 and PAGE_NUMBER from 0.
          * So 1 reduced from PAGE_NUMBER to sync the index
          */
-        PAGE_NUMBER = (selected.pageNumber.toInt())-1;
+        PAGE_NUMBER = (selected.pageNumber.toInt()) - 1
         setPageData()
 
     }
@@ -205,41 +202,43 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
      * managePageNumber sets the page number based on API response and total Units per page.
      * LIMIT  = Total Units per Page
      */
-    private fun managePageNumber(){
-        if(arrayFullList != null && arrayFullList.size > 0){
+    private fun managePageNumber() {
+        if (arrayFullList != null && arrayFullList.size > 0) {
 
-            if(arrayFullList.size > LIMIT){
-                var absolutePageNumber:Int = arrayFullList.size/LIMIT;
-                if(arrayFullList.size-(absolutePageNumber*LIMIT) != 0){
-                    absolutePageNumber+=1;
+            if (arrayFullList.size > LIMIT) {
+                var absolutePageNumber: Int = arrayFullList.size / LIMIT
+                if (arrayFullList.size - (absolutePageNumber * LIMIT) != 0) {
+                    absolutePageNumber += 1
                 }
-                for(i in 0 until absolutePageNumber){
-                    var isActive:Boolean = true;
-                    if(i > 0){
+                for (i in 0 until absolutePageNumber) {
+                    var isActive: Boolean = true
+                    if (i > 0) {
                         isActive = false
                     }
-                    var firstPage:PaginationData = PaginationData(""+(i+1),isActive);
-                    pageArrayList.add(firstPage);
+                    var firstPage: PaginationData = PaginationData("" + (i + 1), isActive)
+                    pageArrayList.add(firstPage)
                 }
 
-            }else{
-                var firstPage:PaginationData = PaginationData("1",true);
-                pageArrayList.add(firstPage);
+            } else {
+                var firstPage: PaginationData = PaginationData("1", true)
+                pageArrayList.add(firstPage)
             }
 
             pageNumberAdapter =
-                PaginationAdapter(this@UnitSelectionActivity, pageArrayList,clickListener = {
-                   page,index -> onPageClick(page,index)
-                })
+                PaginationAdapter(
+                    this@UnitSelectionActivity,
+                    pageArrayList,
+                    clickListener = { page, index ->
+                        onPageClick(page, index)
+                    })
             rv_page.adapter = pageNumberAdapter
 
-            rv_page.setLayoutManager(
-                androidx.recyclerview.widget.LinearLayoutManager(
+            rv_page.layoutManager =
+                LinearLayoutManager(
                     this@UnitSelectionActivity,
-                    androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
+                    LinearLayoutManager.HORIZONTAL,
                     false
                 )
-            );
 
 
         }
@@ -249,42 +248,40 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
      * setPageData does the pagination logic
      * over ArrayList (assuming arrayFullList object contains complete list of Units)
      */
-    private fun setPageData(){
-        if(arrayFullList.size <=LIMIT){
+    private fun setPageData() {
+        if (arrayFullList.size <= LIMIT) {
             btn_page_next.visibility = View.INVISIBLE
             btn_page_prev.visibility = View.INVISIBLE
-            rv_page.visibility = View.INVISIBLE;
-        }else{
+            rv_page.visibility = View.INVISIBLE
+        } else {
             btn_page_next.visibility = View.VISIBLE
             btn_page_prev.visibility = View.VISIBLE
             rv_page.visibility = View.VISIBLE
         }
-        var updatedSelected = ArrayList<UnitPojo>();
-        for(i in 0 until arrayFullList.size){
-            var currentUnit:UnitPojo = arrayFullList[i];
-            val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(arrayFullList.get(i).unUnitID)) index else null}
-            if(indices != null && indices.size > 0){
-                currentUnit.isSelected = true;
-            }else{
-                currentUnit.isSelected = false;
+        var updatedSelected = ArrayList<UnitPojo>()
+        for (i in 0 until arrayFullList.size) {
+            var currentUnit: UnitPojo = arrayFullList[i]
+            val indices = selectedUnits.mapIndexedNotNull { index, event ->
+                if (event.unUnitID.equals(arrayFullList.get(i).unUnitID)) index else null
             }
-            updatedSelected.add(currentUnit);
+            currentUnit.isSelected = indices != null && indices.size > 0
+            updatedSelected.add(currentUnit)
         }
-        arrayFullList = updatedSelected;
+        arrayFullList = updatedSelected
 
-        if(arrayFullList.size > LIMIT){
-            var start = 0;
-            var end = 0;
+        if (arrayFullList.size > LIMIT) {
+            var start = 0
+            var end = 0
 
-            if(PAGE_NUMBER == 0){
-                start = 0;
-                end = LIMIT-1
-            }else{
-                start = PAGE_NUMBER*LIMIT;
-                end  = start+(LIMIT-1)
+            if (PAGE_NUMBER == 0) {
+                start = 0
+                end = LIMIT - 1
+            } else {
+                start = PAGE_NUMBER * LIMIT
+                end = start + (LIMIT - 1)
 
-                if(arrayFullList.size < end){
-                    end = arrayFullList.size-1
+                if (arrayFullList.size < end) {
+                    end = arrayFullList.size - 1
                 }
             }
 
@@ -293,24 +290,30 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
              */
             try {
                 arrayList = ArrayList(arrayFullList.subList(start, end + 1))
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 arrayList = ArrayList(arrayFullList.subList(start, end))
             }
             rv_unit.showProgress()
-                orderListAdapter =
-                    UnitSelectionActivity.UnitListAdapter(arrayList as ArrayList<UnitPojo>, this@UnitSelectionActivity, checkListener = {
-                       arr,ischecked -> onCheckUnit(arr,ischecked)
+            orderListAdapter =
+                UnitSelectionActivity.UnitListAdapter(
+                    arrayList,
+                    this@UnitSelectionActivity,
+                    checkListener = { arr, ischecked ->
+                        onCheckUnit(arr, ischecked)
                     })
-                rv_unit.adapter = orderListAdapter
+            rv_unit.adapter = orderListAdapter
             orderListAdapter!!.notifyDataSetChanged()
             rv_unit.hideProgress()
 
-        }else{
+        } else {
             rv_unit.showProgress()
             orderListAdapter =
-                UnitSelectionActivity.UnitListAdapter(arrayFullList, this@UnitSelectionActivity, checkListener = {
-                    arr,ischecked -> onCheckUnit(arr, ischecked)
-                })
+                UnitSelectionActivity.UnitListAdapter(
+                    arrayFullList,
+                    this@UnitSelectionActivity,
+                    checkListener = { arr, ischecked ->
+                        onCheckUnit(arr, ischecked)
+                    })
             rv_unit.adapter = orderListAdapter
             orderListAdapter!!.notifyDataSetChanged()
             rv_unit.hideProgress()
@@ -321,50 +324,50 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
     }
 
 
-    private fun onCheckUnit(checked:UnitPojo, isSelected:Boolean){
-        var arr = ArrayList<UnitPojo>();
-        for(unitObj in arrayFullList){
-            if(checked.unUnitID.equals(unitObj.unUnitID)){
-                var obj = unitObj;
-                obj.isSelected = isSelected;
-                arr.add(obj);
-            }else{
-                arr.add(unitObj);
+    private fun onCheckUnit(checked: UnitPojo, isSelected: Boolean) {
+        var arr = ArrayList<UnitPojo>()
+        for (unitObj in arrayFullList) {
+            if (checked.unUnitID.equals(unitObj.unUnitID)) {
+                var obj = unitObj
+                obj.isSelected = isSelected
+                arr.add(obj)
+            } else {
+                arr.add(unitObj)
             }
         }
-        arrayFullList = arr;
-        if(!isSelected){
+        arrayFullList = arr
+        if (!isSelected) {
 
-            val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(checked.unUnitID)) index else null}
-            if(indices != null && indices.size > 0){
-                selectedUnits.removeAt(indices[0]);
+            val indices =
+                selectedUnits.mapIndexedNotNull { index, event -> if (event.unUnitID.equals(checked.unUnitID)) index else null }
+            if (indices != null && indices.size > 0) {
+                selectedUnits.removeAt(indices[0])
             }
         } else {
-            selectedUnits.add(checked);
+            selectedUnits.add(checked)
         }
         //orderListAdapter!!.notifyDataSetChanged();
     }
 
-    private fun managePageNavButtons(){
-        if(PAGE_NUMBER == 0){
+    private fun managePageNavButtons() {
+        if (PAGE_NUMBER == 0) {
             btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.prev_page))
-        }else{
+        } else {
             btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.prev_active))
         }
 
-        if(PAGE_NUMBER == (pageArrayList.size-1)){
+        if (PAGE_NUMBER == (pageArrayList.size - 1)) {
             btn_page_next.setImageDrawable(this.resources.getDrawable(R.drawable.next_inactive))
-        }else{
+        } else {
             btn_page_next.setImageDrawable(this.resources.getDrawable(R.drawable.next_page))
         }
     }
 
 
-
     private fun getUnitsFromBlock() {
         showProgressrefresh()
         RetrofitClinet.instance
-            .getUnitsFromBlock(CHAMPTOKEN,""+blockId)
+            .getUnitsFromBlock(CHAMPTOKEN, "" + blockId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<UnitsList<ArrayList<UnitPojo>>>() {
@@ -372,8 +375,8 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                 override fun onSuccessResponse(UnitList: UnitsList<ArrayList<UnitPojo>>) {
                     dismissProgressrefresh()
                     if (UnitList.success == true) {
-                        arrayFullList = UnitList.data.unitsByBlockID;
-                        setPageData();
+                        arrayFullList = UnitList.data.unitsByBlockID
+                        setPageData()
                         managePageNumber()
 
                     } else {
@@ -396,7 +399,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
     }
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context, val checkListener:(UnitPojo, Boolean) -> Unit) :
-        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
 
@@ -413,32 +416,32 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
 
         override fun onBindViewHolder(holder: MenuHolder, position: Int) {
-            val orderData = listVistor?.get(position)
-            val vistordate = orderData?.asAssnID
-            holder.apartmentNamee.text = orderData?.unUniName
-            if(listVistor!!.get(position).isSelected){
-                holder.cb_unit.setChecked(true)
-                holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-            }else{
-                holder.cb_unit.isChecked = false;
-                holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+            val orderData = listVistor.get(position)
+            val vistordate = orderData.asAssnID
+            holder.apartmentNamee.text = orderData.unUniName
+            if (listVistor.get(position).isSelected) {
+                holder.cb_unit.isChecked = true
+                holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent))
+            } else {
+                holder.cb_unit.isChecked = false
+                holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style)
             }
 
-            holder.cb_unit.setOnCheckedChangeListener {buttonView, isChecked ->
+            holder.cb_unit.setOnCheckedChangeListener { buttonView, isChecked ->
                 // Toast.makeText(this,isChecked.toString(),Toast.LENGTH_SHORT).show()
-                listVistor!!.get(position).isSelected=isChecked
-                if(isChecked) {
-                    holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
-                }else{
-                    holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
+                listVistor.get(position).isSelected = isChecked
+                if (isChecked) {
+                    holder.cb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent))
+                } else {
+                    holder.cb_unit.setBackgroundResource(R.drawable.checkbox_state_style)
                 }
-                checkListener(listVistor!!.get(position),isChecked)
+                checkListener(listVistor.get(position), isChecked)
 
             }
             //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
 
             holder.iv_unit.setOnClickListener {
-                if (orderData!!.owner.size == 0 && orderData!!.tenant.size == 0) {
+                if (orderData.owner.size == 0 && orderData.tenant.size == 0) {
                     //  Log.d("cdvd 2", "" + orderData?.owner[0].uoisdCode + " " + orderData?.owner[0].uoMobile);
 
 //if(orderData.owner[0].uoMobile!=null) {
@@ -474,9 +477,9 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 //                    mcontext.startActivity(intent)
 
 
-                    if (orderData!!.tenant.size != 0) {
+                    if (orderData.tenant.size != 0) {
 
-                        val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                        val alertadd = AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
                         val view = factory.inflate(R.layout.layout_phonenumber, null)
                         var tv_number1: TextView? = null
@@ -520,7 +523,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                         iv_unit1.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL);
+                            val intent = Intent(Intent.ACTION_CALL)
                             intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile)
                             mcontext.startActivity(intent)
 
@@ -529,7 +532,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                         iv_unit2.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL);
+                            val intent = Intent(Intent.ACTION_CALL)
                             intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile1)
                             mcontext.startActivity(intent)
 
@@ -541,9 +544,9 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                     } else {
 
-                        if (orderData!!.owner.size != 0) {
+                        if (orderData.owner.size != 0) {
 
-                            val alertadd = androidx.appcompat.app.AlertDialog.Builder(mcontext)
+                            val alertadd = AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -625,7 +628,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                             iv_unit1.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile)
                                 mcontext.startActivity(intent)
 
@@ -633,7 +636,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                             iv_unit2.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile1)
                                 mcontext.startActivity(intent)
 
@@ -641,21 +644,21 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
                             iv_unit3.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile2)
                                 mcontext.startActivity(intent)
 
                             }
                             iv_unit4.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile3)
                                 mcontext.startActivity(intent)
 
                             }
                             iv_unit5.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile4)
                                 mcontext.startActivity(intent)
 
@@ -675,11 +678,13 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                                 // if the dialog is cancelable
                                 .setCancelable(false)
                                 // positive button text and action
-                                .setPositiveButton("Ok", DialogInterface.OnClickListener { dialog, id ->
-                                    dialog.cancel()
+                                .setPositiveButton(
+                                    "Ok",
+                                    DialogInterface.OnClickListener { dialog, id ->
+                                        dialog.cancel()
 
 
-                                })
+                                    })
                             // negative button text and action
 //                        .setNegativeButton("Cancel", DialogInterface.OnClickListener {
 //                                dialog, id -> dialog.cancel()
@@ -701,20 +706,20 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                 val mcontextintent = (mcontext as Activity).intent
 
                 val intent = Intent(mcontext, MobileNumberScreen::class.java)
-                intent.putExtra(FLOW_TYPE,mcontextintent.getStringExtra(FLOW_TYPE))
-                intent.putExtra(VISITOR_TYPE,mcontextintent.getStringExtra(VISITOR_TYPE))
-                intent.putExtra(COMPANY_NAME,mcontextintent.getStringExtra(COMPANY_NAME))
-                intent.putExtra(UNITID, orderData?.unUnitID)
-                intent.putExtra(UNITNAME, orderData?.unUniName)
+                intent.putExtra(FLOW_TYPE, mcontextintent.getStringExtra(FLOW_TYPE))
+                intent.putExtra(VISITOR_TYPE, mcontextintent.getStringExtra(VISITOR_TYPE))
+                intent.putExtra(COMPANY_NAME, mcontextintent.getStringExtra(COMPANY_NAME))
+                intent.putExtra(UNITID, orderData.unUnitID)
+                intent.putExtra(UNITNAME, orderData.unUniName)
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
 
-                if( listVistor!!.get(position).isSelected){
-                    listVistor!!.get(position).isSelected=false
-                    holder.cb_unit.setChecked(false)
-                }else{
-                    listVistor!!.get(position).isSelected=true
-                    holder.cb_unit.setChecked(true)
+                if (listVistor.get(position).isSelected) {
+                    listVistor.get(position).isSelected = false
+                    holder.cb_unit.isChecked = false
+                } else {
+                    listVistor.get(position).isSelected = true
+                    holder.cb_unit.isChecked = true
                 }
                 //checkListener(listVistor!!.get(position))
 
@@ -722,11 +727,10 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
         }
 
         override fun getItemCount(): Int {
-            return listVistor?.size ?: 0
+            return listVistor.size
         }
 
-        inner class MenuHolder(private val view: View) :
-            androidx.recyclerview.widget.RecyclerView.ViewHolder(view) {
+        inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
             val iv_unit: ImageView
             val cb_unit: AppCompatCheckBox
@@ -738,7 +742,7 @@ class UnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
                 iv_unit = view.findViewById(R.id.iv_unit)
                 cb_unit = view.findViewById(R.id.cb_unit)
                 apartmentNamee = view.findViewById(R.id.tv_unit)
-                lv_itemrecyclerview=view.findViewById(R.id.lv_itemrecyclerview)
+                lv_itemrecyclerview = view.findViewById(R.id.lv_itemrecyclerview)
 
             }
 

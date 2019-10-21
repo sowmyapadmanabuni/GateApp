@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 
 
-class RecyclerViewAdapter(val list: ArrayList<MyData>,val clickListener:(MyData, Int) -> Unit) : RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter(val list: ArrayList<MyData>, val clickListener: (MyData, Int) -> Unit) :
+    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerViewAdapter.ViewHolder {
         val v = LayoutInflater.from(parent.context).inflate(R.layout.activity_recycle_sos_items, parent, false)

@@ -37,6 +37,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
     boolean isLocationManagerUpdatingLocation;
 
 
+
     ArrayList<Location> locationList;
 
     ArrayList<Location> oldLocationList;
@@ -93,16 +94,20 @@ public class LocationService extends Service implements LocationListener, GpsSta
         registerReceiver(this.batteryInfoReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
     }
 
+
+
     @Override
     public int onStartCommand(Intent i, int flags, int startId) {
         super.onStartCommand(i, flags, startId);
         return Service.START_STICKY;
     }
 
+
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
     }
+
 
     @Override
     public void onRebind(Intent intent) {
@@ -123,6 +128,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
     }
 
+
     //This is where we detect the app is being killed, thus stop service.
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -131,6 +137,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
 
         stopSelf();
     }
+
 
     /* LocationListener implemenation */
     @Override
@@ -169,13 +176,13 @@ public class LocationService extends Service implements LocationListener, GpsSta
         //Broadcast location provider status change here
     }
 
-    public void startLogging() {
+    public void startLogging(){
         isLogging = true;
     }
 
-    public void stopLogging() {
-        if (locationList.size() > 1 && batteryLevelArray.size() > 1) {
-            long currentTimeInMillis = (long) (SystemClock.elapsedRealtimeNanos() / 1000000);
+    public void stopLogging(){
+        if (locationList.size() > 1 && batteryLevelArray.size() > 1){
+            long currentTimeInMillis = SystemClock.elapsedRealtimeNanos() / 1000000;
             long elapsedTimeInSeconds = (currentTimeInMillis - runStartTimeInMillis) / 1000;
             float totalDistanceInMeters = 0;
             for (int i = 0; i < locationList.size() - 1; i++) {
@@ -193,10 +200,11 @@ public class LocationService extends Service implements LocationListener, GpsSta
     }
 
 
+
     public void startUpdatingLocation() {
         if (this.isLocationManagerUpdatingLocation == false) {
             isLocationManagerUpdatingLocation = true;
-            runStartTimeInMillis = (long) (SystemClock.elapsedRealtimeNanos() / 1000000);
+            runStartTimeInMillis = SystemClock.elapsedRealtimeNanos() / 1000000;
 
 
             locationList.clear();
@@ -276,8 +284,8 @@ public class LocationService extends Service implements LocationListener, GpsSta
     private long getLocationAge(Location newLocation) {
         long locationAge;
         if (Build.VERSION.SDK_INT >= 17) {
-            long currentTimeInMilli = (long) (SystemClock.elapsedRealtimeNanos() / 1000000);
-            long locationTimeInMilli = (long) (newLocation.getElapsedRealtimeNanos() / 1000000);
+            long currentTimeInMilli = SystemClock.elapsedRealtimeNanos() / 1000000;
+            long locationTimeInMilli = newLocation.getElapsedRealtimeNanos() / 1000000;
             locationAge = currentTimeInMilli - locationTimeInMilli;
         } else {
             locationAge = System.currentTimeMillis() - newLocation.getTime();
@@ -314,7 +322,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
         /* Kalman Filter */
         float Qvalue;
 
-        long locationTimeInMillis = (long) (location.getElapsedRealtimeNanos() / 1000000);
+        long locationTimeInMillis = location.getElapsedRealtimeNanos() / 1000000;
         long elapsedTimeInMillis = locationTimeInMillis - runStartTimeInMillis;
 
         if (currentSpeed == 0.0f) {
@@ -332,7 +340,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
         predictedLocation.setLongitude(predictedLng);
         float predictedDeltaInMeters = predictedLocation.distanceTo(location);
 
-        if (predictedDeltaInMeters > 60) {
+        if(predictedDeltaInMeters > 60){
             Log.d(TAG, "Kalman Filter detects mal GPS, we should probably remove this from track");
             kalmanFilter.consecutiveRejectCount += 1;
 

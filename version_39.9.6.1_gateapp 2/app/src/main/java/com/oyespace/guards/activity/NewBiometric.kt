@@ -8,6 +8,7 @@ import android.content.*
 import android.graphics.*
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -18,7 +19,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import com.oyespace.guards.R
 import java.io.IOException
 import java.nio.ByteBuffer

@@ -75,7 +75,7 @@ public class BaseActivity extends AppCompatActivity implements ResponseHandler, 
      */
     public void setUpToolbar(String title, boolean enableBack, int icon) {
         try {
-            Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            Toolbar mToolbar = findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
             ActionBar actionBar = getSupportActionBar();
             actionBar.setTitle(null);

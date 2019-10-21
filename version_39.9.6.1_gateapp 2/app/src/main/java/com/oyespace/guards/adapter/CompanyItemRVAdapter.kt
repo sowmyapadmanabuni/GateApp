@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BlockSelectionActivity
 import com.oyespace.guards.pojo.VendorPojo
@@ -17,7 +19,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
 
 class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<CompanyItemRVAdapter.ItemViewHolder>() {
+    RecyclerView.Adapter<CompanyItemRVAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
         return ItemViewHolder(
@@ -38,7 +40,8 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
             if(arrayList[position].vendor_names.equals("Others")){
                 intent.putExtra(COMPANY_NAME, OTHERS)
             }else{
-                intent.putExtra(COMPANY_NAME, arrayList[position].vendor_names)
+               val data= arrayList[position].vendor_names
+                intent.putExtra(COMPANY_NAME, data)
 
             }
             mcontext.startActivity(intent)
@@ -60,8 +63,7 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
         return arrayList.size
     }
 
-    class ItemViewHolder(itemView: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val itemLabel: TextView
         val lv_itemrecyclerview: LinearLayout
         val img_logo:ImageView

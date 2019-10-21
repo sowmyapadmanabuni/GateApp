@@ -11,6 +11,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.oyespace.guards.R
@@ -49,17 +51,16 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
     internal var unitNumber4=""
     internal var unitNumber5=""
 
-    private val LIMIT = 10;
-    var PAGE_NUMBER = 0;
-
+    private val LIMIT = 10
+    var PAGE_NUMBER = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unit_selection)
 
-        header_title.setText(this.resources.getString(R.string.units_list_title));
-        header_subtitle.setText("A Block")
+        header_title.text = this.resources.getString(R.string.units_list_title)
+        header_subtitle.text = "A Block"
 
         /**
          * Setting status bar color (Only for Lollipop & above)
@@ -67,9 +68,9 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         //setDarkStatusBar()
 
         try{
-            blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK,-1);
-            blockName = ""+intent.getStringExtra(ConstantUtils.SELECTED_BLOCK_NAME);
-            header_subtitle.setText(blockName)
+            blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK, -1)
+            blockName = "" + intent.getStringExtra(ConstantUtils.SELECTED_BLOCK_NAME)
+            header_subtitle.text = blockName
             var json:String = (intent.getStringExtra(SELECTED_UNITS))
             var selArray:Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)
             selectedUnits = ArrayList(selArray.asList())
@@ -79,12 +80,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
         getUnitsFromBlock()
 
-        rv_unit.setLayoutManager(
-            androidx.recyclerview.widget.GridLayoutManager(
-                this@Vehicle_guest_UnitSelectionActivity,
-                2
-            )
-        )
+        rv_unit.setLayoutManager(GridLayoutManager(this@Vehicle_guest_UnitSelectionActivity, 2))
     }
 
     override fun onClick(v: View?) {
@@ -94,7 +90,9 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             R.id.buttonNext -> {
                     for (j in arrayFullList.indices) {
                         if (arrayFullList.get(j).isSelected) {
-                            val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(arrayFullList.get(j).unUnitID)) index else null}
+                            val indices = selectedUnits.mapIndexedNotNull { index, event ->
+                                if (event.unUnitID.equals(arrayFullList.get(j).unUnitID)) index else null
+                            }
                             if(indices == null || indices.size == 0) {
                               //  selectedUnits.add(arrayFullList[j])
 
@@ -121,22 +119,22 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             }
 
             R.id.btn_page_next -> {
-                btn_page_prev.isEnabled = true;
+                btn_page_prev.isEnabled = true
                 //var filtered = pageArrayList!!.filter { it.isActive.equals(true) }
                 var index = -1
                // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
                 for(i in 0 until pageArrayList.size){
                     if(pageArrayList[i].isActive == true){
-                        index = i;
-                        break;
+                        index = i
+                        break
                     }
                 }
                 if(index != -1){
                     if((index+1) < pageArrayList.size) {
-                        pageArrayList[index].isActive = false;
-                        pageArrayList[index + 1].isActive = true;
+                        pageArrayList[index].isActive = false
+                        pageArrayList[index + 1].isActive = true
                         pageNumberAdapter!!.notifyDataSetChanged()
-                        PAGE_NUMBER+=1;
+                        PAGE_NUMBER += 1
                         setPageData()
                     }
 
@@ -145,22 +143,22 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
             }
 
             R.id.btn_page_prev -> {
-                btn_page_next.isEnabled = true;
+                btn_page_next.isEnabled = true
                 var index = -1
                 // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
                 for(i in 0 until pageArrayList.size){
                     if(pageArrayList[i].isActive == true){
-                        index = i;
-                        break;
+                        index = i
+                        break
                     }
                 }
                // val indices = pageArrayList!!.mapIndexedNotNull { index, event ->  if (event.isActive.equals(true)) index else null}
                 if(index != -1){
                     if((index-1) >= 0) {
-                        pageArrayList[index].isActive = false;
-                        pageArrayList[index - 1].isActive = true;
+                        pageArrayList[index].isActive = false
+                        pageArrayList[index - 1].isActive = true
                         pageNumberAdapter!!.notifyDataSetChanged()
-                        PAGE_NUMBER-=1;
+                        PAGE_NUMBER -= 1
                         setPageData()
                     }
 
@@ -181,26 +179,26 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
      * for setting the data based on page number
      */
     fun onPageClick(selected:PaginationData, index:Int){
-        var arr = ArrayList<PaginationData>();
+        var arr = ArrayList<PaginationData>()
         for(pageObj in pageArrayList){
             if(selected.pageNumber.equals(pageObj.pageNumber)){
-                var obj = pageObj;
-                obj.isActive = true;
-                arr.add(obj);
+                var obj = pageObj
+                obj.isActive = true
+                arr.add(obj)
             }else{
-                var obj = pageObj;
-                obj.isActive = false;
-                arr.add(obj);
+                var obj = pageObj
+                obj.isActive = false
+                arr.add(obj)
             }
         }
-        pageArrayList = arr;
-        pageNumberAdapter!!.notifyDataSetChanged();
+        pageArrayList = arr
+        pageNumberAdapter!!.notifyDataSetChanged()
 
         /**
          * PaginationData object indexes from 1 and PAGE_NUMBER from 0.
          * So 1 reduced from PAGE_NUMBER to sync the index
          */
-        PAGE_NUMBER = (selected.pageNumber.toInt())-1;
+        PAGE_NUMBER = (selected.pageNumber.toInt()) - 1
         setPageData()
 
     }
@@ -213,22 +211,22 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         if(arrayFullList != null && arrayFullList.size > 0){
 
             if(arrayFullList.size > LIMIT){
-                var absolutePageNumber:Int = arrayFullList.size/LIMIT;
+                var absolutePageNumber: Int = arrayFullList.size / LIMIT
                 if(arrayFullList.size-(absolutePageNumber*LIMIT) != 0){
-                    absolutePageNumber+=1;
+                    absolutePageNumber += 1
                 }
                 for(i in 0 until absolutePageNumber){
-                    var isActive:Boolean = true;
+                    var isActive: Boolean = true
                     if(i > 0){
                         isActive = false
                     }
-                    var firstPage:PaginationData = PaginationData(""+(i+1),isActive);
-                    pageArrayList.add(firstPage);
+                    var firstPage: PaginationData = PaginationData("" + (i + 1), isActive)
+                    pageArrayList.add(firstPage)
                 }
 
             }else{
-                var firstPage:PaginationData = PaginationData("1",true);
-                pageArrayList.add(firstPage);
+                var firstPage: PaginationData = PaginationData("1", true)
+                pageArrayList.add(firstPage)
             }
 
             pageNumberAdapter =
@@ -237,13 +235,11 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 })
             rv_page.adapter = pageNumberAdapter
 
-            rv_page.setLayoutManager(
-                androidx.recyclerview.widget.LinearLayoutManager(
-                    this@Vehicle_guest_UnitSelectionActivity,
-                    androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL,
-                    false
-                )
-            );
+            rv_page.layoutManager = LinearLayoutManager(
+                this@Vehicle_guest_UnitSelectionActivity,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
 
 
         }
@@ -257,34 +253,32 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         if(arrayFullList.size <=LIMIT){
             btn_page_next.visibility = View.INVISIBLE
             btn_page_prev.visibility = View.INVISIBLE
-            rv_page.visibility = View.INVISIBLE;
+            rv_page.visibility = View.INVISIBLE
         }else{
             btn_page_next.visibility = View.VISIBLE
             btn_page_prev.visibility = View.VISIBLE
             rv_page.visibility = View.VISIBLE
         }
-        var updatedSelected = ArrayList<UnitPojo>();
+        var updatedSelected = ArrayList<UnitPojo>()
         for(i in 0 until arrayFullList.size){
-            var currentUnit:UnitPojo = arrayFullList[i];
-            val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(arrayFullList.get(i).unUnitID)) index else null}
-            if(indices != null && indices.size > 0){
-                currentUnit.isSelected = true;
-            }else{
-                currentUnit.isSelected = false;
+            var currentUnit: UnitPojo = arrayFullList[i]
+            val indices = selectedUnits.mapIndexedNotNull { index, event ->
+                if (event.unUnitID.equals(arrayFullList.get(i).unUnitID)) index else null
             }
-            updatedSelected.add(currentUnit);
+            currentUnit.isSelected = indices != null && indices.size > 0
+            updatedSelected.add(currentUnit)
         }
-        arrayFullList = updatedSelected;
+        arrayFullList = updatedSelected
 
         if(arrayFullList.size > LIMIT){
-            var start = 0;
-            var end = 0;
+            var start = 0
+            var end = 0
 
             if(PAGE_NUMBER == 0){
-                start = 0;
+                start = 0
                 end = LIMIT-1
             }else{
-                start = PAGE_NUMBER*LIMIT;
+                start = PAGE_NUMBER * LIMIT
                 end  = start+(LIMIT-1)
 
                 if(arrayFullList.size < end){
@@ -327,25 +321,25 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
 
     private fun onCheckUnit(checked:UnitPojo, isSelected:Boolean){
-        var arr = ArrayList<UnitPojo>();
+        var arr = ArrayList<UnitPojo>()
         for(unitObj in arrayFullList){
             if(checked.unUnitID.equals(unitObj.unUnitID)){
-                var obj = unitObj;
-                obj.isSelected = isSelected;
-                arr.add(obj);
+                var obj = unitObj
+                obj.isSelected = isSelected
+                arr.add(obj)
             }else{
-                arr.add(unitObj);
+                arr.add(unitObj)
             }
         }
-        arrayFullList = arr;
+        arrayFullList = arr
         if(!isSelected){
 
             val indices = selectedUnits!!.mapIndexedNotNull { index, event ->  if (event.unUnitID.equals(checked.unUnitID)) index else null}
             if(indices != null && indices.size > 0){
-                selectedUnits.removeAt(indices[0]);
+                selectedUnits.removeAt(indices[0])
             }
         } else {
-            selectedUnits.add(checked);
+            selectedUnits.add(checked)
         }
         //orderListAdapter!!.notifyDataSetChanged();
     }
@@ -377,8 +371,8 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                 override fun onSuccessResponse(UnitList: UnitsList<ArrayList<UnitPojo>>) {
                     dismissProgressrefresh()
                     if (UnitList.success == true) {
-                        arrayFullList = UnitList.data.unitsByBlockID;
-                        setPageData();
+                        arrayFullList = UnitList.data.unitsByBlockID
+                        setPageData()
                         managePageNumber()
 
                     } else {
@@ -401,7 +395,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
     }
 
     class UnitListAdapter(private val listVistor: ArrayList<UnitPojo>, private val mcontext: Context, val checkListener:(UnitPojo, Boolean) -> Unit) :
-        androidx.recyclerview.widget.RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
+        RecyclerView.Adapter<UnitListAdapter.MenuHolder>() {
 
         private val mInflater: LayoutInflater
         private var lastSelectedPosition = -1
@@ -422,9 +416,9 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
 
         override fun onBindViewHolder(holder: MenuHolder, position: Int) {
-            val orderData = listVistor?.get(position)
-            val vistordate = orderData?.asAssnID
-            holder.apartmentNamee.text = orderData?.unUniName
+            val orderData = listVistor.get(position)
+            val vistordate = orderData.asAssnID
+            holder.apartmentNamee.text = orderData.unUniName
 
             holder.rb_unit.setChecked(lastSelectedPosition == position);
 
@@ -455,19 +449,19 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
 
 
-            if(listVistor!!.get(position).isSelected){
+            if (listVistor.get(position).isSelected) {
                 pos=position
 
-                holder.rb_unit.setChecked(true)
-                holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent));
+                holder.rb_unit.isChecked = true
+                holder.rb_unit.setBackgroundColor(mcontext.resources.getColor(android.R.color.transparent))
             }else{
                 holder.rb_unit.isChecked = false;
                 holder.rb_unit.setBackgroundResource(R.drawable.checkbox_state_style);
             }
-
+            //  Log.d("cdvd",orderData?.unUniName+" "+orderData.owner.uoisdCode+""+orderData.owner.uoMobile);
 
             holder.iv_unit.setOnClickListener {
-                if (orderData!!.owner.size == 0 && orderData!!.tenant.size == 0) {
+                if (orderData.owner.size == 0 && orderData.tenant.size == 0) {
                     //  Log.d("cdvd 2", "" + orderData?.owner[0].uoisdCode + " " + orderData?.owner[0].uoMobile);
 
 //if(orderData.owner[0].uoMobile!=null) {
@@ -503,7 +497,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 //                    mcontext.startActivity(intent)
 
 
-                    if (orderData!!.tenant.size != 0) {
+                    if (orderData.tenant.size != 0) {
 
                         val alertadd = AlertDialog.Builder(mcontext)
                         val factory = LayoutInflater.from(mcontext)
@@ -549,7 +543,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                         iv_unit1.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL);
+                            val intent = Intent(Intent.ACTION_CALL)
                             intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile)
                             mcontext.startActivity(intent)
 
@@ -558,7 +552,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                         iv_unit2.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL);
+                            val intent = Intent(Intent.ACTION_CALL)
                             intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile1)
                             mcontext.startActivity(intent)
 
@@ -570,9 +564,9 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                     } else {
 
-                        if (orderData!!.owner.size != 0) {
+                        if (orderData.owner.size != 0) {
 
-                            val alertadd =AlertDialog.Builder(mcontext)
+                            val alertadd = AlertDialog.Builder(mcontext)
                             val factory = LayoutInflater.from(mcontext)
                             val view = factory.inflate(R.layout.layout_phonenumber, null)
                             var tv_number1: TextView? = null
@@ -654,7 +648,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                             iv_unit1.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile)
                                 mcontext.startActivity(intent)
 
@@ -662,7 +656,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                             iv_unit2.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile1)
                                 mcontext.startActivity(intent)
 
@@ -670,21 +664,21 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
 
                             iv_unit3.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile2)
                                 mcontext.startActivity(intent)
 
                             }
                             iv_unit4.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile3)
                                 mcontext.startActivity(intent)
 
                             }
                             iv_unit5.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL);
+                                val intent = Intent(Intent.ACTION_CALL)
                                 intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile4)
                                 mcontext.startActivity(intent)
 
@@ -738,7 +732,7 @@ class Vehicle_guest_UnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
         }
 
         override fun getItemCount(): Int {
-            return listVistor?.size ?: 0
+            return listVistor.size
         }
 
         inner class MenuHolder(private val view: View) : RecyclerView.ViewHolder(view) {

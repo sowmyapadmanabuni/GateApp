@@ -56,7 +56,7 @@ public class CarImages_Adapter extends PagerAdapter {
     public Object instantiateItem(ViewGroup container, final int position) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View pagerview = inflater.inflate(R.layout.custom_add_car_images_layout, container, false);
-        final ImageView pagerImage = (ImageView) pagerview.findViewById(R.id.car_images);
+        final ImageView pagerImage = pagerview.findViewById(R.id.car_images);
         Log.e("Path", "" + listimage.get(position));
         Bitmap b = null;
         try {
@@ -68,7 +68,7 @@ public class CarImages_Adapter extends PagerAdapter {
         }
         pagerImage.setImageBitmap(b);
         container.addView(pagerview, 0);
-        final ImageView imagedelete = (ImageView) pagerview.findViewById(R.id.image_delete_button);
+        final ImageView imagedelete = pagerview.findViewById(R.id.image_delete_button);
         imagedelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

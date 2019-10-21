@@ -51,11 +51,11 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNext -> {
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if (Ed_Name.text.length < 2) {
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this, "Enter Valid Name", Toast.LENGTH_SHORT).show()
 
 
@@ -63,8 +63,8 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
 
 
                     if (ed_dob!!.length() == 0) {
-                        buttonNext.setEnabled(true)
-                        buttonNext.setClickable(true)
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
                         Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
                     } else {
                         val d = Intent(this@ManualNameEntryScreen, ManualAddCarFragment::class.java)
@@ -75,7 +75,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                         d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                        d.putExtra(PERSONNAME, Ed_Name.getText().toString())
+                        d.putExtra(PERSONNAME, Ed_Name.text.toString())
                         d.putExtra("DOB", s_dob.toString())
                         d.putExtra(
                             ConstantUtils.UNIT_ACCOUNT_ID,
@@ -87,8 +87,8 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                         d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                         d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-                        startActivity(d);
-                        finish();
+                        startActivity(d)
+                        finish()
                     }
                 } else {
                     val d = Intent(this@ManualNameEntryScreen, ManualAddCarFragment::class.java)
@@ -100,7 +100,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                    d.putExtra(PERSONNAME, Ed_Name.getText().toString())
+                    d.putExtra(PERSONNAME, Ed_Name.text.toString())
                     d.putExtra("DOB", s_dob.toString())
                     d.putExtra(
                         ConstantUtils.UNIT_ACCOUNT_ID,
@@ -112,8 +112,8 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                     d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                     d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                     d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-                    startActivity(d);
-                    finish();
+                    startActivity(d)
+                    finish()
 
                 }
             }
@@ -130,8 +130,8 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         ed_dob = findViewById(R.id.ed_dob)
         lyt_dob = findViewById(R.id.lyt_dob)
 
-        if (getIntent().getStringExtra("FIRSTNAME") != null) {
-            Ed_Name.setText(getIntent().getStringExtra("FIRSTNAME"))
+        if (intent.getStringExtra("FIRSTNAME") != null) {
+            Ed_Name.setText(intent.getStringExtra("FIRSTNAME"))
         }
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
             lyt_dob!!.visibility = View.VISIBLE
@@ -141,7 +141,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
 
 
         val sDOB = intent.getStringExtra("BIRTHDAY")
-        sDOB.substring(0, 10);
+        sDOB.substring(0, 10)
 
         cal = Calendar.getInstance()
         y = cal!!.get(Calendar.YEAR)
@@ -149,26 +149,26 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         d = cal!!.get(Calendar.DAY_OF_MONTH)
 
 
-        date = sDOB.substring(0, 10);
-        s_dob = sDOB.substring(0, 10);
+        date = sDOB.substring(0, 10)
+        s_dob = sDOB.substring(0, 10)
 
-        inputt = SimpleDateFormat("yyyy-MM-dd");
-        output = SimpleDateFormat("dd-MM-yyyy");
+        inputt = SimpleDateFormat("yyyy-MM-dd")
+        output = SimpleDateFormat("dd-MM-yyyy")
         try {
-            oneWayTripDate = inputt!!.parse(date);                 // parse input
+            oneWayTripDate = inputt!!.parse(date)                 // parse input
             //0001-01-01
 
             if (output!!.format(oneWayTripDate).equals("01-01-0001")) {
-                ed_dob?.setHint(resources.getString(R.string.textselectdob));    // format output
+                ed_dob?.hint = resources.getString(R.string.textselectdob)    // format output
             } else {
-                ed_dob?.setText(output!!.format(oneWayTripDate));    // format output
+                ed_dob?.setText(output!!.format(oneWayTripDate))    // format output
 
-                out = output!!.format(oneWayTripDate).split(",").toTypedArray();
+                out = output!!.format(oneWayTripDate).split(",").toTypedArray()
 
                 try {
-                    System.out.println("Year = " + out[2]);
-                    System.out.println("Month = " + out[0]);
-                    System.out.println("Day = " + out[1]);
+                    System.out.println("Year = " + out[2])
+                    System.out.println("Month = " + out[0])
+                    System.out.println("Day = " + out[1])
                     y = out[2].toInt()
                     m = out[0].toInt()
                     d = out[1].toInt()
@@ -180,7 +180,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
             }
 
         } catch (e: ParseException) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
 
         txt_assn_name = findViewById(R.id.txt_assn_name)
@@ -217,11 +217,11 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
 
                     // Display Selected date in textbox
 
-                    var userAge = GregorianCalendar(year, month, day);
-                    var minAdultAge = GregorianCalendar();
-                    minAdultAge.add(Calendar.YEAR, -18);
+                    var userAge = GregorianCalendar(year, month, day)
+                    var minAdultAge = GregorianCalendar()
+                    minAdultAge.add(Calendar.YEAR, -18)
                     if (minAdultAge.before(userAge)) {
-                        Toast.makeText(this, "Age is below 18.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Age is below 18.", Toast.LENGTH_LONG).show()
                     } else {
                         ed_dob!!.setText("" + dayOfMonth + "-" + (monthOfYear + 1) + "-" + year)
                         s_dob = ("" + year + "-" + (monthOfYear + 1) + "-" + dayOfMonth)
@@ -232,7 +232,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                 d
             )
             try {
-                datepickerdialog!!.getDatePicker().setMaxDate(calendar!!.getTimeInMillis());
+                datepickerdialog!!.datePicker.maxDate = calendar!!.timeInMillis
 
             } catch (e: KotlinNullPointerException) {
 
@@ -242,7 +242,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         }
 
         Btn_Mic.setOnClickListener {
-            Speak();
+            Speak()
         }
 //        supportActionBar!!.setTitle("Enter your Name")
 //        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
@@ -291,7 +291,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                 RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
             )
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN");
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN")
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
 
             try {
