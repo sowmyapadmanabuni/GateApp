@@ -1,34 +1,36 @@
 package com.oyespace.guards.adapter
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
-import android.content.Intent.getIntent
-import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.viewpager.widget.ViewPager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.BlockSelectionActivity
-import com.oyespace.guards.camtest.ViewFullImageActivity
-import com.oyespace.guards.camtest.ViewPagerAdapter
-import com.oyespace.guards.pojo.VendorPojo
-import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
 import com.squareup.picasso.Picasso
 
-class HorizontalImagesAdapter(private val mcontext: Context,  val arrayList: Array<String>) :
-    androidx.recyclerview.widget.RecyclerView.Adapter<HorizontalImagesAdapter.ItemViewHolder>() {
+class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Array<String>) :
+    RecyclerView.Adapter<HorizontalImagesAdapter.ItemViewHolder>() {
+
+    var imagePopup: AlertDialog? = null
+    var imageList: RecyclerView? = null
+
+    init {
+
+        val view = LayoutInflater.from(mcontext).inflate(R.layout.imageviewer_layout, null, false)
+        imagePopup = AlertDialog.Builder(mcontext)
+            .setView(view)
+            .create()
+
+        imageList = view.findViewById(R.id.imageviewer_list)
+        imageList?.adapter = PopupImagesAdapter(arrayList)
+        PagerSnapHelper().attachToRecyclerView(imageList)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
+
         return ItemViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.layout_horizontal_images, parent, false)
         )
@@ -58,29 +60,13 @@ class HorizontalImagesAdapter(private val mcontext: Context,  val arrayList: Arr
 //
 //        }
 //        if(arrayList[position].image_url>0) {
-            Picasso.with(mcontext)
-                .load("http://mediaupload.oyespace.com/"+arrayList[position])
-                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)
-//holder.image.setOnClickListener {
-//
-//
-//    val alertadd = AlertDialog.Builder(mcontext)
-//    val factory = LayoutInflater.from(mcontext)
-//    val view = factory.inflate(R.layout.activity_view_full_image, null)
-//
-//        val viewPager =view. findViewById(R.id.viewpager) as ViewPager
-//        viewPager.adapter = IamgeViewPagerAdapter(mcontext,arrayList)
-//        viewPager.currentItem = position
-//
-//
-//    alertadd.setView(view)
-//    alertadd.show()
-//
-////    val pos = holder.layoutPosition
-////    val intent = Intent(mcontext, ViewFullImageActivity::class.java)
-////    intent.putExtra("pos", pos)
-////    mcontext.startActivity(intent)
-//}
+        Picasso.with(mcontext)
+            .load("http://mediaupload.oyespace.com/" + arrayList[position])
+            .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)
+
+        holder.image.setOnClickListener {
+            imagePopup?.show()
+        }
 
     }
 
@@ -89,14 +75,41 @@ class HorizontalImagesAdapter(private val mcontext: Context,  val arrayList: Arr
     }
 
     class ItemViewHolder(itemView: View) :
-        androidx.recyclerview.widget.RecyclerView.ViewHolder(itemView) {
+        RecyclerView.ViewHolder(itemView) {
 
         val image: ImageView
 
         init {
-
-            image=itemView.findViewById(R.id.image)
+            image = itemView.findViewById(R.id.image)
         }
     }
+
+    inner class PopupImagesAdapter(val images: Array<String>) : RecyclerView.Adapter<PopupImageVH>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PopupImageVH {
+            return PopupImageVH(LayoutInflater.from(mcontext).inflate(R.layout.popup_image, parent, false))
+        }
+
+        override fun getItemCount(): Int = images.size
+
+        override fun onBindViewHolder(holder: PopupImageVH, position: Int) {
+
+            holder.setImage(images.get(position))
+
+        }
+
+    }
+
+    inner class PopupImageVH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
+        fun setImage(img: String) {
+            val imgv = itemView.findViewById<ImageView>(R.id.image)
+            Picasso.with(mcontext)
+                .load("http://mediaupload.oyespace.com/" + img)
+                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(imgv)
+        }
+
+    }
+
 
 }

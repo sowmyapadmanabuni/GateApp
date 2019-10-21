@@ -3,12 +3,8 @@ package com.oyespace.guards.adapter
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.media.AudioAttributes
-import android.media.AudioManager
 import android.media.MediaPlayer
-import android.media.SoundPool
 import android.net.Uri
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +12,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -25,12 +22,13 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
+import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.TimerUtil
 import com.squareup.picasso.Picasso
-import java.io.File
 import java.util.*
 
 
@@ -39,8 +37,7 @@ class VistorEntryListAdapter(
     private val mcontext: Context
 ) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
 
-    lateinit var firebasedataMap: HashMap<String, NotificationSyncModel>
-    private var refreshImages: Boolean = true
+    var firebasedataMap: HashMap<String, NotificationSyncModel>
     private var searchList: ArrayList<VisitorLog>? = null
     var number: String? = null
     var searchString: String = ""
@@ -82,9 +79,22 @@ class VistorEntryListAdapter(
             holder.entrydate.text = formatDateDMY(visitor.vldCreated)
             if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
                 holder.exitTime.text = ""
-
-                holder.exitdate.text = ""
                 holder.btn_makeexit.visibility = View.VISIBLE
+
+//                if (visitor.vlVenImg.isEmpty() and visitor.vlVoiceNote.isEmpty() and visitor.vlCmnts.isEmpty()) {
+//                    holder.iv_attachment.visibility = View.GONE
+//                    holder.expanded_view.visibility = View.GONE
+//                } else {
+//                    holder.iv_attachment.visibility = View.VISIBLE
+//                    holder.lyt_text.setOnClickListener {
+//
+//                        if (holder.expanded_view.visibility == View.GONE) {
+//                            holder.expanded_view.visibility = View.VISIBLE
+//                        } else {
+//                            holder.expanded_view.visibility = View.GONE
+//                        }
+//                    }
+//                }
 
                 if (visitor.vlVenImg.contains(",")) {
                     var imageList: Array<String>
@@ -108,24 +118,48 @@ class VistorEntryListAdapter(
 
                 val noofUnits = VisitorLogRepo.getUnitCountForVisitor(visitor.vlMobile)
 
-                if (visitor.vlVisType.equals(DELIVERY) && deliveryTimeUp(visitor.vlEntryT, getCurrentTimeLocal(), noofUnits)) {
-                    holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
-                    holder.ll_card.startAnimation(animBlink)
-                } else {
 
-                    val key = visitor.vlVisLgID.toString()
-                    if (firebasedataMap.contains(key)) {
+                if (visitor.vlVisType.equals(DELIVERY)) {
 
-                        val value = firebasedataMap.get(key)
+                    val firebaseObject = firebasedataMap.get(visitor.vlVisLgID.toString())
+
+                    val entryTime = visitor.vlEntryT
+
+                    if (deliveryTimeUp(visitor.vlEntryT, getCurrentTimeLocal(), noofUnits)) {
+                        holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
+                        holder.ll_card.startAnimation(animBlink)
+                    } else {
+
+                        val fbColor = firebaseObject?.buttonColor
                         try {
-                            holder.ll_card.setBackgroundColor(Color.parseColor(value?.buttonColor))
+                            holder.ll_card.setBackgroundColor(Color.parseColor(fbColor))
                         } catch (e: Exception) {
                             e.printStackTrace()
+                        }
+                        when (fbColor) {
+                            "#ffb81a" -> {// pending
+                                holder.btn_makeexit.visibility = View.INVISIBLE
+                                TimerUtil(24 * 60 * 60 * 1000, object : TimerUtil.OnFinishCallback {
+                                    override fun onFinish() {
+
+                                        holder.btn_makeexit.visibility = View.GONE
+                                        exitVisitor(visitor, position)
+
+                                    }
+                                }).start()
+                            }
+                            "#00FF00" -> {// accepted by resident
+                                holder.btn_makeexit.visibility = View.VISIBLE
+                            }
+                            "#FF0000" -> {// rejected by resident
+                                holder.btn_makeexit.visibility = View.VISIBLE
+                            }
                         }
 
                     }
 
                 }
+
 
             } else {
                 holder.exitTime.text = formatDateHM(visitor.vlExitT)
@@ -171,21 +205,12 @@ class VistorEntryListAdapter(
                 }
             }
 
-            if (refreshImages) {
-//                Picasso.with(mcontext).invalidate(imgPath)
-            }
-
             Glide.with(mcontext)
                 .load(imgPath)
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
                 .skipMemoryCache(false)
                 .into(holder.iv_user)
-
-//            Picasso.with(mcontext)
-//                .load(imgPath)
-//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-//                .into(holder.iv_user)
 
             holder.iv_user.setOnClickListener {
 
@@ -244,13 +269,13 @@ class VistorEntryListAdapter(
             }
 
 
-            if (visitor.vlVoiceNote.contains("")) {
+            if (visitor.vlVoiceNote.isEmpty()) {
                 holder.iv_play.visibility = View.GONE
             } else {
                 holder.iv_play.visibility = View.VISIBLE
             }
             holder.iv_play.setOnClickListener {
-                getAudio(visitor.vlVoiceNote)
+                AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
             }
 
             holder.tv_comments.text = visitor.vlCmnts
@@ -263,34 +288,6 @@ class VistorEntryListAdapter(
             }
             holder.expanded_view.visibility = View.GONE
 
-            //        if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
-//            holder.iv_attachment.visibility = View.GONE
-//
-//        }
-//
-//        else{
-//            holder.iv_attachment.visibility=View.VISIBLE
-//
-//        }
-
-//        holder.lyt_text.setOnClickListener {
-//
-            //            if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
-//                holder.expanded_view.visibility = View.GONE
-//            }
-//
-//            else{
-//                if (holder.expanded_view.visibility == View.GONE) {
-            //                    holder.expanded_view.visibility = View.VISIBLE
-//                } else {
-//                    holder.expanded_view.visibility = View.GONE
-//                }
-//            }
-//
-//
-//        }
-
-            // holder.tv_purpose.text=orderData?.vlMobile
         }
 
 
@@ -326,7 +323,6 @@ class VistorEntryListAdapter(
     }
 
     fun setVisitorLog(visitorLog: ArrayList<VisitorLog>?) {
-        refreshImages = true
         if (visitorLog == null) {
             this.searchList = visitorList
         } else {
@@ -347,9 +343,9 @@ class VistorEntryListAdapter(
         val entrydate: TextView
         val exitdate: TextView
         val ll_card: LinearLayout
-        val expanded_view: LinearLayout
+        val expanded_view: ConstraintLayout
         val lyt_text: LinearLayout
-        val iv_map: ImageView
+        //        val iv_map: ImageView
         val rv_images: RecyclerView
         val iv_play: ImageView
         val tv_comments: TextView
@@ -376,7 +372,7 @@ class VistorEntryListAdapter(
             ll_card = view.findViewById(R.id.ll_card)
             expanded_view = view.findViewById(R.id.expanded_view)
             lyt_text = view.findViewById(R.id.lyt_text)
-            iv_map = view.findViewById(R.id.iv_map)
+//            iv_map = view.findViewById(R.id.iv_map)
             rv_images = view.findViewById(R.id.rv_images)
             iv_play = view.findViewById(R.id.iv_play)
             tv_comments = view.findViewById(R.id.tv_comments)
@@ -389,55 +385,10 @@ class VistorEntryListAdapter(
 
     fun applySearch(search: String) {
 
-        refreshImages = search.isEmpty()
-
         this.searchString = search
         searchList = VisitorLogRepo.search_IN_Visitors(search)
 
         notifyDataSetChanged()
-
-    }
-
-    fun getAudio(filename: String) {
-
-
-        try {
-            if (mp.isPlaying) {
-                mp.stop()
-                mp.release()
-
-            }
-
-            mp.start()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-
-        val mediaPlayer: MediaPlayer
-//
-        val am = mcontext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-        mediaPlayer = MediaPlayer()
-
-
-        var spb = SoundPool.Builder()
-        spb.setMaxStreams(10)
-        var attrBuilder = AudioAttributes.Builder()
-        attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-        spb.setAudioAttributes(attrBuilder.build())
-        spb.build()
-
-        mediaPlayer.setDataSource("http://mediaupload.oyespace.com/" + filename)
-        mediaPlayer.prepare()
-
-        mediaPlayer.start()
-
-
-        val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            .absolutePath
-        val f = File(baseDir + filename)
-        f.delete()
 
     }
 

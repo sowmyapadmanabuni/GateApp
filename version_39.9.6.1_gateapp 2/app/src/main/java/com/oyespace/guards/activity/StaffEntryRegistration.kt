@@ -24,7 +24,6 @@ import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
@@ -401,30 +400,20 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             Log.i("taaag", "count $count")
                             if (count <= 0) {
 
-                                VisitorEntryLogRealm.addVisitorEntries(
-                                    visitorsList,
-                                    object : VisitorEntryLogRealm.VisitorEntryListener {
-                                        override fun onEntrySave(success: Boolean) {
+                                for (i in list.indices) {
+                                    val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
+                                    val dir = Environment.getExternalStorageDirectory().path
+                                    val file = File(dir, fileName)
+                                    file.delete()
+                                }
 
-                                            for (i in list.indices) {
-                                                val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
-                                                val dir = Environment.getExternalStorageDirectory().path
-                                                val file = File(dir, fileName)
-                                                file.delete()
-                                            }
+                                val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                                deleteDir(dir.absolutePath)
 
-                                            val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                                            deleteDir(dir.absolutePath)
+                                uploadImage(imgName, mBitmap)
 
-                                            uploadImage(imgName, mBitmap)
-
-                                            dismissProgress()
-                                            finish()
-
-                                        }
-
-                                    }
-                                )
+                                dismissProgress()
+                                finish()
 
                             }
 

@@ -87,6 +87,23 @@ public class DateTimeUtils {
 
     }
 
+    public static long remainingTimeMs(String entryTimeString, long maxMS) {
+
+        try {
+
+            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+            long entryTime = DATE_FORMAT_YMDHMS.parse(entryTimeString).getTime();
+//            long currentTIme = DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)).getTime();
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+
+    }
+
     public static boolean deliveryTimeUp(String downloaded_date, String curr_date_YMD_hms, int itemCount) {
 
         try {
