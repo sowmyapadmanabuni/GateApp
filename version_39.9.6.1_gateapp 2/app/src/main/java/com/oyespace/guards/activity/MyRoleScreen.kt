@@ -92,6 +92,7 @@ class MyRoleScreen : BaseKotlinActivity() {
                             //if the existing elements contains the search input
                             Log.d("button_done ","device "+" "+" "+s.deGateNo)
                             Prefs.putString(GATE_NO,s.deGateNo)
+                            Prefs.putInt(GATE_DEVICE_ID,s.deid)
                             if (s.deStatus) {
                                 Log.d("device ","device "+s.deStatus+" "+s.deStatus+" ")
 

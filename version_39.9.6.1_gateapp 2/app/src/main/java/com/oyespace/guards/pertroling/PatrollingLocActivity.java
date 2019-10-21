@@ -12,12 +12,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.location.Location;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -37,6 +40,7 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.zxing.Result;
+import com.oyespace.guards.CapPhoto;
 import com.oyespace.guards.R;
 import com.oyespace.guards.SGPatrollingService;
 import com.oyespace.guards.activity.BaseKotlinActivity;
@@ -47,6 +51,8 @@ import com.oyespace.guards.models.ScheduleCheckPointsData;
 import com.oyespace.guards.network.CommonDisposable;
 import com.oyespace.guards.network.RetrofitClinet;
 import com.oyespace.guards.pojo.CheckPointData;
+import com.oyespace.guards.pojo.CheckPointScanRequest;
+import com.oyespace.guards.pojo.CheckPointScanResponse;
 import com.oyespace.guards.pojo.GetCheckPointResponse;
 import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.Prefs;
@@ -73,9 +79,14 @@ import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_DISTANCE_THRESHOLD;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
 import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_DEVICE_ID;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
+import static com.oyespace.guards.utils.ConstantUtils.MEDIA_URL;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
 import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_COMPLETED_ON;
+import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_HIDDEN_SELFIE;
 import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
+import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
 
 public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void> {
 
@@ -147,6 +158,14 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         mActiveSchedule = getIntent().getIntExtra(PATROLLING_SCHEDULE_ID,0);
         getScheduleCheckPoints();
 
+        byte[] wrrw = getIntent().getByteArrayExtra(PERSON_PHOTO);
+        if(wrrw != null){
+            Log.e("IMAGE_CAPTURED",""+wrrw);
+        }
+
+        checkDrawOverWindowPermission();
+
+
         startLocationListener();
         initScanner();
         initSpeech();
@@ -156,6 +175,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         int lastScannedCP = Prefs.getInt(ACTIVE_PATROLLING_LAST_CP, -1);
 
         if(ongoingSchedule == mActiveSchedule && ongoingSchedule != -1){
+            startSiren();
             showPendingWarning();
         }
 
@@ -164,6 +184,46 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //populateGeofenceList();
         //addGeofences();
     }
+
+
+    private void checkDrawOverWindowPermission(){
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 1234);
+            }else{
+                startHiddenCamera();
+            }
+        } else {
+            startHiddenCamera();
+        }
+    }
+
+    private void startHiddenCamera(){
+        String imgName = "Selfie" + "Association" + Prefs.getInt(
+                ASSOCIATION_ID,
+                0
+        ) + "GUARD_PATROLLING" + Prefs.getString(ConstantUtils.GATE_NO, "") + System.currentTimeMillis() + ".jpg";
+
+        Intent front_translucent =  new Intent(getBaseContext(), CapPhoto.class);
+        front_translucent.putExtra("Front_Request", true);
+        front_translucent.putExtra("ImageName",imgName);
+
+        // front_translucent.putExtra("Quality_Mode", camCapture.getQuality());
+        getApplication().getApplicationContext().startService(
+                front_translucent);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1234) {
+           startHiddenCamera();
+        }
+    }
+
 
 
     private void getScheduleCheckPoints(){
@@ -212,6 +272,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             public void onClick(DialogInterface dialog, int id) {
                 Prefs.remove(ACTIVE_PATROLLING_SCHEDULE);
                 Prefs.remove(ACTIVE_PATROLLING_LAST_CP);
+                stopSiren();
                 Toast.makeText(PatrollingLocActivity.this,"Please go to the first checkpoint",Toast.LENGTH_LONG).show();
                 dialog.cancel();
             }
@@ -484,7 +545,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         if (ongoingSchedule == -1) {
             //Fresh Start
             int nextCP = getNextCheckPoint(-1);
-
+            Log.e("NEXT_CHECKPOINT",""+nextCP);
             if(nextCP==checkPointData.getCpChkPntID()){
                 if (mCPType.equals(CHECKPOINT_TYPE_START)) {
 
@@ -494,6 +555,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         toSpeech.speak("Checkpoint Scanned Successfully", TextToSpeech.QUEUE_FLUSH, null);
                         showAnimatedDialog("Checkpoint Scanned Successfully", R.raw.done, true, "OK");
                         startSiren();
+                        sendScannedCheckPoint(checkPointData);
                         return true;
                     } else {
                         toSpeech.speak("You are out of checkpoint location", TextToSpeech.QUEUE_FLUSH, null);
@@ -520,6 +582,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 startSiren();
             }
             int nextCP = getNextCheckPoint(lastScannedCP);
+            Log.e("NEXT_CHECKPOINT_SEC",""+nextCP);
             if (nextCP == checkPointData.getCpChkPntID() && !mCPType.equalsIgnoreCase(CHECKPOINT_TYPE_START)) {
 
                 if (isValidDistance(coordinate.getLat(), coordinate.getLon())) {
@@ -531,14 +594,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         showAnimatedDialog("Patrolling Completed", R.raw.done, true, "OK");
                         Prefs.putString(PATROLLING_COMPLETED_ON+mActiveSchedule,new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date()));
                         stopSiren();
-                        //onBackPressed();
                     }else{
                         Prefs.putInt(ACTIVE_PATROLLING_SCHEDULE, mActiveSchedule);
                         Prefs.putInt(ACTIVE_PATROLLING_LAST_CP, checkPointData.getCpChkPntID());
                         toSpeech.speak("Checkpoint Scanned Successfully", TextToSpeech.QUEUE_FLUSH, null);
                         showAnimatedDialog("Checkpoint Scanned Successfully", R.raw.done, true, "OK");
-                       //
                     }
+                    sendScannedCheckPoint(checkPointData);
                     return true;
                 } else {
                     toSpeech.speak("You are out of checkpoint location", TextToSpeech.QUEUE_FLUSH, null);
@@ -620,8 +682,9 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     private boolean isValidDistance(Double mCPLatitude, Double mCPLongitude) {
         float result = calculateDistance(mCPLatitude, mCPLongitude);
-        return true;
-        //return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
+        //return true;
+        Log.e("DISTANCE_LOC",""+result);
+        return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
 
 //        if (results[0] < CHECKPOINT_DISTANCE_THRESHOLD) {
 //            //toSpeech.speak("Checkpoint scanned successfully. Move to next checkpoint", TextToSpeech.QUEUE_FLUSH, null);
@@ -755,9 +818,49 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     }
 
+    private void sendScannedCheckPoint(CheckPointData checkPointData){
+
+        CheckPointScanRequest scanRequest = new CheckPointScanRequest(
+                Prefs.getInt(ASSOCIATION_ID,0),
+                "",
+                Prefs.getString(GATE_NO, ""),
+                mActiveSchedule,
+                new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),checkPointData.getCpgpsPnt(),
+                checkPointData.getCpCkPName(),MEDIA_URL+Prefs.getString(PATROLLING_HIDDEN_SELFIE,""),Prefs.getInt(GATE_DEVICE_ID,0),checkPointData.getCpcPntAt());
+
+        Log.e("scanRequest",""+scanRequest);
+            RetrofitClinet.Companion.getInstance()
+                .scanCheckPoint(OYE247TOKEN, scanRequest)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new CommonDisposable<CheckPointScanResponse>() {
+
+                    @Override
+                    public void noNetowork() {
+
+                    }
+
+                    @Override
+                    public void onErrorResponse(@NotNull Throwable e) {
+                        Log.e("SCNANNED_ERR",""+e);
+                    }
+
+                    @Override
+                    public void onSuccessResponse(CheckPointScanResponse checkPointScanResponse) {
+                        Log.e("SCNANNED_NETWR",""+checkPointScanResponse);
+                    }
+                });
+    }
+
     @Override
     public void onResume() {
         Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true);
+
+        byte[] wrrw = getIntent().getByteArrayExtra(PERSON_PHOTO);
+        if(wrrw != null){
+            Log.e("IMAGE_CAPTURED_res",""+wrrw);
+        }
+
         super.onResume();
         mScannerView.setResultHandler(this);
         mScannerView.startCamera();
@@ -782,7 +885,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     protected void onDestroy() {
         try {
             Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false);
-
+            stopSiren();
             if (toSpeech != null) {
                 toSpeech.stop();
                 toSpeech.shutdown();

@@ -342,7 +342,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
+                    Log.e("uploadImage", "response:" + response.body()!!)
+                    Prefs.putString(ConstantUtils.PATROLLING_HIDDEN_SELFIE,""+localImgName);
                     file.delete()
 
                 } catch (ex: Exception) {
