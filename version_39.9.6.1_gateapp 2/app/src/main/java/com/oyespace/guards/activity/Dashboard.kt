@@ -37,6 +37,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.karumi.dexter.Dexter
@@ -55,7 +56,6 @@ import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
 import com.oyespace.guards.models.*
 import com.oyespace.guards.models.FingerPrint
-import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.network.*
 import com.oyespace.guards.ocr.CaptureImageOcr
@@ -89,7 +89,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     ResponseHandler,
-    SGFingerPresentEvent {
+    SGFingerPresentEvent, ValueEventListener {
 
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
@@ -189,6 +189,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     var pTimer: Timer? = null
     var pTimerChecker: Timer? = null
     //a separate thread.
+    lateinit var firebaseDBRef: DatabaseReference
 
 
     var fingerDetectedHandler: Handler = object : Handler() {
@@ -468,6 +469,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(receiver, IntentFilter("SYNC"))//constant
 
+        firebaseDBRef = FirebaseDatabase.getInstance().getReference("NotificationSync")
+
     }
 
     fun stopSiren() {
@@ -596,6 +599,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         dismissProgressrefresh()
         loadEntryVisitorLog()
+
 
         if (isTimeAutomatic(application)) {
 
@@ -741,11 +745,14 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             return
         }
 
+        showProgress("loading entry data...")
         VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
-            override fun onFetch(visitorLog: ArrayList<VisitorLog>?) {
+            override fun onFetch(visitorLog: ArrayList<VisitorLog>?, errorMessage: String?) {
 
+                // reset no data text
                 rv_dashboard!!.visibility = View.GONE
                 tv_nodata.visibility = View.VISIBLE
+                tv_nodata.text = "no data"
 
                 if (visitorLog != null) {
                     newAl = visitorLog
@@ -770,8 +777,13 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     if (!searchString.isEmpty()) {
                         vistorEntryListAdapter!!.applySearch(searchString)
                     }
+                    firebaseDBRef.removeEventListener(this@Dashboard)
+                    firebaseDBRef.addValueEventListener(this@Dashboard)
 
+                } else {
+                    Toast.makeText(this@Dashboard, errorMessage, Toast.LENGTH_SHORT).show()
                 }
+                dismissProgress()
 
             }
 
@@ -785,8 +797,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             return
         }
 
+        showProgress("loading exit data...")
         VisitorLogRepo.get_OUT_VisitorLog(pullFromBackend, object : VisitorLogRepo.ExitVisitorLogFetchListener {
-            override fun onFetch(visitorLog: ArrayList<ExitVisitorLog>?) {
+            override fun onFetch(visitorLog: ArrayList<ExitVisitorLog>?, errorMessage: String?) {
 
                 if (visitorLog != null) {
 
@@ -812,7 +825,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                         vistorOutListAdapter!!.applySearch(searchString, true)
                     }
 
+                } else {
+                    Toast.makeText(this@Dashboard, errorMessage, Toast.LENGTH_SHORT).show()
                 }
+                dismissProgress()
             }
 
         })
@@ -1462,7 +1478,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             Prefs.putString("BUTTON", "OUT")
             btn_in.setBackgroundColor(resources.getColor(R.color.grey))
             btn_out.setBackgroundColor(resources.getColor(R.color.orange))
-            loadExitVisitorLog(false)
+            loadExitVisitorLog(true)
         }
 
 
@@ -2405,6 +2421,39 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     }
 
+    override fun onCancelled(p0: DatabaseError) {
+
+    }
+
+    override fun onDataChange(datasnapshot: DataSnapshot) {
+
+        if (!showingOutLog) {
+            if (vistorEntryListAdapter != null) {
+
+                val firebasedataMap = HashMap<String, NotificationSyncModel>()
+                for (h in datasnapshot.children) {
+                    try {
+                        val data = h.getValue(NotificationSyncModel::class.java)
+
+                        if (data != null) {
+                            firebasedataMap.put(data.visitorlogId, data)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("taaag", "crash at value ${h.value}")
+                        Toast.makeText(this, "crash at value ${h.value}", Toast.LENGTH_SHORT).show()
+                        e.printStackTrace()
+                    }
+
+                }
+                vistorEntryListAdapter!!.setFirebaseDataHashmap(firebasedataMap)
+
+            }
+
+        } else {
+
+        }
+
+    }
 
 }
 

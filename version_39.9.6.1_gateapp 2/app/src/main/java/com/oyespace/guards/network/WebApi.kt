@@ -3,7 +3,6 @@ package com.oyespace.guards.network
 
 import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
-import com.oyespace.guards.pojo.VisitorLog
 import com.oyespace.guards.request.FingerPrintCreateReq
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY
@@ -23,7 +22,7 @@ interface WebApi {
 
     @GET("oyesafe/api/v1/VisitorLog/GetVisitorLogListByDCreatedAndAssocID/{id}/{date}")
     fun visitorList(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String, @Path("date") currentdate: String)
-            : Single<GlobalApiObject<ArrayList<VisitorLog>>>
+            : Single<GlobalApiObject<ArrayList<VisitorLogResponse>>>
 
     //http://apidev.oyespace.com/oyeliving/api/v1/Unit/GetUnitListByAssocID/2
     @GET("oyeliving/api/v1/Unit/GetUnitListByAssocID/{id}")
@@ -113,11 +112,11 @@ interface WebApi {
 
     @GET("oye247/api/v1/GetVisitorLogEntryListByAssocID/{id}")
     fun getVisitorLogEntryList(@Header(OYE247KEY) token: String, @Path("id") assnId: Int)
-            : Single<GetVisitorsResponse<ArrayList<VisitorLog>>>
+            : Single<GetVisitorsResponse<ArrayList<VisitorLogResponse>>>
 
     @GET("oye247/api/v1/GetVisitorLogExitListByAssocID/{id}")
     fun getVisitorLogExitList(@Header(OYE247KEY) token: String, @Path("id") associationID: Int)
-            : Single<GetExitVisitorsResponse<ArrayList<VisitorLog>>>
+            : Single<GetExitVisitorsResponse<ArrayList<VisitorLogResponse>>>
 
     @GET("oye247/api/v1/TicketingResponse/GetTicketingResponseListByTicketingResID/{id}")
     fun getTicketingResponses(@Header(OYE247KEY) token: String, @Path("id") ticketID: String)

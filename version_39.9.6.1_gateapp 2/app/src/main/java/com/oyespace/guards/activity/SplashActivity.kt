@@ -110,7 +110,9 @@ class SplashActivity : BaseLocationActivity() {
     private fun launchMainActivity() {
         // val mainIntent = Intent(this@SplashActivity, DashboardActivity::class.java)
 
-        VisitorLogRepo.get_OUT_VisitorLog(true)
+        Thread {
+            VisitorLogRepo.get_OUT_VisitorLog(true)
+        }.start()
 
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         Mobile_IMEI_NO = tm.deviceId

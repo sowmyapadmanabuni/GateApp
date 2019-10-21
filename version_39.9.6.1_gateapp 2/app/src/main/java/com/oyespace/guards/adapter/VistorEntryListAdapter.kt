@@ -9,7 +9,6 @@ import android.media.MediaPlayer
 import android.media.SoundPool
 import android.net.Uri
 import android.os.Environment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,9 +18,11 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.*
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
@@ -38,19 +39,17 @@ class VistorEntryListAdapter(
     private val mcontext: Context
 ) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
 
-    lateinit var firebasedataMapp : HashMap<String, String>
-    lateinit var ref: DatabaseReference
+    lateinit var firebasedataMap: HashMap<String, NotificationSyncModel>
     private var refreshImages: Boolean = true
     private var searchList: ArrayList<VisitorLog>? = null
     var number: String? = null
     var searchString: String = ""
-    var mobnumber:String?=null
-    lateinit var mp:  MediaPlayer
+    var mobnumber: String? = null
+    lateinit var mp: MediaPlayer
 
     init {
         this.searchList = visitorList
-        ref= FirebaseDatabase.getInstance().getReference("NotificationSync")
-        firebasedataMapp= hashMapOf()
+        firebasedataMap = hashMapOf()
     }
 
     internal var animBlink: Animation =
@@ -64,104 +63,88 @@ class VistorEntryListAdapter(
 
     override fun onBindViewHolder(holder: MenuHolder, p: Int) {
 
+        holder.setIsRecyclable(false)
+
         val position = holder.adapterPosition
 
-        var orderData: VisitorLog? = null
+        var visitor: VisitorLog? = null
         try {
-            orderData = searchList!!.get(position)
+            visitor = searchList!!.get(position)
         } catch (e: Exception) {
             return
         }
-        Log.e("orderData", "" + orderData)
-        if (orderData != null && orderData.isValid) {
 
-            val vistordate = orderData.asAssnID
-            holder.apartmentNamee.text = orderData.unUniName
-            holder.entryTime.text = formatDateHM(orderData.vlEntryT) + " "
-            Log.d("ddd", formatDateHM(orderData.vlEntryT))
-            holder.entrydate.text = formatDateDMY(orderData.vldCreated)
-            if (orderData.vlExitT.equals("0001-01-01T00:00:00", true)) {
-//            if (true) {
+        if (visitor != null && visitor.isValid) {
+
+            val vistordate = visitor.asAssnID
+            holder.apartmentNamee.text = visitor.unUniName
+            holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
+            holder.entrydate.text = formatDateDMY(visitor.vldCreated)
+            if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
                 holder.exitTime.text = ""
+
                 holder.exitdate.text = ""
                 holder.btn_makeexit.visibility = View.VISIBLE
 
-                if (orderData.vlVenImg.contains(",")) {
+                if (visitor.vlVenImg.contains(",")) {
                     var imageList: Array<String>
-                    imageList = orderData.vlVenImg.split(",".toRegex())
+                    imageList = visitor.vlVenImg.split(",".toRegex())
                         .dropLastWhile({ it.isEmpty() }).toTypedArray()
 
 
                     holder.rv_images.setHasFixedSize(true)
                     val linearLayoutManager =
-                        androidx.recyclerview.widget.LinearLayoutManager(mcontext,
-                            LinearLayoutManager.HORIZONTAL,true)
+                        LinearLayoutManager(
+                            mcontext,
+                            LinearLayoutManager.HORIZONTAL, true
+                        )
                     holder.rv_images.layoutManager = linearLayoutManager
 
 
-                    val adapter = HorizontalImagesAdapter( mcontext,imageList)
+                    val adapter = HorizontalImagesAdapter(mcontext, imageList)
                     holder.rv_images.adapter = adapter
 
                 }
 
-                if (orderData.vlVisType.equals(DELIVERY) && deliveryTimeUp(orderData.vlEntryT, getCurrentTimeLocal(), 1)) {
-//                    holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
-//                    holder.ll_card.startAnimation(animBlink)
+                val noofUnits = VisitorLogRepo.getUnitCountForVisitor(visitor.vlMobile)
+
+                if (visitor.vlVisType.equals(DELIVERY) && deliveryTimeUp(visitor.vlEntryT, getCurrentTimeLocal(), noofUnits)) {
+                    holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
+                    holder.ll_card.startAnimation(animBlink)
                 } else {
-//                    holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
-//                    holder.ll_card.animation = null
-                    ref.addValueEventListener(object :ValueEventListener{
-                        override fun onCancelled(p0: DatabaseError) {
-                            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+                    val key = visitor.vlVisLgID.toString()
+                    if (firebasedataMap.contains(key)) {
+
+                        val value = firebasedataMap.get(key)
+                        try {
+                            holder.ll_card.setBackgroundColor(Color.parseColor(value?.buttonColor))
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
 
-                        override fun onDataChange(p0: DataSnapshot) {
+                    }
 
-//                            if(p0.exists()){
-//                                for(h in p0.children){
-//
-//                                    var data= h.getValue(NotificationSyncModel::class.java)
-//
-//                                    firebasedataMapp.put(data!!.visitorlogId,data!!.buttonColor)
-//                                    //  firebasedatalist.add(data!!)
-//                                    try {
-//                                        if (firebasedataMapp.containsKey(orderData?.vlVisLgID.toString())) {
-//
-//                                            Toast.makeText(mcontext,"mcv",Toast.LENGTH_LONG).show()
-//                                            holder.ll_card.setBackgroundColor(Color.parseColor(firebasedataMapp[orderData?.vlVisLgID.toString()]))
-//                                        }
-//                                    }catch (e:IndexOutOfBoundsException){
-//
-//                                    }
-//
-//                                    Toast.makeText(mcontext, firebasedataMapp.get(data!!.visitorlogId), Toast.LENGTH_LONG).show()
-//
-//                                }
-//                            }
-
-                        }
-
-                    })
                 }
 
             } else {
-                holder.exitTime.text = formatDateHM(orderData.vlExitT)
-                holder.exitdate.text = formatDateDMY(orderData.vldUpdated)
+                holder.exitTime.text = formatDateHM(visitor.vlExitT)
+                holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
                 holder.btn_makeexit.visibility = View.INVISIBLE
                 holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
                 holder.ll_card.animation = null
 
             }
 
-            holder.serviceProvider.text = orderData.vlComName + ", Visitors: " + orderData.vlVisCnt
-            holder.visitorName.text = orderData.vlfName
+            holder.serviceProvider.text = visitor.vlComName + ", Visitors: " + visitor.vlVisCnt
+            holder.visitorName.text = visitor.vlfName
 
             holder.btn_makeexit.setOnClickListener {
                 holder.btn_makeexit.visibility = View.GONE
-                exitVisitor(orderData, position)
+                exitVisitor(visitor, position)
             }
 
-            if (orderData.vlMobile.length > 5) {
+            if (visitor.vlMobile.length > 5) {
                 holder.iv_call.visibility = View.VISIBLE
             } else {
                 holder.iv_call.visibility = View.INVISIBLE
@@ -169,34 +152,40 @@ class VistorEntryListAdapter(
             try {
 
 
-                number = orderData.vlMobile.substring(3)
+                number = visitor.vlMobile.substring(3)
 
 
             } catch (e: StringIndexOutOfBoundsException) {
             }
-            // Log.v("Image URL",IMAGE_BASE_URL+"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+number+".jpg")
 
 
-            var imgPath = IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg
+            var imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
 
-            if (orderData.vlVisType.equals("STAFF", true)) {
-                if (orderData.vlEntryImg.isEmpty()) {
-                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg"
+            if (visitor.vlVisType.equals("STAFF", true)) {
+                if (visitor.vlEntryImg.isEmpty()) {
+                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
             } else {
-                if (orderData.vlEntryImg.isEmpty()) {
+                if (visitor.vlEntryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"
                 }
             }
 
             if (refreshImages) {
-                Picasso.with(mcontext).invalidate(imgPath)
+//                Picasso.with(mcontext).invalidate(imgPath)
             }
 
-            Picasso.with(mcontext)
+            Glide.with(mcontext)
                 .load(imgPath)
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(false)
                 .into(holder.iv_user)
+
+//            Picasso.with(mcontext)
+//                .load(imgPath)
+//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+//                .into(holder.iv_user)
 
             holder.iv_user.setOnClickListener {
 
@@ -212,11 +201,11 @@ class VistorEntryListAdapter(
                 // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
-                if (orderData.vlVisType.equals("STAFF", true)) {
+                if (visitor.vlVisType.equals("STAFF", true)) {
 
-                    if (orderData.vlEntryImg.equals("")) {
+                    if (visitor.vlEntryImg.equals("")) {
                         Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg")
+                            .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg")
                             .placeholder(R.drawable.user_icon_black)
                             .error(R.drawable.user_icon_black)
                             .into(dialog_imageview)
@@ -224,7 +213,7 @@ class VistorEntryListAdapter(
 
 
                         Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
+                            .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
                             .placeholder(R.drawable.user_icon_black)
                             .error(R.drawable.user_icon_black)
                             .into(dialog_imageview)
@@ -232,7 +221,7 @@ class VistorEntryListAdapter(
 
                 } else {
 
-                    if (orderData.vlEntryImg.equals("")) {
+                    if (visitor.vlEntryImg.equals("")) {
                         Picasso.with(mcontext)
                             .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
                             .placeholder(R.drawable.user_icon_black)
@@ -240,7 +229,7 @@ class VistorEntryListAdapter(
                             .into(dialog_imageview)
                     } else {
                         Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
+                            .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
                             .placeholder(R.drawable.user_icon_black)
                             .error(R.drawable.user_icon_black)
                             .into(dialog_imageview)
@@ -250,31 +239,31 @@ class VistorEntryListAdapter(
 
                 }
 
-            alertadd.setView(view)
-            alertadd.show()
-        }
+                alertadd.setView(view)
+                alertadd.show()
+            }
 
 
-            if (orderData.vlVoiceNote.contains("")) {
-            holder.iv_play.visibility=View.GONE
-        }else{
-            holder.iv_play.visibility=View.VISIBLE
-        }
-        holder.iv_play.setOnClickListener{
-            getAudio(orderData.vlVoiceNote)
-        }
+            if (visitor.vlVoiceNote.contains("")) {
+                holder.iv_play.visibility = View.GONE
+            } else {
+                holder.iv_play.visibility = View.VISIBLE
+            }
+            holder.iv_play.setOnClickListener {
+                getAudio(visitor.vlVoiceNote)
+            }
 
-            holder.tv_comments.text = orderData.vlCmnts
+            holder.tv_comments.text = visitor.vlCmnts
 
-        holder.iv_call.setOnClickListener {
+            holder.iv_call.setOnClickListener {
 
                 val intent = Intent(Intent.ACTION_CALL)
-                intent.data = Uri.parse("tel:" + orderData.vlMobile)
+                intent.data = Uri.parse("tel:" + visitor.vlMobile)
                 mcontext.startActivity(intent)
             }
             holder.expanded_view.visibility = View.GONE
 
-    //        if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
+            //        if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
 //            holder.iv_attachment.visibility = View.GONE
 //
 //        }
@@ -286,13 +275,13 @@ class VistorEntryListAdapter(
 
 //        holder.lyt_text.setOnClickListener {
 //
-    //            if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
+            //            if(orderData.vlCmnts.equals("")&&orderData.vlVenImg.equals("")&&orderData.vlVoiceNote.equals("")){
 //                holder.expanded_view.visibility = View.GONE
 //            }
 //
 //            else{
 //                if (holder.expanded_view.visibility == View.GONE) {
-    //                    holder.expanded_view.visibility = View.VISIBLE
+            //                    holder.expanded_view.visibility = View.VISIBLE
 //                } else {
 //                    holder.expanded_view.visibility = View.GONE
 //                }
@@ -307,6 +296,11 @@ class VistorEntryListAdapter(
 
     }
 
+    fun setFirebaseDataHashmap(map: HashMap<String, NotificationSyncModel>) {
+        this.firebasedataMap = map
+        notifyDataSetChanged()
+    }
+
     private fun exitVisitor(orderData: VisitorLog, position: Int) {
 
         try {
@@ -316,17 +310,14 @@ class VistorEntryListAdapter(
             e.printStackTrace()
         }
 
-//        val log = VisitorLogRepo.get_IN_VisitorLog()
-//        if (log != null) {
-//            visitorList = log
-//        }
-
-
         try {
-            searchList!!.removeAt(position)
-        } catch (e: IndexOutOfBoundsException) {
+            searchList?.removeAt(position)
+            notifyItemRemoved(position)
+            notifyDataSetChanged()
+        } catch (e: Exception) {
             e.printStackTrace()
         }
+
 
     }
 
@@ -359,10 +350,10 @@ class VistorEntryListAdapter(
         val expanded_view: LinearLayout
         val lyt_text: LinearLayout
         val iv_map: ImageView
-        val rv_images:RecyclerView
-        val iv_play:ImageView
-        val tv_comments:TextView
-        val iv_attachment:ImageView
+        val rv_images: RecyclerView
+        val iv_play: ImageView
+        val tv_comments: TextView
+        val iv_attachment: ImageView
 
 
         init {
@@ -386,10 +377,10 @@ class VistorEntryListAdapter(
             expanded_view = view.findViewById(R.id.expanded_view)
             lyt_text = view.findViewById(R.id.lyt_text)
             iv_map = view.findViewById(R.id.iv_map)
-            rv_images=view.findViewById(R.id.rv_images)
-            iv_play=view.findViewById(R.id.iv_play)
-            tv_comments=view.findViewById(R.id.tv_comments)
-            iv_attachment=view.findViewById(R.id.iv_attachment)
+            rv_images = view.findViewById(R.id.rv_images)
+            iv_play = view.findViewById(R.id.iv_play)
+            tv_comments = view.findViewById(R.id.tv_comments)
+            iv_attachment = view.findViewById(R.id.iv_attachment)
 
 
         }
@@ -406,8 +397,8 @@ class VistorEntryListAdapter(
         notifyDataSetChanged()
 
     }
-    fun getAudio(filename:String) {
 
+    fun getAudio(filename: String) {
 
 
         try {
@@ -421,7 +412,6 @@ class VistorEntryListAdapter(
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
 
 
         val mediaPlayer: MediaPlayer

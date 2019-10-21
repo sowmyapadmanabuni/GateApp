@@ -49,6 +49,7 @@ class
 BackgroundSyncReceiver : BroadcastReceiver() {
     var unAccountID: String? = null
     lateinit var mcontext: Context
+
     override fun onReceive(context: Context, intent: Intent) {
         // TODO: This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
@@ -150,9 +151,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         } else if (intent.getStringExtra(BSR_Action).equals(VISITOR_ENTRY_SYNC)) {
 
             Log.d("SYCNCHECK", "in 86")
-            VisitorLogRepo.get_OUT_VisitorLog(true)
             VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
-                override fun onFetch(visitorLog: ArrayList<VisitorLog>?) {
+                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, errorMessage: String?) {
 
                     val smsIntent = Intent(SYNC)
                     smsIntent.putExtra("message", VISITOR_ENTRY_SYNC)

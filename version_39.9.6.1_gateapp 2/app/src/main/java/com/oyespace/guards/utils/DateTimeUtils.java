@@ -1,24 +1,10 @@
 package com.oyespace.guards.utils;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-
-import com.oyespace.guards.R;
-import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
-import com.oyespace.guards.qrscanner.VehicleGuestQRRegistration;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -29,23 +15,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
-import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
-import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
-import static com.oyespace.guards.utils.ConstantUtils.FROMDATE;
-import static com.oyespace.guards.utils.ConstantUtils.FROMTIME;
-import static com.oyespace.guards.utils.ConstantUtils.GUEST;
-import static com.oyespace.guards.utils.ConstantUtils.INVITATIONID;
-import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
-import static com.oyespace.guards.utils.ConstantUtils.NUMBEROFPERSONS;
-import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
-import static com.oyespace.guards.utils.ConstantUtils.TODATE;
-import static com.oyespace.guards.utils.ConstantUtils.UNITID;
-import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
-import static com.oyespace.guards.utils.ConstantUtils.VEHICLENUMBER;
-import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_GUESTWITHQRCODE;
-import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 /**
  * Created by Kalyan on 22-Dec-17.
@@ -93,28 +62,23 @@ public class DateTimeUtils {
         final SimpleDateFormat DATE_FORMAT_YMDHMS = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
 
         String currentDate = DATE_FORMAT_YMDHMS.format(new Date());
-        System.out.println(" C DATE is  " + currentDate);
         return currentDate;
     }
 
     public static String getCurrentTimeLocalYMD() {
         String currentDate = DATE_FORMATYMD.format(new Date());
-        System.out.println(" C DATE is  " + currentDate);
         return currentDate;
     }
 
     public static String formatDateHM(String date) {
         try {
-            Log.d("mycode1156 time", " ff");
             java.util.Date dt_dwnld_date;
             SimpleDateFormat dateFormatLocal = new SimpleDateFormat("hh:mm:ss aa");
             SimpleDateFormat dateFormatGMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             dateFormatGMT.setTimeZone(TimeZone.getDefault());
             dt_dwnld_date = dateFormatGMT.parse(date);
-            Log.d("mycode1156 time", dateFormatLocal.format(dt_dwnld_date) + " ");
             return dateFormatLocal.format(dt_dwnld_date);
         } catch (java.text.ParseException e) {
-            Log.d("mycode1156 time", " " + e.toString());
             e.printStackTrace();
             return date;
         } catch (Exception ex) {
@@ -124,7 +88,6 @@ public class DateTimeUtils {
     }
 
     public static boolean deliveryTimeUp(String downloaded_date, String curr_date_YMD_hms, int itemCount) {
-        Log.d("stfdh1 0", downloaded_date + " " + curr_date_YMD_hms);
 
         try {
             java.util.Date dt_dwnld_date, dt_curr_date;
@@ -144,8 +107,6 @@ public class DateTimeUtils {
             //Change to Calendar Date
             c2.setTime(DATE_FORMAT_YMDHMS.parse(DATE_FORMAT_YMDHMS.format(dt_curr_date)));
             c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)));
-            Log.d("stfdh1 1", dateFormatLocal.format(dt_curr_date) + " " + dateFormatLocal.format(dt_dwnld_date) + " " + dt_dwnld_date.toLocaleString() + " " + dt_curr_date.toLocaleString());
-            Log.d("stfdh1 2", c1.getTimeInMillis() + " " + c2.getTimeInMillis());
             //get Time in milli seconds
             long ms1 = c1.getTimeInMillis();
             long ms2 = c2.getTimeInMillis();
@@ -153,10 +114,10 @@ public class DateTimeUtils {
             //get difference in milli seconds
             long diff_sec = ms2 - ms1;
             int day_diff = (int) diff_sec / (60 * 1000);
-            int allottedTime = 0 + itemCount * 7;
+            int allottedTime = itemCount * 7;
 
             //int allottedTime=8+itemCount*7;
-            Log.d("stfdh1 time", day_diff + " " + c2.getTimeInMillis() + " " + diff_sec + " " + allottedTime);
+
             if (day_diff >= 120) {
 //                return day_diff;
                 return true;
@@ -164,7 +125,7 @@ public class DateTimeUtils {
             return day_diff >= allottedTime;
 //            return day_diff;
         } catch (java.text.ParseException e) {
-            Log.d("stfdh1 time", " " + e.toString());
+
             e.printStackTrace();
             return true;
 //            return 7;
@@ -175,16 +136,13 @@ public class DateTimeUtils {
 
     public static String formatDateDMY(String date) {
         try {
-            Log.d("mycode1156 time", " ff");
             java.util.Date dt_dwnld_date;
             SimpleDateFormat dateFormatLocal = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
             SimpleDateFormat dateFormatGMT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault());
             dateFormatGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
             dt_dwnld_date = dateFormatGMT.parse(date);
-            Log.d("mycode1156 time", dateFormatLocal.format(dt_dwnld_date) + " ");
             return dateFormatLocal.format(dt_dwnld_date);
         } catch (java.text.ParseException e) {
-            Log.d("mycode1156 time", " " + e.toString());
             e.printStackTrace();
             return date;
         } catch (Exception ex) {
@@ -220,7 +178,6 @@ public class DateTimeUtils {
 
     public static String formatTimeHM(String date) {
         try {
-            Log.d("mycode1156 time", " ff");
             java.util.Date dt_dwnld_date;
 
 
@@ -266,16 +223,14 @@ public class DateTimeUtils {
         boolean b = false;
 
         try {
+            // Toast.makeText(context,"222",Toast.LENGTH_LONG).show();
+            // If start date is after the end date.
+            //Toast.makeText(context,"333",Toast.LENGTH_LONG).show();
             if (dfDate.parse(startDate).before(dfDate.parse(endDate))) {
                 //Toast.makeText(context,"111",Toast.LENGTH_LONG).show();
                 b = true;  // If start date is before end date.
-            } else if (dfDate.parse(startDate).equals(dfDate.parse(endDate))) {
-                b = true;  // If two dates are equal.
-               // Toast.makeText(context,"222",Toast.LENGTH_LONG).show();
-            } else {
-                b = false; // If start date is after the end date.
-                //Toast.makeText(context,"333",Toast.LENGTH_LONG).show();
-            }
+            } else
+                b = dfDate.parse(startDate).equals(dfDate.parse(endDate));  // If two dates are equal.
         } catch (ParseException e) {
             e.printStackTrace();
         }

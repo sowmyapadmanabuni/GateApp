@@ -24,22 +24,19 @@ import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.realm.VisitorEntryLogRealm
+import com.oyespace.guards.repo.VisitorLogRepo
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
-import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.NumberUtils.toInteger
-import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import java.io.File
 import java.util.*
-import kotlin.concurrent.fixedRateTimer
 
 class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
@@ -51,8 +48,9 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-    var visitorLogID: String = ""
-    var pos = 0
+
+    var count = 0
+    val visitorsList: ArrayList<VisitorLog> = arrayListOf<VisitorLog>()
 
     override fun onClick(v: View?) {
 
@@ -68,47 +66,27 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     var unitname_dataList: Array<String>
                     var unitid_dataList: Array<String>
                     var unitAccountId_dataList: Array<String>
-                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
-                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex())
-                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitAccountId_dataList =
-                        intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex())
-                            .dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                    unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                     if (unitname_dataList.size > 0) {
-                        // Toast.makeText(this@StaffEntryRegistration,intent.getStringExtra(UNITNAME),Toast.LENGTH_LONG).show()
+
+                        count = unitname_dataList.size
+                        showProgress()
 
                         for (i in 0 until unitname_dataList.size) {
 
-                            pos = i
-
-                            Log.v(
-                                "UNITS@@@..",
-                                unitname_dataList.size.toString() + " ..." + unitname_dataList.get(i).replace(
-                                    " ",
-                                    ""
-                                )
+                            visitorLog(
+                                unitname_dataList.get(i).replace(" ", ""),
+                                unitid_dataList.get(i).replace(" ", ""),
+                                unitAccountId_dataList.get(i).replace(" ", "")
                             )
-
-                            showProgress()
-
-                            fixedRateTimer("timer", false, 0, 30000) {
-                                this@StaffEntryRegistration.runOnUiThread {
-                                    visitorLog(
-                                        unitname_dataList.get(i).replace(" ", ""),
-                                        unitid_dataList.get(i).replace(" ", ""),
-                                        unitAccountId_dataList.get(i).replace(" ", "")
-                                    )
-                                }
-                            }
 
 
                         }
 
-
                     }
                 } else {
-                    showProgress()
 
                     visitorLog(
                         intent.getStringExtra(UNITNAME),
@@ -316,12 +294,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
         val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
-        var memID: Int = 410
-        if (BASE_URL.contains("dev", true)) {
-            memID = 64
-        } else if (BASE_URL.contains("uat", true)) {
-            memID = 64
-        }
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
@@ -333,8 +305,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20
         )
 
-        Log.d("taaag", "request: " + req.toString())
-
         compositeDisposable.add(
             RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
                 .subscribeOn(Schedulers.io())
@@ -342,35 +312,15 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                 .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
 
-                        if (globalApiObject.success == true) {
+                        if (globalApiObject.success) {
 
-                            // TODO shift this realm code into ReamDB
-                            Log.d("taaag", "response for id: " + globalApiObject.data.visitorLog.vlVisLgID)
-                            updatecolor(globalApiObject.data.visitorLog.vlVisLgID.toString(), "#ffb81a")
+                            val vlid = globalApiObject.data.visitorLog.vlVisLgID
+                            Log.i("taaag", "saving... $vlid")
 
-
-                            //realm.executeTransaction {
-                            realm = Realm.getDefaultInstance()
-                            if (!realm.isInTransaction) {
-                                realm.beginTransaction()
-                            }
-
-                            var vlog = realm.where(VisitorLog::class.java)
-                                .equalTo("vlVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
-                                .findFirst()
-
-                            val vlogCount = (realm.where(VisitorLog::class.java).equalTo(
-                                "vlVisLgID",
-                                globalApiObject.data.visitorLog.vlVisLgID
-                            ).count()).toInt()
-                            if (vlogCount == 0) {
-                                vlog = realm.createObject(
-                                    VisitorLog::class.java,
-                                    globalApiObject.data.visitorLog.vlVisLgID
-                                )
-                            }
-                            vlog!!.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
-                            vlog.mEMemID = memID
+                            val vlog = VisitorLog()
+                            vlog.vlVisLgID = vlid
+                            vlog.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
+                            vlog.mEMemID = globalApiObject.data.visitorLog.meMemID
                             vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
                             vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
                             vlog.vlfName = intent.getStringExtra(PERSONNAME)
@@ -380,24 +330,57 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             vlog.unUniName = intent.getStringExtra(UNITNAME)
                             vlog.vlVisCnt = 1
                             vlog.vlEntryT = getCurrentTimeLocal()
-                            realm.commitTransaction()
-                            //}
+                            visitorsList.add(vlog)
 
-                            for (i in list.indices) {
-                                val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
-                                val dir = Environment.getExternalStorageDirectory().path
-                                val file = File(dir, fileName)
-                                file.delete()
-                            }
 
-                            val dir =
-                                File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                            if (dir.isDirectory) {
-                                val children = dir.list()
-                                for (i in children!!.indices) {
-                                    File(dir, children[i]).delete()
-                                }
-                            }
+//                            VisitorEntryLogRealm.addVisitorEntries(
+//                                vlid,
+//                                Prefs.getInt(ASSOCIATION_ID, 0),
+//                                memID,
+//                                vlid,
+//                                toInteger(intent.getStringExtra(UNITID)),
+//                                intent.getStringExtra(PERSONNAME),
+//                                intent.getStringExtra(MOBILENUMBER),
+//                                intent.getStringExtra(COMPANY_NAME),
+//                                intent.getStringExtra(VISITOR_TYPE),
+//                                intent.getStringExtra(UNITNAME),
+//                                1,
+//                                getCurrentTimeLocal(),
+//                                object : VisitorEntryLogRealm.VisitorEntryListener {
+//                                    override fun onEntrySave(visitorId: Int, success: Boolean) {
+//
+////                                        updateFirebaseColor(visitorId.toString(), "#00FF00")
+//                                        count--
+//                                        Log.i("taaag", "count $count")
+//                                        if (count <= 0) {
+//
+//                                            for (i in list.indices) {
+//                                                val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
+//                                                val dir = Environment.getExternalStorageDirectory().path
+//                                                val file = File(dir, fileName)
+//                                                file.delete()
+//                                            }
+//
+//                                            val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+//                                            deleteDir(dir.absolutePath)
+//
+//                                            uploadImage(imgName, mBitmap)
+//
+//                                            val visitors = VisitorLogRepo.get_IN_VisitorsForPhone(intent.getStringExtra(MOBILENUMBER))
+//                                            if (visitors != null) {
+//                                                for (visitor in visitors) {
+//                                                    updateFirebaseColor(visitor.vlVisLgID.toString(), "#ff00ff")
+//                                                }
+//                                            }
+//
+//                                            dismissProgress()
+//                                            finish()
+//                                        }
+//
+//                                    }
+//
+//                                }
+//                            )
 
                             val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
                             d.putExtra(BSR_Action, VisitorEntryFCM)
@@ -410,24 +393,51 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             d.putExtra(UNITID, UNUnitID.toString())
                             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                             d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
-                            d.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                            d.putExtra("VLVisLgID", vlid)
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                             sendBroadcast(d)
-                            // var imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +globalApiObject.data.visitorLog.vlVisLgID  + ".jpg"
 
+                            count--
+                            Log.i("taaag", "count $count")
+                            if (count <= 0) {
 
-                            uploadImage(imgName, mBitmap)
-                            finish()
+                                VisitorEntryLogRealm.addVisitorEntries(
+                                    visitorsList,
+                                    object : VisitorEntryLogRealm.VisitorEntryListener {
+                                        override fun onEntrySave(success: Boolean) {
+
+                                            for (i in list.indices) {
+                                                val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
+                                                val dir = Environment.getExternalStorageDirectory().path
+                                                val file = File(dir, fileName)
+                                                file.delete()
+                                            }
+
+                                            val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+                                            deleteDir(dir.absolutePath)
+
+                                            uploadImage(imgName, mBitmap)
+
+                                            dismissProgress()
+                                            finish()
+
+                                        }
+
+                                    }
+                                )
+
+                            }
+
                         } else {
                             Utils.showToast(applicationContext, globalApiObject.apiVersion)
+                            dismissProgress()
+                            finish()
                         }
                     }
 
                     override fun onErrorResponse(e: Throwable) {
                         Utils.showToast(applicationContext, getString(R.string.some_wrng) + e.toString())
                         Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
-
-                        dismissProgress()
                     }
 
                     override fun noNetowork() {
@@ -495,6 +505,16 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         )
     }
 
+    override fun onStop() {
+        super.onStop()
+        val visitors = VisitorLogRepo.get_IN_VisitorsForPhone(intent.getStringExtra(MOBILENUMBER))
+        Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
+        if (visitors != null) {
+            for (visitor in visitors) {
+                updateFirebaseColor(visitor.vlVisLgID.toString())
+            }
+        }
+    }
 
     fun setLocale(lang: String?) {
         var lang = lang
@@ -523,14 +543,16 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         }
     }
 
-    fun updatecolor(visitorId: String, buttonColor: String) {
+    fun updateFirebaseColor(visitorId: String, buttonColor: String = "#ffb81a") {
+
+        Log.i("taaag", "push to firebase: " + visitorId)
         val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
         val id = ref.push().key
         val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
         ref.child(visitorId).setValue(notificationSyncModel).addOnCompleteListener {
-            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
+            //            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
         }
-    }
 
+    }
 
 }

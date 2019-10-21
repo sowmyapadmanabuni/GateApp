@@ -1,7 +1,5 @@
 package com.oyespace.guards.realm;
 
-import android.util.Log;
-
 import com.oyespace.guards.models.VisitorLog;
 
 import java.util.ArrayList;
@@ -25,11 +23,80 @@ public class VisitorEntryLogRealm {
         return list;
     }
 
+    public static void addVisitorEntries(ArrayList<VisitorLog> vlogs, VisitorEntryListener listener) {
+
+        Realm.getDefaultInstance().executeTransactionAsync(realm -> {
+                    realm.insert(vlogs);
+                }, () -> {
+                    if (listener != null)
+                        listener.onEntrySave(true);
+                },
+                (error) -> {
+                    if (listener != null)
+                        listener.onEntrySave(false);
+                });
+
+    }
+
+//    public synchronized static void addVisitorEntries(
+//            int vlLogid,
+//            int assId,
+//            int memID,
+//            int regVisID,
+//            int unitID,
+//            String fName,
+//            String mobile,
+//            String compName,
+//            String type,
+//            String unitName,
+//            int visCount,
+//            String entryTime,
+//            VisitorEntryListener listener) {
+//
+//        Log.i("taaag", "saving on realm " + Thread.currentThread().getName() + " thread");
+//
+//        Realm.getDefaultInstance().executeTransactionAsync(realm -> {
+//
+//                    final VisitorLog vlog = realm.createObject(VisitorLog.class, vlLogid);
+//                    vlog.setAsAssnID(assId);
+//                    vlog.setMEMemID(memID);
+//                    vlog.setReRgVisID(regVisID);
+//                    vlog.setUNUnitID(unitID);
+//                    vlog.setVlfName(fName);
+//                    vlog.setVlMobile(mobile);
+//                    vlog.setVlComName(compName);
+//                    vlog.setVlVisType(type);
+//                    vlog.setUnUniName(unitName);
+//                    vlog.setVlVisCnt(visCount);
+//                    vlog.setVlEntryT(entryTime);
+//
+//                },
+//                () -> {
+//                    if (listener != null)
+//                        listener.onEntrySave(vlLogid, true);
+//                },
+//                (error) -> {
+//                    if (listener != null)
+//                        listener.onEntrySave(-1, false);
+//                }
+//        );
+//
+//    }
+
     public static VisitorLog getVisitorForId(int id) {
         Realm realm = Realm.getDefaultInstance();
         return realm.where(VisitorLog.class)
                 .equalTo("reRgVisID", id)
                 .findFirst();
+
+    }
+
+    public static ArrayList<VisitorLog> getVisitorsForMobile(String phone) {
+
+        Realm realm = Realm.getDefaultInstance();
+        return new ArrayList<>(realm.where(VisitorLog.class)
+                .contains("vlMobile", phone)
+                .findAll());
 
     }
 
@@ -54,9 +121,6 @@ public class VisitorEntryLogRealm {
             realm.beginTransaction();
         }
         realm.delete(VisitorLog.class);
-        for (VisitorLog v : visitorsList) {
-            Log.i("taaag", "about to put in realm -> " + v.getVlVisLgID());
-        }
         realm.insertOrUpdate(visitorsList);
         realm.commitTransaction();
     }
@@ -67,8 +131,7 @@ public class VisitorEntryLogRealm {
             return getVisitorEntryLog();
         } else {
             Realm realm = Realm.getDefaultInstance();
-            ArrayList<VisitorLog> results = new ArrayList<>();
-            results.addAll(realm.where(VisitorLog.class)
+            return new ArrayList<>(realm.where(VisitorLog.class)
                     .contains("vlfName", searchQuery, Case.INSENSITIVE)
                     .or()
                     .contains("vlComName", searchQuery, Case.INSENSITIVE)
@@ -77,7 +140,6 @@ public class VisitorEntryLogRealm {
                     .or()
                     .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
                     .findAll());
-            return results;
         }
 
     }
@@ -97,4 +159,15 @@ public class VisitorEntryLogRealm {
         r.executeTransaction(realm -> realm.delete(VisitorLog.class));
 
     }
+
+    public static int getUnitCountForVisitor(String phone) {
+
+        return (int) Realm.getDefaultInstance().where(VisitorLog.class).equalTo("vlMobile", phone).count();
+
+    }
+
+    public interface VisitorEntryListener {
+        void onEntrySave(boolean success);
+    }
+
 }

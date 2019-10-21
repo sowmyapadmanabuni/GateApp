@@ -70,20 +70,11 @@ class VistorOutListAdapter(
         val vistordate = orderData.asAssnID
         holder.apartmentNamee.text = orderData.unUniName
         holder.entryTime.text = formatDateHM(orderData.vlEntryT) + " "
-        Log.d("ddd", formatDateHM(orderData.vlEntryT))
         holder.entrydate.text = formatDateDMY(orderData.vldCreated)
         if (orderData.vlExitT.equals("0001-01-01T00:00:00", true)) {
             holder.exitTime.text = ""
             holder.exitdate.text = ""
             holder.btn_makeexit.visibility = View.VISIBLE
-            Log.d(
-                "dddh",
-                " u " + (orderData.vlVisType.equals(DELIVERY)) + " " + deliveryTimeUp(
-                    orderData.vlEntryT,
-                    getCurrentTimeLocal(),
-                    1
-                )
-            )
 
             if (orderData.vlVisType.equals(DELIVERY) && deliveryTimeUp(
                     orderData.vlEntryT,

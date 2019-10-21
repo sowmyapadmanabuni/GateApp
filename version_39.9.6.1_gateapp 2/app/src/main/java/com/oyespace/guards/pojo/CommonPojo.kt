@@ -2,7 +2,6 @@ package com.oyespace.guards.pojo
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import io.realm.RealmList
 import kotlinx.android.parcel.Parcelize
 
@@ -16,9 +15,9 @@ data class SearchResult(
     val lng: String = ""
 ) : Parcelable
 
-data class GlobalApiObject<T>(val success: Boolean?, val apiVersion: String?, val data: VisitorLog)
+data class GlobalApiObject<T>(val success: Boolean?, val apiVersion: String?, val data: VisitorLogResponse)
 
-data class VisitorLog(val visitorlogbydate: ArrayList<Visitorlogbydate>)
+data class VisitorLogResponse(val visitorlogbydate: ArrayList<Visitorlogbydate>)
 
 data class Visitorlogbydate(
     val asAssnID: Int?,

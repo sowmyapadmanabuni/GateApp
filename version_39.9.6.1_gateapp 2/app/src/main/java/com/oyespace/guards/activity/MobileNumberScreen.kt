@@ -127,6 +127,13 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
+                if (useDummyValues) {
+                    textview.text = "+919930620323"
+                    ccd = "+91"
+                    mobileNumber = "9930620323"
+                }
+
+
                 if (textview.text.length == 13) {
 
                     if (entryExists(ccd, mobileNumber)) {
@@ -264,8 +271,8 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         val timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
-                val remainedSecs: Long  = millisUntilFinished / 1000;
-                timer.text=("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60));// manage it accordign to you
+                val remainedSecs: Long = millisUntilFinished / 1000
+                timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
             }
 
             override fun onFinish() {
@@ -430,7 +437,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT).show()
                 }
             })
             .onSameThread()

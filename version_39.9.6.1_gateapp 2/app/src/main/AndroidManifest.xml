@@ -121,12 +121,6 @@
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key" />
-
-        <activity
-                android:name=".DashboardActivity"
-                android:exported="true"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
         <activity
                 android:name=".activity.MobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"

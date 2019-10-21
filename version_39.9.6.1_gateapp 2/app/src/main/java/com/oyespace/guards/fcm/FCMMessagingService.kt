@@ -31,12 +31,12 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import java.io.File
 
-class FCMMessagingService : FirebaseMessagingService(){
+class FCMMessagingService : FirebaseMessagingService() {
     internal var msg = ""
-    lateinit var mp:  MediaPlayer
+    lateinit var mp: MediaPlayer
     internal var handler = Handler()
     internal lateinit var mediaPlayer: MediaPlayer
-    var  myFormat="3gp"
+    var myFormat = "3gp"
 
 //    private val firebaseDatabase = FirebaseDatabase.getInstance()
 //    private val mRootReference = firebaseDatabase.getReference()
@@ -85,10 +85,8 @@ class FCMMessagingService : FirebaseMessagingService(){
 
         Log.d("JSON s", "data: " + remoteMessage.data)
 
-        try
-        {
-            if (remoteMessage.data["activt"].equals("visitorEntryApproval", ignoreCase = true))
-            {
+        try {
+            if (remoteMessage.data["activt"].equals("visitorEntryApproval", ignoreCase = true)) {
 
                 //TODO only notification and open respective activity
                 Log.d(
@@ -104,8 +102,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "JSON in",
                     "visitorEntryApproval: " + remoteMessage.data["name"] + " " + remoteMessage.data["entry_type"]
                 )
-            } else if (remoteMessage.data["activt"].equals("childExitApproval", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("childExitApproval", ignoreCase = true)) {
 
 //                dbh.insertSecurityNotificationTable(prefManager.getAssociationId(),
 //                    remoteMessage!!.data["activt"],
@@ -119,8 +116,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "Child_Exit: " + remoteMessage.data["name"] + " " + remoteMessage.data["entry_type"]
                 )
 
-            } else if (remoteMessage.data["activt"].equals("childExitApproved", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("childExitApproved", ignoreCase = true)) {
 
                 //TODO notification and open respective activity
                 Log.d(
@@ -143,8 +139,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "CourierEntryApproval",
                     ignoreCase = true
                 )
-            )
-            {
+            ) {
 
 //                courierEntryReject(remoteMessage!!.data["name"] + " " + remoteMessage!!.data["entry_type"],
 //                    remoteMessage!!.data["mobile"], remoteMessage!!.data["nr_id"]
@@ -167,8 +162,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "setFirebaseWelcomeMsg",
                     ignoreCase = true
                 )
-            )
-            {
+            ) {
 
 //                mChildReference = mRootReference.child("message" + prefManager.getAssociationId())
 //                mChildReference!!.setValue(remoteMessage!!.data["name"])
@@ -178,8 +172,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "getFirebaseWelcomeMsg",
                     ignoreCase = true
                 )
-            )
-            {
+            ) {
 
 //                prefManager = PrefManager(applicationContext)
 //                mChildReference = mRootReference.child("message" + prefManager.getAssociationId())
@@ -204,8 +197,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 //                    }
 //                })
 
-            } else if (remoteMessage.data["activt"].equals("CourierReply", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("CourierReply", ignoreCase = true)) {
 
 //                val intentAction = Intent(applicationContext, DownloadResDataReceiver::class.java)
 //                intentAction.putExtra("action", "COURIER")
@@ -230,8 +222,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "CourierReply: " + remoteMessage.data["name"] + " " + remoteMessage.data["entry_type"] + " " + remoteMessage.data["nr_id"]
                 )
 
-            } else if (remoteMessage.data["activt"].equals("permissionStatus", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("permissionStatus", ignoreCase = true)) {
 
                 //TODO only notification
                 Log.d(
@@ -239,15 +230,14 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "permissionStatus: " + remoteMessage.data["name"] + " " + remoteMessage.data["entry_type"]
                 )
 
-            } else if (remoteMessage.data["activt"].equals(Emergency, ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals(Emergency, ignoreCase = true)) {
                 Log.d(
                     "Dgddfdfe fcm in emer",
                     remoteMessage.data["incidentId"] + " " + remoteMessage.data["mob"]
                             + " " + remoteMessage.data["incidentId"]
                 )
 
-                Log.d("Dgddfdfeemer ",   " 205 " )
+                Log.d("Dgddfdfeemer ", " 205 ")
                 //val intent = Intent(this, SplashActivity::class.java)
                 getEmerResponses(
                     remoteMessage.data["name"].toString(),
@@ -257,8 +247,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     remoteMessage.data["gps"].toString()
                 )
 
-            } else if (remoteMessage.data["activt"].equals("emergencyAttend", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("emergencyAttend", ignoreCase = true)) {
                 Log.d(
                     "Dgddfdfe fcm in attend",
                     remoteMessage.data["incidentId"] + " " + remoteMessage.data["mob"]
@@ -266,8 +255,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                 )
                 Prefs.putBoolean(EMERGENCY_SOUND_ON, false)
 
-            } else if (remoteMessage.data["activt"].equals("incident", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("incident", ignoreCase = true)) {
 //                dbh.insertSecurityNotificationTable(prefManager.getAssociationId(),
 //                    remoteMessage!!.data["activt"], remoteMessage!!.data["name"], remoteMessage!!.data["gps"],
 //                    Integer.valueOf(remoteMessage!!.data["incidentId"]), remoteMessage!!.data["mob"].trim { it <= ' ' })
@@ -283,8 +271,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     ConstantUtils.BACKGROUND_SYNC,
                     ignoreCase = true
                 )
-            )
-            {
+            ) {
                 Log.d("Dgddfdf", "fcm:msg " + remoteMessage.data["activt"])
                 val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
                 intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VISITOR_ENTRY_SYNC)
@@ -306,8 +293,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 //                intentAction1.putExtra(action, GUARD + Attendance)
 //                sendBroadcast(intentAction1)
             //   }
-            else if (remoteMessage.data["activt"].equals("PatrollingNotDone", ignoreCase = true))
-            {
+            else if (remoteMessage.data["activt"].equals("PatrollingNotDone", ignoreCase = true)) {
 
                 //TODO only notification and open respective activity
                 Log.d(
@@ -315,8 +301,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "PatrollingNotDone: " + remoteMessage.data["name"] + " " + remoteMessage.data["entry_type"]
                 )
 
-            } else if (remoteMessage.data["activt"].equals("emergencyResponse", ignoreCase = true))
-            {
+            } else if (remoteMessage.data["activt"].equals("emergencyResponse", ignoreCase = true)) {
 
                 //TODO only notification and open respective activity
                 Log.d(
@@ -379,8 +364,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                     "Default : " + remoteMessage.data["name"] + " " + remoteMessage.data["entry_type"]
                 )
             }
-        }
-        catch (ex:Exception) {
+        } catch (ex: Exception) {
 
             Log.d("JSON ex3 858", "Notification  " + ex.toString() + " data " + remoteMessage.data)
         }
@@ -389,7 +373,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     }
 
-    private fun sendFCM_welcomeMsg(welcomeMessage:String) {
+    private fun sendFCM_welcomeMsg(welcomeMessage: String) {
 //        val apiService = FCMApiClient.getClient().create(FCMApiInterface::class.java)
 //
 //        val payloadData = EntryPermissionPayload("getFirebaseWelcomeMsgReply",
@@ -410,7 +394,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 //        })
     }
 
-    internal fun courierEntryReject(title:String, mobileNumber:String, nrid:String) {
+    internal fun courierEntryReject(title: String, mobileNumber: String, nrid: String) {
 
 //        try
 //        {
@@ -498,7 +482,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     }
 
-    internal fun yesNoNotification_25(title:String, mobileNumber:String, emergencyID:String, emergencyB:Boolean, gps:String) {
+    internal fun yesNoNotification_25(title: String, mobileNumber: String, emergencyID: String, emergencyB: Boolean, gps: String) {
 
         val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
 ////        am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
@@ -510,7 +494,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 //                // final MediaPlayer mediaPlayer;
         mediaPlayer = MediaPlayer.create(this, R.raw.emergency)
         mediaPlayer.start()
-        Log.d("Dgddfdfeemer ",   " 547 " )
+        Log.d("Dgddfdfeemer ", " 547 ")
 
         Prefs.putBoolean(EMERGENCY_SOUND_ON, true)
 
@@ -525,7 +509,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     }
 
-    internal fun childExitNotification(title:String, name:String, nrv_id:String, unit_id:String) {
+    internal fun childExitNotification(title: String, name: String, nrv_id: String, unit_id: String) {
 
 //        try
 //        {
@@ -636,7 +620,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     }
 
-    private fun getEmerResponses(title:String, mobileNumber:String, emergencyId:String, emergencyB:Boolean, gps:String) {
+    private fun getEmerResponses(title: String, mobileNumber: String, emergencyId: String, emergencyB: Boolean, gps: String) {
 //        RetrofitClinet.instance
 //            .getTicketingResponses(OYE247TOKEN,emergencyId)
 //            .subscribeOn(Schedulers.io())
@@ -676,7 +660,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     }
 
-    fun makeAutoEntry(NRVisitorID:Int) {
+    fun makeAutoEntry(NRVisitorID: Int) {
 
 //        object: AsyncTask<String, String, String>() {
 //
@@ -725,11 +709,11 @@ class FCMMessagingService : FirebaseMessagingService(){
     }
 
     fun playMediaFile() {
-        Log.d("Dgddfdfeemer ",   " 787 " )
+        Log.d("Dgddfdfeemer ", " 787 ")
 
         val r = Runnable {
 
-            if (Prefs.getBoolean(EMERGENCY_SOUND_ON,false)) {
+            if (Prefs.getBoolean(EMERGENCY_SOUND_ON, false)) {
                 playMediaFile()
                 mediaPlayer = MediaPlayer.create(applicationContext, R.raw.emergency)
                 mediaPlayer.start()
@@ -740,8 +724,7 @@ class FCMMessagingService : FirebaseMessagingService(){
 
     }
 
-    fun getAudio(filename:String) {
-
+    fun getAudio(filename: String) {
 
 
 //Define Notification Manager
@@ -765,10 +748,9 @@ class FCMMessagingService : FirebaseMessagingService(){
         }
 
 
-
-      val mediaPlayer:MediaPlayer
+        val mediaPlayer: MediaPlayer
 //
-       val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val am = getSystemService(Context.AUDIO_SERVICE) as AudioManager
         am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
         mediaPlayer = MediaPlayer()
 
@@ -807,9 +789,10 @@ class FCMMessagingService : FirebaseMessagingService(){
         adminChannel.enableVibration(true)
         notificationManager.createNotificationChannel(adminChannel)
     }
+
     private fun getNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int) {
 
-        val dataReq = SendGateAppNotificationRequest(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID )
+        val dataReq = SendGateAppNotificationRequest(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID)
 
 
         CloudFunctionRetrofitClinet.instance
@@ -840,7 +823,7 @@ class FCMMessagingService : FirebaseMessagingService(){
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList",e.toString())
+                    Log.d("Error WorkerList", e.toString())
                 }
 
                 override fun noNetowork() {
