@@ -43,7 +43,7 @@ class MyRoleScreen : BaseKotlinActivity() {
     private fun getDeviceRegistrationInfo() {
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         var Mobile_IMEI_NO = tm.deviceId
-     //   Mobile_IMEI_NO=""
+        //   Mobile_IMEI_NO=""
         val getSimNumber = tm.line1Number
 
 
@@ -54,15 +54,15 @@ class MyRoleScreen : BaseKotlinActivity() {
 //        }
 
 //if(getSimNumber!=null){
-    if(getSimNumber.length==0){
-    Log.v("GetSimNumber",getSimNumber)
+        if(getSimNumber.length==0){
+            Log.v("GetSimNumber",getSimNumber)
 
-}
+        }
         else{
-    Prefs.putString(PrefKeys.MOBILE_NUMBER, getSimNumber)
+            Prefs.putString(PrefKeys.MOBILE_NUMBER, getSimNumber)
         }
 
-       // Prefs.putString(PrefKeys.COUNTRY_CODE, countryCode.toString())
+        // Prefs.putString(PrefKeys.COUNTRY_CODE, countryCode.toString())
 
 
 
@@ -74,42 +74,61 @@ class MyRoleScreen : BaseKotlinActivity() {
 
         compositeDisposable.add(
             RetrofitClinet.instance.getDeviceInfobyMobImeiCall(OYE247TOKEN,req)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetDeviceInfobyMobImeiResp<Device>>() {
-                override fun onSuccessResponse(globalApiObject: GetDeviceInfobyMobImeiResp<Device>) {
-                    if (globalApiObject.data.device!= null) {
-                       // Utils.showToast(applicationContext, intToString( globalApiObject.data.workers.asAssnID))
-                        Log.d("getDeviceInfoCall","StaffEntry " +globalApiObject.data.toString())
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<GetDeviceInfobyMobImeiResp<Device>>() {
+                    override fun onSuccessResponse(globalApiObject: GetDeviceInfobyMobImeiResp<Device>) {
+                        if (globalApiObject.data.device!= null) {
+                            // Utils.showToast(applicationContext, intToString( globalApiObject.data.workers.asAssnID))
+                            Log.d("getDeviceInfoCall","StaffEntry " +globalApiObject.data.toString())
 
-                        val exitedSort = ArrayList<Device>()
-                        val arrayList = globalApiObject.data.device
+                            val exitedSort = ArrayList<Device>()
+                            val arrayList = globalApiObject.data.device
 
-                        //looping through existing elements
-                        for (s in arrayList) {
-                            //if the existing elements contains the search input
-                            Log.d("button_done ","device "+" "+" "+s.deGateNo)
-                            Prefs.putString(GATE_NO,s.deGateNo)
-                            if (s.deStatus) {
-                                Log.d("device ","device "+s.deStatus+" "+s.deStatus+" ")
+                            //looping through existing elements
+                            for (s in arrayList) {
+                                //if the existing elements contains the search input
+                                Log.d("button_done ","device "+" "+" "+s.deGateNo)
+                                Prefs.putString(GATE_NO,s.deGateNo)
+                                Prefs.putInt(GATE_DEVICE_ID,s.deid)
+                                if (s.deStatus) {
+                                    Log.d("device ","device "+s.deStatus+" "+s.deStatus+" ")
 
 
-                                exitedSort.add(s)
-                                //adding the element to filtered list
-                            } else {
-                                exitedSort.add(s)
+                                    exitedSort.add(s)
+                                    //adding the element to filtered list
+                                } else {
+                                    exitedSort.add(s)
+                                }
                             }
-                        }
-                        getDeviceList(globalApiObject.data.device[0].asAssnID)
-                        if(exitedSort!=null) {
-                            getAssnInfo(globalApiObject.data.device[0].asAssnID)
+                            getDeviceList(globalApiObject.data.device[0].asAssnID)
+                            if(exitedSort!=null) {
+                                getAssnInfo(globalApiObject.data.device[0].asAssnID)
 
-                        //    LocalDb.saveDeviceInfo(globalApiObject.data.workers)
-                        }else{
+                                //    LocalDb.saveDeviceInfo(globalApiObject.data.workers)
+                            }else{
+
+                                LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                                    .setTopColorRes(R.color.google_red)
+                                    //.setIcon(R.drawable.ic_info_black_24dp)
+                                    //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+                                    .setTitle("invalid")
+                                    .setTitleGravity(Gravity.CENTER)
+                                    .setMessage("Not Registered as Gate Device")
+                                    .setMessageGravity(Gravity.CENTER)
+                                    .setPositiveButton(android.R.string.ok) {
+
+                                    }
+
+                                    .show()
+
+                            }
+
+                        } else {
 
                             LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
                                 .setTopColorRes(R.color.google_red)
-                                //.setIcon(R.drawable.ic_info_black_24dp)
+                                .setIcon(R.drawable.ic_info_black_24dp)
                                 //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
                                 .setTitle("invalid")
                                 .setTitleGravity(Gravity.CENTER)
@@ -120,84 +139,66 @@ class MyRoleScreen : BaseKotlinActivity() {
                                 }
 
                                 .show()
-
                         }
-
-                    } else {
-
-                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.google_red)
-                            .setIcon(R.drawable.ic_info_black_24dp)
-                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-                            .setTitle("invalid")
-                            .setTitleGravity(Gravity.CENTER)
-                            .setMessage("Not Registered as Gate Device")
-                            .setMessageGravity(Gravity.CENTER)
-                            .setPositiveButton(android.R.string.ok) {
-
-                            }
-
-                            .show()
                     }
-                }
 
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("onErrorResponse","StaffEntry "+e.toString())
+                    override fun onErrorResponse(e: Throwable) {
+                        Log.d("onErrorResponse","StaffEntry "+e.toString())
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
 
-                    if(getSimNumber.length==0){
+                        if(getSimNumber.length==0){
 
-                        val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,null)
-                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.google_red)
-                            .setIcon(R.drawable.ic_info_black_24dp)
-                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-                            .setTitle("Device is not registered as Gate device")
-                            .setTitleGravity(Gravity.CENTER)
-                             .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
-                            //.setMessage(Mobile_IMEI_NO + " and +91" + intent.getStringExtra("MOBIELNUMBER") + " is not registered as Gate Device")
+                            val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,null)
+                            LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                                .setTopColorRes(R.color.google_red)
+                                .setIcon(R.drawable.ic_info_black_24dp)
+                                //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+                                .setTitle("Device is not registered as Gate device")
+                                .setTitleGravity(Gravity.CENTER)
+                                .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
+                                //.setMessage(Mobile_IMEI_NO + " and +91" + intent.getStringExtra("MOBIELNUMBER") + " is not registered as Gate Device")
 
-                            .setMessageGravity(Gravity.CENTER)
-                            .setPositiveButton(android.R.string.ok) {
-                                finish()
-                            }
+                                .setMessageGravity(Gravity.CENTER)
+                                .setPositiveButton(android.R.string.ok) {
+                                    finish()
+                                }
 
-                            .show()
-                        dismissProgress()
-                    }else {
+                                .show()
+                            dismissProgress()
+                        }else {
 
 
-                        LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
-                            .setTopColorRes(R.color.google_red)
-                            // .setIcon(R.drawable.ic_info_black_24dp)
-                            //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
-                            .setTitle("Device is not registered as Gate device")
-                            .setTitleGravity(Gravity.CENTER)
-                            // .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
-                            .setMessage(Mobile_IMEI_NO + " and +" + getSimNumber + " is not registered as Gate Device")
+                            LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
+                                .setTopColorRes(R.color.google_red)
+                                // .setIcon(R.drawable.ic_info_black_24dp)
+                                //This will add Don't show again checkbox to the dialog. You can pass any ID as argument
+                                .setTitle("Device is not registered as Gate device")
+                                .setTitleGravity(Gravity.CENTER)
+                                // .setMessage(Mobile_IMEI_NO+" and +"+Prefs.getString(PrefKeys.COUNTRY_CODE,null)+Prefs.getString(PrefKeys.MOBILE_NUMBER,null)+" is Not Registered as Gate Device")
+                                .setMessage(Mobile_IMEI_NO + " and +" + getSimNumber + " is not registered as Gate Device")
 
-                            .setMessageGravity(Gravity.CENTER)
-                            .setPositiveButton(android.R.string.ok) {
-                                finish()
-                            }
+                                .setMessageGravity(Gravity.CENTER)
+                                .setPositiveButton(android.R.string.ok) {
+                                    finish()
+                                }
 
-                            .show()
+                                .show()
+                            dismissProgress()
+                        }
+                    }
+
+                    override fun noNetowork() {
+                        Utils.showToast(applicationContext, getString(R.string.no_internet))
+                    }
+
+                    override fun onShowProgress() {
+                        showProgress()
+                    }
+
+                    override fun onDismissProgress() {
                         dismissProgress()
                     }
-               }
-
-                override fun noNetowork() {
-                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                }
-
-                override fun onShowProgress() {
-                    showProgress()
-                }
-
-                override fun onDismissProgress() {
-                    dismissProgress()
-                }
-            }))
+                }))
     }
 
     private fun getAssnInfo(AssnID: Int ) {
@@ -319,29 +320,29 @@ class MyRoleScreen : BaseKotlinActivity() {
                 }
             })
     }
-fun getDeviceList(AssnID: Int){
-    RetrofitClinet.instance.getDeviceListResponse(OYE247TOKEN, intToString(AssnID))
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribeWith(object : CommonDisposable<getDeviceList>() {
+    fun getDeviceList(AssnID: Int){
+        RetrofitClinet.instance.getDeviceListResponse(OYE247TOKEN, intToString(AssnID))
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<getDeviceList>() {
 
-            override fun onSuccessResponse(deviceListResponse: getDeviceList) {
+                override fun onSuccessResponse(deviceListResponse: getDeviceList) {
 
 
-                if (deviceListResponse.data.deviceListByAssocID!= null) {
-                    Prefs.putInt("TOTAL_GUARDS", deviceListResponse.data.deviceListByAssocID.size)
-                    Log.e("WorkerListsuccess", deviceListResponse.data.toString())
+                    if (deviceListResponse.data.deviceListByAssocID!= null) {
+                        Prefs.putInt("TOTAL_GUARDS", deviceListResponse.data.deviceListByAssocID.size)
+                        Log.e("WorkerListsuccess", deviceListResponse.data.toString())
 
-                    val arrayList = deviceListResponse.data.deviceListByAssocID
+                        val arrayList = deviceListResponse.data.deviceListByAssocID
 
-                    if(arrayList.size ==1 || arrayList.size == 0){
-                        Prefs.putString(WALKIETALKIE,"OFF")
-                        Log.e("Device List",arrayList.size.toString())
-                    }
-                    else{
-                        Prefs.putString(WALKIETALKIE,"ON")
-                        Log.e("Device List",arrayList.size.toString())
-                    }
+                        if(arrayList.size ==1 || arrayList.size == 0){
+                            Prefs.putString(WALKIETALKIE,"OFF")
+                            Log.e("Device List",arrayList.size.toString())
+                        }
+                        else{
+                            Prefs.putString(WALKIETALKIE,"ON")
+                            Log.e("Device List",arrayList.size.toString())
+                        }
 
 //                    Collections.sort(arrayList, object : Comparator<WorkerDetails>{
 //                        override  fun compare(lhs: WorkerDetails, rhs: WorkerDetails): Int {
@@ -354,13 +355,13 @@ fun getDeviceList(AssnID: Int){
 //                    startActivity(mainIntent)
 //                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
 //                    finish()
-                } else {
-                    Prefs.putInt("TOTAL_GUARDS", 1)
+                    } else {
+                        Prefs.putInt("TOTAL_GUARDS", 1)
 //                    val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
 //                    startActivity(mainIntent)
 //                    finish()
 
-                    //rv_staff.setEmptyAdapter("No items to show!", false, 0)
+                        //rv_staff.setEmptyAdapter("No items to show!", false, 0)
 //
 //                    LovelyStandardDialog(this@MyRoleScreen, LovelyStandardDialog.ButtonLayout.VERTICAL)
 //                        .setTopColorRes(R.color.google_red)
@@ -377,22 +378,22 @@ fun getDeviceList(AssnID: Int){
 //                        }
 //
 //                        .show()
+                    }
                 }
-            }
 
-            override fun onErrorResponse(e: Throwable) {
+                override fun onErrorResponse(e: Throwable) {
 
-                //rv_staff.setEmptyAdapter(getString(R.string.some_wrng), false, 0)
-                Toast.makeText(this@MyRoleScreen, getString(R.string.some_wrng), Toast.LENGTH_LONG)
-                    .show()
-                Log.d("Error WorkerList",e.toString())
+                    //rv_staff.setEmptyAdapter(getString(R.string.some_wrng), false, 0)
+                    Toast.makeText(this@MyRoleScreen, getString(R.string.some_wrng), Toast.LENGTH_LONG)
+                        .show()
+                    Log.d("Error WorkerList",e.toString())
 
-            }
+                }
 
-            override fun noNetowork() {
-                Toast.makeText(this@MyRoleScreen, "No network call ", Toast.LENGTH_LONG)
-                    .show()
-            }
-        })
-}
+                override fun noNetowork() {
+                    Toast.makeText(this@MyRoleScreen, "No network call ", Toast.LENGTH_LONG)
+                        .show()
+                }
+            })
+    }
 }

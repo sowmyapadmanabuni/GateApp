@@ -32,6 +32,7 @@ public class ConstantUtils {
     public static final String WORKER_ID = "worker_id";
     public static final String ASSOCIATION_ID = "ASSOCIATION_ID";
     public static final String GATE_NO = "GATE_NO";
+    public static final String GATE_DEVICE_ID = "GATE_DEVICE_ID";
     public static final String GATE_MOB = "GATE_MOB";
     public static final String DEVICE_ID = "DEVICE_ID";
     public static final String SERVICE_PROVIDER = "Service Provider";
@@ -84,6 +85,7 @@ public class ConstantUtils {
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
     public static final String PATROLLING_END_POINT = "Patrolling End Point";
     public static final String PATROLLING_SCHEDULE_ID = "PATROLLING_SCHEDULE_ID";
+    public static final String MEDIA_URL = IMAGE_BASE_URL+"Images/";
 
     public static final String BACKGROUND_SYNC = "BACKGROUND_SYNC";
     public static final String NONREGULAR = "NONREGULAR";
@@ -101,6 +103,7 @@ public class ConstantUtils {
     public static final String ACTIVE_PATROLLING_SCHEDULE = "ACTIVE_PATROLLING_SCHEDULE";
     public static final String ACTIVE_PATROLLING_LAST_CP = "ACTIVE_PATROLLING_LAST_CP";
     public static final String PATROLLING_COMPLETED_ON = "PATROLLING_COMPLETED_ON_";
+    public static final String PATROLLING_HIDDEN_SELFIE = "PATROLLING_HIDDEN_SELFIE";
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
