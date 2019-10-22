@@ -1871,6 +1871,24 @@ data class Subscription(
     val susDate: String
 )
 
+data class CheckPointScanRequest(
+    val ASAssnID: Int,
+    val WKWorkID: String,
+    val wkfName: String,
+    val PSPtrlSID : Int,
+    val TRTDateT:String,
+    val TRGPSPnt:String,
+    val CPCkPName:String,
+    val TRImage:String,
+    val deId:Int,
+    val CPCPntAt:String
+)
+
+data class CheckPointScanResponse(
+    val apiVersion: String,
+    val `data`: String,
+    val success: Boolean
+)
 
 
 

@@ -42,6 +42,7 @@ public class PatrollingAlert extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT,false);
+        stopSiren();
         try {
             handler.removeCallbacks(runnable);
         }catch (Exception e){
@@ -78,6 +79,7 @@ public class PatrollingAlert extends AppCompatActivity {
                         snoozed = Prefs.getInt(ConstantUtils.SNOOZE_COUNT + scheduleId, 0);
                     }catch (Exception e){
                         e.printStackTrace();
+                        stopSiren();
                     }
                     snoozed+=1;
 

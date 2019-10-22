@@ -98,6 +98,10 @@ interface WebApi {
     fun startPatrollingCall(@Header(OYE247KEY) token: String, @Body startPatrollingReq: StartPatrollingReq)
             : Single<StartPatrollingResp>
 
+    @POST("oye247/api/v1/Tracking/Create")
+    fun scanCheckPoint(@Header(OYE247KEY) token: String, @Body cpScanReq: CheckPointScanRequest)
+            : Single<CheckPointScanResponse>
+
     @POST("oye247/api/v1/Patrolling/PatrollingEndDateUpdate")
     fun stopPatrollingCall(@Header(OYE247KEY) token: String, @Body stopPatrollingReq: StopPatrollingReq)
             : Single<StopPatrollingResp>

@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
+import com.oyespace.guards.CapPhoto
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.PatrolShiftsAdapter
@@ -23,6 +24,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_pschedule_list.*
 import kotlinx.android.synthetic.main.header_with_back.*
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PScheduleListActivity:BaseKotlinActivity(){
 
@@ -87,6 +91,8 @@ class PScheduleListActivity:BaseKotlinActivity(){
         if(ongoingSchedule == -1 || ongoingSchedule == selectedShift.psPtrlSID){
             navigateToScanView(selectedShift)
         }else if(ongoingSchedule != -1 && !scheduleExist){
+            Prefs.remove(ACTIVE_PATROLLING_SCHEDULE)
+            Prefs.remove(ACTIVE_PATROLLING_LAST_CP)
             navigateToScanView(selectedShift)
         }
         else{
@@ -107,11 +113,11 @@ class PScheduleListActivity:BaseKotlinActivity(){
         val batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
         Log.e("BATTERY",""+batLevel)
-        if(batLevel>30) {
+        //if(batLevel>=30) {
             startActivityForResult(mPatrolIntent, 1)
-        }else{
-            showAnimatedDialog("Please connect your charger to continue",R.raw.battery,false,"OK")
-        }
+//        }else{
+//            showAnimatedDialog("Please connect your charger to continue",R.raw.battery,false,"OK")
+//        }
     }
 
 
@@ -126,7 +132,18 @@ class PScheduleListActivity:BaseKotlinActivity(){
                 override fun onSuccessResponse(PatrolList: ShiftsListResponse<ArrayList<PatrolShift>>) {
                     dismissProgressrefresh()
                     if (PatrolList.success == true) {
-                        mPatrolShiftArray = PatrolList.data.patrollingShifts;
+                        var mTempShifts = PatrolList.data.patrollingShifts;
+                        var updatedArrayList = ArrayList<PatrolShift>()
+                        val sdf: SimpleDateFormat = SimpleDateFormat("EEEE")
+                        val d: Date = Date()
+                        val day = sdf.format(d)
+                        for(shift:PatrolShift in mTempShifts){
+                            if(shift.psRepDays.contains(day,ignoreCase = true)){
+                                updatedArrayList.add(shift)
+                            }
+                        }
+
+                        mPatrolShiftArray = updatedArrayList
                         setSchedulesAdapter()
                     }
                 }
