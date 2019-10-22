@@ -500,7 +500,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
         if (visitors != null) {
             for (visitor in visitors) {
-                updateFirebaseColor(visitor.vlVisLgID.toString())
+                updateFirebaseColor(visitor.vlVisLgID)
             }
         }
     }
@@ -532,13 +532,13 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         }
     }
 
-    fun updateFirebaseColor(visitorId: String, buttonColor: String = "#ffb81a") {
+    fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
 
         Log.i("taaag", "push to firebase: " + visitorId)
         val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
         val id = ref.push().key
         val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
-        ref.child(visitorId).setValue(notificationSyncModel).addOnCompleteListener {
+        ref.child(visitorId.toString()).setValue(notificationSyncModel).addOnCompleteListener {
             //            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
         }
 
