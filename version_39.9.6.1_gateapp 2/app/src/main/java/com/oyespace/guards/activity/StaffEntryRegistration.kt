@@ -14,12 +14,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.firebase.database.FirebaseDatabase
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
-import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -314,7 +312,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         if (globalApiObject.success) {
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
-                            Log.i("taaag", "saving... $vlid")
+                            Log.i("taaag", "saving... $vlid for entryTime: ${getCurrentTimeLocal()}")
 
                             val vlog = VisitorLog()
                             vlog.vlVisLgID = vlid
@@ -500,7 +498,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
         if (visitors != null) {
             for (visitor in visitors) {
-                updateFirebaseColor(visitor.vlVisLgID)
+                AppUtils.updateFirebaseColor(visitor.vlVisLgID)
             }
         }
     }
@@ -530,18 +528,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
-    }
-
-    fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
-
-        Log.i("taaag", "push to firebase: " + visitorId)
-        val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
-        val id = ref.push().key
-        val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
-        ref.child(visitorId.toString()).setValue(notificationSyncModel).addOnCompleteListener {
-            //            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
-        }
-
     }
 
 }

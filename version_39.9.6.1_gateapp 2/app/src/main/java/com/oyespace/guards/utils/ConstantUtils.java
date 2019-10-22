@@ -75,11 +75,11 @@ public class ConstantUtils {
 
 
     //http://mediaupload.oyespace.com/Images/
- // public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
- public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
-    //public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
-    public static final String BASE_URL = "https://apidev.oyespace.com/";
-    //public static final String BASE_URL="https://apiuat.oyespace.com/";
+//  public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+// public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+    public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+    //    public static final String BASE_URL = "https://apidev.oyespace.com/";
+    public static final String BASE_URL = "https://apiuat.oyespace.com/";
 //    public static final String BASE_URL = "https://api.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
@@ -121,5 +121,6 @@ public class ConstantUtils {
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
 
+    public static final int MAX_DELIVERY_ALLOWED_SEC = 7 * 60;// min * 60
 
 }

@@ -282,7 +282,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                         deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
 
-                        AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID.toString())
+                        AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
 
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)

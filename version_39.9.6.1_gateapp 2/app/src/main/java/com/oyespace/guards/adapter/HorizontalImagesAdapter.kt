@@ -65,6 +65,7 @@ class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Arra
             .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)
 
         holder.image.setOnClickListener {
+            imageList?.scrollToPosition(position)
             imagePopup?.show()
         }
 

@@ -104,7 +104,37 @@ public class DateTimeUtils {
 
     }
 
-    public static boolean deliveryTimeUp(String downloaded_date, String curr_date_YMD_hms, int itemCount) {
+    public static long msLeft(String et, int maxSec) {
+
+        try {
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(DATE_FORMAT_YMDHMS.parse(et));
+            c1.add(Calendar.SECOND, maxSec);
+
+            Calendar c2 = Calendar.getInstance();
+            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+            final String currentString = "1900-01-01T" + dateFormatLocal.format(DATE_FORMAT_YMDHMS.parse(getCurrentTimeLocal()));
+            c2.setTime(DATE_FORMAT_YMDHMS.parse(currentString));
+
+            //get Time in milli seconds
+            long ms1 = c1.getTimeInMillis();
+            long ms2 = c2.getTimeInMillis();
+            long msPassed = ms1 - ms2;
+
+            Log.i("taaag", "maxTime: " + msPassed / 1000);
+
+
+            return msPassed;
+
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
+
+    public static boolean deliveryTimeUp(String downloaded_date, String curr_date_YMD_hms, int maxMins) {
 
         try {
             java.util.Date dt_dwnld_date, dt_curr_date;
@@ -131,7 +161,7 @@ public class DateTimeUtils {
             //get difference in milli seconds
             long diff_sec = ms2 - ms1;
             int day_diff = (int) diff_sec / (60 * 1000);
-            int allottedTime = itemCount * 7;
+            int allottedTime = maxMins;
 
             //int allottedTime=8+itemCount*7;
 

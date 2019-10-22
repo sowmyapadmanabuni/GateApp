@@ -13,7 +13,6 @@ import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
@@ -94,30 +93,38 @@ class VistorOutListAdapter(
                     holder.expanded_view.visibility = View.GONE
                 }
             }
-            holder.iv_play.setOnClickListener {
-                AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+            if (visitor.vlVoiceNote.isEmpty()) {
+                holder.iv_play.visibility = View.GONE
+            } else {
+                holder.iv_play.visibility = View.VISIBLE
+                holder.iv_play.setOnClickListener {
+                    AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+                }
             }
-        }
 
-        holder.tv_comments.text = visitor.vlCmnts
+            if (visitor.vlCmnts.isEmpty()) {
+                holder.tv_comments.visibility = View.GONE
+            } else {
+                holder.tv_comments.visibility = View.VISIBLE
+                holder.tv_comments.text = visitor.vlCmnts
+            }
 
-        if (visitor.vlVenImg.contains(",")) {
-            var imageList: Array<String>
-            imageList = visitor.vlVenImg.split(",".toRegex())
-                .dropLastWhile({ it.isEmpty() }).toTypedArray()
+            if (visitor.vlVenImg.isEmpty()) {
+                holder.rv_images.visibility = View.GONE
+            } else {
+
+                holder.rv_images.visibility = View.VISIBLE
+                if (visitor.vlVenImg.contains(",")) {
+                    var imageList: Array<String>
+                    imageList = visitor.vlVenImg.split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
 
 
-            holder.rv_images.setHasFixedSize(true)
-            val linearLayoutManager =
-                LinearLayoutManager(
-                    mcontext,
-                    LinearLayoutManager.HORIZONTAL, true
-                )
-            holder.rv_images.layoutManager = linearLayoutManager
+                    holder.rv_images.setHasFixedSize(true)
+                    holder.rv_images.adapter = HorizontalImagesAdapter(mcontext, imageList)
 
-
-            val adapter = HorizontalImagesAdapter(mcontext, imageList)
-            holder.rv_images.adapter = adapter
+                }
+            }
 
         }
 

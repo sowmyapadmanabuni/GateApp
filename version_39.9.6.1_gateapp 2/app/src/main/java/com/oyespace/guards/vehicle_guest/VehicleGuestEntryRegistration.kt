@@ -273,7 +273,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity(), View.OnClickListener
                                 false
                             )
 
-                            AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID.toString())
+                            AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
 
                             val d = Intent(this@VehicleGuestEntryRegistration, BackgroundSyncReceiver::class.java)
                             d.putExtra(BSR_Action, VisitorEntryFCM)

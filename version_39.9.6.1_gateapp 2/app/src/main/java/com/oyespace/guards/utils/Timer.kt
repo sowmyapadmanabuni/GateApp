@@ -2,7 +2,7 @@ package com.oyespace.guards.utils
 
 import android.os.CountDownTimer
 
-class TimerUtil(millisInFuture: Long, val onFinishCallback: OnFinishCallback? = null) : CountDownTimer(millisInFuture, 1000) {
+class TimerUtil(millisInFuture: Long, val onFinishCallback: OnFinishCallback?) : CountDownTimer(millisInFuture, 1000) {
 
     override fun onFinish() {
         onFinishCallback?.onFinish()

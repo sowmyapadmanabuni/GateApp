@@ -65,13 +65,13 @@ class AppUtils {
             return dist
         }
 
-        fun updateFirebaseColor(visitorId: String, buttonColor: String = "#ffb81a") {
+        fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
 
             Log.i("taaag", "push to firebase: " + visitorId)
             val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
             val id = ref.push().key
             val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
-            ref.child(visitorId).setValue(notificationSyncModel).addOnCompleteListener {
+            ref.child(visitorId.toString()).setValue(notificationSyncModel).addOnCompleteListener {
                 //            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
             }
 

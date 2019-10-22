@@ -1463,7 +1463,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 if (vistorOutListAdapter == null) {
                     vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
                 } else {
-                    vistorEntryListAdapter!!.setVisitorLog(newAl)
+                    vistorEntryListAdapter?.setVisitorLog(newAl)
                 }
                 rv_dashboard?.adapter = vistorEntryListAdapter
                 btn_in.setBackgroundColor(resources.getColor(R.color.orange))
@@ -1818,6 +1818,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
 
         fun isTimeAutomatic(c: Context): Boolean {
+            return true
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 Settings.Global.getInt(c.contentResolver, Settings.Global.AUTO_TIME, 0) == 1
             } else {
@@ -1830,6 +1831,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         }
 
         fun isTimeZoneAutomatic(c: Context): Boolean {
+            return true
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 Settings.Global.getInt(c.contentResolver, Settings.Global.AUTO_TIME_ZONE, 0) == 1
             } else {
@@ -2449,7 +2451,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                         }
                     } catch (e: Exception) {
                         Log.e("taaag", "crash at value ${h.value}")
-                        Toast.makeText(this, "crash at value ${h.value}", Toast.LENGTH_SHORT).show()
                         e.printStackTrace()
                     }
 

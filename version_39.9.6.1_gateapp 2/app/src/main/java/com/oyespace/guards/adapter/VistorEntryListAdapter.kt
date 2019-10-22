@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,8 +24,7 @@ import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.ConstantUtils.DELIVERY
-import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.TimerUtil
@@ -81,20 +81,52 @@ class VistorEntryListAdapter(
                 holder.exitTime.text = ""
                 holder.btn_makeexit.visibility = View.VISIBLE
 
-//                if (visitor.vlVenImg.isEmpty() and visitor.vlVoiceNote.isEmpty() and visitor.vlCmnts.isEmpty()) {
-//                    holder.iv_attachment.visibility = View.GONE
-//                    holder.expanded_view.visibility = View.GONE
-//                } else {
-//                    holder.iv_attachment.visibility = View.VISIBLE
-//                    holder.lyt_text.setOnClickListener {
-//
-//                        if (holder.expanded_view.visibility == View.GONE) {
-//                            holder.expanded_view.visibility = View.VISIBLE
-//                        } else {
-//                            holder.expanded_view.visibility = View.GONE
-//                        }
-//                    }
-//                }
+                if (visitor.vlVenImg.isEmpty() and visitor.vlVoiceNote.isEmpty() and visitor.vlCmnts.isEmpty()) {
+                    holder.iv_attachment.visibility = View.GONE
+                    holder.expanded_view.visibility = View.GONE
+                } else {
+                    holder.iv_attachment.visibility = View.VISIBLE
+                    holder.lyt_text.setOnClickListener {
+
+                        if (holder.expanded_view.visibility == View.GONE) {
+                            holder.expanded_view.visibility = View.VISIBLE
+                        } else {
+                            holder.expanded_view.visibility = View.GONE
+                        }
+                    }
+                    if (visitor.vlVoiceNote.isEmpty()) {
+                        holder.iv_play.visibility = View.GONE
+                    } else {
+                        holder.iv_play.visibility = View.VISIBLE
+                        holder.iv_play.setOnClickListener {
+                            AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+                        }
+                    }
+
+                    if (visitor.vlCmnts.isEmpty()) {
+                        holder.tv_comments.visibility = View.GONE
+                    } else {
+                        holder.tv_comments.visibility = View.VISIBLE
+                        holder.tv_comments.text = visitor.vlCmnts
+                    }
+
+                    if (visitor.vlVenImg.isEmpty()) {
+                        holder.rv_images.visibility = View.GONE
+                    } else {
+
+                        holder.rv_images.visibility = View.VISIBLE
+                        if (visitor.vlVenImg.contains(",")) {
+                            var imageList: Array<String>
+                            imageList = visitor.vlVenImg.split(",".toRegex())
+                                .dropLastWhile({ it.isEmpty() }).toTypedArray()
+
+
+                            holder.rv_images.setHasFixedSize(true)
+                            holder.rv_images.adapter = HorizontalImagesAdapter(mcontext, imageList)
+
+                        }
+                    }
+                }
 
                 if (visitor.vlVenImg.contains(",")) {
                     var imageList: Array<String>
@@ -122,10 +154,13 @@ class VistorEntryListAdapter(
                 if (visitor.vlVisType.equals(DELIVERY)) {
 
                     val firebaseObject = firebasedataMap.get(visitor.vlVisLgID.toString())
+                    holder.btn_makeexit.visibility = View.GONE
 
                     val entryTime = visitor.vlEntryT
 
-                    if (deliveryTimeUp(visitor.vlEntryT, getCurrentTimeLocal(), noofUnits)) {
+                    val msLeft = msLeft(entryTime, MAX_DELIVERY_ALLOWED_SEC * noofUnits)
+
+                    if (msLeft < 0) {
                         holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
                         holder.ll_card.startAnimation(animBlink)
                     } else {
@@ -143,6 +178,7 @@ class VistorEntryListAdapter(
                                     override fun onFinish() {
 
                                         holder.btn_makeexit.visibility = View.GONE
+                                        // TODO don't exit, just remove entry
                                         exitVisitor(visitor, position)
 
                                     }
@@ -155,6 +191,22 @@ class VistorEntryListAdapter(
                                 holder.btn_makeexit.visibility = View.VISIBLE
                             }
                         }
+
+                        // TODO start this when accepted
+                        TimerUtil(msLeft, object : TimerUtil.OnFinishCallback {
+                            override fun onFinish() {
+                                holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
+                                holder.ll_card.startAnimation(animBlink)
+                                Handler().post {
+                                    searchList = VisitorLogRepo.get_IN_VisitorLog(false)
+                                    if (searchList != null) {
+                                        visitorList = searchList!!
+                                    }
+                                    notifyDataSetChanged()
+                                }
+                            }
+                        }).start()
+
 
                     }
 
