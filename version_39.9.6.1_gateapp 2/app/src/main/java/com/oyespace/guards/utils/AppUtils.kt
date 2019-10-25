@@ -1,5 +1,7 @@
 package com.oyespace.guards.utils
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
@@ -38,6 +40,32 @@ class AppUtils {
                 return formattedDate
             }catch (e:Exception){
                 return serverTime!!
+            }
+        }
+
+        fun decodeBitmap(data: ByteArray): Bitmap {
+            var bitmap: Bitmap? = null
+            try {
+                val bfOptions = BitmapFactory.Options()
+                bfOptions.inDither = false // Disable Dithering mode
+                bfOptions.inPurgeable = true // Tell to gc that whether it needs free
+                // memory, the Bitmap can be cleared
+                bfOptions.inInputShareable = true // Which kind of reference will be
+                // used to recover the Bitmap data
+                // after being clear, when it will
+                // be used in the future
+                bfOptions.inTempStorage = ByteArray(32 * 1024)
+
+                if (data != null)
+                    bitmap = BitmapFactory.decodeByteArray(
+                        data, 0, data.size,
+                        bfOptions
+                    )
+
+                return bitmap!!
+            }catch (e:java.lang.Exception){
+                e.printStackTrace()
+                return bitmap!!;
             }
         }
 
