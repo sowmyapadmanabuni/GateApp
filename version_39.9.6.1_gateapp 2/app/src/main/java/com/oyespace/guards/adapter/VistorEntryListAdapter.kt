@@ -155,7 +155,7 @@ class VistorEntryListAdapter(
                 if (visitor.vlVisType.equals(DELIVERY)) {
 
                     val firebaseObject = firebasedataMap.get(visitor.vlVisLgID.toString())
-                    holder.btn_makeexit.visibility = View.GONE
+                    holder.btn_makeexit.visibility = View.INVISIBLE
 
                     val entryTime = visitor.vlEntryT
 
@@ -164,6 +164,7 @@ class VistorEntryListAdapter(
                     if (msLeft < 0) {
                         holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
                         holder.ll_card.startAnimation(animBlink)
+                        holder.btn_makeexit.visibility = View.VISIBLE
                     } else {
 
                         val fbColor = firebaseObject?.buttonColor
