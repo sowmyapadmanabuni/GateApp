@@ -43,6 +43,7 @@ class VistorEntryListAdapter(
     var searchString: String = ""
     var mobnumber: String? = null
     lateinit var mp: MediaPlayer
+    var imgPath:String?=null
 
     init {
         this.searchList = visitorList
@@ -245,16 +246,18 @@ class VistorEntryListAdapter(
             }
 
 
-            var imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
+
 
             if (visitor.vlVisType.equals("STAFF", true)) {
                 if (visitor.vlEntryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
             } else {
-                if (visitor.vlEntryImg.isEmpty()) {
-                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"
-                }
+
+                imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
+//                if (visitor.vlEntryImg.isEmpty()) {
+//                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"
+//                }
             }
 
             Glide.with(mcontext)
@@ -286,6 +289,9 @@ class VistorEntryListAdapter(
                             .placeholder(R.drawable.user_icon_black)
                             .error(R.drawable.user_icon_black)
                             .into(dialog_imageview)
+
+
+
                     } else {
 
 

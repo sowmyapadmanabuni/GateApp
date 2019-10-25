@@ -1,9 +1,11 @@
 package com.oyespace.guards.realm;
 
+import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.models.Worker;
 
 import java.util.ArrayList;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmList;
 
@@ -45,5 +47,15 @@ public class StaffRealm {
         realm.copyToRealmOrUpdate(arrayList);
         realm.commitTransaction();
         realm.close();
+    }
+
+    public static ArrayList<Worker> searchVisitorLog(String searchQuery) {
+
+        Realm realm = Realm.getDefaultInstance();
+        return new ArrayList<>(realm.where(Worker.class)
+                .contains("wkfName", searchQuery, Case.INSENSITIVE)
+                .findAll());
+
+
     }
 }

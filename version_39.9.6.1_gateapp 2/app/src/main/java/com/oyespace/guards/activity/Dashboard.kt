@@ -366,6 +366,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         setSupportActionBar(toolbar)
         mReceiver = BatteryBroadcastReceiver()
 
+
         telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         sendAnalyticsData("SDDashB_Oncreate", "Start", Date().toString() + "")
@@ -426,9 +427,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-            registerReceiver(mUsbReceiver, filter)
-        }
+//        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+//            registerReceiver(mUsbReceiver, filter)
+//        }
 
 
 
@@ -563,6 +564,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
     override fun onResume() {
+
+        registerReceiver(mUsbReceiver, filter)
+
         runTimerCheck()
 
 
@@ -1007,9 +1011,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         mVerifyImage = null
         mVerifyTemplate = null
         //        sgfplib.Close();
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+        //if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
             unregisterReceiver(mUsbReceiver)
-        }
+        //}
         val ddc2 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         Log.d("SYNC_UNIT_LIST", "af ")
         ddc2.putExtra(BSR_Action, SYNC_UNIT_LIST)
@@ -1132,12 +1136,18 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     fun getFingerprintFromScanner(): ByteArray? {
 
+
         val templateSize = IntArray(1)
         sgfplib!!.GetMaxTemplateSize(templateSize)
         val fpTemp = ByteArray(templateSize[0])
         val fpImg = ByteArray(mImageWidth * mImageHeight)
-        sgfplib!!.GetImage(fpImg)
-        val code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
+        var code= 0L
+        try {
+            sgfplib!!.GetImageEx(fpImg,10000, 50)
+             code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
+        }catch (e:NullPointerException){
+
+        }
         when (code) {
             SGFDX_ERROR_NONE -> {
                 showToast(this, "fingerprint captured")
