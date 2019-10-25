@@ -87,9 +87,9 @@ public class ConstantUtils {
     public static final String PATROLLING_SCHEDULE_ID = "PATROLLING_SCHEDULE_ID";
     public static final String MEDIA_URL = IMAGE_BASE_URL+"Images/";
 
-    public static final String BACKGROUND_SYNC="BACKGROUND_SYNC";
-    public static final String NONREGULAR="NONREGULAR";
-    public static final String SYNC="SYNC";
+    public static final String BACKGROUND_SYNC = "BACKGROUND_SYNC";
+    public static final String NONREGULAR = "NONREGULAR";
+    public static final String SYNC = "SYNC";
 
     public static final String Emergency = "Emergency";
     public static final String WALKIETALKIE = "WalkieTalkie";
@@ -122,6 +122,6 @@ public class ConstantUtils {
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
 
-
+    public static final int MAX_DELIVERY_ALLOWED_SEC = 7 * 60;// min * 60
 
 }

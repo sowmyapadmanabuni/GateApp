@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import com.oyespace.guards.BackgroundSyncReceiver
@@ -283,6 +282,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                         deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
 
+                        AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
 
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)
@@ -537,5 +537,6 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 }
             })
     }
+
 
 }

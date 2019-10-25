@@ -22,6 +22,15 @@
                           android:layout_weight="1"
                           android:layout_height="match_parent"
                           android:orientation="vertical">
+
+
+                <ImageView android:layout_width="40dp"
+                        android:layout_weight="1"
+                        android:layout_height="40dp"
+                        android:layout_margin="5dp"
+                        android:id="@+id/iv_help"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/helpline"/>
                 <!--<TextView android:layout_width="match_parent"-->
                           <!--android:layout_height="wrap_content"-->
                           <!--android:id="@+id/txt_device_name"-->

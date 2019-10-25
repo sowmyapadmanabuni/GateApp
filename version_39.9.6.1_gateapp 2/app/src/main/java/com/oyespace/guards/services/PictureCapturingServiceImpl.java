@@ -42,7 +42,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP) //NOTE: camera 2 api was added in API level 21
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class PictureCapturingServiceImpl extends APictureCapturingService {
 
     private static final String TAG = PictureCapturingServiceImpl.class.getSimpleName();
@@ -155,18 +155,12 @@ public class PictureCapturingServiceImpl extends APictureCapturingService {
         public void onClosed(@NonNull CameraDevice camera) {
             cameraClosed = true;
             Log.e(TAG, "camera " + camera.getId() + " closed");
-            //once the current camera has been closed, start taking another picture
-//            if (!cameraIds.isEmpty()) {
-//                takeAnotherPicture();
-//            } else {
-                capturingListener.onDoneCapturingAllPhotos(picturesTaken);
-            //}
+            capturingListener.onDoneCapturingAllPhotos(picturesTaken);
         }
 
 
         @Override
         public void onError(@NonNull CameraDevice camera, int error) {
-            Log.e(TAG, "camera in error, int code " + error);
             if (cameraDevice != null && !cameraClosed) {
                 cameraDevice.close();
             }

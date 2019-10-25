@@ -7,6 +7,7 @@ import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.models.ExitVisitorLog
 import com.oyespace.guards.models.GetExitVisitorsResponse
 import com.oyespace.guards.models.GetVisitorsResponse
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
@@ -50,7 +51,7 @@ class VisitorLogRepo {
                                     listener?.onFetch(null, "no entries found")
                                 } else {
                                     VisitorEntryLogRealm.updateVisitorLogs(visitorsList)
-                                    listener?.onFetch(VisitorEntryLogRealm.getVisitorEntryLog())
+                                    listener?.onFetch(getOverstaySortedList())
                                 }
                             } else {
                                 listener?.onFetch(null)
@@ -69,7 +70,7 @@ class VisitorLogRepo {
                 return null
             } else {
 
-                val logs = VisitorEntryLogRealm.getVisitorEntryLog()
+                val logs = getOverstaySortedList()
                 listener?.onFetch(logs)
                 return logs
 
@@ -93,8 +94,33 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.entryExists(phone)
         }
 
-        fun search_IN_Visitors(search: String): ArrayList<com.oyespace.guards.models.VisitorLog>? {
-            return VisitorEntryLogRealm.searchVisitorLog(search)
+        fun search_IN_Visitors(search: String): ArrayList<VisitorLog>? {
+            if (search.isEmpty()) {
+                return getOverstaySortedList()
+            } else {
+                return VisitorEntryLogRealm.searchVisitorLog(search)
+            }
+        }
+
+        fun getOverstaySortedList(): ArrayList<VisitorLog>? {
+
+            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
+
+            val overStaying = ArrayList<VisitorLog>()
+            val underStaying = ArrayList<VisitorLog>()
+
+            for (vl in listFromRealm) {
+                val msLeft = DateTimeUtils.msLeft(vl.vlEntryT, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
+                if (msLeft <= 0) {
+                    overStaying.add(vl)
+                } else {
+                    underStaying.add(vl)
+                }
+            }
+
+            overStaying.addAll(underStaying)
+            return overStaying
+
         }
 
         fun getUnitCountForVisitor(phone: String): Int {

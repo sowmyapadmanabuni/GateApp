@@ -12,11 +12,13 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.ExitVisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
+import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
 import com.oyespace.guards.utils.DateTimeUtils
@@ -68,9 +70,64 @@ class VistorOutListAdapter(
 
         val orderData = searchList!!.get(position)
         val vistordate = orderData.asAssnID
+        var visitor: ExitVisitorLog? = null
+        try {
+            visitor = searchList!!.get(position)
+        } catch (e: Exception) {
+            return
+        }
         holder.apartmentNamee.text = orderData.unUniName
         holder.entryTime.text = formatDateHM(orderData.vlEntryT) + " "
         holder.entrydate.text = formatDateDMY(orderData.vldCreated)
+
+        if (visitor.vlVenImg.isEmpty() and visitor.vlVoiceNote.isEmpty() and visitor.vlCmnts.isEmpty()) {
+            holder.iv_attachment.visibility = View.GONE
+            holder.expanded_view.visibility = View.GONE
+        } else {
+            holder.iv_attachment.visibility = View.VISIBLE
+            holder.lyt_text.setOnClickListener {
+
+                if (holder.expanded_view.visibility == View.GONE) {
+                    holder.expanded_view.visibility = View.VISIBLE
+                } else {
+                    holder.expanded_view.visibility = View.GONE
+                }
+            }
+            if (visitor.vlVoiceNote.isEmpty()) {
+                holder.iv_play.visibility = View.GONE
+            } else {
+                holder.iv_play.visibility = View.VISIBLE
+                holder.iv_play.setOnClickListener {
+                    AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+                }
+            }
+
+            if (visitor.vlCmnts.isEmpty()) {
+                holder.tv_comments.visibility = View.GONE
+            } else {
+                holder.tv_comments.visibility = View.VISIBLE
+                holder.tv_comments.text = visitor.vlCmnts
+            }
+
+            if (visitor.vlVenImg.isEmpty()) {
+                holder.rv_images.visibility = View.GONE
+            } else {
+
+                holder.rv_images.visibility = View.VISIBLE
+                if (visitor.vlVenImg.contains(",")) {
+                    var imageList: Array<String>
+                    imageList = visitor.vlVenImg.split(",".toRegex())
+                        .dropLastWhile({ it.isEmpty() }).toTypedArray()
+
+
+                    holder.rv_images.setHasFixedSize(true)
+                    holder.rv_images.adapter = HorizontalImagesAdapter(mcontext, imageList)
+
+                }
+            }
+
+        }
+
         if (orderData.vlExitT.equals("0001-01-01T00:00:00", true)) {
             holder.exitTime.text = ""
             holder.exitdate.text = ""
@@ -203,14 +260,7 @@ class VistorOutListAdapter(
             mcontext.startActivity(intent)
         }
 
-        holder.lyt_text.setOnClickListener {
-
-            if (holder.expanded_view.visibility == View.GONE) {
-                holder.expanded_view.visibility = View.VISIBLE
-            } else {
-                holder.expanded_view.visibility = View.GONE
-            }
-        }
+        holder.expanded_view.visibility = View.GONE
 
     }
 
@@ -241,9 +291,12 @@ class VistorOutListAdapter(
         val entrydate: TextView
         val exitdate: TextView
         val ll_card: LinearLayout
-        val expanded_view: LinearLayout
-
+        val rv_images: RecyclerView
+        val expanded_view: ConstraintLayout
+        val tv_comments: TextView
         val lyt_text: LinearLayout
+        val iv_attachment: ImageView
+        val iv_play: ImageView
 
         init {
             entryTime = view.findViewById(R.id.tv_entrytime)
@@ -264,7 +317,10 @@ class VistorOutListAdapter(
             exitdate = view.findViewById(R.id.tv_exitdate)
             ll_card = view.findViewById(R.id.ll_card)
             lyt_text = view.findViewById(R.id.lyt_text)
-
+            iv_attachment = view.findViewById(R.id.iv_attachment)
+            rv_images = view.findViewById(R.id.rv_images)
+            tv_comments = view.findViewById(R.id.tv_comments)
+            iv_play = view.findViewById(R.id.iv_play)
 
         }
 

@@ -2,9 +2,18 @@ package com.oyespace.guards.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.content.Context
+import android.media.AudioAttributes
+import android.media.AudioManager
+import android.media.MediaPlayer
+import android.media.SoundPool
+import android.os.Environment
 import android.util.Log
+import com.google.firebase.database.FirebaseDatabase
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
+import com.oyespace.guards.models.NotificationSyncModel
+import java.io.File
 import java.text.SimpleDateFormat
 
 
@@ -82,6 +91,47 @@ class AppUtils {
 
             Log.d("xgdssd Dgddfdf", "$lat1 $lng1 $lat2 $lng2 $dist")
             return dist
+        }
+
+        fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
+
+            Log.i("taaag", "push to firebase: " + visitorId)
+            val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
+            val id = ref.push().key
+            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
+            ref.child(visitorId.toString()).setValue(notificationSyncModel).addOnCompleteListener {
+                //            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
+            }
+
+        }
+
+        fun playAudio(mcontext: Context, filename: String) {
+
+            val mediaPlayer: MediaPlayer
+//
+            val am = mcontext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
+            mediaPlayer = MediaPlayer()
+
+
+            var spb = SoundPool.Builder()
+            spb.setMaxStreams(10)
+            var attrBuilder = AudioAttributes.Builder()
+            attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
+            spb.setAudioAttributes(attrBuilder.build())
+            spb.build()
+
+            mediaPlayer.setDataSource("http://mediaupload.oyespace.com/" + filename)
+            mediaPlayer.prepare()
+
+            mediaPlayer.start()
+
+
+            val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .absolutePath
+            val f = File(baseDir + filename)
+            f.delete()
+
         }
 
     }

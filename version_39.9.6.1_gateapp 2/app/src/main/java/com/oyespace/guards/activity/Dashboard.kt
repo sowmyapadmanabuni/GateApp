@@ -122,6 +122,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     private var myAudioRecorder: MediaRecorder? = null
 
     var iv_settings: ImageView? = null
+    var iv_help:ImageView?=null
     lateinit var tv_nodata: TextView
     // LinearLayout lyt_settings;
     var clickable = 0
@@ -1387,6 +1388,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         txt_gate_name = findViewById(R.id.txt_gate_name)
         tv_subscriptiondate?.setOnClickListener(this)
         iv_settings = findViewById(R.id.iv_settings)
+        iv_help=findViewById(R.id.iv_help)
         iv_settings?.setOnClickListener(this)
         lyt_settings = findViewById(R.id.lyt_settings)
         iv_settings?.setBackgroundResource(R.drawable.settings)
@@ -1429,6 +1431,13 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             Speak()
 
         })
+
+       iv_help!!.setOnClickListener{
+           val intent = Intent(Intent.ACTION_CALL)
+           intent.data = Uri.parse("tel:" + "9343121121")
+           startActivity(intent)
+        }
+
         btn_in.setOnClickListener {
 
             showingOutLog = false
@@ -1454,7 +1463,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 if (vistorOutListAdapter == null) {
                     vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
                 } else {
-                    vistorEntryListAdapter!!.setVisitorLog(newAl)
+                    vistorEntryListAdapter?.setVisitorLog(newAl)
                 }
                 rv_dashboard?.adapter = vistorEntryListAdapter
                 btn_in.setBackgroundColor(resources.getColor(R.color.orange))
@@ -1809,6 +1818,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         private val ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION"
 
         fun isTimeAutomatic(c: Context): Boolean {
+            return true
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 Settings.Global.getInt(c.contentResolver, Settings.Global.AUTO_TIME, 0) == 1
             } else {
@@ -1821,6 +1831,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         }
 
         fun isTimeZoneAutomatic(c: Context): Boolean {
+            return true
             return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
                 Settings.Global.getInt(c.contentResolver, Settings.Global.AUTO_TIME_ZONE, 0) == 1
             } else {
@@ -2436,11 +2447,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                         val data = h.getValue(NotificationSyncModel::class.java)
 
                         if (data != null) {
-                            firebasedataMap.put(data.visitorlogId, data)
+                            firebasedataMap.put(data.visitorlogId.toString(), data)
                         }
                     } catch (e: Exception) {
                         Log.e("taaag", "crash at value ${h.value}")
-                        Toast.makeText(this, "crash at value ${h.value}", Toast.LENGTH_SHORT).show()
                         e.printStackTrace()
                     }
 

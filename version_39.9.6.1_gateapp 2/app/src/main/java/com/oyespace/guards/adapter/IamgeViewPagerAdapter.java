@@ -10,10 +10,6 @@ import android.widget.RelativeLayout;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.oyespace.guards.R;
-import com.oyespace.guards.camtest.AddCarFragment;
-import com.oyespace.guards.camtest.ImageHelper;
-
-
 
 
 public class IamgeViewPagerAdapter extends PagerAdapter {
@@ -21,13 +17,13 @@ public class IamgeViewPagerAdapter extends PagerAdapter {
 
     Context mContext;
     LayoutInflater mLayoutInflater;
-    String imagesList[];
+    String[] imagesList;
 
 
-    public IamgeViewPagerAdapter(Context context, String imagesList[]) {
+    public IamgeViewPagerAdapter(Context context, String[] imagesList) {
 
         mContext = context;
-        imagesList=imagesList;
+        this.imagesList = imagesList;
 
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -39,7 +35,7 @@ public class IamgeViewPagerAdapter extends PagerAdapter {
 
     @Override
     public boolean isViewFromObject(View view, Object object) {
-        return view == ((RelativeLayout) object);
+        return view == object;
     }
 
     @Override
@@ -47,8 +43,8 @@ public class IamgeViewPagerAdapter extends PagerAdapter {
         View itemView = mLayoutInflater.inflate(R.layout.layout_viewpager_iem, container, false);
 
 
-        ImageView imageView = (ImageView) itemView.findViewById(R.id.image);
-      //  ImageHelper.loadImage(mContext, imagesList[position], imageView);
+        ImageView imageView = itemView.findViewById(R.id.image);
+        //  ImageHelper.loadImage(mContext, imagesList[position], imageView);
 
 
         container.addView(itemView);

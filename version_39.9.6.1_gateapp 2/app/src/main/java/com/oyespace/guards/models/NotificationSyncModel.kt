@@ -1,10 +1,10 @@
 package com.oyespace.guards.models
 
 class NotificationSyncModel(
-    val visitorlogId: String,
+    val visitorlogId: Int,
     val buttonColor: String,
     val opened: Boolean = false
 ) {
-    constructor() : this("", "")
+    constructor() : this(0, "")
 }
 

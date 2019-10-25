@@ -30,15 +30,8 @@ public abstract class APictureCapturingService {
 
     int getOrientation() {
         final int rotation = this.activity.getWindowManager().getDefaultDisplay().getRotation();
-        Log.e("getOrientation",""+rotation);
         return ORIENTATIONS.get(90);
     }
 
-
-    /**
-     * starts pictures capturing process.
-     *
-     * @param listener picture capturing listener
-     */
     public abstract void startCapturing(final PictureCapturingListener listener);
 }

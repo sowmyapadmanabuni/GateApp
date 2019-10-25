@@ -301,33 +301,30 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 //                val imgName = "Association"+ "0" + ".jpg"
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
+                byte[] byteArray = null;
+                try {
+                    Log.d("Dgddfdf picas", "5 2");
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                    byteArray = bos.toByteArray();
+                    int len = bos.toByteArray().length;
+                    System.out.println("AFTER COMPRESSION-===>" + len);
+                    bos.flush();
+                    bos.close();
+                } catch (Exception ex) {
+                    Log.d("Dgddfdf picas", "7");
+                }
 
+               if (photo == null && imageView1.getDrawable() == null) {
 
-//                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
+                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
 
-                if (photo == null && imageView1.getDrawable() == null) {
                     submit_button.setEnabled(true);
                     submit_button.setClickable(true);
-                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
                 }
-//                }else if (list.size() == 0){
-//                    Toast.makeText(getApplicationContext(),"Capture Product Photo ", Toast.LENGTH_SHORT).show();
-//                }
                 else {
 
-                    byte[] byteArray = null;
-                    try {
-                        Log.d("Dgddfdf picas", "5 2");
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                        byteArray = bos.toByteArray();
-                        int len = bos.toByteArray().length;
-                        System.out.println("AFTER COMPRESSION-===>" + len);
-                        bos.flush();
-                        bos.close();
-                    } catch (Exception ex) {
-                        Log.d("Dgddfdf picas", "7");
-                    }
+
 
                     Intent d = new Intent(VehicleOthersAddCarFragment.this, VehicleOthersEntryRegistration.class);
 //                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)

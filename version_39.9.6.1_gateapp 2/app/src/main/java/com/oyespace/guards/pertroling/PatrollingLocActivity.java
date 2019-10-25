@@ -768,9 +768,9 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
     private boolean isValidDistance(Double mCPLatitude, Double mCPLongitude) {
         float result = calculateDistance(mCPLatitude, mCPLongitude);
-        return true;
+        //return true;
         //Log.e("DISTANCE_LOC",""+result);
-        //return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
+        return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
     }
 
     private float calculateDistance(Double mCPLatitude, Double mCPLongitude) {

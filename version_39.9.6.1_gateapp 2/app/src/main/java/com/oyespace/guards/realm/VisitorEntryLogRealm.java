@@ -127,20 +127,17 @@ public class VisitorEntryLogRealm {
 
     public static ArrayList<VisitorLog> searchVisitorLog(String searchQuery) {
 
-        if (searchQuery.isEmpty()) {
-            return getVisitorEntryLog();
-        } else {
-            Realm realm = Realm.getDefaultInstance();
-            return new ArrayList<>(realm.where(VisitorLog.class)
-                    .contains("vlfName", searchQuery, Case.INSENSITIVE)
-                    .or()
-                    .contains("vlComName", searchQuery, Case.INSENSITIVE)
-                    .or()
-                    .contains("vlMobile", searchQuery)
-                    .or()
-                    .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
-                    .findAll());
-        }
+        Realm realm = Realm.getDefaultInstance();
+        return new ArrayList<>(realm.where(VisitorLog.class)
+                .contains("vlfName", searchQuery, Case.INSENSITIVE)
+                .or()
+                .contains("vlComName", searchQuery, Case.INSENSITIVE)
+                .or()
+                .contains("vlMobile", searchQuery)
+                .or()
+                .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
+                .findAll());
+
 
     }
 
