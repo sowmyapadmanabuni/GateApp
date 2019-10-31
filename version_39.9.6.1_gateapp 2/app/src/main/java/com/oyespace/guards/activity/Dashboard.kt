@@ -533,7 +533,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
     fun runTimerCheck() {
-        pTimerChecker = fixedRateTimer("patroll_timer_checker", false, 6000, 20000) {
+        pTimerChecker = fixedRateTimer("patroll_timer_checker", false, 6000, 15000) {
             this@Dashboard.runOnUiThread {
                 val activeAlert = Prefs.getBoolean("ACTIVE_ALERT", false)
                 if (!activeAlert) {
@@ -546,7 +546,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     }
 
     fun runPatrollingTimer() {
-        pTimer = fixedRateTimer("patroll_timer", false, 60000, 60000) {
+        pTimer = fixedRateTimer("patroll_timer", false, 1000, 60000) {
             this@Dashboard.runOnUiThread {
                 notifyPatrollingReminder()
             }
@@ -563,7 +563,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
     override fun onResume() {
-        runTimerCheck()
+        if(pTimerChecker == null) {
+            runTimerCheck()
+        }
 
 
         fixedRateTimer("timer", false, 0, 60000) {

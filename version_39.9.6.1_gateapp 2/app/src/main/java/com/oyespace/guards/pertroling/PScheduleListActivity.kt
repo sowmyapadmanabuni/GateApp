@@ -16,6 +16,7 @@ import com.androidhiddencamera.CameraConfig
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.activity.PatrollingAlert
 import com.oyespace.guards.adapter.PatrolShiftsAdapter
 import com.oyespace.guards.models.PatrolShift
 import com.oyespace.guards.models.ShiftsListResponse
@@ -67,25 +68,22 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
     }
 
     override fun onStart() {
-        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
+        //Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
         super.onStart()
     }
 
     override fun onDestroy() {
-        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
-        if(pTimer != null){
-            pTimer!!.cancel()
-        }
+       // Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
         super.onDestroy()
     }
 
     override fun onPause() {
-        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
+       // Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
         super.onPause()
     }
 
     override fun onResume() {
-        Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
+        //Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
         super.onResume()
     }
 
@@ -105,14 +103,14 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
         if(pTimer==null) {
             pTimer = fixedRateTimer("schedule_timer_checker", false, 0, 60000) {
                 this@PScheduleListActivity.runOnUiThread {
-
+                    Log.e("TIMER_1","Started")
                     val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
                     val pausedTimeString = Prefs.getString(ACTIVE_PATROLLING_LAST_TIME, "")
                     val scheduleExist = isScheduleExist(ongoingSchedule)
                     if (scheduleExist && ongoingSchedule != -1 && !pausedTimeString.equals("")) {
                         val minuteDiff = getMinuteDifference(pausedTimeString)
                         Log.e("checkMinutesTimer", "" + minuteDiff)
-                        if(minuteDiff>=15){
+                        if(minuteDiff>=PATROLLING_PAUSE_TIMER){
                             Prefs.remove(ACTIVE_PATROLLING_SCHEDULE)
                             Prefs.remove(ACTIVE_PATROLLING_LAST_CP)
                             Prefs.remove(ACTIVE_PATROLLING_LAST_TIME)
@@ -120,11 +118,28 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
                             if(pTimer != null){
                                 pTimer!!.cancel()
                             }
+                        }else if(minuteDiff == PATROLLING_PAUSE_REMINDER_TIMER){
+
+                            val isReminder = Prefs.getBoolean(ConstantUtils.PATROLLING_RESUMED_TIME + ongoingSchedule,false)
+                            if(!isReminder) {
+                                val alertDlg =
+                                    Intent(this@PScheduleListActivity, PatrollingAlert::class.java)
+                                alertDlg.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                alertDlg.putExtra("MSG", "Resume patrolling in 2 minutes")
+                                alertDlg.putExtra("BTN_TEXT", "OK")
+                                alertDlg.putExtra("ANIM", R.raw.alarm)
+                                alertDlg.putExtra("TYPE", "PATROLLING_PAUSE")
+                                alertDlg.putExtra("SCHEDULEID", ongoingSchedule)
+                                startActivity(alertDlg)
+                                //showAnimatedDialog("Resume patrolling in 2 minutes",R.raw.error_alert,true,"OK")
+                            }
                         }
 
                     }
                 }
             }
+        }else{
+            Log.e("TIMER_2","NOT NULL")
         }
     }
 
@@ -179,7 +194,11 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
         Prefs.remove(SNOOZE_COUNT+selectedShift.psPtrlSID)
         Prefs.remove(SNOOZE_IS_ACTIVE+selectedShift.psPtrlSID)
         Prefs.remove(SNOOZE_TIME+selectedShift.psPtrlSID)
-
+        Prefs.remove(PATROLLING_RESUMED_TIME + selectedShift.psPtrlSID)
+        if(pTimer != null){
+            pTimer!!.cancel()
+            pTimer = null
+        }
         val bm: BatteryManager = this.getSystemService(BATTERY_SERVICE) as BatteryManager;
         val batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
@@ -308,6 +327,7 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
                         if(ongoingSchedule != -1) {
                             scheduleExist = isScheduleExist(ongoingSchedule)
                             if(scheduleExist){
+                                Log.e("Starting_","Calling Timer")
                                 startMinutesTimer()
                             }
                         }

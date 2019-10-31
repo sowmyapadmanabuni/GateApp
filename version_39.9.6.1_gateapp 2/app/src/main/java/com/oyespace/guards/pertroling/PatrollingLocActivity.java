@@ -162,11 +162,12 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
         byte[] wrrw = getIntent().getByteArrayExtra(PERSON_PHOTO);
         if(wrrw != null){
-            Log.e("IMAGE_CAPTURED",""+wrrw);
+            //Log.e("IMAGE_CAPTURED",""+wrrw);
         }
 
         mPauseBtn = findViewById(R.id.btn_pause);
         mStopBtn = findViewById(R.id.btn_stop);
+        mStopBtn.setVisibility(View.GONE);
         mScanTitle = findViewById(R.id.toolbar);
 
 
@@ -210,37 +211,37 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //-1 = Error
         //0 = No more checkpoints (Reached Last Checkpoint)
         int lastCheckPoint = Prefs.getInt(ACTIVE_PATROLLING_LAST_CP, -1);
-        Log.e("setNextCheckPointLabel",""+lastCheckPoint);
+        //Log.e("setNextCheckPointLabel",""+lastCheckPoint);
         if(scheduleCheckPoints.size() > 0) {
-            Log.e("setNextCheckPointLabel","Size > 0");
+            //Log.e("setNextCheckPointLabel","Size > 0");
             if (lastCheckPoint == -1) {
                 mScanTitle.setText("Scan First Checkpoint\n"+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
                 toSpeech.speak("Scan First Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
             } else {
-                Log.e("setNextCheckPointLabel","is not -1");
+                //Log.e("setNextCheckPointLabel","is not -1");
                     boolean isCheckPointFound = false;
 
                     int currentIndex = -1;
                     int nextCheckPoint = -1;
                     for (int i = 0; i < scheduleCheckPoints.size(); i++) {
                         ScheduleCheckPointsData cp = scheduleCheckPoints.get(i);
-                        Log.e("setNextCheckPointLabel",""+cp.getPsChkPID()+" - "+lastCheckPoint);
+                        //Log.e("setNextCheckPointLabel",""+cp.getPsChkPID()+" - "+lastCheckPoint);
                         if (cp.getPsChkPID() == lastCheckPoint) {
-                            Log.e("setNextCheckPointLabel","Found "+i);
+                            //Log.e("setNextCheckPointLabel","Found "+i);
                             currentIndex = i;
                             isCheckPointFound = true;
                             break;
                         }
                     }
-                    Log.e("setNextCheckPointLabel",""+isCheckPointFound+" - "+currentIndex);
+                    //Log.e("setNextCheckPointLabel",""+isCheckPointFound+" - "+currentIndex);
                     if (isCheckPointFound) {
                         if (scheduleCheckPoints.size() == currentIndex + 1) {
-                            Log.e("setNextCheckPointLabel","Next_LAST "+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
+                            //Log.e("setNextCheckPointLabel","Next_LAST "+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
                             mScanTitle.setText("Scan First Checkpoint\n"+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
                             toSpeech.speak("Scan First Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                         } else {
                             try {
-                                Log.e("setNextCheckPointLabel","Next_ELSE "+scheduleCheckPoints.get(currentIndex + 1).getChecks().get(0).getCpCkPName());
+                                //Log.e("setNextCheckPointLabel","Next_ELSE "+scheduleCheckPoints.get(currentIndex + 1).getChecks().get(0).getCpCkPName());
                                 mScanTitle.setText("Scan Checkpoint\n"+scheduleCheckPoints.get(currentIndex + 1).getChecks().get(0).getCpCkPName());
                                 toSpeech.speak("Scan Next Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                             } catch (Exception e) {
@@ -329,7 +330,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         public void onSuccessResponse(CheckPointsOfSheduleListResponse<ArrayList<PatrolShift>> checkPointResponse) {
                             try {
                                 dismissProgressrefresh();
-                                Log.e("getScheduleCheckPoints",""+checkPointResponse.getData().getCheckPointsBySchedule());
+                                //Log.e("getScheduleCheckPoints",""+checkPointResponse.getData().getCheckPointsBySchedule());
                                 if(checkPointResponse.getSuccess() && checkPointResponse.getData().getCheckPointsBySchedule().size()>0){
                                     isScanEnabled = true;
                                     PatrolShift patrolShift = checkPointResponse.getData().getCheckPointsBySchedule().get(0);
@@ -469,8 +470,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             @Override
             public void onReceive(Context context, Intent intent) {
                 Location newLocation = intent.getParcelableExtra("location");
-                Log.e("newLocation", "" + newLocation);
-                Log.e("mPredictedLocation", "" + mPredictedLocation);
+                //Log.e("newLocation", "" + newLocation);
+                //Log.e("mPredictedLocation", "" + mPredictedLocation);
                 if (mPredictedLocation == null) {
                     mPredictedLocation = newLocation;
                 }
@@ -483,7 +484,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             @Override
             public void onReceive(Context context, Intent intent) {
                 Location predictedLocation = intent.getParcelableExtra("location");
-                Log.e("predictedLocation", "" + predictedLocation);
+                //Log.e("predictedLocation", "" + predictedLocation);
                 mPredictedLocation = predictedLocation;
                 //drawPredictionRange(predictedLocation);
 
@@ -526,7 +527,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     @Override
     public void handleResult(final Result result) {
         //showProgressrefreshWithText("Calibrating.. please wait for 5 seconds");
-        Log.e("SCANNED",""+result);
+        //Log.e("SCANNED",""+result);
         //Toast.makeText(PatrollingLocActivity.this,"Reached result",Toast.LENGTH_SHORT).show();
         try {
             String qrResultTemp = result.getText();
@@ -542,7 +543,6 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     public void run() {
                         hideAnimatedDialog();
                         String patrolingdata = result.getText();
-                        Log.e("ACTUAL", "" + result.getText());
                         String[] patrolingdataList = patrolingdata.split(",");
                         mScannerView.startCamera();
                         if (patrolingdataList.length > 4) {
@@ -586,7 +586,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
             int mCurrentAssociation = Prefs.getInt(ASSOCIATION_ID, 0);
 
-            Log.e("mCurrentAssociation", "" + mCurrentAssociation);
+            //Log.e("mCurrentAssociation", "" + mCurrentAssociation);
 
             if (mCurrentAssociation != 0 && mCurrentAssociation == mCPAssociation) {
 
@@ -601,8 +601,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                // showAnimatedDialog("Wrong QR Code.", R.raw.error, true, "OK");
             }
 
-            Log.e("PATROLL", "Patroling Data " + qrCheckpoint);
-            Log.e("PARSED", " " + mCPLatitude + " - " + mCPLongitude);
+            //Log.e("PATROLL", "Patroling Data " + qrCheckpoint);
+            //Log.e("PARSED", " " + mCPLatitude + " - " + mCPLongitude);
 
 
             onResume();
@@ -626,12 +626,12 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         String mCPType = checkPointData.getCpcPntAt();
         String locationStr = checkPointData.getCpgpsPnt();
         CoordinateFromString coordinate = new CoordinateFromString(locationStr);
-        Log.e("CHECKPOIINT:: ", "" + checkPointData);
+        //Log.e("CHECKPOIINT:: ", "" + checkPointData);
         //calculateWifiSignalWeightage(checkPointData.getCpSurrName());
         if (ongoingSchedule == -1) {
             //Fresh Start
             int nextCP = getNextCheckPoint(-1);
-            Log.e("NEXT_CHECKPOINT",""+nextCP);
+            //Log.e("NEXT_CHECKPOINT",""+nextCP);
             if(nextCP==checkPointData.getCpChkPntID()){
                 if (mCPType.equals(CHECKPOINT_TYPE_START)) {
 
@@ -667,7 +667,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 startSiren();
             }
             int nextCP = getNextCheckPoint(lastScannedCP);
-            Log.e("NEXT_CHECKPOINT_SEC",""+nextCP);
+            //Log.e("NEXT_CHECKPOINT_SEC",""+nextCP);
             if (nextCP == checkPointData.getCpChkPntID() && !mCPType.equalsIgnoreCase(CHECKPOINT_TYPE_START)) {
 
                 if (isValidDistance(coordinate.getLat(), coordinate.getLon())) {
@@ -770,13 +770,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         float result = calculateDistance(mCPLatitude, mCPLongitude);
         //return true;
         //Log.e("DISTANCE_LOC",""+result);
-        return result < CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
+        return result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
     }
 
     private float calculateDistance(Double mCPLatitude, Double mCPLongitude) {
         float[] results = new float[2];
         //calculateWifiSignalWeightage();
-        Log.e("CALUCLAUTAING",""+mPredictedLocation.getLatitude()+" - "+mPredictedLocation.getLongitude()+" - "+ mCPLatitude+" - "+ mCPLongitude);
+        //Log.e("CALUCLAUTAING",""+mPredictedLocation.getLatitude()+" - "+mPredictedLocation.getLongitude()+" - "+ mCPLatitude+" - "+ mCPLongitude);
         Location.distanceBetween(mPredictedLocation.getLatitude(), mPredictedLocation.getLongitude(), mCPLatitude, mCPLongitude, results);
         //Toast.makeText(PatrollingLocActivity.this, "Distance: " + results[0], Toast.LENGTH_LONG).show();
         return results[0];
@@ -817,7 +817,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
 // Level of a Scan Result
         List<ScanResult> wifiList = wifiManager.getScanResults();
-        Log.e("WIFILIST", "" + wifiList);
+        //Log.e("WIFILIST", "" + wifiList);
 
 
         for (int i = 0; i < mSurroundings.length(); i++) {
@@ -826,7 +826,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 String cpBssId = wifiObj.getString("BSSID");
                 int cpLevel = wifiObj.getInt("level");
                 for (ScanResult scanResult : wifiList) {
-                    Log.e("CURRENRT_LEVEL", "Prev " + scanResult.level + " out of 5");
+                    //Log.e("CURRENRT_LEVEL", "Prev " + scanResult.level + " out of 5");
 
                     String localBSSID = scanResult.BSSID;
                     int localLevel = scanResult.level;
@@ -834,7 +834,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     if (localBSSID.equalsIgnoreCase(cpBssId)) {
                         int localSignalStrength = WifiManager.calculateSignalLevel(localLevel, 5);
                         int cpSignalStrength = WifiManager.calculateSignalLevel(cpLevel, 5);
-                        Log.e("OBTAINED_LEVEL", "Level is " + localSignalStrength + " out of 5");
+                        //Log.e("OBTAINED_LEVEL", "Level is " + localSignalStrength + " out of 5");
                     }
 
 
@@ -904,7 +904,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),checkPointData.getCpgpsPnt(),
                 checkPointData.getCpCkPName(),MEDIA_URL+Prefs.getString(PATROLLING_HIDDEN_SELFIE,""),Prefs.getInt(GATE_DEVICE_ID,0),checkPointData.getCpcPntAt());
 
-        Log.e("scanRequest",""+scanRequest);
+        //Log.e("scanRequest",""+scanRequest);
             RetrofitClinet.Companion.getInstance()
                 .scanCheckPoint(OYE247TOKEN, scanRequest)
                 .subscribeOn(Schedulers.io())
@@ -918,12 +918,12 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                     @Override
                     public void onErrorResponse(@NotNull Throwable e) {
-                        Log.e("SCNANNED_ERR",""+e);
+                        //Log.e("SCNANNED_ERR",""+e);
                     }
 
                     @Override
                     public void onSuccessResponse(CheckPointScanResponse checkPointScanResponse) {
-                        Log.e("SCNANNED_NETWR",""+checkPointScanResponse);
+                        //Log.e("SCNANNED_NETWR",""+checkPointScanResponse);
                     }
                 });
     }
@@ -934,7 +934,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
         byte[] wrrw = getIntent().getByteArrayExtra(PERSON_PHOTO);
         if(wrrw != null){
-            Log.e("IMAGE_CAPTURED_res",""+wrrw);
+            //Log.e("IMAGE_CAPTURED_res",""+wrrw);
         }
 
         super.onResume();

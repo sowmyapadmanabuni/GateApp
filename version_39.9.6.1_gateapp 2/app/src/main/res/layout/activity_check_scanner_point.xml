@@ -60,7 +60,6 @@
             android:text="PAUSE"
             android:background="@drawable/square"
             android:textColor="@color/white"
-            android:layout_marginRight="40dp"
             android:layout_gravity="bottom"
     />
         <Button
@@ -71,6 +70,7 @@
                 android:textColor="@color/white"
                 android:background="@drawable/square"
                 android:layout_gravity="bottom"
+                android:visibility="gone"
                 />
     </LinearLayout>
 

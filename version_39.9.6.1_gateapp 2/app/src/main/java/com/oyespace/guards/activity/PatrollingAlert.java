@@ -31,6 +31,7 @@ public class PatrollingAlert extends AppCompatActivity {
     int scheduleId = 0;
     Runnable runnable;
     Handler handler = new android.os.Handler();
+    String mType="";
 
     @Override
     protected void onStart() {
@@ -65,6 +66,8 @@ public class PatrollingAlert extends AppCompatActivity {
         String btnText = getIntent().getStringExtra("BTN_TEXT");
         int anim = getIntent().getIntExtra("ANIM",R.raw.error);
         scheduleId = getIntent().getIntExtra("SCHEDULEID",0);
+        mType = getIntent().getStringExtra("TYPE");
+
 
         mMessage.setText(message);
         mBtn.setText(btnText);
@@ -73,27 +76,34 @@ public class PatrollingAlert extends AppCompatActivity {
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(mBtn.getText().toString().contains("Snooze")){
-                    int snoozed = 0;
-                    try {
-                        snoozed = Prefs.getInt(ConstantUtils.SNOOZE_COUNT + scheduleId, 0);
-                    }catch (Exception e){
-                        e.printStackTrace();
-                        stopSiren();
-                    }
-                    snoozed+=1;
+                if(mType.equals("PATROLLING_ALARM")) {
+                    if (mBtn.getText().toString().contains("Snooze")) {
+                        int snoozed = 0;
+                        try {
+                            snoozed = Prefs.getInt(ConstantUtils.SNOOZE_COUNT + scheduleId, 0);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            stopSiren();
+                        }
+                        snoozed += 1;
 
-                    Prefs.putBoolean(ConstantUtils.SNOOZE_IS_ACTIVE+scheduleId,true);
-                    Prefs.putInt(ConstantUtils.SNOOZE_COUNT+scheduleId,snoozed);
-                    Prefs.putString(ConstantUtils.SNOOZE_TIME+scheduleId,new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date()));
-                    stopSiren();
-                    Toast.makeText(PatrollingAlert.this,"Snoozed for next 5 minutes",Toast.LENGTH_SHORT).show();
-                }else{
-                    Intent patrolIntent = new Intent(PatrollingAlert.this, PScheduleListActivity.class);
-                    startActivity(patrolIntent);
+                        Prefs.putBoolean(ConstantUtils.SNOOZE_IS_ACTIVE + scheduleId, true);
+                        Prefs.putInt(ConstantUtils.SNOOZE_COUNT + scheduleId, snoozed);
+                        Prefs.putString(ConstantUtils.SNOOZE_TIME + scheduleId, new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date()));
+                        stopSiren();
+                        Toast.makeText(PatrollingAlert.this, "Snoozed for next 5 minutes", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Intent patrolIntent = new Intent(PatrollingAlert.this, PScheduleListActivity.class);
+                        startActivity(patrolIntent);
+                    }
+                    Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false);
+                    finish();
+                }else if(mType.equals("PATROLLING_PAUSE")){
+                    Prefs.putBoolean(ConstantUtils.PATROLLING_RESUMED_TIME + scheduleId, true);
+                    //Intent patrolIntent = new Intent(PatrollingAlert.this, PScheduleListActivity.class);
+                    //startActivity(patrolIntent);
+                    finish();
                 }
-                Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT,false);
-                finish();
             }
         });
 

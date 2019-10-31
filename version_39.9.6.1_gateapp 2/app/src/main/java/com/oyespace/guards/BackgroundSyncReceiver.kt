@@ -474,7 +474,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+id,false)
 
 
-        Log.e("IS_SNOOZED_"+id,""+isSnoozed)
+        Log.e("IS_SNOOZED_"+id,""+isSnoozed+" - ATCVE? "+isActiveAlert)
 
         if(!isSOS && !isActiveAlert) {
             val alertDlg =

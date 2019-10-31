@@ -78,7 +78,7 @@ public class ConstantUtils {
   //public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
  //public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
     public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
-    //public static final String BASE_URL="https://apidev.oyespace.com/";
+   // public static final String BASE_URL="https://apidev.oyespace.com/";
     public static final String BASE_URL="https://apiuat.oyespace.com/";
     //public static final String BASE_URL = "https://api.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT="Patrolling Start and End Point";
@@ -108,7 +108,9 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 14.5f;
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 13.9f;
+    public static final int PATROLLING_PAUSE_TIMER = 10;
+    public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
     public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
@@ -121,6 +123,7 @@ public class ConstantUtils {
     public static final String SNOOZE_COUNT = "SNOOZED_COUNT_";
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
+    public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
     public static final int MAX_DELIVERY_ALLOWED_SEC = 7 * 60;// min * 60
 
