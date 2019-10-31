@@ -48,6 +48,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.ServiceProviderListActivity
 import com.oyespace.guards.activity.StaffListActivity
+import com.oyespace.guards.adapter.ChildEventListenerAdapter
 import com.oyespace.guards.adapter.VistorEntryListAdapter
 import com.oyespace.guards.adapter.VistorOutListAdapter
 import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
@@ -122,7 +123,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     private var myAudioRecorder: MediaRecorder? = null
 
     var iv_settings: ImageView? = null
-    var iv_help:ImageView?=null
+    var iv_help: ImageView? = null
     lateinit var tv_nodata: TextView
     // LinearLayout lyt_settings;
     var clickable = 0
@@ -190,7 +191,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     var pTimer: Timer? = null
     var pTimerChecker: Timer? = null
     //a separate thread.
-    lateinit var firebaseDBRef: DatabaseReference
+//    lateinit var notificationSyncFBRef: DatabaseReference
+    lateinit var walkieAudioFBRef: DatabaseReference
+    lateinit var fbdbAssocName: String
 
 
     var fingerDetectedHandler: Handler = object : Handler() {
@@ -366,6 +369,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         setSupportActionBar(toolbar)
         mReceiver = BatteryBroadcastReceiver()
 
+
         telMgr = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
         sendAnalyticsData("SDDashB_Oncreate", "Start", Date().toString() + "")
@@ -426,9 +430,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-            registerReceiver(mUsbReceiver, filter)
-        }
+//        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+//            registerReceiver(mUsbReceiver, filter)
+//        }
 
 
 
@@ -470,7 +474,28 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         LocalBroadcastManager.getInstance(this)
             .registerReceiver(receiver, IntentFilter("SYNC"))//constant
 
-        firebaseDBRef = FirebaseDatabase.getInstance().getReference("NotificationSync")
+
+        fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
+        walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("walkie_talkie_audio").child(fbdbAssocName)
+
+        AppUtils.removeWalkieTalkieAudioFirebase()
+
+        walkieAudioFBRef.addChildEventListener(object : ChildEventListenerAdapter() {
+
+            override fun onChildChanged(ds: DataSnapshot, p1: String?) {
+                onChildAdded(ds, p1)
+            }
+
+            override fun onChildAdded(ds: DataSnapshot, p1: String?) {
+                val filename = ds.value.toString()
+
+                if (filename != null && !filename.equals("null")) {
+                    AppUtils.playWalkieTalkiAudio(this@Dashboard, filename)
+                    AppUtils.removeWalkieTalkieAudioFirebase()
+                }
+            }
+
+        })
 
     }
 
@@ -566,6 +591,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         if(pTimerChecker == null) {
             runTimerCheck()
         }
+
+        registerReceiver(mUsbReceiver, filter)
+
 
 
         fixedRateTimer("timer", false, 0, 60000) {
@@ -743,7 +771,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     }
 
-    private fun loadEntryVisitorLog() {
+    private fun loadEntryVisitorLog(callback: () -> Unit = {}) {
         if (showingOutLog) {
             return
         }
@@ -780,8 +808,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     if (!searchString.isEmpty()) {
                         vistorEntryListAdapter!!.applySearch(searchString)
                     }
-                    firebaseDBRef.removeEventListener(this@Dashboard)
-                    firebaseDBRef.addValueEventListener(this@Dashboard)
+
+                    callback()
 
                 } else {
                     Toast.makeText(this@Dashboard, errorMessage, Toast.LENGTH_SHORT).show()
@@ -1009,9 +1037,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         mVerifyImage = null
         mVerifyTemplate = null
         //        sgfplib.Close();
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+        //if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
             unregisterReceiver(mUsbReceiver)
-        }
+        //}
         val ddc2 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         Log.d("SYNC_UNIT_LIST", "af ")
         ddc2.putExtra(BSR_Action, SYNC_UNIT_LIST)
@@ -1134,12 +1162,18 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     fun getFingerprintFromScanner(): ByteArray? {
 
+
         val templateSize = IntArray(1)
         sgfplib!!.GetMaxTemplateSize(templateSize)
         val fpTemp = ByteArray(templateSize[0])
         val fpImg = ByteArray(mImageWidth * mImageHeight)
-        sgfplib!!.GetImage(fpImg)
-        val code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
+        var code= 0L
+        try {
+            sgfplib!!.GetImageEx(fpImg,10000, 50)
+             code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
+        }catch (e:NullPointerException){
+
+        }
         when (code) {
             SGFDX_ERROR_NONE -> {
                 showToast(this, "fingerprint captured")
@@ -1390,7 +1424,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         txt_gate_name = findViewById(R.id.txt_gate_name)
         tv_subscriptiondate?.setOnClickListener(this)
         iv_settings = findViewById(R.id.iv_settings)
-        iv_help=findViewById(R.id.iv_help)
+        iv_help = findViewById(R.id.iv_help)
         iv_settings?.setOnClickListener(this)
         lyt_settings = findViewById(R.id.lyt_settings)
         iv_settings?.setBackgroundResource(R.drawable.settings)
@@ -1434,10 +1468,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         })
 
-       iv_help!!.setOnClickListener{
-           val intent = Intent(Intent.ACTION_CALL)
-           intent.data = Uri.parse("tel:" + "9343121121")
-           startActivity(intent)
+        iv_help!!.setOnClickListener {
+            val intent = Intent(Intent.ACTION_CALL)
+            intent.data = Uri.parse("tel:" + "9343121121")
+            startActivity(intent)
         }
 
         btn_in.setOnClickListener {
@@ -1891,12 +1925,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     fun uploadAudio() {
 
+        audioclip = audiofile.toString()
 
-        val Audio = audiofile
-        audioclip = Audio.toString()
-
-        val file = File(audiofile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), audiofile)
         val body = MultipartBody.Part.createFormData("Test", audioclip, requestFile)
         val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
         val call = apiService.updateImageProfile(body)
@@ -1904,13 +1935,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 try {
-                    val intentAction1 = Intent(applicationContext, BackgroundSyncReceiver::class.java)
-                    intentAction1.putExtra(BSR_Action, ConstantUtils.SENDAUDIO)
-                    intentAction1.putExtra("FILENAME", response.body().toString())
-                    sendBroadcast(intentAction1)
-                    Log.d("uploadAudio 110", "response:" + response.body()!!)
-                    Log.d("uploadAudio 112", file.toString())
-
+                    AppUtils.addWalkieTalkieAudioFirebase(response.body().toString())
 
                 } catch (ex: Exception) {
                     Log.d("uploadAudio 113", "errr:" + ex.toString())
@@ -1929,11 +1954,14 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     private fun startRecording() {
 
+        val dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        audiofile = File.createTempFile("AudioRecording", ".3gp", dir)
+
         myAudioRecorder = MediaRecorder()
         myAudioRecorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
         myAudioRecorder?.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
         myAudioRecorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-        myAudioRecorder?.setOutputFile(mFileName)
+        myAudioRecorder?.setOutputFile(audiofile?.absolutePath)
         // recorder.setOnErrorListener(errorListener)
         // recorder.setOnInfoListener(infoListener)
 
@@ -2440,14 +2468,23 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     override fun onDataChange(datasnapshot: DataSnapshot) {
 
+//        updateEntriesWithFBData(datasnapshot)
+
+    }
+
+    private fun updateEntriesWithFBData(datasnapshot: DataSnapshot) {
         if (!showingOutLog) {
             if (vistorEntryListAdapter != null) {
 
                 val firebasedataMap = HashMap<String, NotificationSyncModel>()
+                var refreshList: Boolean = false
+
                 for (h in datasnapshot.children) {
                     try {
                         val data = h.getValue(NotificationSyncModel::class.java)
-
+                        if (!refreshList) {
+                            refreshList = data?.newAttachment!!
+                        }
                         if (data != null) {
                             firebasedataMap.put(data.visitorlogId.toString(), data)
                         }
@@ -2457,14 +2494,15 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     }
 
                 }
-                vistorEntryListAdapter!!.setFirebaseDataHashmap(firebasedataMap)
+                //@Todo: @Pranay Remove this if unused
+               // vistorEntryListAdapter!!.setFirebaseDataHashmap(firebasedataMap)
+                if (refreshList) {
+                    loadEntryVisitorLog()
+                }
 
             }
 
-        } else {
-
         }
-
     }
 
 }

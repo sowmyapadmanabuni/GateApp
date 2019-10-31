@@ -407,6 +407,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //                }
                 else {
 
+                    Toast.makeText(AddCarFragment.this,photo.toString(),Toast.LENGTH_LONG).show();
                     if (getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)) {
                         submit_button.setEnabled(false);
                         submit_button.setClickable(false);

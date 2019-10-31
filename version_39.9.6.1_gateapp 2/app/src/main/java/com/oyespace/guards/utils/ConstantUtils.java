@@ -125,6 +125,6 @@ public class ConstantUtils {
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
     public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
-    public static final int MAX_DELIVERY_ALLOWED_SEC = 7 * 60;// min * 60
+    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 60 : 7 * 60;// min * 60
 
 }

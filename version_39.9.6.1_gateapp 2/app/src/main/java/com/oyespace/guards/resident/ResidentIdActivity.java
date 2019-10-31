@@ -75,8 +75,17 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
     @Override
     public void handleResult(Result result) {
 
-        String phone = result.getText().split(";")[0];
-        String associateId = result.getText().split(";")[1];
+        String[] qrData = result.getText().split(";");
+        if (qrData.length < 2) {
+            Utils.getAlertDialog(
+                    ResidentIdActivity.this,
+                    "Invalid QR code", R.drawable.invalid_invi,
+                    v -> finish()).show();
+            return;
+        }
+
+        String phone = qrData[0];
+        String associateId = qrData[1];
 
         new ResidentChecker().isResident(phone, Integer.parseInt(associateId), new ResidentChecker.ResponseListener() {
             @Override
@@ -102,8 +111,6 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
                         v -> finish()).show();
             }
         });
-
-        String str = phone + "; " + associateId;
 
     }
 

@@ -209,8 +209,8 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
                 Picasso.with(VehicleOthersAddCarFragment.this)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
+                       .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+                       .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
 
                 builder.setView(dialogView);
 
@@ -226,9 +226,9 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 
        // iamgeLyt.removeAllViews();
         list.clear();
-        Picasso.with(this)
-                .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+       Picasso.with(this)
+               .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -246,26 +246,11 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                 Log.v("CALLER IMAGEVIEW", IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
 
                 imageView1.setImageBitmap(photo);
-                Picasso.with(this)
+              Picasso.with(this)
                         .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+                      .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
-
-//            if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
-//                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
-//                imageView1.setImageBitmap(personPhoto);
-//
-//                Picasso.with(VehicleOthersAddCarFragment.this)
-//                        .load(IMAGE_BASE_URL +"Images/PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-//
-////                Picasso.with(this)
-////                        .load(IMAGE_BASE_URL +"Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-////               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-//
-//
-//            }
 
         }
 
@@ -301,49 +286,54 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
 //                val imgName = "Association"+ "0" + ".jpg"
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
-                byte[] byteArray = null;
-                try {
-                    Log.d("Dgddfdf picas", "5 2");
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                    photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                    byteArray = bos.toByteArray();
-                    int len = bos.toByteArray().length;
-                    System.out.println("AFTER COMPRESSION-===>" + len);
-                    bos.flush();
-                    bos.close();
-                } catch (Exception ex) {
-                    Log.d("Dgddfdf picas", "7");
-                }
 
-               if (photo == null && imageView1.getDrawable() == null) {
 
-                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
+               //if (photo!= null && imageView1.getDrawable()!=getResources().getDrawable(R.drawable.user_icon_black)) {
+                   if (imageView1.getDrawable().getConstantState()!=getResources().getDrawable(R.drawable.user_icon_black).getConstantState()) {
 
-                    submit_button.setEnabled(true);
-                    submit_button.setClickable(true);
+                   byte[] byteArray = null;
+                   try {
+                       Log.d("Dgddfdf picas", "5 2");
+                       ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                       photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
+                       byteArray = bos.toByteArray();
+                       int len = bos.toByteArray().length;
+                       System.out.println("AFTER COMPRESSION-===>" + len);
+                       bos.flush();
+                       bos.close();
+                   } catch (Exception ex) {
+                       Log.d("Dgddfdf picas", "7");
+                   }
+
+
+                   Intent d = new Intent(VehicleOthersAddCarFragment.this, VehicleOthersEntryRegistration.class);
+//                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+//                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+                   d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
+                   d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
+                   d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
+                   d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
+                   d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
+                   d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
+                   d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                   d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                   d.putExtra(PERSON_PHOTO, byteArray);
+                   d.putExtra(ITEMS_PHOTO_LIST, list);
+                   d.putExtra(VEHICLE_NUMBER,getIntent().getStringExtra(VEHICLE_NUMBER));
+                   d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
+                   d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
+                   startActivity(d);
+                   finish();
+
+
+
                 }
                 else {
 
+                   Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
+                   submit_button.setEnabled(true);
+                   submit_button.setClickable(true);
 
-
-                    Intent d = new Intent(VehicleOthersAddCarFragment.this, VehicleOthersEntryRegistration.class);
-//                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-//                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
-                    d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
-                    d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-                    d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
-                    d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
-                    d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
-                    d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-                    d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-                    d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
-                    d.putExtra(PERSON_PHOTO, byteArray);
-                    d.putExtra(ITEMS_PHOTO_LIST, list);
-                    d.putExtra(VEHICLE_NUMBER,getIntent().getStringExtra(VEHICLE_NUMBER));
-                    d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
-                    d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
-                    startActivity(d);
-                    finish();
                 }
 
             }

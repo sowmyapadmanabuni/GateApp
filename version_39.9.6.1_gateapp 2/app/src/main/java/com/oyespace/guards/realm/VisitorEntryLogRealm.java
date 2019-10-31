@@ -91,6 +91,14 @@ public class VisitorEntryLogRealm {
 
     }
 
+    public static VisitorLog getVisitorForVisitorId(int id) {
+        Realm realm = Realm.getDefaultInstance();
+        return realm.where(VisitorLog.class)
+                .equalTo("vlVisLgID", id)
+                .findFirst();
+
+    }
+
     public static ArrayList<VisitorLog> getVisitorsForMobile(String phone) {
 
         Realm realm = Realm.getDefaultInstance();
@@ -146,7 +154,7 @@ public class VisitorEntryLogRealm {
         Realm realm = Realm.getDefaultInstance();
 
         return realm.where(VisitorLog.class)
-                .equalTo("vlMobile", mobile).count() != 0;
+                .contains("vlMobile", mobile).count() != 0;
 
     }
 

@@ -2,7 +2,7 @@ package com.oyespace.guards.repo
 
 import android.content.Context
 import android.content.Intent
-import com.google.firebase.database.FirebaseDatabase
+import android.util.Log
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.models.ExitVisitorLog
 import com.oyespace.guards.models.GetExitVisitorsResponse
@@ -15,6 +15,7 @@ import com.oyespace.guards.pojo.VisitorExitResp
 import com.oyespace.guards.pojo.VisitorLogResponse
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
+import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.Prefs
@@ -78,9 +79,12 @@ class VisitorLogRepo {
 
         }
 
-        fun get_IN_VisitorForId(id: Int): com.oyespace.guards.models.VisitorLog? {
+        fun get_IN_VisitorForId(id: Int): VisitorLog? {
             return VisitorEntryLogRealm.getVisitorForId(id)
         }
+
+        fun get_IN_VisitorForVisitorId(id: String) =
+            VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt())
 
         fun get_IN_VisitorsForPhone(phone: String): ArrayList<com.oyespace.guards.models.VisitorLog>? {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
@@ -104,22 +108,25 @@ class VisitorLogRepo {
 
         fun getOverstaySortedList(): ArrayList<VisitorLog>? {
 
-            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
+            Log.i("taaag", "getting visitorLog from realm")
+            return VisitorEntryLogRealm.getVisitorEntryLog()
+//            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
 
-            val overStaying = ArrayList<VisitorLog>()
-            val underStaying = ArrayList<VisitorLog>()
-
-            for (vl in listFromRealm) {
-                val msLeft = DateTimeUtils.msLeft(vl.vlEntryT, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
-                if (msLeft <= 0) {
-                    overStaying.add(vl)
-                } else {
-                    underStaying.add(vl)
-                }
-            }
-
-            overStaying.addAll(underStaying)
-            return overStaying
+//            val overStaying = ArrayList<VisitorLog>()
+//            val underStaying = ArrayList<VisitorLog>()
+//
+//            for (vl in listFromRealm) {
+//                // TODO change entry time to accepted one
+//                val msLeft = DateTimeUtils.msLeft(vl.vlEntryT, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
+//                if (msLeft <= 0) {
+//                    overStaying.add(vl)
+//                } else {
+//                    underStaying.add(vl)
+//                }
+//            }
+//
+//            overStaying.addAll(underStaying)
+//            return overStaying
 
         }
 
@@ -142,8 +149,7 @@ class VisitorLogRepo {
                                 // update exit log from backend
                                 delete_IN_Visitor(vLogId)
 
-                                val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
-                                ref.child(vLogId.toString()).removeValue()
+                                AppUtils.removeFBNotificationSyncEntry(vLogId)
 
                                 val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
                                 intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)

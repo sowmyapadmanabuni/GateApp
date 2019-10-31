@@ -349,7 +349,6 @@ class FCMMessagingService : FirebaseMessagingService() {
 
             } else if (remoteMessage.data["activt"].equals("audiomessage", ignoreCase = true)) {
 
-                getAudio(remoteMessage.data["entry_type"].toString())
                 //TODO notification and open respective activity
                 Log.d(
                     "JSON in",

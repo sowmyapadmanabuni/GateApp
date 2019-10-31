@@ -416,7 +416,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT).show()
                 }
             })
             .onSameThread()
@@ -579,8 +579,8 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                            startActivity(d);
-                            finish();
+                            startActivity(d)
+                            finish()
 
 
                         } else {
@@ -619,6 +619,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
         d.putExtra(UNITID, intent.getStringExtra(UNITID))
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
         d.putExtra(MOBILENUMBER, textview.text.toString())
+        d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
         d.putExtra(COUNTRYCODE, countryCode)
 
         startActivity(d)

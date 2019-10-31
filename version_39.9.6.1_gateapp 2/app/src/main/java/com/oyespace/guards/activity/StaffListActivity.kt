@@ -63,19 +63,6 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_staff_list)
-        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
-            override fun onFetch(staff: ArrayList<Worker>?) {
-
-                if (staff == null || staff.isEmpty()) {
-                    tv_nodata.visibility = View.VISIBLE
-                } else {
-                    tv_nodata.visibility = View.INVISIBLE
-                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
-                    rv_staff!!.adapter = WorkerAdapter
-                }
-            }
-
-        })
 
         tv_nodata = findViewById(R.id.tv_nodata)
         tv = findViewById<EditText>(R.id.edt_search_text1)
@@ -102,21 +89,25 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
 
         tv.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                if (WorkerAdapter != null) {
-                    WorkerAdapter!!.filter.filter(charSequence)
 
-                }
             }
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                try {
-                    if (WorkerAdapter != null) {
-                        WorkerAdapter!!.filter.filter(charSequence)
 
-                    }
+
+
+                try {
+
+                        if (WorkerAdapter != null) {
+                            WorkerAdapter!!.applySearch(charSequence.toString())
+
+                        }
+
+
                 } catch (e: KotlinNullPointerException) {
 
                 }
+
             }
 
             override fun afterTextChanged(editable: Editable) {
@@ -127,6 +118,29 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         btn_mic.setOnClickListener {
             Speak()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i("taaag", "staff refresh")
+        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
+            override fun onFetch(staff: ArrayList<Worker>?) {
+
+                if (staff == null || staff.isEmpty()) {
+                    tv_nodata.visibility = View.VISIBLE
+                } else {
+                    tv_nodata.visibility = View.INVISIBLE
+                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
+                    rv_staff!!.adapter = WorkerAdapter
+
+                    val searchString = tv.text.toString()
+                    if (!searchString.isEmpty()) {
+                        WorkerAdapter!!.applySearch(searchString)
+                    }
+                }
+            }
+
+        })
     }
 
     fun setLocale(lang: String?) {
