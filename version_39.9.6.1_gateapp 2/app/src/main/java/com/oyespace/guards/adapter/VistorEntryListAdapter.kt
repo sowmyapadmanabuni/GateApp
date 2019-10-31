@@ -380,10 +380,6 @@ class VistorEntryListAdapter(
         }
     }
 
-    fun setFirebaseDataHashmap(map: HashMap<String, NotificationSyncModel>) {
-        notifyDataSetChanged()
-    }
-
     private fun exitVisitor(vlLogId: String, position: Int) {
 
         try {
