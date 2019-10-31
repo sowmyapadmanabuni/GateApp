@@ -2,12 +2,14 @@ package com.oyespace.guards.repo
 
 import android.util.Log
 import com.oyespace.guards.models.GetWorkersResponse
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.realm.StaffRealm
+import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
@@ -83,6 +85,15 @@ class StaffRepo {
 
         fun getFingerForStaff(staffID: Int) = RealmDB.fingercount(staffID)
 
+
+
+        fun search_Staff(search: String): ArrayList<Worker>? {
+            if (search.isEmpty()) {
+                return getStaffList()
+            } else {
+                return StaffRealm.searchVisitorLog(search)
+            }
+        }
 
     }
 

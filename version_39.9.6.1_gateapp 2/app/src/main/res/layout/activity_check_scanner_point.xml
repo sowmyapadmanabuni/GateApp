@@ -23,6 +23,7 @@
             android:gravity="center"
             android:layout_height="wrap_content"/>
 
+
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,22 +37,41 @@
         />
 
     </LinearLayout>
-    <TextView
-            android:id="@+id/scanned_text"
+<!--    <TextView-->
+<!--            android:id="@+id/scanned_text"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:background="@color/white"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:text=""-->
+<!--            android:layout_gravity="bottom"-->
+<!--    />-->
+    <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
-            android:layout_margin="10dp"
-            android:text=""
-            android:layout_gravity="bottom"
-    />
+            android:layout_marginBottom="40dp"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_gravity="bottom">
     <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
+            android:id="@+id/btn_pause"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:text=""
+            android:text="PAUSE"
+            android:background="@drawable/square"
+            android:textColor="@color/white"
+            android:layout_marginRight="40dp"
             android:layout_gravity="bottom"
     />
+        <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="STOP"
+                android:textColor="@color/white"
+                android:background="@drawable/square"
+                android:layout_gravity="bottom"
+                />
+    </LinearLayout>
 
 </FrameLayout>

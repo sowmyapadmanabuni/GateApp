@@ -2,20 +2,28 @@ package com.oyespace.guards.pertroling
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.BatteryManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
-import com.oyespace.guards.CapPhoto
+import androidx.core.app.ActivityCompat
+import com.androidhiddencamera.CameraConfig
+import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.PatrolShiftsAdapter
-import com.oyespace.guards.models.CheckPointsOfSheduleListResponse
 import com.oyespace.guards.models.PatrolShift
 import com.oyespace.guards.models.ShiftsListResponse
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.services.APictureCapturingService
+import com.oyespace.guards.services.PictureCapturingListener
+import com.oyespace.guards.services.PictureCapturingServiceImpl
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -24,15 +32,24 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_pschedule_list.*
 import kotlinx.android.synthetic.main.header_with_back.*
+import java.io.ByteArrayOutputStream
+import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.concurrent.fixedRateTimer
 
-class PScheduleListActivity:BaseKotlinActivity(){
+class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, ActivityCompat.OnRequestPermissionsResultCallback {
+
+
+    var pictureService: APictureCapturingService?=null;
 
 
     var mPatrolShiftArray = ArrayList<PatrolShift>()
     var mPatrolShiftsAdapter: PatrolShiftsAdapter? = null
+    var mCameraConfig:CameraConfig? = null;
+    var mSelectedShift:PatrolShift? =null
+    var pTimer: Timer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +59,11 @@ class PScheduleListActivity:BaseKotlinActivity(){
             finish()
         }
         getPatrollingSchedules()
+
+
+
+        pictureService = PictureCapturingServiceImpl.getInstance(this);
+
     }
 
     override fun onStart() {
@@ -51,6 +73,9 @@ class PScheduleListActivity:BaseKotlinActivity(){
 
     override fun onDestroy() {
         Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
+        if(pTimer != null){
+            pTimer!!.cancel()
+        }
         super.onDestroy()
     }
 
@@ -62,6 +87,45 @@ class PScheduleListActivity:BaseKotlinActivity(){
     override fun onResume() {
         Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, true)
         super.onResume()
+    }
+
+    fun getMinuteDifference(incomingString:String):Long{
+        val currentSDF = SimpleDateFormat("dd-MM-yyyy HH:mm:ss")
+        val currentDateString = currentSDF.format(Date())
+
+        val currentDateObj = currentSDF.parse(currentDateString)
+        val pausedDateObj = currentSDF.parse(incomingString)
+        val diff = currentDateObj.time-pausedDateObj.time
+        val seconds = diff / 1000
+        val minutes = seconds / 60
+        return minutes;
+    }
+
+    fun startMinutesTimer() {
+        if(pTimer==null) {
+            pTimer = fixedRateTimer("schedule_timer_checker", false, 0, 60000) {
+                this@PScheduleListActivity.runOnUiThread {
+
+                    val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
+                    val pausedTimeString = Prefs.getString(ACTIVE_PATROLLING_LAST_TIME, "")
+                    val scheduleExist = isScheduleExist(ongoingSchedule)
+                    if (scheduleExist && ongoingSchedule != -1 && !pausedTimeString.equals("")) {
+                        val minuteDiff = getMinuteDifference(pausedTimeString)
+                        Log.e("checkMinutesTimer", "" + minuteDiff)
+                        if(minuteDiff>=15){
+                            Prefs.remove(ACTIVE_PATROLLING_SCHEDULE)
+                            Prefs.remove(ACTIVE_PATROLLING_LAST_CP)
+                            Prefs.remove(ACTIVE_PATROLLING_LAST_TIME)
+                            setSchedulesAdapter()
+                            if(pTimer != null){
+                                pTimer!!.cancel()
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
     }
 
     private fun setSchedulesAdapter(){
@@ -78,21 +142,28 @@ class PScheduleListActivity:BaseKotlinActivity(){
         mPatrolShiftsAdapter!!.notifyDataSetChanged()
     }
 
+    private fun isScheduleExist(ongoingSchedule:Int):Boolean{
+        for (shift: PatrolShift in mPatrolShiftArray) {
+            if(shift.psPtrlSID == ongoingSchedule){
+                return true;
+            }
+        }
+        return false
+    }
+
     private fun onPageClick(selectedShift:PatrolShift, index:Int){
+        Log.e("ONPAGSECLIC","CLIKED");
         val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
         var scheduleExist:Boolean = false
         if(ongoingSchedule != -1) {
-            for (shift: PatrolShift in mPatrolShiftArray) {
-                if(shift.psPtrlSID == ongoingSchedule){
-                    scheduleExist = true;
-                }
-            }
+            scheduleExist = isScheduleExist(ongoingSchedule)
         }
         if(ongoingSchedule == -1 || ongoingSchedule == selectedShift.psPtrlSID){
             navigateToScanView(selectedShift)
         }else if(ongoingSchedule != -1 && !scheduleExist){
             Prefs.remove(ACTIVE_PATROLLING_SCHEDULE)
             Prefs.remove(ACTIVE_PATROLLING_LAST_CP)
+            Prefs.remove(ACTIVE_PATROLLING_LAST_TIME)
             navigateToScanView(selectedShift)
         }
         else{
@@ -114,11 +185,97 @@ class PScheduleListActivity:BaseKotlinActivity(){
 
         Log.e("BATTERY",""+batLevel)
         //if(batLevel>=30) {
-            startActivityForResult(mPatrolIntent, 1)
+            //startActivityForResult(mPatrolIntent, 1)
+        mSelectedShift = selectedShift
+        checkDrawOverWindowPermission()
 //        }else{
 //            showAnimatedDialog("Please connect your charger to continue",R.raw.battery,false,"OK")
 //        }
     }
+
+    private fun startHiddenCamera(){
+       // takePicture()
+        showProgress("Fetching schedules..")
+        pictureService!!.startCapturing(this)
+    }
+
+
+    private fun checkDrawOverWindowPermission(){
+
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(this)) {
+                val intent =  Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                    Uri.parse("package:" + getPackageName()));
+                startActivityForResult(intent, 1234);
+            }else{
+                startHiddenCamera();
+            }
+        } else {
+            startHiddenCamera();
+        }
+    }
+
+    override fun onCaptureDone(pictureUrl: String?, pictureData: ByteArray?) {
+        dismissProgress()
+        Log.e("CAPTURE_PIC_1",""+pictureUrl);
+
+    }
+
+    override fun onDoneCapturingAllPhotos(picturesTaken: TreeMap<String, ByteArray>?) {
+    try {
+        Log.e("CAPTURE_PIC_2", "" + picturesTaken!!.lastEntry().key);
+        Log.e("CAPTURE_PIC_2", "" + picturesTaken!!.lastEntry().value);
+        //Toast.makeText(this@PScheduleListActivity, "CAPTURE DONE", Toast.LENGTH_LONG).show()
+
+
+        var bmp: Bitmap = AppUtils.decodeBitmap(picturesTaken!!.lastEntry().value)
+        if (bmp != null) {
+            val bytes = ByteArrayOutputStream()
+
+            var byteArray: ByteArray? = null
+            bmp.compress(Bitmap.CompressFormat.JPEG, 80, bytes)
+            byteArray = bytes.toByteArray()
+
+
+            //   uploadImage(imgName,personPhoto);
+            val spl: List<String> = picturesTaken!!.lastEntry().key.split("/");
+            Log.e("Acced", "" + spl.get(spl.size - 1))
+            val ddc = Intent(applicationContext, BackgroundSyncReceiver::class.java)
+
+            ddc.putExtra(BSR_Action, UPLOAD_GUARD_PHOTO)
+            ddc.putExtra("imgName", spl.get(spl.size - 1))
+            ddc.putExtra("GUARD_PHOTO", byteArray)
+            sendBroadcast(ddc)
+            dismissProgress()
+
+            val mPatrolIntent =
+                Intent(this@PScheduleListActivity, PatrollingLocActivity::class.java)
+            mPatrolIntent.putExtra(PATROLLING_SCHEDULE_ID, mSelectedShift!!.psPtrlSID)
+
+            Prefs.remove(SNOOZE_COUNT + mSelectedShift!!.psPtrlSID)
+            Prefs.remove(SNOOZE_IS_ACTIVE + mSelectedShift!!.psPtrlSID)
+            Prefs.remove(SNOOZE_TIME + mSelectedShift!!.psPtrlSID)
+
+            val bm: BatteryManager = this.getSystemService(BATTERY_SERVICE) as BatteryManager;
+            val batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+
+            Log.e("BATTERY", "" + batLevel)
+            //if(batLevel>=30) {
+
+            startActivityForResult(mPatrolIntent, 1)
+        } else {
+            dismissProgress()
+        }
+        //Toast.makeText(this@PScheduleListActivity, "onDoneCapturingAllPhotos", Toast.LENGTH_LONG).show()
+    }catch (e:Exception){
+        dismissProgress()
+        e.printStackTrace()
+    }
+    }
+
+
+
 
 
     private fun getPatrollingSchedules(){
@@ -145,6 +302,15 @@ class PScheduleListActivity:BaseKotlinActivity(){
 
                         mPatrolShiftArray = updatedArrayList
                         setSchedulesAdapter()
+
+                        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
+                        var scheduleExist:Boolean = false
+                        if(ongoingSchedule != -1) {
+                            scheduleExist = isScheduleExist(ongoingSchedule)
+                            if(scheduleExist){
+                                startMinutesTimer()
+                            }
+                        }
                     }
                 }
 
@@ -167,6 +333,8 @@ class PScheduleListActivity:BaseKotlinActivity(){
             if(resultCode == Activity.RESULT_OK){
                 getPatrollingSchedules()
             }
+        } else if (requestCode == 1234) {
+            startHiddenCamera();
         }
     }
 

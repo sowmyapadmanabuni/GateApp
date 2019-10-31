@@ -140,7 +140,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 uploadImage(intent.getStringExtra("imgName"), mBitmap)
 
             } else {
-                Log.d("uploadImage", "else " + intent.getStringExtra("imgName"))
+                Log.e("uploadImage", "else " + intent.getStringExtra("imgName"))
             }
         } else if (intent.getStringExtra(BSR_Action).equals(SYNC_STAFF_LIST)) {
             StaffRepo.getStaffList(true)
@@ -310,7 +310,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
     fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage", localImgName)
+        Log.e("uploadImage", localImgName)
         var byteArrayProfile: ByteArray?
         val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
         val imageFile = File(mPath)

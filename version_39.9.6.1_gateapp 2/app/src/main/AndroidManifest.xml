@@ -102,6 +102,8 @@
                 android:name=".CapPhoto"
                 android:enabled="true"
                 android:exported="true" />
+
+
         <service
                 android:name=".pertroling.LocationService"
                 android:enabled="true"

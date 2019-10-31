@@ -25,7 +25,9 @@ import com.oyespace.guards.pojo.CreateVisitorLogReq
 import com.oyespace.guards.pojo.CreateVisitorLogResp
 import com.oyespace.guards.pojo.UnitlistbyUnitID
 import com.oyespace.guards.pojo.VLRData
+import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.repo.StaffRepo
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
@@ -36,9 +38,10 @@ import java.util.*
 
 
 class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
-    RecyclerView.Adapter<StaffAdapter.StaffViewHolder>(), Filterable {
+    RecyclerView.Adapter<StaffAdapter.StaffViewHolder>() {
 
     private var searchList: ArrayList<Worker>? = null
+    var searchString: String = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): StaffViewHolder {
         return StaffViewHolder(LayoutInflater.from(mcontext).inflate(R.layout.layout_staff_adapter_row, parent, false))
@@ -589,33 +592,42 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
 
     }
 
-    override fun getFilter(): Filter {
+//    override fun getFilter(): Filter {
+//
+//        return object : Filter() {
+//            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+//                searchList = results?.values as ArrayList<Worker>
+//                notifyDataSetChanged()
+//            }
+//
+//            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
+//                val charString = charSequence.toString()
+//                if (charString.isEmpty()) {
+//                    searchList = items
+//                } else {
+//                    val filteredList = ArrayList<Worker>()
+//                    for (row in items) {
+//                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
+//                        if (row.wkfName.toLowerCase().contains(charString.toLowerCase())) {
+//                            filteredList.add(row)
+//                        }
+//                    }
+//                    searchList = filteredList
+//                }
+//                val filterResults = Filter.FilterResults()
+//                filterResults.values = searchList
+//                return filterResults
+//            }
+//        }
+//
+//    }
 
-        return object : Filter() {
-            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-                searchList = results?.values as ArrayList<Worker>
-                notifyDataSetChanged()
-            }
+    fun applySearch(search: String) {
 
-            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
-                val charString = charSequence.toString()
-                if (charString.isEmpty()) {
-                    searchList = items
-                } else {
-                    val filteredList = ArrayList<Worker>()
-                    for (row in items) {
-                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-                        if (row.wkfName.toLowerCase().contains(charString.toLowerCase())) {
-                            filteredList.add(row)
-                        }
-                    }
-                    searchList = filteredList
-                }
-                val filterResults = Filter.FilterResults()
-                filterResults.values = searchList
-                return filterResults
-            }
-        }
+        this.searchString = search
+        searchList = StaffRepo.search_Staff(search)
+
+        notifyDataSetChanged()
 
     }
 

@@ -89,21 +89,25 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
 
         tv.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                if (WorkerAdapter != null) {
-                    WorkerAdapter!!.filter.filter(charSequence)
 
-                }
             }
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
-                try {
-                    if (WorkerAdapter != null) {
-                        WorkerAdapter!!.filter.filter(charSequence)
 
-                    }
+
+
+                try {
+
+                        if (WorkerAdapter != null) {
+                            WorkerAdapter!!.applySearch(charSequence.toString())
+
+                        }
+
+
                 } catch (e: KotlinNullPointerException) {
 
                 }
+
             }
 
             override fun afterTextChanged(editable: Editable) {
@@ -128,6 +132,11 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
                     tv_nodata.visibility = View.INVISIBLE
                     WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
                     rv_staff!!.adapter = WorkerAdapter
+
+                    val searchString = tv.text.toString()
+                    if (!searchString.isEmpty()) {
+                        WorkerAdapter!!.applySearch(searchString)
+                    }
                 }
             }
 
