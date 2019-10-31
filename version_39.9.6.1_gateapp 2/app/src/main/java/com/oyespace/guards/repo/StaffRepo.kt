@@ -6,6 +6,7 @@ import com.oyespace.guards.models.Worker
 import com.oyespace.guards.models.WorkersList
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.realm.StaffRealm
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
@@ -79,6 +80,9 @@ class StaffRepo {
         fun checkExistingStaffForPhone(phone: String): Boolean {
             return StaffRealm.staffForPhoneExists(phone)
         }
+
+        fun getFingerForStaff(staffID: Int) = RealmDB.fingercount(staffID)
+
 
     }
 

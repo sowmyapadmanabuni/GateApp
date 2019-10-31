@@ -36,20 +36,19 @@ class AppUtils {
         }
 
         fun intToString(price: Int?): String {
-            return  ""+ price
+            return "" + price
         }
 
-        fun getTimeFromDate(serverTime:String?):String{
+        fun getTimeFromDate(serverTime: String?): String {
             try {
                 val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 val formatter = SimpleDateFormat("hh:mm a")
                 val formattedDate = formatter.format(parser.parse(serverTime))
                 return formattedDate
-            }catch (e:Exception){
+            } catch (e: Exception) {
                 return serverTime!!
             }
         }
-
 
 
         fun calGeoLocationDiff(lat1: Double, lng1: Double, lat2: Double, lng2: Double): Int {
@@ -67,13 +66,94 @@ class AppUtils {
 
         fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
 
+            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.i("taaag", "push to firebase: " + visitorId)
-            val ref = FirebaseDatabase.getInstance().getReference("NotificationSync")
-            val id = ref.push().key
             val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
-            ref.child(visitorId.toString()).setValue(notificationSyncModel).addOnCompleteListener {
-                //            Toast.makeText(this@StaffEntryRegistration, "DONE", Toast.LENGTH_LONG).show()
+            FirebaseDatabase.getInstance()
+                .getReference("NotificationSync")
+                .child(childName)
+                .child(visitorId.toString()).setValue(notificationSyncModel)
+
+        }
+
+        fun removeFBNotificationSyncEntry(visitorId: Int) {
+
+            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
+            Log.i("taaag", "remove from firebase: " + visitorId)
+            FirebaseDatabase.getInstance()
+                .getReference("NotificationSync")
+                .child(childName)
+                .child(visitorId.toString())
+                .removeValue()
+
+        }
+
+        fun addWalkieTalkieAudioFirebase(fileName: String) {
+            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
+            FirebaseDatabase.getInstance()
+                .getReference("walkie_talkie_audio")
+                .child(childName)
+                .child("filename")
+                .setValue(fileName)
+        }
+
+        fun removeWalkieTalkieAudioFirebase() {
+            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
+            FirebaseDatabase.getInstance()
+                .getReference("walkie_talkie_audio")
+                .child(childName)
+                .child("filename")
+                .removeValue()
+        }
+
+        fun playWalkieTalkiAudio(context: Context, filename: String) {
+
+
+            Log.i("taaaag", "playing audio: $filename")
+            var mp = MediaPlayer.create(context, R.raw.walkietalkiestart)
+
+            try {
+                if (mp.isPlaying) {
+                    mp.stop()
+                    mp.release()
+                    //getAudio(remoteMessage!!.data["entry_type"].toString())
+                    mp = MediaPlayer.create(context, R.raw.walkietalkieinterference)
+                }
+
+                mp.start()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
+
+
+            val mediaPlayer: MediaPlayer
+//
+            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
+            mediaPlayer = MediaPlayer()
+
+
+            val spb = SoundPool.Builder()
+            spb.setMaxStreams(10)
+            val attrBuilder = AudioAttributes.Builder()
+            attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
+            spb.setAudioAttributes(attrBuilder.build())
+            spb.build()
+
+            mediaPlayer.setDataSource(ConstantUtils.IMAGE_BASE_URL + filename)
+            try {
+                mediaPlayer.prepareAsync()
+
+                mediaPlayer.start()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+
+            val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                .absolutePath
+            val f = File(baseDir + filename)
+            f.delete()
 
         }
 
@@ -107,8 +187,6 @@ class AppUtils {
         }
 
     }
-
-
 
 
 }

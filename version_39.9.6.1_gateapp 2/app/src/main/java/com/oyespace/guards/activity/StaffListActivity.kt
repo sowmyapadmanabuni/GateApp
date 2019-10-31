@@ -63,19 +63,6 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_staff_list)
-        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
-            override fun onFetch(staff: ArrayList<Worker>?) {
-
-                if (staff == null || staff.isEmpty()) {
-                    tv_nodata.visibility = View.VISIBLE
-                } else {
-                    tv_nodata.visibility = View.INVISIBLE
-                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
-                    rv_staff!!.adapter = WorkerAdapter
-                }
-            }
-
-        })
 
         tv_nodata = findViewById(R.id.tv_nodata)
         tv = findViewById<EditText>(R.id.edt_search_text1)
@@ -127,6 +114,24 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         btn_mic.setOnClickListener {
             Speak()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.i("taaag", "staff refresh")
+        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
+            override fun onFetch(staff: ArrayList<Worker>?) {
+
+                if (staff == null || staff.isEmpty()) {
+                    tv_nodata.visibility = View.VISIBLE
+                } else {
+                    tv_nodata.visibility = View.INVISIBLE
+                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
+                    rv_staff!!.adapter = WorkerAdapter
+                }
+            }
+
+        })
     }
 
     fun setLocale(lang: String?) {

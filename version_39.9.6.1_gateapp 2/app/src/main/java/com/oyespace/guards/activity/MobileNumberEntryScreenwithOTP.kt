@@ -146,8 +146,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             if (phone != null) {
 
                 Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
-                val phoneNumber = "+91" + phone
-                if (intent.getStringExtra(MOBILENUMBER).equals(phoneNumber)) {
+                val phoneNumber = "" + phone
+                if (intent.getStringExtra(MOBILENUMBER).contains(phoneNumber)) {
 
                     if (VisitorLogRepo.check_IN_VisitorByPhone(phoneNumber)) {
                         Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
@@ -197,7 +197,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT).show()
                 }
             })
             .onSameThread()
@@ -547,18 +547,18 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                            // getAccountDetails(countryCode.toString(), phone.toString());
 
-                            getVisitorByWorkerId(
-                                Prefs.getInt(ASSOCIATION_ID, 0),
-                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                            visitorLog(
                                 intent.getStringExtra("UNITID"),
-                                intent.getStringExtra("FIRSTNAME"),
+                                intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
                                 intent.getStringExtra(MOBILENUMBER),
                                 intent.getStringExtra("DESIGNATION"),
                                 intent.getStringExtra("WORKTYPE"),
-                                intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
-                                intent.getStringExtra("UNITNAME"),
-                                intent.getStringExtra("Image")
+                                intent.getIntExtra("WORKERID", 0),
+                                intent.getStringExtra("UNITNAME")
                             )
+
+                            buttonNext.isEnabled = false
+                            buttonNext.isClickable = false
 
 
 
@@ -653,7 +653,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),
             "" ,"","","","","","","","",""
-        );
+        )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         CompositeDisposable().add(

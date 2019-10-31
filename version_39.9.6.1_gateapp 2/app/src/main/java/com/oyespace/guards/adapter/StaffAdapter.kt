@@ -25,7 +25,7 @@ import com.oyespace.guards.pojo.CreateVisitorLogReq
 import com.oyespace.guards.pojo.CreateVisitorLogResp
 import com.oyespace.guards.pojo.UnitlistbyUnitID
 import com.oyespace.guards.pojo.VLRData
-import com.oyespace.guards.realm.RealmDB
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
@@ -107,7 +107,6 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
 
         }
         holder.btn_biometric.setOnClickListener {
-            Log.d("btn_biometric","bf ")
 
             progressDialog = ProgressDialog(mcontext)
             progressDialog?.isIndeterminate = false
@@ -122,8 +121,8 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             pdCanceller.postDelayed(progressRunnable, 3000)
 
             val d = Intent(mcontext, Biometric::class.java)
-            d.putExtra(ConstantUtils.WORKER_ID, staffdata.wkWorkID)
-            d.putExtra(ConstantUtils.PERSONNAME, staffdata.wkfName + " " + staffdata.wklName)
+            d.putExtra(WORKER_ID, staffdata.wkWorkID)
+            d.putExtra(PERSONNAME, staffdata.wkfName + " " + staffdata.wklName)
             d.putExtra(UNITID, staffdata.unUnitID)
             d.putExtra(UNITNAME, staffdata.unUniName)
             d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
@@ -132,7 +131,6 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             d.putExtra(COUNTRYCODE,"")
             d.putExtra(MOBILENUMBER, staffdata.wkMobile)
             mcontext.startActivity(d)
-            Log.d("btn_biometric","af ")
 
         }
 
@@ -295,7 +293,9 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             mcontext.startActivity(intent)
         }
 
-        if (RealmDB.fingercount(staffdata.wkWorkID) > 1) {
+        val noofFingers = StaffRepo.getFingerForStaff(staffdata.wkWorkID)
+
+        if (noofFingers > 1) {
             holder.btn_biometric.visibility=View.INVISIBLE
         }else{
             if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 1") {

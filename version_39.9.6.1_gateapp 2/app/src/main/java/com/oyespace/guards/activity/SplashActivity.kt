@@ -24,6 +24,7 @@ import com.oyespace.guards.pojo.Device
 import com.oyespace.guards.pojo.GetDeviceInfobyMobImeiReq
 import com.oyespace.guards.pojo.GetDeviceInfobyMobImeiResp
 import com.oyespace.guards.pojo.SearchResult
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
@@ -133,7 +134,9 @@ class SplashActivity : BaseLocationActivity() {
 
 
             } else {
-                if (LocalDb.getStaffList() == null) {
+                val staffList = StaffRepo.getStaffList(false)
+
+                if (staffList == null || staffList.isEmpty()) {
                     // Toast.makeText(this, " failed", Toast.LENGTH_SHORT).show()
                     val mainIntent = Intent(this@SplashActivity, MyRoleScreen::class.java)
                     intent.putExtra("MOBIELNUMBER", PrefKeys.MOBILE_NUMBER)

@@ -87,45 +87,26 @@ public class DateTimeUtils {
 
     }
 
-    public static long remainingTimeMs(String entryTimeString, long maxMS) {
-
-        try {
-
-            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-
-            long entryTime = DATE_FORMAT_YMDHMS.parse(entryTimeString).getTime();
-//            long currentTIme = DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)).getTime();
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return -1;
-
-    }
-
     public static long msLeft(String et, int maxSec) {
 
         try {
 
+            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
             Calendar c1 = Calendar.getInstance();
-            c1.setTime(DATE_FORMAT_YMDHMS.parse(et));
+            final String timeString = "1900-01-01T" + dateFormatLocal.format(DATE_FORMAT_YMDHMS.parse(et));
+            c1.setTime(DATE_FORMAT_YMDHMS.parse(timeString));
             c1.add(Calendar.SECOND, maxSec);
 
             Calendar c2 = Calendar.getInstance();
-            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
             final String currentString = "1900-01-01T" + dateFormatLocal.format(DATE_FORMAT_YMDHMS.parse(getCurrentTimeLocal()));
             c2.setTime(DATE_FORMAT_YMDHMS.parse(currentString));
 
             //get Time in milli seconds
             long ms1 = c1.getTimeInMillis();
             long ms2 = c2.getTimeInMillis();
-            long msPassed = ms1 - ms2;
 
-            Log.i("taaag", "maxTime: " + msPassed / 1000);
-
-
-            return msPassed;
+            return ms1 - ms2;
 
         } catch (java.text.ParseException e) {
             e.printStackTrace();
