@@ -108,7 +108,7 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 13.9f;
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 15.2f;
     public static final int PATROLLING_PAUSE_TIMER = 10;
     public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
     public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
@@ -119,6 +119,7 @@ public class ConstantUtils {
 
     public static final boolean useDummyValues = false;
 
+    public static final String SNOOZE_SCHEDULE_TIME="SNOOZE_SCHEDULE_TIME";
     public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
     public static final String SNOOZE_COUNT = "SNOOZED_COUNT_";
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";

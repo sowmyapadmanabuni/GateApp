@@ -270,6 +270,9 @@ open class BaseKotlinActivity : AppCompatActivity() {
             btn.text = btnText
             btn.setOnClickListener {
                 alertDialog?.dismiss()
+                if(desc.equals("Patrolling Completed",true)){
+                    finish()
+                }
             }
         } else {
             btn.visibility = View.GONE

@@ -31,7 +31,7 @@ public class PatrollingAlert extends AppCompatActivity {
     int scheduleId = 0;
     Runnable runnable;
     Handler handler = new android.os.Handler();
-    String mType="";
+    String mType="",mScheduleStartTime="";
 
     @Override
     protected void onStart() {
@@ -67,6 +67,7 @@ public class PatrollingAlert extends AppCompatActivity {
         int anim = getIntent().getIntExtra("ANIM",R.raw.error);
         scheduleId = getIntent().getIntExtra("SCHEDULEID",0);
         mType = getIntent().getStringExtra("TYPE");
+        mScheduleStartTime = getIntent().getStringExtra("SNOOZED_SCHEDULE_TIME");
 
 
         mMessage.setText(message);
@@ -86,7 +87,9 @@ public class PatrollingAlert extends AppCompatActivity {
                             stopSiren();
                         }
                         snoozed += 1;
-
+                        if(!mScheduleStartTime.equals("")) {
+                            Prefs.putString(ConstantUtils.SNOOZE_SCHEDULE_TIME + scheduleId, "" + mScheduleStartTime);
+                        }
                         Prefs.putBoolean(ConstantUtils.SNOOZE_IS_ACTIVE + scheduleId, true);
                         Prefs.putInt(ConstantUtils.SNOOZE_COUNT + scheduleId, snoozed);
                         Prefs.putString(ConstantUtils.SNOOZE_TIME + scheduleId, new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").format(new Date()));
