@@ -2,20 +2,18 @@ package com.oyespace.guards.utils
 
 import android.os.CountDownTimer
 
-class TimerUtil(millisInFuture: Long, var onFinishCallback: OnFinishCallback?) : CountDownTimer(millisInFuture, 1000) {
+class TimerUtil(
+    millisInFuture: Long,
+    var onFinishCallback: () -> Unit = {},
+    var onTickcallback: () -> Unit = {}
+) : CountDownTimer(millisInFuture, 1000) {
 
     override fun onFinish() {
-        onFinishCallback?.onFinish()
+        onFinishCallback()
     }
 
     override fun onTick(millisUntilFinished: Long) {
-
-    }
-
-    interface OnFinishCallback {
-
-        fun onFinish()
-
+        onTickcallback()
     }
 
 }

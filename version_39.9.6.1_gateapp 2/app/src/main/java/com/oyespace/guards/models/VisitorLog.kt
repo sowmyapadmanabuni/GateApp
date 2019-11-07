@@ -56,7 +56,6 @@ open class VisitorLog:RealmObject(){
     var vlVoiceNote: String = ""
     var vlCmnts: String = ""
 
-
 }
 data class GetVisitorsResponse<T>(
     val apiVersion: String,

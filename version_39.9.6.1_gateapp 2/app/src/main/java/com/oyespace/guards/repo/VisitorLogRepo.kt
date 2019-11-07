@@ -3,16 +3,18 @@ package com.oyespace.guards.repo
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.models.ExitVisitorLog
-import com.oyespace.guards.models.GetExitVisitorsResponse
-import com.oyespace.guards.models.GetVisitorsResponse
-import com.oyespace.guards.models.VisitorLog
+import com.oyespace.guards.models.*
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
 import com.oyespace.guards.pojo.VisitorLogResponse
+import com.oyespace.guards.realm.VisitorEntryFirebaseObjectRealm
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.AppUtils
@@ -32,7 +34,7 @@ class VisitorLogRepo {
         fun get_IN_VisitorLog(
             updatedFromBackend: Boolean = false,
             listener: VisitorLogFetchListener? = null
-        ): ArrayList<com.oyespace.guards.models.VisitorLog>? {
+        ): ArrayList<VisitorLog>? {
 
             if (updatedFromBackend) {
                 RetrofitClinet.instance
@@ -51,6 +53,27 @@ class VisitorLogRepo {
                                     VisitorEntryLogRealm.deleteAllVisitorLogs()
                                     listener?.onFetch(null, "no entries found")
                                 } else {
+
+                                    val fbdbAssocName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
+                                    val notificationSyncFBRef = FirebaseDatabase.getInstance().getReference("NotificationSync").child(fbdbAssocName)
+
+
+                                    for (visitor in visitorsList) {
+
+                                        notificationSyncFBRef.child(visitor.vlVisLgID.toString()).addValueEventListener(object : ValueEventListener {
+                                            override fun onCancelled(p0: DatabaseError) {
+                                            }
+
+                                            override fun onDataChange(snapshot: DataSnapshot) {
+                                                val firebaseObject = snapshot.getValue(NotificationSyncModel::class.java)
+                                                if (firebaseObject != null) {
+                                                    updateFirebaseTime(visitor.vlVisLgID, firebaseObject.updatedTime)
+                                                }
+                                            }
+
+                                        })
+
+                                    }
                                     VisitorEntryLogRealm.updateVisitorLogs(visitorsList)
                                     listener?.onFetch(getOverstaySortedList())
                                 }
@@ -108,30 +131,56 @@ class VisitorLogRepo {
 
         fun getOverstaySortedList(): ArrayList<VisitorLog>? {
 
-            Log.i("taaag", "getting visitorLog from realm")
-            return VisitorEntryLogRealm.getVisitorEntryLog()
-//            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
+            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
 
-//            val overStaying = ArrayList<VisitorLog>()
-//            val underStaying = ArrayList<VisitorLog>()
-//
-//            for (vl in listFromRealm) {
-//                // TODO change entry time to accepted one
-//                val msLeft = DateTimeUtils.msLeft(vl.vlEntryT, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
-//                if (msLeft <= 0) {
-//                    overStaying.add(vl)
-//                } else {
-//                    underStaying.add(vl)
-//                }
-//            }
-//
-//            overStaying.addAll(underStaying)
-//            return overStaying
+            val overStaying = ArrayList<VisitorLog>()
+            val underStaying = ArrayList<VisitorLog>()
+
+            for (vl in listFromRealm) {
+                val fbObj = VisitorEntryFirebaseObjectRealm.getVisitorFirebaseObject(vl.vlVisLgID)
+                if (fbObj == null) {
+                    underStaying.add(vl)
+                } else {
+                    if (fbObj.vlStatus == "pending") {
+                        underStaying.add(vl)
+                    } else {
+                        val msLeft = DateTimeUtils.msLeft(fbObj.vlUpdatedTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
+                        Log.v("taaag", "vlID: ${vl.vlVisLgID} fbTIme: ${fbObj} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
+                        if (msLeft <= 0) {
+                            overStaying.add(vl)
+                            Log.v("taaag", "overstaying: ${vl.vlVisLgID} fbTIme: ${fbObj} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
+                        } else {
+                            underStaying.add(vl)
+                        }
+                    }
+                }
+
+
+            }
+            Log.d("taaag", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
+            overStaying.addAll(underStaying)
+            return overStaying
 
         }
 
         fun getUnitCountForVisitor(phone: String): Int {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
+        }
+
+        fun updateFirebaseTime(vLogId: Int, time: String) {
+            VisitorEntryFirebaseObjectRealm.updateFirebaseTime(vLogId, time)
+        }
+
+        fun updateStatus(vLogId: Int, status: String) {
+            VisitorEntryFirebaseObjectRealm.updateStatus(vLogId, status)
+        }
+
+        fun getFirebaseStatus(vLogId: Int): String {
+            val obj = VisitorEntryFirebaseObjectRealm.getVisitorFirebaseObject(vLogId)
+            if (obj != null)
+                return obj.vlStatus
+            else
+                return "pending"
         }
 
         fun exitVisitor(context: Context, vLogId: Int) {
@@ -146,10 +195,11 @@ class VisitorLogRepo {
 
                             if (globalApiObject.success) {
 
-                                // update exit log from backend
-                                delete_IN_Visitor(vLogId)
-
                                 AppUtils.removeFBNotificationSyncEntry(vLogId)
+
+                                var s = Prefs.getString(ConstantUtils.SP_DEL_FB_IDs, "")
+                                s += "$vLogId,"
+                                Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
                                 val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
                                 intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
@@ -248,11 +298,56 @@ class VisitorLogRepo {
 
         }
 
+        fun exitYesterdaysINEntries() {
+
+            // TODO work on this
+
+        }
+
+        fun cleanupFirebaseVisitorEntryObjects() {
+
+            val fbLogs = VisitorEntryFirebaseObjectRealm.getAll()
+
+            if (fbLogs == null) {
+                Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, "")
+                return
+            }
+
+            if ((fbLogs.isEmpty())) {
+                Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, "")
+                return
+            }
+
+            val visitorLogs = VisitorEntryLogRealm.getVisitorEntryLog()
+
+            if (visitorLogs != null) {
+                if (visitorLogs.isEmpty()) {
+                    VisitorEntryFirebaseObjectRealm.deleteAll()
+                } else {
+                    val s = Prefs.getString(ConstantUtils.SP_DEL_FB_IDs, "")
+                    if (s.isEmpty()) {
+                        return
+                    }
+
+                    val ids = s.split(",")
+                    for (id in ids) {
+                        if (!id.isEmpty()) {
+                            VisitorEntryFirebaseObjectRealm.deleteEntry(id.toInt())
+                        }
+                    }
+
+
+                }
+            }
+            Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, "")
+
+        }
+
     }
 
     interface VisitorLogFetchListener {
 
-        fun onFetch(visitorLog: ArrayList<com.oyespace.guards.models.VisitorLog>?, error: String? = "")
+        fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String? = "")
 
     }
 

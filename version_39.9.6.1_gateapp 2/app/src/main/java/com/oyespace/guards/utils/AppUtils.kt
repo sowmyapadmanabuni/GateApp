@@ -1,8 +1,9 @@
 package com.oyespace.guards.utils
 
+import android.app.ProgressDialog
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
@@ -72,9 +73,9 @@ class AppUtils {
                     )
 
                 return bitmap!!
-            }catch (e:java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 e.printStackTrace()
-                return bitmap!!;
+                return bitmap!!
             }
         }
 
@@ -95,7 +96,7 @@ class AppUtils {
         fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-            Log.i("taaag", "push to firebase: " + visitorId)
+            Log.d("taaag", "push to firebase: " + visitorId)
             val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
             FirebaseDatabase.getInstance()
                 .getReference("NotificationSync")
@@ -136,8 +137,6 @@ class AppUtils {
 
         fun playWalkieTalkiAudio(context: Context, filename: String) {
 
-
-            Log.i("taaaag", "playing audio: $filename")
             var mp = MediaPlayer.create(context, R.raw.walkietalkiestart)
 
             try {
@@ -148,69 +147,56 @@ class AppUtils {
                     mp = MediaPlayer.create(context, R.raw.walkietalkieinterference)
                 }
 
-                mp.start()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
 
+            playAudio(context, filename, ConstantUtils.IMAGE_BASE_URL)
 
-            val mediaPlayer: MediaPlayer
-//
-            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-            mediaPlayer = MediaPlayer()
-
-
-            val spb = SoundPool.Builder()
-            spb.setMaxStreams(10)
-            val attrBuilder = AudioAttributes.Builder()
-            attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-            spb.setAudioAttributes(attrBuilder.build())
-            spb.build()
-
-            mediaPlayer.setDataSource(ConstantUtils.IMAGE_BASE_URL + filename)
-            try {
-                mediaPlayer.prepareAsync()
-
-                mediaPlayer.start()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-
-            val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .absolutePath
-            val f = File(baseDir + filename)
-            f.delete()
 
         }
 
-        fun playAudio(mcontext: Context, filename: String) {
+        fun playAttachementAudio(context: Context, filename: String) {
+            playAudio(context, filename, "http://mediaupload.oyespace.com/")
+        }
 
-            val mediaPlayer: MediaPlayer
-//
-            val am = mcontext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        private fun playAudio(context: Context, filename: String, baseUrl: String? = null) {
+
+            Log.i("taaaag", "playing audio: $filename")
+
+            val progressDialog = ProgressDialog(context)
+            progressDialog.isIndeterminate = true
+            progressDialog.setCancelable(true)
+            progressDialog.setMessage("preparing audio file")
+            progressDialog.setCanceledOnTouchOutside(true)
+
+            val am = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             am.setStreamVolume(AudioManager.STREAM_MUSIC, am.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0)
-            mediaPlayer = MediaPlayer()
 
+            val attributes = AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC).build()
+            SoundPool.Builder().setMaxStreams(10).setAudioAttributes(attributes).build()
 
-            var spb = SoundPool.Builder()
-            spb.setMaxStreams(10)
-            var attrBuilder = AudioAttributes.Builder()
-            attrBuilder.setLegacyStreamType(AudioManager.STREAM_MUSIC)
-            spb.setAudioAttributes(attrBuilder.build())
-            spb.build()
-
-            mediaPlayer.setDataSource("http://mediaupload.oyespace.com/" + filename)
-            mediaPlayer.prepare()
-
-            mediaPlayer.start()
-
-
-            val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                .absolutePath
-            val f = File(baseDir + filename)
-            f.delete()
+            val mediaPlayer = MediaPlayer()
+            if (baseUrl == null) {
+                mediaPlayer.setDataSource(filename)
+            } else {
+                mediaPlayer.setDataSource(baseUrl + filename)
+            }
+            mediaPlayer.setOnPreparedListener {
+                progressDialog.dismiss()
+                mediaPlayer.start()
+                val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    .absolutePath
+                val f = File(baseDir + filename)
+                f.delete()
+            }
+            try {
+                progressDialog.show()
+                mediaPlayer.prepareAsync()
+//                progressDialog.dismiss()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
 
         }
 

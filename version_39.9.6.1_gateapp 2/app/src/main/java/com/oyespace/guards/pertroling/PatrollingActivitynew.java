@@ -38,6 +38,7 @@ import com.oyespace.guards.network.ResponseHandler;
 import com.oyespace.guards.network.RestClient;
 import com.oyespace.guards.network.URLData;
 import com.oyespace.guards.qrscanner.BaseScannerActivity;
+import com.oyespace.guards.repo.StaffRepo;
 import com.oyespace.guards.request.PatrollingStartReq;
 import com.oyespace.guards.request.PatrollingStopReq;
 import com.oyespace.guards.request.SaveTrackingReq;
@@ -331,7 +332,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         PatrollingStartReq loginReq = new PatrollingStartReq();
 
         loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID,0) ;
-        loginReq.WKWorkID = LocalDb.getStaffList().get(0).getWkWorkID();
+        loginReq.WKWorkID = StaffRepo.Companion.getStaffList(false, null).get(0).getWkWorkID();
         loginReq.wkfName = Prefs.getString(GATE_NO, "");//LocalDb.getStaffList().get(0).getWkfName()+LocalDb.getStaffList().get(0).getWklName();
         loginReq.PSPtrlSID =  1 ;
         //loginReq.PTSDateT=DateTimeUtils.getCurrentTimeLocal();
@@ -369,7 +370,7 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
         loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
         loginReq.CPCkPName=checkPointName;
         loginReq.TRGPSPnt=gpsPoint;
-        loginReq.WKWorkID = LocalDb.getStaffList().get(0).getWkWorkID();
+        loginReq.WKWorkID = StaffRepo.Companion.getStaffList(false, null).get(0).getWkWorkID();
         loginReq.PTPtrlID = Prefs.getInt(PATROLLING_ID,0) ;
         loginReq.TRTDateT = DateTimeUtils.getCurrentTimeLocal();
 

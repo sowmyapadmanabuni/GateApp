@@ -37,7 +37,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.karumi.dexter.Dexter
@@ -90,7 +92,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     ResponseHandler,
-    SGFingerPresentEvent, ValueEventListener {
+    SGFingerPresentEvent {
 
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
@@ -435,7 +437,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 //        }
 
 
-
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
 
         bSecuGenDeviceOpened = false
@@ -614,7 +615,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         }
         val ddc1 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-        Log.d("SYNC_STAFF_LIST", "af ")
         ddc1.putExtra(BSR_Action, SYNC_STAFF_LIST)
         sendBroadcast(ddc1)
 
@@ -774,7 +774,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             return
         }
 
-        showProgress("loading entry data...")
+//		showProgress("loading entry data...")
         VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
             override fun onFetch(visitorLog: ArrayList<VisitorLog>?, errorMessage: String?) {
 
@@ -812,7 +812,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 } else {
                     Toast.makeText(this@Dashboard, errorMessage, Toast.LENGTH_SHORT).show()
                 }
-                dismissProgress()
+//				dismissProgress()
 
             }
 
@@ -1036,7 +1036,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         mVerifyTemplate = null
         //        sgfplib.Close();
         //if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-            unregisterReceiver(mUsbReceiver)
+        unregisterReceiver(mUsbReceiver)
         //}
         val ddc2 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         Log.d("SYNC_UNIT_LIST", "af ")
@@ -1165,11 +1165,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         sgfplib!!.GetMaxTemplateSize(templateSize)
         val fpTemp = ByteArray(templateSize[0])
         val fpImg = ByteArray(mImageWidth * mImageHeight)
-        var code= 0L
+        var code = 0L
         try {
-            sgfplib!!.GetImageEx(fpImg,10000, 50)
-             code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
-        }catch (e:NullPointerException){
+            sgfplib!!.GetImageEx(fpImg, 10000, 50)
+            code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
+        } catch (e: NullPointerException) {
 
         }
         when (code) {
@@ -2458,48 +2458,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             })
 
 
-    }
-
-    override fun onCancelled(p0: DatabaseError) {
-
-    }
-
-    override fun onDataChange(datasnapshot: DataSnapshot) {
-
-//        updateEntriesWithFBData(datasnapshot)
-
-    }
-
-    private fun updateEntriesWithFBData(datasnapshot: DataSnapshot) {
-        if (!showingOutLog) {
-            if (vistorEntryListAdapter != null) {
-
-                val firebasedataMap = HashMap<String, NotificationSyncModel>()
-                var refreshList: Boolean = false
-
-                for (h in datasnapshot.children) {
-                    try {
-                        val data = h.getValue(NotificationSyncModel::class.java)
-                        if (!refreshList) {
-                            refreshList = data?.newAttachment!!
-                        }
-                        if (data != null) {
-                            firebasedataMap.put(data.visitorlogId.toString(), data)
-                        }
-                    } catch (e: Exception) {
-                        Log.e("taaag", "crash at value ${h.value}")
-                        e.printStackTrace()
-                    }
-
-                }
-                vistorEntryListAdapter!!.setFirebaseDataHashmap(firebasedataMap)
-                if (refreshList) {
-                    loadEntryVisitorLog()
-                }
-
-            }
-
-        }
     }
 
 }

@@ -113,7 +113,10 @@ class SplashActivity : BaseLocationActivity() {
 
         Thread {
             VisitorLogRepo.get_OUT_VisitorLog(true)
+            VisitorLogRepo.exitYesterdaysINEntries()
+            VisitorLogRepo.cleanupFirebaseVisitorEntryObjects()
         }.start()
+
 
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         Mobile_IMEI_NO = tm.deviceId
@@ -228,7 +231,8 @@ class SplashActivity : BaseLocationActivity() {
 
 
                                 } else {
-                                    if (LocalDb.getStaffList() == null) {
+                                    val staffList = StaffRepo.getStaffList(false)
+                                    if (staffList == null || staffList.size == 0) {
                                         // Toast.makeText(this, " failed", Toast.LENGTH_SHORT).show()
                                         val mainIntent = Intent(this@SplashActivity, MyRoleScreen::class.java)
                                         intent.putExtra("MOBIELNUMBER", PrefKeys.MOBILE_NUMBER)

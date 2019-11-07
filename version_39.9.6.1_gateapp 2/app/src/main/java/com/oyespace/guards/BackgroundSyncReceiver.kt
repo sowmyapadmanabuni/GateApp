@@ -51,7 +51,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     lateinit var mcontext: Context
 
     override fun onReceive(context: Context, intent: Intent) {
-        // TODO: This method is called when the BroadcastReceiver is receiving
+        // This method is called when the BroadcastReceiver is receiving
         // an Intent broadcast.
         val action2 = intent.getStringExtra(BSR_Action)
         mcontext = context
@@ -355,7 +355,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 try {
                     Log.e("uploadImage", "response:" + response.body()!!)
-                    Prefs.putString(ConstantUtils.PATROLLING_HIDDEN_SELFIE,""+localImgName);
+                    Prefs.putString(ConstantUtils.PATROLLING_HIDDEN_SELFIE, "" + localImgName)
                     file.delete()
 
                 } catch (ex: Exception) {
@@ -747,7 +747,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             .getCheckPointList(OYE247TOKEN, intToString(LocalDb.getAssociation().asAssnID))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<CheckpointListResp<CheckPointByAssocID>>() {
+            .subscribe(object : CommonDisposable<CheckpointListResp<CheckPointByAssocID>>() {
 
                 override fun onSuccessResponse(workerListResponse: CheckpointListResp<CheckPointByAssocID>) {
 
