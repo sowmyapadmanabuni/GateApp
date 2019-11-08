@@ -411,6 +411,16 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 val diff = startTimeObj.time-Date().time
                                 val seconds = diff / 1000
                                 val minutes = seconds / 60
+
+                                val snoozeScheduleTime = Prefs.getString(SNOOZE_SCHEDULE_TIME+schedules.psPtrlSID,"")
+                                val tempIsSnoozed = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
+                                if(tempIsSnoozed && !snoozeScheduleTime.equals("") && !snoozeScheduleTime.equals(schedules.pssTime)){
+                                    Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_IS_ACTIVE+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_TIME+schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_SCHEDULE_TIME+schedules.psPtrlSID)
+                                }
+
                                 val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
                                 val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+schedules.psPtrlSID,0)
                                 val snoozedTime:String = Prefs.getString(SNOOZE_TIME+schedules.psPtrlSID,"")
@@ -425,16 +435,17 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 Log.e("THE_DIFF",""+minutes+" - "+isSnoozed+" - "+snoozeMins+"  - "+isPatrollingCompleted)
 
                                 if(((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount<3 && snoozeMins>=5 && snoozeMins<17)) && !isPatrollingCompleted){
-
+                                    Log.e("INSIDE_1",""+(minutes <= 5 && minutes > -1)+" - "+(isSnoozed && snoozeCount<3 && snoozeMins>=5 && snoozeMins<17))
                                     if(schedules.psSnooze){
                                         //Snooze enabled
-                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID)
+                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID,schedules.pssTime)
                                     }else{
-                                        showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
+                                        showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID,"")
                                     }
                                     break
 
                                 }else if(isSnoozed && snoozeCount>=3 && snoozeMins>=20){
+                                    Log.e("INSIDE_2",""+(isSnoozed && snoozeCount>=3 && snoozeMins>=20))
                                     Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
                                     Prefs.remove(SNOOZE_IS_ACTIVE+schedules.psPtrlSID)
                                     Prefs.remove(SNOOZE_TIME+schedules.psPtrlSID)
@@ -443,9 +454,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                         if(schedules.psSnooze){
                                             //Snooze enabled
-                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID)
+                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID,schedules.pssTime)
                                         }else{
-                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID)
+                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID,"")
                                         }
                                         break
 
@@ -468,13 +479,13 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
-    fun showDialog(desc: String, title: String, isCancellable: Boolean, btnText: String, id:Int) {
+    fun showDialog(desc: String, title: String, isCancellable: Boolean, btnText: String, id:Int, scheduleTime:String) {
         val isSOS:Boolean = Prefs.getBoolean("ACTIVE_SOS",false)
         val isActiveAlert:Boolean = Prefs.getBoolean("ACTIVE_ALERT",false)
         val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+id,false)
 
 
-        Log.e("IS_SNOOZED_"+id,""+isSnoozed)
+        Log.e("IS_SNOOZED_"+id,""+isSnoozed+" - ATCVE? "+isActiveAlert)
 
         if(!isSOS && !isActiveAlert) {
             val alertDlg =
@@ -485,6 +496,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             alertDlg.putExtra("ANIM",R.raw.alarm)
             alertDlg.putExtra("TYPE","PATROLLING_ALARM")
             alertDlg.putExtra("SCHEDULEID",id)
+            alertDlg.putExtra("SNOOZED_SCHEDULE_TIME",scheduleTime)
 
             if(isSnoozed){
                 val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+id,0)

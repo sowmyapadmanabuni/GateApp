@@ -102,15 +102,17 @@ public class ConstantUtils {
     public static final String DOB = "dob";
 
     public static final String ACTIVE_PATROLLING_SCHEDULE = "ACTIVE_PATROLLING_SCHEDULE";
-    public static final String ACTIVE_PATROLLING_LAST_TIME = "ACTIVE_PATROLLING_LAST_TIME";
     public static final String ACTIVE_PATROLLING_LAST_CP = "ACTIVE_PATROLLING_LAST_CP";
+    public static final String ACTIVE_PATROLLING_LAST_TIME = "ACTIVE_PATROLLING_LAST_TIME";
     public static final String PATROLLING_COMPLETED_ON = "PATROLLING_COMPLETED_ON_";
     public static final String PATROLLING_HIDDEN_SELFIE = "PATROLLING_HIDDEN_SELFIE";
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 16.0f;
-    public static final String BGS_PATROLLING_ALARM = "BGS_PATROLLING_ALARM";
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 15.2f;
+    public static final int PATROLLING_PAUSE_TIMER = 10;
+    public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
+    public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
@@ -119,10 +121,12 @@ public class ConstantUtils {
     public static final boolean debug = false;
     public static final boolean useDummyValues = false;
 
+    public static final String SNOOZE_SCHEDULE_TIME="SNOOZE_SCHEDULE_TIME";
     public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
     public static final String SNOOZE_COUNT = "SNOOZED_COUNT_";
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
+    public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
     public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 5 : 3 * 60;// 7 mins
 

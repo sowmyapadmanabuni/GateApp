@@ -183,7 +183,6 @@ interface WebApi {
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     fun checkIfResident(@Header(OYE247KEY) token: String, @Body residentCheckReq: ResidentCheckReq): Single<ResidentCheckResponse>
 
-
     @GET("oye247/api/v1/GetCheckPointNamesByPatrollingSchedule/{schedId}")
     fun scheduleCheckPointsList(@Header("X-OYE247-APIKey") token: String, @Path("schedId") scheduleId: String)
             : Single<CheckPointsOfSheduleListResponse<ArrayList<PatrolShift>>>
