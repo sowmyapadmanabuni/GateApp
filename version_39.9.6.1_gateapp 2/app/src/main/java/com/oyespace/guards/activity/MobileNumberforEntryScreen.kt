@@ -102,7 +102,14 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
 
             R.id.buttonNext -> {
-                if (textview.text.length > 0) {
+
+                if (useDummyValues) {
+                    textview.text = "+919930620323"
+                    ccd = "+91"
+                    mobileNumber = "9930620323"
+                }
+
+                if (textview.text.isNotEmpty()) {
 
                     Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
                     val phoneNumber = textview.text.toString()
@@ -638,6 +645,8 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
                             // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
+
+                            FirebaseDBUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID, "#f0f0f0")
 
 
                             if (unitId.contains(",")) {

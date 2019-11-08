@@ -55,6 +55,8 @@ open class VisitorLog:RealmObject(){
     var vlVenImg: String = ""
     var vlVoiceNote: String = ""
     var vlCmnts: String = ""
+    var vlApprStat: String = ""
+    var vlsActTm: String = ""
 
 }
 data class GetVisitorsResponse<T>(

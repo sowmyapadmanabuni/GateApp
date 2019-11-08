@@ -24,6 +24,7 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -273,7 +274,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity(), View.OnClickListener
                                 false
                             )
 
-                            AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
+                            updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
 
                             val d = Intent(this@VehicleGuestEntryRegistration, BackgroundSyncReceiver::class.java)
                             d.putExtra(BSR_Action, VisitorEntryFCM)

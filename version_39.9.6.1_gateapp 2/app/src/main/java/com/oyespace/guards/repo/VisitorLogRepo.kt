@@ -3,23 +3,21 @@ package com.oyespace.guards.repo
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.models.*
+import com.oyespace.guards.models.ExitVisitorLog
+import com.oyespace.guards.models.GetExitVisitorsResponse
+import com.oyespace.guards.models.GetVisitorsResponse
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
 import com.oyespace.guards.pojo.VisitorExitResp
 import com.oyespace.guards.pojo.VisitorLogResponse
-import com.oyespace.guards.realm.VisitorEntryFirebaseObjectRealm
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
-import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.DateTimeUtils
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -53,27 +51,6 @@ class VisitorLogRepo {
                                     VisitorEntryLogRealm.deleteAllVisitorLogs()
                                     listener?.onFetch(null, "no entries found")
                                 } else {
-
-                                    val fbdbAssocName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-                                    val notificationSyncFBRef = FirebaseDatabase.getInstance().getReference("NotificationSync").child(fbdbAssocName)
-
-
-                                    for (visitor in visitorsList) {
-
-                                        notificationSyncFBRef.child(visitor.vlVisLgID.toString()).addValueEventListener(object : ValueEventListener {
-                                            override fun onCancelled(p0: DatabaseError) {
-                                            }
-
-                                            override fun onDataChange(snapshot: DataSnapshot) {
-                                                val firebaseObject = snapshot.getValue(NotificationSyncModel::class.java)
-                                                if (firebaseObject != null) {
-                                                    updateFirebaseTime(visitor.vlVisLgID, firebaseObject.updatedTime)
-                                                }
-                                            }
-
-                                        })
-
-                                    }
                                     VisitorEntryLogRealm.updateVisitorLogs(visitorsList)
                                     listener?.onFetch(getOverstaySortedList())
                                 }
@@ -137,21 +114,22 @@ class VisitorLogRepo {
             val underStaying = ArrayList<VisitorLog>()
 
             for (vl in listFromRealm) {
-                val fbObj = VisitorEntryFirebaseObjectRealm.getVisitorFirebaseObject(vl.vlVisLgID)
-                if (fbObj == null) {
+
+                val actTime = vl.vlsActTm
+                val status = vl.vlApprStat
+
+                if (status.equals("pending", true)) {
                     underStaying.add(vl)
                 } else {
-                    if (fbObj.vlStatus == "pending") {
-                        underStaying.add(vl)
-                    } else {
-                        val msLeft = DateTimeUtils.msLeft(fbObj.vlUpdatedTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
-                        Log.v("taaag", "vlID: ${vl.vlVisLgID} fbTIme: ${fbObj} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
-                        if (msLeft <= 0) {
+                    val msLeft = DateTimeUtils.msLeft(actTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
+                    Log.v("taaag", "vlID: ${vl.vlVisLgID} actTIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
+                    if (msLeft <= 0) {
+                        if (status.equals("approved", true)) {
                             overStaying.add(vl)
-                            Log.v("taaag", "overstaying: ${vl.vlVisLgID} fbTIme: ${fbObj} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
-                        } else {
-                            underStaying.add(vl)
+                            Log.v("taaag", "overstaying: ${vl.vlVisLgID} actIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
                         }
+                    } else {
+                        underStaying.add(vl)
                     }
                 }
 
@@ -167,22 +145,6 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
         }
 
-        fun updateFirebaseTime(vLogId: Int, time: String) {
-            VisitorEntryFirebaseObjectRealm.updateFirebaseTime(vLogId, time)
-        }
-
-        fun updateStatus(vLogId: Int, status: String) {
-            VisitorEntryFirebaseObjectRealm.updateStatus(vLogId, status)
-        }
-
-        fun getFirebaseStatus(vLogId: Int): String {
-            val obj = VisitorEntryFirebaseObjectRealm.getVisitorFirebaseObject(vLogId)
-            if (obj != null)
-                return obj.vlStatus
-            else
-                return "pending"
-        }
-
         fun exitVisitor(context: Context, vLogId: Int) {
 
             val req = VisitorExitReq(DateTimeUtils.getCurrentTimeLocal(), 0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""))
@@ -195,7 +157,7 @@ class VisitorLogRepo {
 
                             if (globalApiObject.success) {
 
-                                AppUtils.removeFBNotificationSyncEntry(vLogId)
+                                removeFBNotificationSyncEntry(vLogId)
 
                                 var s = Prefs.getString(ConstantUtils.SP_DEL_FB_IDs, "")
                                 s += "$vLogId,"
@@ -304,42 +266,32 @@ class VisitorLogRepo {
 
         }
 
-        fun cleanupFirebaseVisitorEntryObjects() {
+        fun allowEntry(ccd: String?, mobileNumber: String?): Boolean {
 
-            val fbLogs = VisitorEntryFirebaseObjectRealm.getAll()
 
-            if (fbLogs == null) {
-                Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, "")
-                return
-            }
+            val entryExists = check_IN_VisitorByPhone(ccd + mobileNumber)
 
-            if ((fbLogs.isEmpty())) {
-                Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, "")
-                return
-            }
+            if (entryExists) {
 
-            val visitorLogs = VisitorEntryLogRealm.getVisitorEntryLog()
+                if (mobileNumber != null) {
 
-            if (visitorLogs != null) {
-                if (visitorLogs.isEmpty()) {
-                    VisitorEntryFirebaseObjectRealm.deleteAll()
-                } else {
-                    val s = Prefs.getString(ConstantUtils.SP_DEL_FB_IDs, "")
-                    if (s.isEmpty()) {
-                        return
-                    }
+                    val visitorLog = get_IN_VisitorsForPhone(mobileNumber)
 
-                    val ids = s.split(",")
-                    for (id in ids) {
-                        if (!id.isEmpty()) {
-                            VisitorEntryFirebaseObjectRealm.deleteEntry(id.toInt())
+                    if (visitorLog != null) {
+                        for (v in visitorLog) {
+
+                            if (v.vlApprStat.equals("Approved", true)) {
+                                return false
+                            }
+
                         }
                     }
 
-
                 }
+
             }
-            Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, "")
+
+            return true
 
         }
 

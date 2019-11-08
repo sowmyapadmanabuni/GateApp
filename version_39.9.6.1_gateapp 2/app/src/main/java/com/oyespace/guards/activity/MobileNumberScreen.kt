@@ -41,11 +41,11 @@ import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -136,7 +136,9 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                 if (textview.text.length == 13) {
 
-                    if (entryExists(ccd, mobileNumber)) {
+                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                    if (!allowEntry) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@MobileNumberScreen)
                         // builder.setTitle("Vendor Entry already done")

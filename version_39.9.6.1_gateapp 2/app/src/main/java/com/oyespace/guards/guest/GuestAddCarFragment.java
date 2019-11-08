@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
 import com.oyespace.guards.R;
+import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.camtest.CarImages_Adapter;
 import com.oyespace.guards.camtest.ImageAdapter;
 import com.oyespace.guards.camtest.ImageHelper;
@@ -73,7 +74,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 
-public class GuestAddCarFragment extends Activity implements View.OnClickListener {
+public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnClickListener {
     TextView txt_assn_name,txt_device_name,txt_gate_name ;
     TextView tv_name;
     File file;

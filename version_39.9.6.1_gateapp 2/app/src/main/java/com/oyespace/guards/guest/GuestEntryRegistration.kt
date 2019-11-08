@@ -27,6 +27,7 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -282,7 +283,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                         deleteDir(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
 
-                        AppUtils.updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
+                        updateFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
 
                         val dd  =  Intent(this@GuestEntryRegistration, BackgroundSyncReceiver::class.java)
                         dd.putExtra(BSR_Action, VisitorEntryFCM)

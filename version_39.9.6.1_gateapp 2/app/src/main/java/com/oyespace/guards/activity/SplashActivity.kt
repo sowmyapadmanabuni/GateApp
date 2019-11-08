@@ -114,7 +114,6 @@ class SplashActivity : BaseLocationActivity() {
         Thread {
             VisitorLogRepo.get_OUT_VisitorLog(true)
             VisitorLogRepo.exitYesterdaysINEntries()
-            VisitorLogRepo.cleanupFirebaseVisitorEntryObjects()
         }.start()
 
 

@@ -1,5 +1,6 @@
 package com.oyespace.guards.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.os.Handler
@@ -54,14 +55,13 @@ class VistorEntryListAdapter(
         timerHashMap = hashMapOf()
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
         notificationSyncFBRef = FirebaseDatabase.getInstance().getReference("NotificationSync").child(fbdbAssocName)
-        setHasStableIds(true)
     }
 
-    override fun getItemId(position: Int): Long {
-        try {
-            return searchList?.get(position)?.vlVisLgID?.toLong()!!
-        } catch (e: Exception) {
-            return super.getItemId(position)
+    override fun getItemViewType(position: Int): Int {
+        return try {
+            searchList?.get(position)?.vlVisLgID!!
+        } catch (e: java.lang.Exception) {
+            return position
         }
     }
 
@@ -81,6 +81,7 @@ class VistorEntryListAdapter(
         }
     }
 
+    @SuppressLint("DefaultLocale")
     override fun onBindViewHolder(holder: MenuHolder, p: Int) {
 
         val position = holder.adapterPosition
@@ -110,11 +111,23 @@ class VistorEntryListAdapter(
 
                 updateAttachments(visitor, holder)
 
-                when (visitor.vlVisType) {
+                val type = visitor.vlVisType
+                when (type) {
 
-                    DELIVERY, STAFF -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                    DELIVERY -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                    STAFF -> {
+                        notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                        holder.btn_makeexit.visibility = View.VISIBLE
+                    }
+                    else -> {
+                        holder.btn_makeexit.visibility = View.VISIBLE
+                        Log.d("taaag", "fb child listener not attached")
+                    }
                 }
 
+                if (debug) {
+                    holder.btn_makeexit.visibility = View.VISIBLE
+                }
                 holder.btn_makeexit.setOnClickListener {
                     holder.btn_makeexit.visibility = View.GONE
                     notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
@@ -134,7 +147,7 @@ class VistorEntryListAdapter(
             holder.visitorName.text = visitor.vlfName
 
 
-            if (visitor.vlVisType.equals("STAFF", true)) {
+            if (visitor.vlVisType.equals(STAFF, true)) {
                 if (visitor.vlEntryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
@@ -167,7 +180,7 @@ class VistorEntryListAdapter(
                 // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
-                if (visitor.vlVisType.equals("STAFF", true)) {
+                if (visitor.vlVisType.equals(STAFF, true)) {
 
                     if (visitor.vlEntryImg.equals("")) {
                         Picasso.with(mcontext)
@@ -288,15 +301,17 @@ class VistorEntryListAdapter(
     private fun exitVisitor(vlLogId: String, position: Int) {
 
         val lgid = vlLogId.toInt()
-        deleteEntryFromList(lgid, position)
+        deleteEntryFromList(lgid, position, false)
         VisitorLogRepo.exitVisitor(mcontext, lgid)
 
     }
 
-    private fun deleteEntryFromList(lgid: Int, position: Int) {
+    private fun deleteEntryFromList(lgid: Int, position: Int, updateSearchList: Boolean = true) {
         try {
-            searchList?.removeAt(position)
-            notifyItemRemoved(position)
+            if (updateSearchList) {
+                searchList?.removeAt(position)
+                notifyItemRemoved(position)
+            }
             timerHashMap[lgid.toString()]?.cancel()
             timerHashMap.remove(lgid.toString())
         } catch (e: Exception) {
@@ -394,21 +409,20 @@ class VistorEntryListAdapter(
 
             if (firebaseObject != null) {
 
+                var msLeft: Long = 0
                 when (visitorType) {
                     DELIVERY -> {
-                        val msLeft: Long
                         var timeupCallback: () -> Unit = {}
 
                         holder.isAnimating = false
                         holder.ll_card.clearAnimation()
 
                         val fbColor = firebaseObject.buttonColor.toLowerCase()
-                        if (dataSnapshot.hasChild("updatedTime")) {
-                            entryTime = firebaseObject.updatedTime
+                        entryTime = if (dataSnapshot.hasChild("updatedTime")) {
+                            firebaseObject.updatedTime
                         } else {
-                            entryTime = visitor.vlEntryT
+                            visitor.vlEntryT
                         }
-                        VisitorLogRepo.updateFirebaseTime(vlLogId.toInt(), entryTime)
 
                         try {
                             holder.ll_card.setBackgroundColor(Color.parseColor(fbColor))
@@ -431,7 +445,6 @@ class VistorEntryListAdapter(
                             ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
                                 holder.btn_makeexit.visibility = View.VISIBLE
                                 msLeft = msLeft(entryTime, MAX_DELIVERY_ALLOWED_SEC)
-                                VisitorLogRepo.updateStatus(vlLogId.toInt(), "accepted")
                                 if (msLeft < 0) {// time is up
                                     holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
                                     holder.isAnimating = true
@@ -440,19 +453,23 @@ class VistorEntryListAdapter(
                                 } else {
                                     timeupCallback = {
                                         Handler().post {
-                                            searchList = VisitorLogRepo.get_IN_VisitorLog(false)
-                                            if (searchList != null) {
-                                                visitorList = searchList!!
-                                            }
-                                            notifyDataSetChanged()
+                                            VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                                                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+                                                    searchList = visitorLog
+                                                    if (visitorLog != null) {
+                                                        visitorList = visitorLog
+                                                    }
+                                                    notifyDataSetChanged()
+                                                }
+
+                                            })
                                         }
                                     }
                                 }
                             }
                             REJECTED_COLOR -> {// rejected by resident, start timer for 4hrs to remove
                                 holder.btn_makeexit.visibility = View.INVISIBLE
-                                msLeft = msLeft(entryTime, 4 * 60 * 60 * 1000)// 4 hrs
-                                VisitorLogRepo.updateStatus(vlLogId.toInt(), "rejected")
+                                msLeft = msLeft(entryTime, 4 * 60 * 60)// 4 hrs
                                 timeupCallback = {
                                     deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
                                 }
@@ -460,15 +477,13 @@ class VistorEntryListAdapter(
                             }
                             else -> {// pending, start timer for 24hrs to remove, hide exit button
                                 holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-                                msLeft = msLeft(entryTime, 24 * 60 * 60 * 1000)// 24 hrs
-                                VisitorLogRepo.updateStatus(vlLogId.toInt(), "pending")
+                                msLeft = msLeft(entryTime, 24 * 60 * 60)// 24 hrs
                                 timeupCallback = {
                                     deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
                                 }
                             }
                         }
 
-                        Log.v("taaag", "vlID: $vlLogId, time: $entryTime, ms left: $msLeft")
                         if (timerHashMap.contains(vlLogId)) {
 
                             timerHashMap[vlLogId]?.cancel()
@@ -480,8 +495,14 @@ class VistorEntryListAdapter(
                         timerHashMap[vlLogId]?.start()
                     }
                     STAFF -> {
+                        holder.btn_makeexit.visibility = View.VISIBLE
                         checkForAttachments(firebaseObject)
                     }
+                }
+
+                try {
+                    Log.i("taaag", "vlID: $vlLogId, time: $entryTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
+                } catch (ignored: IllegalStateException) {
                 }
 
 

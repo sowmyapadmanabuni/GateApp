@@ -87,30 +87,37 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
         String phone = qrData[0];
         String associateId = qrData[1];
 
-        new ResidentChecker().isResident(phone, Integer.parseInt(associateId), new ResidentChecker.ResponseListener() {
-            @Override
-            public void onResult(boolean isResident) {
-                if (isResident) {
-                    Utils.getAlertDialog(
-                            ResidentIdActivity.this,
-                            getString(R.string.valid), -1,
-                            v -> finish()).show();
-                } else {
+        try {
+            new ResidentChecker().isResident(phone, Integer.parseInt(associateId), new ResidentChecker.ResponseListener() {
+                @Override
+                public void onResult(boolean isResident) {
+                    if (isResident) {
+                        Utils.getAlertDialog(
+                                ResidentIdActivity.this,
+                                getString(R.string.valid), -1,
+                                v -> finish()).show();
+                    } else {
+                        Utils.getAlertDialog(
+                                ResidentIdActivity.this,
+                                getString(R.string.invalid), R.drawable.invalid_invi,
+                                v -> finish()).show();
+                    }
+                }
+
+                @Override
+                public void onError(@NotNull String error) {
                     Utils.getAlertDialog(
                             ResidentIdActivity.this,
                             getString(R.string.invalid), R.drawable.invalid_invi,
                             v -> finish()).show();
                 }
-            }
-
-            @Override
-            public void onError(@NotNull String error) {
-                Utils.getAlertDialog(
-                        ResidentIdActivity.this,
-                        getString(R.string.invalid), R.drawable.invalid_invi,
-                        v -> finish()).show();
-            }
-        });
+            });
+        } catch (Exception e) {
+            Utils.getAlertDialog(
+                    ResidentIdActivity.this,
+                    getString(R.string.invalid), R.drawable.invalid_invi,
+                    v -> finish()).show();
+        }
 
     }
 

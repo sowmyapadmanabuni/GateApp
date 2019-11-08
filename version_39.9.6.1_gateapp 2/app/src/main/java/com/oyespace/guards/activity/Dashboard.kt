@@ -77,6 +77,9 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.addWalkieTalkieAudioFirebase
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeWalkieTalkieAudioFirebase
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.Utils.showToast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -477,9 +480,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
-        walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("walkie_talkie_audio").child(fbdbAssocName)
+        walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("wt_audio").child(fbdbAssocName)
 
-        AppUtils.removeWalkieTalkieAudioFirebase()
+        removeWalkieTalkieAudioFirebase()
 
         walkieAudioFBRef.addChildEventListener(object : ChildEventListenerAdapter() {
 
@@ -492,7 +495,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                 if (filename != null && !filename.equals("null")) {
                     AppUtils.playWalkieTalkiAudio(this@Dashboard, filename)
-                    AppUtils.removeWalkieTalkieAudioFirebase()
+                    removeWalkieTalkieAudioFirebase()
                 }
             }
 
@@ -774,14 +777,17 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             return
         }
 
-//		showProgress("loading entry data...")
+        if (newAl == null || newAl!!.isEmpty()) {
+            tv_nodata.text = "fetching data..."
+            tv_nodata.visibility = View.VISIBLE
+        }
         VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
             override fun onFetch(visitorLog: ArrayList<VisitorLog>?, errorMessage: String?) {
 
                 // reset no data text
                 rv_dashboard!!.visibility = View.GONE
-                tv_nodata.visibility = View.VISIBLE
                 tv_nodata.text = "no data"
+                tv_nodata.visibility = View.VISIBLE
 
                 if (visitorLog != null) {
                     newAl = visitorLog
@@ -812,7 +818,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 } else {
                     Toast.makeText(this@Dashboard, errorMessage, Toast.LENGTH_SHORT).show()
                 }
-//				dismissProgress()
 
             }
 
@@ -1933,7 +1938,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 try {
-                    AppUtils.addWalkieTalkieAudioFirebase(response.body().toString())
+                    addWalkieTalkieAudioFirebase(response.body().toString())
 
                 } catch (ex: Exception) {
                     Log.d("uploadAudio 113", "errr:" + ex.toString())
@@ -2120,7 +2125,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID, assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
+            .subscribe(object : CommonDisposable<getVisitorDataByWorker>() {
 
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
 
@@ -2181,6 +2186,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                             val visitorLogID = globalApiObject.data.visitorLog.vlVisLgID
 
+                            updateFirebaseColor(visitorLogID, "#f0f0f0")
+
                             if (unitId.contains(",")) {
 
                                 var unitname_dataList: Array<String>
@@ -2195,7 +2202,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                                         .dropLastWhile({ it.isEmpty() })
                                         .toTypedArray()
                                 // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                                if (unitid_dataList.size > 0) {
+                                if (unitid_dataList.isNotEmpty()) {
                                     for (i in 0 until unitid_dataList.size) {
 
                                         val ddc = Intent(

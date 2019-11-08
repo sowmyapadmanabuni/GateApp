@@ -1819,8 +1819,8 @@ data class SOSUpdateResp(
 )
 
 data class ResidentCheckReq(
-    val FMMobile: String,
-    val ASAssnID: Int
+    val MobileNumber: String,
+    val AssociationID: Int
 )
 
 data class ResidentCheckObject(

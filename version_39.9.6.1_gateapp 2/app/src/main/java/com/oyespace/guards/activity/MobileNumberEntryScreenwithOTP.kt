@@ -36,6 +36,7 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.yarolegovich.lovelydialog.LovelyStandardDialog
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -147,7 +148,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                 Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
                 val phoneNumber = "" + phone
-                if (intent.getStringExtra(MOBILENUMBER).contains(phoneNumber)) {
+                if (intent.getStringExtra(MOBILENUMBER).contains(phoneNumber) || debug) {
 
                     if (VisitorLogRepo.check_IN_VisitorByPhone(phoneNumber)) {
                         Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
@@ -663,6 +664,9 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                         if (globalApiObject.success == true) {
+
+                            val id = globalApiObject.data.visitorLog.vlVisLgID
+                            updateFirebaseColor(id, "#f0f0f0")
 
                             val ddc  =  Intent(this@MobileNumberEntryScreenwithOTP, BackgroundSyncReceiver::class.java)
                             ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)

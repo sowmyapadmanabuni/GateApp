@@ -4,7 +4,9 @@ import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Bundle
 import android.speech.RecognizerIntent
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -56,6 +58,18 @@ open class BaseKotlinActivity : AppCompatActivity() {
         if (realm != null && !realm.isClosed) {
             realm.close()
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        var intentStr = ""
+        try {
+            for (i in intent?.extras?.keySet()!!) {
+                intentStr += "$i=${intent.extras[i]} | "
+            }
+        } catch (ignored: Exception) {
+        }
+        Log.i("taaag", this@BaseKotlinActivity::class.java.simpleName + " created, intent: ${intentStr}")
     }
 
     protected val compositeDisposable = CompositeDisposable()

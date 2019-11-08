@@ -28,7 +28,7 @@ public class ConstantUtils {
     public static final String ITEMS_PHOTO_LIST = "items_photo_list";
 
     public static final String DELIVERY = "Delivery";
-    public static final String STAFF = "STAFF";
+    public static final String STAFF = "Staff";
     public static final String STAFF_REGISTRATION = "STAFF_REGISTRATION";
     public static final String WORKER_ID = "worker_id";
     public static final String ASSOCIATION_ID = "ASSOCIATION_ID";
@@ -76,12 +76,12 @@ public class ConstantUtils {
 
 
     //http://mediaupload.oyespace.com/Images/
-    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
-    //    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
-//     public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
-    public static final String BASE_URL = "https://api.oyespace.com/";
-    //    public static final String BASE_URL = "https://apidev.oyespace.com/";
-//    public static final String BASE_URL = "https://apiuat.oyespace.com/";
+//    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+//    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+    public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+    //    public static final String BASE_URL = "https://api.oyespace.com/";
+//    public static final String BASE_URL = "https://apidev.oyespace.com/";
+    public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
     public static final String PATROLLING_END_POINT = "Patrolling End Point";
@@ -124,7 +124,7 @@ public class ConstantUtils {
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
 
-    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 30 : 3 * 60;// 7 mins
+    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 5 : 3 * 60;// 7 mins
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";
 

@@ -10,10 +10,8 @@ import android.media.MediaPlayer
 import android.media.SoundPool
 import android.os.Environment
 import android.util.Log
-import com.google.firebase.database.FirebaseDatabase
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
-import com.oyespace.guards.models.NotificationSyncModel
 import java.io.File
 import java.text.SimpleDateFormat
 
@@ -91,48 +89,6 @@ class AppUtils {
 
             Log.d("xgdssd Dgddfdf", "$lat1 $lng1 $lat2 $lng2 $dist")
             return dist
-        }
-
-        fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a") {
-
-            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-            Log.d("taaag", "push to firebase: " + visitorId)
-            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor)
-            FirebaseDatabase.getInstance()
-                .getReference("NotificationSync")
-                .child(childName)
-                .child(visitorId.toString()).setValue(notificationSyncModel)
-
-        }
-
-        fun removeFBNotificationSyncEntry(visitorId: Int) {
-
-            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-            Log.i("taaag", "remove from firebase: " + visitorId)
-            FirebaseDatabase.getInstance()
-                .getReference("NotificationSync")
-                .child(childName)
-                .child(visitorId.toString())
-                .removeValue()
-
-        }
-
-        fun addWalkieTalkieAudioFirebase(fileName: String) {
-            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-            FirebaseDatabase.getInstance()
-                .getReference("walkie_talkie_audio")
-                .child(childName)
-                .child("filename")
-                .setValue(fileName)
-        }
-
-        fun removeWalkieTalkieAudioFirebase() {
-            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-            FirebaseDatabase.getInstance()
-                .getReference("walkie_talkie_audio")
-                .child(childName)
-                .child("filename")
-                .removeValue()
         }
 
         fun playWalkieTalkiAudio(context: Context, filename: String) {

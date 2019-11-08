@@ -27,6 +27,7 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -354,7 +355,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                         }
                                         if (visitors != null) {
                                             for (visitor in visitors) {
-                                                AppUtils.updateFirebaseColor(visitor.vlVisLgID)
+                                                updateFirebaseColor(visitor.vlVisLgID)
                                             }
                                         }
                                         dismissProgress()
