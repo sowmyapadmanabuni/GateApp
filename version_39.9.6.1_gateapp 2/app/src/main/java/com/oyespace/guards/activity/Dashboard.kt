@@ -75,6 +75,9 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocalYMD
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.addWalkieTalkieAudioFirebase
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeWalkieTalkieAudioFirebase
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.Utils.showToast
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -90,7 +93,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     ResponseHandler,
-    SGFingerPresentEvent, ValueEventListener {
+    SGFingerPresentEvent {
 
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
@@ -435,7 +438,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 //        }
 
 
-
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
 
         bSecuGenDeviceOpened = false
@@ -476,9 +478,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
-        walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("walkie_talkie_audio").child(fbdbAssocName)
+        walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("wt_audio").child(fbdbAssocName)
 
-        AppUtils.removeWalkieTalkieAudioFirebase()
+        removeWalkieTalkieAudioFirebase()
 
         walkieAudioFBRef.addChildEventListener(object : ChildEventListenerAdapter() {
 
@@ -491,7 +493,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                 if (filename != null && !filename.equals("null")) {
                     AppUtils.playWalkieTalkiAudio(this@Dashboard, filename)
-                    AppUtils.removeWalkieTalkieAudioFirebase()
+                    removeWalkieTalkieAudioFirebase()
                 }
             }
 
@@ -616,7 +618,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         }
         val ddc1 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-        Log.d("SYNC_STAFF_LIST", "af ")
         ddc1.putExtra(BSR_Action, SYNC_STAFF_LIST)
         sendBroadcast(ddc1)
 
@@ -776,14 +777,17 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             return
         }
 
-        showProgress("loading entry data...")
+        if (newAl == null || newAl!!.isEmpty()) {
+            tv_nodata.text = "fetching data..."
+            tv_nodata.visibility = View.VISIBLE
+        }
         VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
             override fun onFetch(visitorLog: ArrayList<VisitorLog>?, errorMessage: String?) {
 
                 // reset no data text
                 rv_dashboard!!.visibility = View.GONE
-                tv_nodata.visibility = View.VISIBLE
                 tv_nodata.text = "no data"
+                tv_nodata.visibility = View.VISIBLE
 
                 if (visitorLog != null) {
                     newAl = visitorLog
@@ -814,7 +818,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 } else {
                     Toast.makeText(this@Dashboard, errorMessage, Toast.LENGTH_SHORT).show()
                 }
-                dismissProgress()
 
             }
 
@@ -1038,7 +1041,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         mVerifyTemplate = null
         //        sgfplib.Close();
         //if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-            unregisterReceiver(mUsbReceiver)
+        unregisterReceiver(mUsbReceiver)
         //}
         val ddc2 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         Log.d("SYNC_UNIT_LIST", "af ")
@@ -1167,11 +1170,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         sgfplib!!.GetMaxTemplateSize(templateSize)
         val fpTemp = ByteArray(templateSize[0])
         val fpImg = ByteArray(mImageWidth * mImageHeight)
-        var code= 0L
+        var code = 0L
         try {
-            sgfplib!!.GetImageEx(fpImg,10000, 50)
-             code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
-        }catch (e:NullPointerException){
+            sgfplib!!.GetImageEx(fpImg, 10000, 50)
+            code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
+        } catch (e: NullPointerException) {
 
         }
         when (code) {
@@ -1935,7 +1938,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         call.enqueue(object : Callback<Any> {
             override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                 try {
-                    AppUtils.addWalkieTalkieAudioFirebase(response.body().toString())
+                    addWalkieTalkieAudioFirebase(response.body().toString())
 
                 } catch (ex: Exception) {
                     Log.d("uploadAudio 113", "errr:" + ex.toString())
@@ -2122,7 +2125,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID, assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
+            .subscribe(object : CommonDisposable<getVisitorDataByWorker>() {
 
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
 
@@ -2183,6 +2186,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                             val visitorLogID = globalApiObject.data.visitorLog.vlVisLgID
 
+                            updateFirebaseColor(visitorLogID, "#f0f0f0")
+
                             if (unitId.contains(",")) {
 
                                 var unitname_dataList: Array<String>
@@ -2197,7 +2202,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                                         .dropLastWhile({ it.isEmpty() })
                                         .toTypedArray()
                                 // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                                if (unitid_dataList.size > 0) {
+                                if (unitid_dataList.isNotEmpty()) {
                                     for (i in 0 until unitid_dataList.size) {
 
                                         val ddc = Intent(
@@ -2460,49 +2465,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             })
 
 
-    }
-
-    override fun onCancelled(p0: DatabaseError) {
-
-    }
-
-    override fun onDataChange(datasnapshot: DataSnapshot) {
-
-//        updateEntriesWithFBData(datasnapshot)
-
-    }
-
-    private fun updateEntriesWithFBData(datasnapshot: DataSnapshot) {
-        if (!showingOutLog) {
-            if (vistorEntryListAdapter != null) {
-
-                val firebasedataMap = HashMap<String, NotificationSyncModel>()
-                var refreshList: Boolean = false
-
-                for (h in datasnapshot.children) {
-                    try {
-                        val data = h.getValue(NotificationSyncModel::class.java)
-                        if (!refreshList) {
-                            refreshList = data?.newAttachment!!
-                        }
-                        if (data != null) {
-                            firebasedataMap.put(data.visitorlogId.toString(), data)
-                        }
-                    } catch (e: Exception) {
-                        Log.e("taaag", "crash at value ${h.value}")
-                        e.printStackTrace()
-                    }
-
-                }
-                //@Todo: @Pranay Remove this if unused
-               // vistorEntryListAdapter!!.setFirebaseDataHashmap(firebasedataMap)
-                if (refreshList) {
-                    loadEntryVisitorLog()
-                }
-
-            }
-
-        }
     }
 
 }

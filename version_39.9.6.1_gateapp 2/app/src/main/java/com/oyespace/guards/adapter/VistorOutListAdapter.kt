@@ -1,9 +1,7 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -98,7 +96,7 @@ class VistorOutListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
                 holder.iv_play.setOnClickListener {
-                    AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+                    AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
                 }
             }
 
@@ -174,11 +172,6 @@ class VistorOutListAdapter(
 
         }
 
-        if (orderData.vlMobile.length > 5) {
-            holder.iv_call.visibility = View.VISIBLE
-        } else {
-            holder.iv_call.visibility = View.INVISIBLE
-        }
         try {
             number = orderData.vlMobile.substring(3)
             //  number = orderData.vlMobile
@@ -251,13 +244,6 @@ class VistorOutListAdapter(
             alertadd.setView(view)
             alertadd.show()
 
-        }
-
-        holder.iv_call.setOnClickListener {
-
-            val intent = Intent(Intent.ACTION_CALL)
-            intent.data = Uri.parse("tel:" + orderData.vlMobile)
-            mcontext.startActivity(intent)
         }
 
         holder.expanded_view.visibility = View.GONE

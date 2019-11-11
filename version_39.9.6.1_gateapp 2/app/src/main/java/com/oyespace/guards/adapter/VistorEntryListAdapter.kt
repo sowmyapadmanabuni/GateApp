@@ -1,9 +1,8 @@
 package com.oyespace.guards.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,6 +36,11 @@ class VistorEntryListAdapter(
     private val mcontext: Context
 ) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
 
+    val ACCEPTED_COLOR = "#75be6f"
+    val REJECTED_COLOR = "#ff0000"
+    val PENDING_COLOR = "#ffb81a"
+    val TIMEUP_COLOR = "#ff0000"
+
     private var searchList: ArrayList<VisitorLog>? = null
     var number: String? = null
     var mobnumber: String? = null
@@ -44,13 +48,21 @@ class VistorEntryListAdapter(
     val timerHashMap: HashMap<String, TimerUtil>
     var notificationSyncFBRef: DatabaseReference
     var fbdbAssocName: String
-    var imgPath:String?=null
+    var imgPath: String? = null
 
     init {
         this.searchList = visitorList
         timerHashMap = hashMapOf()
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
         notificationSyncFBRef = FirebaseDatabase.getInstance().getReference("NotificationSync").child(fbdbAssocName)
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return try {
+            searchList?.get(position)?.vlVisLgID!!
+        } catch (e: java.lang.Exception) {
+            return position
+        }
     }
 
     internal var animBlink: Animation =
@@ -62,136 +74,65 @@ class VistorEntryListAdapter(
         return MenuHolder(mainGroup)
     }
 
+    override fun onViewAttachedToWindow(holder: MenuHolder) {
+        super.onViewAttachedToWindow(holder)
+        if (holder.isAnimating) {
+            holder.ll_card.startAnimation(animBlink)
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
     override fun onBindViewHolder(holder: MenuHolder, p: Int) {
 
-//        holder.setIsRecyclable(false)
-//
         val position = holder.adapterPosition
 
-        var visitor: VisitorLog? = null
+        val visitor: VisitorLog?
         try {
-            visitor = searchList!!.get(position)
+            visitor = searchList!![position]
         } catch (e: Exception) {
+            e.printStackTrace()
             return
         }
 
-        Log.i("taaag", "refreshed IN list element")
         if (visitor.isValid) {
             val vlLogId = visitor.vlVisLgID.toString()
-            holder.apartmentNamee.text = visitor.unUniName
+            val unitName = visitor.unUniName
+            val unitID = visitor.uNUnitID
+            Log.v("taaag", "refreshed IN list element at $position for vlID: $vlLogId unit: $unitName ($unitID)")
+            holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId)" else unitName
             holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
             holder.entrydate.text = formatDateDMY(visitor.vldCreated)
+
+
             if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
                 holder.exitTime.text = ""
                 holder.btn_makeexit.visibility = View.VISIBLE
-
-                val venImg = visitor.vlVenImg
-                val voiceNote = visitor.vlVoiceNote
-                val cmnts = visitor.vlCmnts
+                val fbEventListener = FBValueEventListener(visitor, holder)
 
                 updateAttachments(visitor, holder)
 
-                if (visitor.vlVisType.equals(DELIVERY)) {
+                val type = visitor.vlVisType
+                when (type) {
 
-                    notificationSyncFBRef.child(visitor.vlVisLgID.toString()).addValueEventListener(object : ValueEventListener {
-
-                        override fun onCancelled(p0: DatabaseError) {}
-
-                        override fun onDataChange(dataSnapshot: DataSnapshot) {
-
-                            val firebaseObject = dataSnapshot.getValue(NotificationSyncModel::class.java)
-                            val fbColor = firebaseObject?.buttonColor?.toLowerCase()
-                            try {
-                                holder.ll_card.setBackgroundColor(Color.parseColor(fbColor))
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                            }
-
-                            val entryTime = firebaseObject?.updatedTime
-                            val msLeft: Long
-                            var timeupCallback: TimerUtil.OnFinishCallback? = null
-                            if (firebaseObject?.newAttachment != null) {
-                                if (firebaseObject.newAttachment) {
-
-                                    if (venImg.isEmpty() and voiceNote.isEmpty() and cmnts.isEmpty()) {
-                                        VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
-                                            override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                                val v = VisitorLogRepo.get_IN_VisitorForVisitorId(vlLogId)
-                                                updateAttachments(v!!, holder)
-                                            }
-
-                                        })
-                                    } else {
-                                        updateAttachments(visitor, holder)
-                                    }
-                                }
-                            }
-                            when (fbColor) {
-                                "#00ff00", "#75be6f" -> {// accepted by resident, start timer for 7 * noofAcceptedUnits to overstay
-                                    holder.btn_makeexit.visibility = View.VISIBLE
-                                    msLeft = msLeft(entryTime, MAX_DELIVERY_ALLOWED_SEC)
-                                    if (msLeft < 0) {// time is up
-                                        holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
-                                        holder.ll_card.startAnimation(animBlink)
-                                        holder.btn_makeexit.visibility = View.VISIBLE
-                                    } else {
-                                        timeupCallback = object : TimerUtil.OnFinishCallback {
-                                            override fun onFinish() {
-                                                holder.ll_card.setBackgroundColor(Color.parseColor("#ff0000"))
-                                                holder.ll_card.startAnimation(animBlink)
-                                                Handler().post {
-                                                    searchList = VisitorLogRepo.get_IN_VisitorLog(false)
-                                                    if (searchList != null) {
-                                                        visitorList = searchList!!
-                                                    }
-                                                    notifyDataSetChanged()
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                "#ff0000" -> {// rejected by resident, start timer for 4hrs to remove
-                                    holder.btn_makeexit.visibility = View.INVISIBLE
-                                    msLeft = 4 * 60 * 60 * 1000
-                                    timeupCallback = object : TimerUtil.OnFinishCallback {
-                                        override fun onFinish() {
-                                            // TODO remove the entry
-                                        }
-                                    }
-                                }
-                                else -> {// pending, start timer for 24hrs to remove
-//                                    holder.btn_makeexit.visibility = View.INVISIBLE
-                                    msLeft = 24 * 60 * 60 * 1000
-                                    timeupCallback = object : TimerUtil.OnFinishCallback {
-                                        override fun onFinish() {
-
-                                            holder.btn_makeexit.visibility = View.GONE
-                                            // TODO don't exit, just remove entry
-                                            exitVisitor(vlLogId, position)
-
-                                        }
-                                    }
-                                }
-                            }
-
-                            Log.i("taaag", "ms left: $msLeft")
-                            if (timerHashMap.contains(vlLogId)) {
-
-                                timerHashMap[vlLogId]?.cancel()
-                                timerHashMap.replace(vlLogId, TimerUtil(msLeft, timeupCallback))
-
-                            } else {
-                                timerHashMap[vlLogId] = TimerUtil(msLeft, timeupCallback)
-                            }
-                            timerHashMap[vlLogId]?.start()
-
-                        }
-
-                    })
-
-
+                    DELIVERY -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                    STAFF -> {
+                        notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                        holder.btn_makeexit.visibility = View.VISIBLE
+                    }
+                    else -> {
+                        holder.btn_makeexit.visibility = View.VISIBLE
+                        Log.d("taaag", "fb child listener not attached")
+                    }
                 }
 
+                if (debug) {
+                    holder.btn_makeexit.visibility = View.VISIBLE
+                }
+                holder.btn_makeexit.setOnClickListener {
+                    holder.btn_makeexit.visibility = View.GONE
+                    notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
+                    exitVisitor(vlLogId, position)
+                }
 
             } else {
                 holder.exitTime.text = formatDateHM(visitor.vlExitT)
@@ -205,29 +146,8 @@ class VistorEntryListAdapter(
             holder.serviceProvider.text = visitor.vlComName + ", Visitors: " + visitor.vlVisCnt
             holder.visitorName.text = visitor.vlfName
 
-            holder.btn_makeexit.setOnClickListener {
-                holder.btn_makeexit.visibility = View.GONE
-                exitVisitor(vlLogId, position)
-            }
 
-            if (visitor.vlMobile.length > 5) {
-                holder.iv_call.visibility = View.VISIBLE
-            } else {
-                holder.iv_call.visibility = View.INVISIBLE
-            }
-            try {
-
-
-                number = visitor.vlMobile.substring(3)
-
-
-            } catch (e: StringIndexOutOfBoundsException) {
-            }
-
-
-
-
-            if (visitor.vlVisType.equals("STAFF", true)) {
+            if (visitor.vlVisType.equals(STAFF, true)) {
                 if (visitor.vlEntryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
@@ -260,7 +180,7 @@ class VistorEntryListAdapter(
                 // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
-                if (visitor.vlVisType.equals("STAFF", true)) {
+                if (visitor.vlVisType.equals(STAFF, true)) {
 
                     if (visitor.vlEntryImg.equals("")) {
                         Picasso.with(mcontext)
@@ -268,7 +188,6 @@ class VistorEntryListAdapter(
                             .placeholder(R.drawable.user_icon_black)
                             .error(R.drawable.user_icon_black)
                             .into(dialog_imageview)
-
 
 
                     } else {
@@ -282,6 +201,11 @@ class VistorEntryListAdapter(
                     }
 
                 } else {
+
+                    try {
+                        number = visitor.vlMobile.substring(3)
+                    } catch (e: StringIndexOutOfBoundsException) {
+                    }
 
                     if (visitor.vlEntryImg.equals("")) {
                         Picasso.with(mcontext)
@@ -312,17 +236,11 @@ class VistorEntryListAdapter(
                 holder.iv_play.visibility = View.VISIBLE
             }
             holder.iv_play.setOnClickListener {
-                AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+                AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
             }
 
             holder.tv_comments.text = visitor.vlCmnts
 
-            holder.iv_call.setOnClickListener {
-
-                val intent = Intent(Intent.ACTION_CALL)
-                intent.data = Uri.parse("tel:" + visitor.vlMobile)
-                mcontext.startActivity(intent)
-            }
             holder.expanded_view.visibility = View.GONE
 
         }
@@ -331,7 +249,8 @@ class VistorEntryListAdapter(
     }
 
     private fun updateAttachments(visitor: VisitorLog, holder: MenuHolder) {
-        Log.i("taaag", "updating attachmetns")
+        Log.v("taaag", "updating attachmetns")
+
         if (visitor.vlVenImg.isEmpty() and visitor.vlVoiceNote.isEmpty() and visitor.vlCmnts.isEmpty()) {
             holder.iv_attachment.visibility = View.GONE
             holder.expanded_view.visibility = View.GONE
@@ -350,7 +269,7 @@ class VistorEntryListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
                 holder.iv_play.setOnClickListener {
-                    AppUtils.playAudio(mcontext, visitor.vlVoiceNote)
+                    AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
                 }
             }
 
@@ -367,8 +286,7 @@ class VistorEntryListAdapter(
 
                 holder.rv_images.visibility = View.VISIBLE
                 if (visitor.vlVenImg.contains(",")) {
-                    var imageList: Array<String>
-                    imageList = visitor.vlVenImg.split(",".toRegex())
+                    val imageList: Array<String> = visitor.vlVenImg.split(",".toRegex())
                         .dropLastWhile { it.isEmpty() }.toTypedArray()
 
 
@@ -382,24 +300,23 @@ class VistorEntryListAdapter(
 
     private fun exitVisitor(vlLogId: String, position: Int) {
 
+        val lgid = vlLogId.toInt()
+        deleteEntryFromList(lgid, position, false)
+        VisitorLogRepo.exitVisitor(mcontext, lgid)
+
+    }
+
+    private fun deleteEntryFromList(lgid: Int, position: Int, updateSearchList: Boolean = true) {
         try {
-            val lgid = vlLogId.toInt()
-            VisitorLogRepo.exitVisitor(mcontext, lgid)
+            if (updateSearchList) {
+                searchList?.removeAt(position)
+                notifyItemRemoved(position)
+            }
             timerHashMap[lgid.toString()]?.cancel()
             timerHashMap.remove(lgid.toString())
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        try {
-            searchList?.removeAt(position)
-            notifyItemRemoved(position)
-            notifyDataSetChanged()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-
     }
 
     override fun getItemCount(): Int {
@@ -435,6 +352,7 @@ class VistorEntryListAdapter(
         val tv_comments: TextView
         val iv_attachment: ImageView
 
+        var isAnimating: Boolean = false
 
         init {
             entryTime = view.findViewById(R.id.tv_entrytime)
@@ -471,6 +389,144 @@ class VistorEntryListAdapter(
 
         searchList = VisitorLogRepo.search_IN_Visitors(search)
         notifyDataSetChanged()
+
+    }
+
+    inner class FBValueEventListener(val visitor: VisitorLog, var holder: MenuHolder) : ValueEventListener {
+
+        val vlLogId: String = visitor.vlVisLgID.toString()
+        val venImg = visitor.vlVenImg
+        val voiceNote = visitor.vlVoiceNote
+        val cmnts = visitor.vlCmnts
+        var entryTime = visitor.vlEntryT
+        var visitorType = visitor.vlVisType
+
+        override fun onCancelled(p0: DatabaseError) {}
+
+        override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+            val firebaseObject = dataSnapshot.getValue(NotificationSyncModel::class.java)
+
+            if (firebaseObject != null) {
+
+                var msLeft: Long = 0
+                when (visitorType) {
+                    DELIVERY -> {
+                        var timeupCallback: () -> Unit = {}
+
+                        holder.isAnimating = false
+                        holder.ll_card.clearAnimation()
+
+                        val fbColor = firebaseObject.buttonColor.toLowerCase()
+                        entryTime = if (dataSnapshot.hasChild("updatedTime")) {
+                            firebaseObject.updatedTime
+                        } else {
+                            visitor.vlEntryT
+                        }
+
+                        try {
+                            holder.ll_card.setBackgroundColor(Color.parseColor(fbColor))
+                        } catch (e: Exception) {
+                            if (ACCEPTED_COLOR.contains(fbColor)) {
+                                holder.ll_card.setBackgroundColor(Color.parseColor(PENDING_COLOR))
+                            } else if (REJECTED_COLOR.contains(fbColor)) {
+                                holder.ll_card.setBackgroundColor(Color.parseColor(REJECTED_COLOR))
+                            } else {
+                                holder.ll_card.setBackgroundColor(Color.parseColor(PENDING_COLOR))
+                            }
+                            e.printStackTrace()
+                        }
+
+
+                        checkForAttachments(firebaseObject)
+
+                        when (fbColor) {
+                            "#00ff00",
+                            ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
+                                holder.btn_makeexit.visibility = View.VISIBLE
+                                msLeft = msLeft(entryTime, MAX_DELIVERY_ALLOWED_SEC)
+                                if (msLeft < 0) {// time is up
+                                    holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
+                                    holder.isAnimating = true
+                                    holder.ll_card.startAnimation(animBlink)
+                                    holder.btn_makeexit.visibility = View.VISIBLE
+                                } else {
+                                    timeupCallback = {
+                                        Handler().post {
+                                            VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                                                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+                                                    searchList = visitorLog
+                                                    if (visitorLog != null) {
+                                                        visitorList = visitorLog
+                                                    }
+                                                    notifyDataSetChanged()
+                                                }
+
+                                            })
+                                        }
+                                    }
+                                }
+                            }
+                            REJECTED_COLOR -> {// rejected by resident, start timer for 4hrs to remove
+                                holder.btn_makeexit.visibility = View.INVISIBLE
+                                msLeft = msLeft(entryTime, 4 * 60 * 60)// 4 hrs
+                                timeupCallback = {
+                                    deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
+                                }
+
+                            }
+                            else -> {// pending, start timer for 24hrs to remove, hide exit button
+                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
+                                msLeft = msLeft(entryTime, 24 * 60 * 60)// 24 hrs
+                                timeupCallback = {
+                                    deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
+                                }
+                            }
+                        }
+
+                        if (timerHashMap.contains(vlLogId)) {
+
+                            timerHashMap[vlLogId]?.cancel()
+                            timerHashMap.replace(vlLogId, TimerUtil(msLeft, timeupCallback))
+
+                        } else {
+                            timerHashMap[vlLogId] = TimerUtil(msLeft, timeupCallback)
+                        }
+                        timerHashMap[vlLogId]?.start()
+                    }
+                    STAFF -> {
+                        holder.btn_makeexit.visibility = View.VISIBLE
+                        checkForAttachments(firebaseObject)
+                    }
+                }
+
+                try {
+                    Log.i("taaag", "vlID: $vlLogId, time: $entryTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
+                } catch (ignored: IllegalStateException) {
+                }
+
+
+            }
+
+        }
+
+        private fun checkForAttachments(firebaseObject: NotificationSyncModel) {
+            if (firebaseObject.newAttachment) {
+
+                if (venImg.isEmpty() and voiceNote.isEmpty() and cmnts.isEmpty()) {
+                    VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                        override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+                            val v = VisitorLogRepo.get_IN_VisitorForVisitorId(vlLogId)
+                            updateAttachments(v!!, holder)
+                        }
+
+                    })
+                } else {
+                    updateAttachments(visitor, holder)
+                }
+
+            }
+        }
 
     }
 

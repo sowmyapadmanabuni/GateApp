@@ -24,7 +24,7 @@ public class VisitorExitLogRealm {
                     realm.beginTransaction();
                 }
                 realm.delete(ExitVisitorLog.class);
-                Log.i("taaag", "about to put " + visitorsList.size() + " objects in realm on Thread: " + Thread.currentThread().getName());
+                Log.d("taaag", "about to put " + visitorsList.size() + " objects in realm on Thread: " + Thread.currentThread().getName());
                 visitorsList.sort((rhs, lhs) -> (DateTimeUtils.formatDateDMY(lhs.getVldUpdated()) + " " + (lhs.getVlExitT()).replace(
                         "1900-01-01T",
                         ""

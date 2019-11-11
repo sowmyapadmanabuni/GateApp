@@ -33,6 +33,7 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.NumberUtils.toInteger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -346,6 +347,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                             vlog.vlEntryT = getCurrentTimeLocal()
                             realm.commitTransaction()
 
+                            updateFirebaseColor(visitorLogID, "#f0f0f0")
 
                             for (i in list.indices) {
                                 val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
@@ -824,7 +826,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
                 override fun onErrorResponse(e: Throwable) {
 
-                    visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID),intent.getStringExtra(UNIT_ACCOUNT_ID));
+                    visitorLog(intent.getStringExtra(UNITNAME), intent.getStringExtra(UNITID), intent.getStringExtra(UNIT_ACCOUNT_ID))
 
 
                 }

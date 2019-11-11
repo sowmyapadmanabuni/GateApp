@@ -15,9 +15,9 @@ import com.oyespace.guards.pojo.VisitorExitResp
 import com.oyespace.guards.pojo.VisitorLogResponse
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
-import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.DateTimeUtils
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -32,7 +32,7 @@ class VisitorLogRepo {
         fun get_IN_VisitorLog(
             updatedFromBackend: Boolean = false,
             listener: VisitorLogFetchListener? = null
-        ): ArrayList<com.oyespace.guards.models.VisitorLog>? {
+        ): ArrayList<VisitorLog>? {
 
             if (updatedFromBackend) {
                 RetrofitClinet.instance
@@ -108,25 +108,36 @@ class VisitorLogRepo {
 
         fun getOverstaySortedList(): ArrayList<VisitorLog>? {
 
-            Log.i("taaag", "getting visitorLog from realm")
-            return VisitorEntryLogRealm.getVisitorEntryLog()
-//            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
+            val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
 
-//            val overStaying = ArrayList<VisitorLog>()
-//            val underStaying = ArrayList<VisitorLog>()
-//
-//            for (vl in listFromRealm) {
-//                // TODO change entry time to accepted one
-//                val msLeft = DateTimeUtils.msLeft(vl.vlEntryT, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
-//                if (msLeft <= 0) {
-//                    overStaying.add(vl)
-//                } else {
-//                    underStaying.add(vl)
-//                }
-//            }
-//
-//            overStaying.addAll(underStaying)
-//            return overStaying
+            val overStaying = ArrayList<VisitorLog>()
+            val underStaying = ArrayList<VisitorLog>()
+
+            for (vl in listFromRealm) {
+
+                val actTime = vl.vlsActTm
+                val status = vl.vlApprStat
+
+                if (status.equals("pending", true)) {
+                    underStaying.add(vl)
+                } else {
+                    val msLeft = DateTimeUtils.msLeft(actTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
+                    Log.v("taaag", "vlID: ${vl.vlVisLgID} actTIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
+                    if (msLeft <= 0) {
+                        if (status.equals("approved", true)) {
+                            overStaying.add(vl)
+                            Log.v("taaag", "overstaying: ${vl.vlVisLgID} actIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
+                        }
+                    } else {
+                        underStaying.add(vl)
+                    }
+                }
+
+
+            }
+            Log.d("taaag", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
+            overStaying.addAll(underStaying)
+            return overStaying
 
         }
 
@@ -146,10 +157,11 @@ class VisitorLogRepo {
 
                             if (globalApiObject.success) {
 
-                                // update exit log from backend
-                                delete_IN_Visitor(vLogId)
+                                removeFBNotificationSyncEntry(vLogId)
 
-                                AppUtils.removeFBNotificationSyncEntry(vLogId)
+                                var s = Prefs.getString(ConstantUtils.SP_DEL_FB_IDs, "")
+                                s += "$vLogId,"
+                                Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
                                 val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
                                 intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
@@ -248,11 +260,46 @@ class VisitorLogRepo {
 
         }
 
+        fun exitYesterdaysINEntries() {
+
+            // TODO work on this
+
+        }
+
+        fun allowEntry(ccd: String?, mobileNumber: String?): Boolean {
+
+
+            val entryExists = check_IN_VisitorByPhone(ccd + mobileNumber)
+
+            if (entryExists) {
+
+                if (mobileNumber != null) {
+
+                    val visitorLog = get_IN_VisitorsForPhone(mobileNumber)
+
+                    if (visitorLog != null) {
+                        for (v in visitorLog) {
+
+                            if (v.vlApprStat.equals("Approved", true)) {
+                                return false
+                            }
+
+                        }
+                    }
+
+                }
+
+            }
+
+            return true
+
+        }
+
     }
 
     interface VisitorLogFetchListener {
 
-        fun onFetch(visitorLog: ArrayList<com.oyespace.guards.models.VisitorLog>?, error: String? = "")
+        fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String? = "")
 
     }
 

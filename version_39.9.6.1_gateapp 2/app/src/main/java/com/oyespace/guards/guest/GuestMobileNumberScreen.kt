@@ -76,11 +76,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             R.id.btn_nobalance->{
 
                 val d = Intent(this@GuestMobileNumberScreen, GuestMobileNumberScreenwithOTP::class.java)
-                d.putExtra(UNITID, intent.getStringExtra(UNITID))
-                d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                d.putExtras(intent)
                 startActivity(d)
                 finish()
 
@@ -255,7 +251,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
        // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,""))
 
-        Log.d("intentdata MobileNumber", "" + getIntent().getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID));
+        Log.d("intentdata MobileNumber", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID))
 
         btn_mic.setOnClickListener {
             Speak()
@@ -379,7 +375,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
             }).withErrorListener(object : PermissionRequestErrorListener {
 
                 override fun onError(error: DexterError) {
-                    Toast.makeText(getApplicationContext(), "Error occurred! ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(applicationContext, "Error occurred! ", Toast.LENGTH_SHORT).show()
                 }
             })
             .onSameThread()

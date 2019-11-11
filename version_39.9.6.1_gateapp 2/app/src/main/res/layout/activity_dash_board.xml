@@ -306,6 +306,8 @@
                     android:id="@+id/rv_dashboard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingBottom="150dp"
 
             />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

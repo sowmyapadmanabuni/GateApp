@@ -862,6 +862,10 @@ class GuestMobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
         }
 
+        val btn_cancel = dialogs!!.findViewById(R.id.btn_cancel) as Button
+        btn_cancel.setOnClickListener {
+            dialogs!!.dismiss()
+        }
         dialogs!!.show()
 
     }

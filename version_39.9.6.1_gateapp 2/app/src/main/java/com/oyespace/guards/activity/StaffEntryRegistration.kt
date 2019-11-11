@@ -27,13 +27,14 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.NumberUtils.toInteger
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import java.io.File
 import java.util.*
+import kotlin.collections.ArrayList
 
 class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
@@ -312,72 +313,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         if (globalApiObject.success) {
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
-                            Log.i("taaag", "saving... $vlid for entryTime: ${getCurrentTimeLocal()}")
+                            Log.v("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
 
-                            val vlog = VisitorLog()
-                            vlog.vlVisLgID = vlid
-                            vlog.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
-                            vlog.mEMemID = globalApiObject.data.visitorLog.meMemID
-                            vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
-                            vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
-                            vlog.vlfName = intent.getStringExtra(PERSONNAME)
-                            vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
-                            vlog.vlComName = intent.getStringExtra(COMPANY_NAME)
-                            vlog.vlVisType = intent.getStringExtra(VISITOR_TYPE)
-                            vlog.unUniName = intent.getStringExtra(UNITNAME)
-                            vlog.vlVisCnt = 1
-                            vlog.vlEntryT = getCurrentTimeLocal()
-                            visitorsList.add(vlog)
-
-
-//                            VisitorEntryLogRealm.addVisitorEntries(
-//                                vlid,
-//                                Prefs.getInt(ASSOCIATION_ID, 0),
-//                                memID,
-//                                vlid,
-//                                toInteger(intent.getStringExtra(UNITID)),
-//                                intent.getStringExtra(PERSONNAME),
-//                                intent.getStringExtra(MOBILENUMBER),
-//                                intent.getStringExtra(COMPANY_NAME),
-//                                intent.getStringExtra(VISITOR_TYPE),
-//                                intent.getStringExtra(UNITNAME),
-//                                1,
-//                                getCurrentTimeLocal(),
-//                                object : VisitorEntryLogRealm.VisitorEntryListener {
-//                                    override fun onEntrySave(visitorId: Int, success: Boolean) {
-//
-////                                        updateFirebaseColor(visitorId.toString(), "#00FF00")
-//                                        count--
-//                                        Log.i("taaag", "count $count")
-//                                        if (count <= 0) {
-//
-//                                            for (i in list.indices) {
-//                                                val fileName = list[i].substring(list[i].lastIndexOf("/") + 1)
-//                                                val dir = Environment.getExternalStorageDirectory().path
-//                                                val file = File(dir, fileName)
-//                                                file.delete()
-//                                            }
-//
-//                                            val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-//                                            deleteDir(dir.absolutePath)
-//
-//                                            uploadImage(imgName, mBitmap)
-//
-//                                            val visitors = VisitorLogRepo.get_IN_VisitorsForPhone(intent.getStringExtra(MOBILENUMBER))
-//                                            if (visitors != null) {
-//                                                for (visitor in visitors) {
-//                                                    updateFirebaseColor(visitor.vlVisLgID.toString(), "#ff00ff")
-//                                                }
-//                                            }
-//
-//                                            dismissProgress()
-//                                            finish()
-//                                        }
-//
-//                                    }
-//
-//                                }
-//                            )
 
                             val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
                             d.putExtra(BSR_Action, VisitorEntryFCM)
@@ -395,7 +332,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             sendBroadcast(d)
 
                             count--
-                            Log.i("taaag", "count $count")
+                            Log.v("taaag", "count $count")
                             if (count <= 0) {
 
                                 for (i in list.indices) {
@@ -410,8 +347,23 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
                                 uploadImage(imgName, mBitmap)
 
-                                dismissProgress()
-                                finish()
+                                VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                                    override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+                                        val visitors = VisitorLogRepo.get_IN_VisitorsForPhone(intent.getStringExtra(MOBILENUMBER))
+                                        if (debug) {
+                                            Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
+                                        }
+                                        if (visitors != null) {
+                                            for (visitor in visitors) {
+                                                updateFirebaseColor(visitor.vlVisLgID)
+                                            }
+                                        }
+                                        dismissProgress()
+                                        finish()
+
+                                    }
+                                })
+
 
                             }
 
@@ -423,11 +375,17 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     }
 
                     override fun onErrorResponse(e: Throwable) {
+                        dismissProgress()
+                        button_done.isEnabled = true
+                        button_done.isClickable = true
                         Utils.showToast(applicationContext, getString(R.string.some_wrng) + e.toString())
                         Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
                     }
 
                     override fun noNetowork() {
+                        dismissProgress()
+                        button_done.isEnabled = true
+                        button_done.isClickable = true
                         Utils.showToast(applicationContext, getString(R.string.no_internet))
                     }
 
@@ -490,17 +448,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     }
                 })
         )
-    }
-
-    override fun onStop() {
-        super.onStop()
-        val visitors = VisitorLogRepo.get_IN_VisitorsForPhone(intent.getStringExtra(MOBILENUMBER))
-        Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
-        if (visitors != null) {
-            for (visitor in visitors) {
-                AppUtils.updateFirebaseColor(visitor.vlVisLgID)
-            }
-        }
     }
 
     fun setLocale(lang: String?) {
