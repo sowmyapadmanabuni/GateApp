@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -28,6 +29,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
@@ -67,6 +70,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -90,13 +95,14 @@ import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_HIDDEN_SELFIE;
 import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
 import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
 
-public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void>, View.OnClickListener {
+public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void>, View.OnClickListener, OnLocationUpdate {
 
     public LocationService locationService;
     public Location mLocation, mPredictedLocation;
     public TextToSpeech toSpeech;
     private Button mPauseBtn, mStopBtn;
-    private TextView mScanTitle;
+    private TextView mScanTitle, mAccuracyText, mSatellitesText, mLocationTimeText;
+    private ImageView mGPSIcon;
     public int scheduleId;
     static final float GEOFENCE_RADIUS_IN_METERS = 40;
     private static final String PACKAGE_NAME = "com.google.android.gms.location.Geofence";
@@ -111,7 +117,19 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private int mActiveSchedule = 0;
     private boolean isPlayingSiren = false;
     ArrayList<ScheduleCheckPointsData> scheduleCheckPoints = new ArrayList<ScheduleCheckPointsData>();
+    private GPSTracker gpsTracker;
+    private Timer gpsTimeTimer;
+    private long currentLocationAge = 0;
+    private float currentLocationAccuracy = 0;
+    private int currentSatelliteCount = 0;
 
+
+    @Override
+    public void onGPSLocationUpdate(Location location) {
+        mPredictedLocation = location;
+        mLocation = location;
+        setSatellitesAccuracy();
+    }
 
 
     private enum PendingGeofenceTask {
@@ -164,7 +182,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         if(wrrw != null){
             //Log.e("IMAGE_CAPTURED",""+wrrw);
         }
-
+        mAccuracyText = findViewById(R.id.text_accuracy);
+        mSatellitesText = findViewById(R.id.text_satellites);
+        mLocationTimeText = findViewById(R.id.text_location_time);
+        mGPSIcon = findViewById(R.id.gps_stat);
         mPauseBtn = findViewById(R.id.btn_pause);
         mStopBtn = findViewById(R.id.btn_stop);
         mStopBtn.setVisibility(View.GONE);
@@ -205,6 +226,54 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 setNextCheckPointLabel();
             }
         });
+    }
+
+    private long setLocationTime(){
+        long age = getLocationAge(mPredictedLocation)/1000;
+        currentLocationAge = age;
+        currentLocationAccuracy = getAccuracy(mPredictedLocation);
+        currentSatelliteCount = getAvailableSatellites(mPredictedLocation);
+
+        String ageString = ""+age+" seconds";
+        if(age>60){
+            long ageMinutes = age/60;
+            ageString = ""+ageMinutes+" minutes";
+        }
+        mLocationTimeText.setText("Same location for "+ageString);
+        if(age == 15 || age == 30){
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(PatrollingLocActivity.this,"Requesting GPS location",Toast.LENGTH_SHORT).show();
+                    gpsTracker.getLocation();
+                }
+            });
+
+
+        }
+        return age;
+    }
+    private void setSatellitesAccuracy(){
+        try {
+            setLocationTime();
+            //int satellites = getAvailableSatellites(mPredictedLocation);
+            //float accuracy = getAccuracy(mPredictedLocation);
+
+            mSatellitesText.setText("Satellites: " + currentSatelliteCount);
+            mAccuracyText.setText("Accuracy: " + currentLocationAccuracy + "m");
+            ;
+
+            if (currentSatelliteCount > 3 && currentLocationAccuracy < 8 && currentLocationAge < 15) {
+                //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_online));
+                Glide.with(this).load(R.drawable.gps_online).into(mGPSIcon);
+            } else {
+                Glide.with(this).load(R.drawable.gps_offline).into(mGPSIcon);
+                //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_offline));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
     }
 
     private void setNextCheckPointLabel(){
@@ -261,6 +330,24 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         }
     }
 
+    private long getLocationAge(Location newLocation) {
+        long locationAge;
+        if (Build.VERSION.SDK_INT >= 17) {
+            long currentTimeInMilli = SystemClock.elapsedRealtimeNanos() / 1000000;
+            long locationTimeInMilli = newLocation.getElapsedRealtimeNanos() / 1000000;
+            locationAge = currentTimeInMilli - locationTimeInMilli;
+        } else {
+            locationAge = System.currentTimeMillis() - newLocation.getTime();
+        }
+        return locationAge;
+    }
+
+    private int getAvailableSatellites(Location newLocation) {
+        return newLocation.getExtras().getInt("satellites",0);
+    }
+    private float getAccuracy(Location newLocation) {
+        return newLocation.getAccuracy();
+    }
 
     private void checkDrawOverWindowPermission(){
         if (Build.VERSION.SDK_INT >= 23) {
@@ -462,9 +549,11 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         final Intent serviceStart = new Intent(this.getApplication(), LocationService.class);
         this.getApplication().startService(serviceStart);
         this.getApplication().bindService(serviceStart, serviceConnection, Context.BIND_AUTO_CREATE);
-
-        mLocation = new GPSTracker(this).getLocation();
+        gpsTracker = new GPSTracker(this,this::onGPSLocationUpdate);
+        mLocation = gpsTracker.getLocation();
         mPredictedLocation = mLocation;
+        setSatellitesAccuracy();
+        startLocationTimeCheck();
 
         locationUpdateReceiver = new BroadcastReceiver() {
             @Override
@@ -472,10 +561,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 Location newLocation = intent.getParcelableExtra("location");
                 //Log.e("newLocation", "" + newLocation);
                 //Log.e("mPredictedLocation", "" + mPredictedLocation);
-                if (mPredictedLocation == null) {
-                    mPredictedLocation = newLocation;
-                }
-                mLocation = newLocation;
+//                if (mPredictedLocation == null) {
+//                    mPredictedLocation = newLocation;
+//                }
+//                mLocation = newLocation;
                 //loc.setText(""+newLocation.getLatitude()+" , "+newLocation.getLongitude()+", Acc: "+newLocation.getAccuracy());
             }
         };
@@ -485,7 +574,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             public void onReceive(Context context, Intent intent) {
                 Location predictedLocation = intent.getParcelableExtra("location");
                 //Log.e("predictedLocation", "" + predictedLocation);
-                mPredictedLocation = predictedLocation;
+//                mPredictedLocation = predictedLocation;
+//                setSatellitesAccuracy();
                 //drawPredictionRange(predictedLocation);
 
             }
@@ -512,6 +602,25 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             }
         };
         contentFrame.addView(mScannerView);
+    }
+
+    private void startLocationTimeCheck(){
+        try {
+            if (mPredictedLocation != null) {
+                if(gpsTimeTimer == null) {
+                    gpsTimeTimer = new Timer();
+                }
+                gpsTimeTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        setLocationTime();
+                    }
+
+                }, 0, 1000);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void initSpeech() {
@@ -589,12 +698,35 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             //Log.e("mCurrentAssociation", "" + mCurrentAssociation);
 
             if (mCurrentAssociation != 0 && mCurrentAssociation == mCPAssociation) {
+                //gpsTracker.getLocation();
+                //long age = getLocationAge(mPredictedLocation);
+                //int satellites = getAvailableSatellites(mPredictedLocation);
+                //float accuracy = getAccuracy(mPredictedLocation);
+                //setSatellitesAccuracy();
+                if(currentSatelliteCount > 3) {
+                    if(currentLocationAccuracy < 8){
+                        if (currentLocationAge < 15) {
+                            if (isValidCheckPoint(qrCheckpoint)) {
 
-                if (isValidCheckPoint(qrCheckpoint)) {
 
-
-                } else {
-                   // showAnimatedDialog("Invalid QR Code.", R.raw.error, true, "OK");
+                            } else {
+                                // showAnimatedDialog("Invalid QR Code.", R.raw.error, true, "OK");
+                            }
+                        }else{
+                            showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
+                            gpsTracker.getLocation();
+                        }
+                    } else {
+                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
+                        gpsTracker.getLocation();
+                    }
+                }else{
+                    String msg = "No Satellites found. Unable to calculate location";
+                    if(currentSatelliteCount > 0){
+                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+                    }
+                    showAnimatedDialog(msg, R.raw.error, true, "OK");
+                    gpsTracker.getLocation();
                 }
 
             } else {
@@ -770,6 +902,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         float result = calculateDistance(mCPLatitude, mCPLongitude);
         //return true;
         //Log.e("DISTANCE_LOC",""+result);
+        //Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
         return result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
     }
 
@@ -777,8 +910,15 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         float[] results = new float[2];
         //calculateWifiSignalWeightage();
         //Log.e("CALUCLAUTAING",""+mPredictedLocation.getLatitude()+" - "+mPredictedLocation.getLongitude()+" - "+ mCPLatitude+" - "+ mCPLongitude);
+//        Location instantLocation = gpsTracker.getLocation();
+//        if(instantLocation != null){
+//            mPredictedLocation = instantLocation;
+//        }
+
+
         Location.distanceBetween(mPredictedLocation.getLatitude(), mPredictedLocation.getLongitude(), mCPLatitude, mCPLongitude, results);
         //Toast.makeText(PatrollingLocActivity.this, "Distance: " + results[0], Toast.LENGTH_LONG).show();
+        //Toast.makeText(this,"Age: "+getLocationAge(mPredictedLocation)+" & Ditance="+results[0],Toast.LENGTH_LONG).show();
         return results[0];
     }
 
@@ -966,6 +1106,9 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 toSpeech.stop();
                 toSpeech.shutdown();
             }
+            if(gpsTimeTimer != null){
+                gpsTimeTimer.cancel();
+            }
             if (locationUpdateReceiver != null) {
                 unregisterReceiver(locationUpdateReceiver);
             }
@@ -973,7 +1116,15 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             if (predictedLocationReceiver != null) {
                 unregisterReceiver(predictedLocationReceiver);
             }
-        } catch (IllegalArgumentException ex) {
+
+            if(locationService != null){
+                locationService.stopUpdatingLocation();
+            }
+
+            if(mLocation != null){
+              //  mLocation.reset();
+            }
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 

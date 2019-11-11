@@ -195,7 +195,7 @@ public class PictureCapturingServiceImpl extends APictureCapturingService {
                     public void onConfigured(@NonNull CameraCaptureSession session) {
                         try {
                             session.capture(captureBuilder.build(), captureListener, null);
-                        } catch (final CameraAccessException e) {
+                        } catch (Exception e) {
                             Log.e(TAG, " exception occurred while accessing " + currentCameraId, e);
                         }
                     }

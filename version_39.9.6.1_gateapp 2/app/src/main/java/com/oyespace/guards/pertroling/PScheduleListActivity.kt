@@ -203,13 +203,13 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
         val batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
         Log.e("BATTERY",""+batLevel)
-        //if(batLevel>=30) {
+        if(batLevel>=30) {
             //startActivityForResult(mPatrolIntent, 1)
-        mSelectedShift = selectedShift
-        checkDrawOverWindowPermission()
-//        }else{
-//            showAnimatedDialog("Please connect your charger to continue",R.raw.battery,false,"OK")
-//        }
+            mSelectedShift = selectedShift
+            checkDrawOverWindowPermission()
+        }else{
+            showAnimatedDialog("Please connect your charger to continue",R.raw.battery,false,"OK")
+        }
     }
 
     private fun startHiddenCamera(){
