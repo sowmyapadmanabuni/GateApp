@@ -263,7 +263,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             mAccuracyText.setText("Accuracy: " + currentLocationAccuracy + "m");
             ;
 
-            if (currentSatelliteCount > 3 && currentLocationAccuracy < 8 && currentLocationAge < 15) {
+            if (currentSatelliteCount > 4 && currentLocationAge < 15) {
                 //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_online));
                 Glide.with(this).load(R.drawable.gps_online).into(mGPSIcon);
             } else {
@@ -703,8 +703,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 //int satellites = getAvailableSatellites(mPredictedLocation);
                 //float accuracy = getAccuracy(mPredictedLocation);
                 //setSatellitesAccuracy();
-                if(currentSatelliteCount > 3) {
-                    if(currentLocationAccuracy < 8){
+                if(currentSatelliteCount > 4) {
+                    //if(currentLocationAccuracy < 8){
                         if (currentLocationAge < 15) {
                             if (isValidCheckPoint(qrCheckpoint)) {
 
@@ -716,10 +716,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                             showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
                             gpsTracker.getLocation();
                         }
-                    } else {
-                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
-                        gpsTracker.getLocation();
-                    }
+//                    } else {
+//                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
+//                        gpsTracker.getLocation();
+//                    }
                 }else{
                     String msg = "No Satellites found. Unable to calculate location";
                     if(currentSatelliteCount > 0){
