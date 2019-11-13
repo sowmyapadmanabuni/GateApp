@@ -219,7 +219,7 @@ public class LocationService extends Service implements LocationListener, GpsSta
             //Exception thrown when GPS or Network provider were not available on the user's device.
             try {
                 Criteria criteria = new Criteria();
-                criteria.setAccuracy(Criteria.ACCURACY_FINE); //setAccuracyは内部では、https://stackoverflow.com/a/17874592/1709287の用にHorizontalAccuracyの設定に変換されている。
+                criteria.setAccuracy(Criteria.ACCURACY_HIGH); //setAccuracyは内部では、https://stackoverflow.com/a/17874592/1709287の用にHorizontalAccuracyの設定に変換されている。
                 criteria.setPowerRequirement(Criteria.POWER_HIGH);
                 criteria.setAltitudeRequired(false);
                 criteria.setSpeedRequired(true);

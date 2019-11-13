@@ -26,15 +26,58 @@
 
     <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="200dp"
+            android:paddingLeft="16dp"
+
+            android:gravity="bottom"
             android:orientation="vertical">
         <TextView
-                android:id="@+id/scaneddata"
-                android:layout_width="300dp"
-                android:layout_height="173dp"
+                android:id="@+id/text_accuracy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
-                android:text=""
+                android:gravity="center|left"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:text="Accuracy"
         />
+        <TextView
+                android:id="@+id/text_satellites"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:gravity="center|left"
+                android:text="Satellites"
+                />
+        <TextView
+                android:id="@+id/text_location_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:gravity="center|left"
+                android:text="Location Time: "
+                />
+        <TextView
+                android:id="@+id/text_location_time_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:gravity="center|left"
+                android:text="Auto refresh on every 15 seconds (If GPS responds same location for 15 seconds) "
+                />
+        <ImageView
+                android:id="@+id/gps_stat"
+                android:layout_marginTop="4dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:src="@drawable/gps_offline"
+                />
 
     </LinearLayout>
 <!--    <TextView-->
@@ -52,6 +95,7 @@
             android:layout_marginBottom="40dp"
             android:orientation="horizontal"
             android:gravity="center_horizontal"
+
             android:layout_gravity="bottom">
     <Button
             android:id="@+id/btn_pause"
