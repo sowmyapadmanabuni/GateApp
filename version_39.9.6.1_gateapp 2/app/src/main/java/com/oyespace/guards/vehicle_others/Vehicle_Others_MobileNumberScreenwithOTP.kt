@@ -827,7 +827,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
     }
 
     private fun showDialog(title: String) {
-        var dialogs = Dialog(this@Vehicle_Others_MobileNumberScreenwithOTP)
+        val dialogs = Dialog(this@Vehicle_Others_MobileNumberScreenwithOTP)
 
         dialogs.setCancelable(false)
         dialogs.setContentView(R.layout.layout_otp_dialog)
@@ -861,6 +861,11 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
             }
 
         }
+        val btn_cancel = dialogs.findViewById(R.id.btn_cancel) as Button
+        btn_cancel.setOnClickListener {
+            dialogs.dismiss()
+        }
+
 
         dialogs.show()
 

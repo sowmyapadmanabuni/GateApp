@@ -16,6 +16,7 @@ import com.oyespace.guards.pojo.VisitorLogResponse
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
@@ -86,8 +87,12 @@ class VisitorLogRepo {
         fun get_IN_VisitorForVisitorId(id: String) =
             VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt())
 
-        fun get_IN_VisitorsForPhone(phone: String): ArrayList<com.oyespace.guards.models.VisitorLog>? {
+        fun get_IN_VisitorsForPhone(phone: String): ArrayList<VisitorLog>? {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
+        }
+
+        fun get_IN_VisitorsForName(name: String): ArrayList<VisitorLog>? {
+            return VisitorEntryLogRealm.getVisitorsForName(name)
         }
 
         fun delete_IN_Visitor(lgid: Int) {
@@ -263,6 +268,14 @@ class VisitorLogRepo {
         fun exitYesterdaysINEntries() {
 
             // TODO work on this
+//            get_IN_VisitorLog(true, object : VisitorLogFetchListener{
+//                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+//
+//                    if()
+//
+//                }
+//            })
+
 
         }
 
@@ -280,7 +293,11 @@ class VisitorLogRepo {
                     if (visitorLog != null) {
                         for (v in visitorLog) {
 
-                            if (v.vlApprStat.equals("Approved", true)) {
+                            if (v.vlVisType.contains(DELIVERY, true)) {
+                                if (v.vlApprStat.equals("Approved", true)) {
+                                    return false
+                                }
+                            } else {
                                 return false
                             }
 

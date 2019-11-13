@@ -48,7 +48,6 @@ class VistorEntryListAdapter(
     val timerHashMap: HashMap<String, TimerUtil>
     var notificationSyncFBRef: DatabaseReference
     var fbdbAssocName: String
-    var imgPath: String? = null
 
     init {
         this.searchList = visitorList
@@ -106,16 +105,15 @@ class VistorEntryListAdapter(
 
             if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
                 holder.exitTime.text = ""
-                holder.btn_makeexit.visibility = View.VISIBLE
                 val fbEventListener = FBValueEventListener(visitor, holder)
 
                 updateAttachments(visitor, holder)
 
                 val type = visitor.vlVisType
-                when (type) {
+                when {
 
-                    DELIVERY -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
-                    STAFF -> {
+                    type.contains(DELIVERY, true) -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                    type.contains(STAFF, true) -> {
                         notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
                         holder.btn_makeexit.visibility = View.VISIBLE
                     }
@@ -147,16 +145,13 @@ class VistorEntryListAdapter(
             holder.visitorName.text = visitor.vlfName
 
 
-            if (visitor.vlVisType.equals(STAFF, true)) {
-                if (visitor.vlEntryImg.isEmpty()) {
+            val entryImg = visitor.vlEntryImg
+            var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
+            Log.e("taaag", "downloading image: $imgPath")
+            if (visitor.vlVisType.contains(STAFF, true)) {
+                if (entryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
-            } else {
-
-                imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
-//                if (visitor.vlEntryImg.isEmpty()) {
-//                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"
-//                }
             }
 
             Glide.with(mcontext)
@@ -180,25 +175,21 @@ class VistorEntryListAdapter(
                 // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
-                if (visitor.vlVisType.equals(STAFF, true)) {
+                if (visitor.vlVisType.contains(STAFF, true)) {
 
-                    if (visitor.vlEntryImg.equals("")) {
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg")
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
+                    var img = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
 
+                    if (visitor.vlEntryImg.isEmpty()) {
 
-                    } else {
+                        img = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
 
-
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
                     }
+
+                    Picasso.with(mcontext)
+                        .load(img)
+                        .placeholder(R.drawable.user_icon_black)
+                        .error(R.drawable.user_icon_black)
+                        .into(dialog_imageview)
 
                 } else {
 
@@ -235,6 +226,7 @@ class VistorEntryListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
             }
+
             holder.iv_play.setOnClickListener {
                 AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
             }
@@ -255,13 +247,15 @@ class VistorEntryListAdapter(
             holder.iv_attachment.visibility = View.GONE
             holder.expanded_view.visibility = View.GONE
         } else {
+
             holder.iv_attachment.visibility = View.VISIBLE
-            holder.lyt_text.setOnClickListener {
+            holder.iv_attachment.setOnClickListener {
 
                 if (holder.expanded_view.visibility == View.GONE) {
                     holder.expanded_view.visibility = View.VISIBLE
                 } else {
                     holder.expanded_view.visibility = View.GONE
+                    AppUtils.stopAudioPlayback()
                 }
             }
             if (visitor.vlVoiceNote.isEmpty()) {
@@ -269,6 +263,7 @@ class VistorEntryListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
                 holder.iv_play.setOnClickListener {
+                    AppUtils.stopAudioPlayback()
                     AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
                 }
             }
@@ -410,8 +405,8 @@ class VistorEntryListAdapter(
             if (firebaseObject != null) {
 
                 var msLeft: Long = 0
-                when (visitorType) {
-                    DELIVERY -> {
+                when {
+                    visitorType.contains(DELIVERY, true) -> {
                         var timeupCallback: () -> Unit = {}
 
                         holder.isAnimating = false
@@ -494,7 +489,7 @@ class VistorEntryListAdapter(
                         }
                         timerHashMap[vlLogId]?.start()
                     }
-                    STAFF -> {
+                    visitorType.contains(STAFF, true) -> {
                         holder.btn_makeexit.visibility = View.VISIBLE
                         checkForAttachments(firebaseObject)
                     }

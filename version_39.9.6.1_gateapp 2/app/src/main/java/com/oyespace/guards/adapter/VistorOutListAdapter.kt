@@ -82,13 +82,15 @@ class VistorOutListAdapter(
             holder.iv_attachment.visibility = View.GONE
             holder.expanded_view.visibility = View.GONE
         } else {
+
             holder.iv_attachment.visibility = View.VISIBLE
-            holder.lyt_text.setOnClickListener {
+            holder.iv_attachment.setOnClickListener {
 
                 if (holder.expanded_view.visibility == View.GONE) {
                     holder.expanded_view.visibility = View.VISIBLE
                 } else {
                     holder.expanded_view.visibility = View.GONE
+                    AppUtils.stopAudioPlayback()
                 }
             }
             if (visitor.vlVoiceNote.isEmpty()) {
@@ -96,6 +98,7 @@ class VistorOutListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
                 holder.iv_play.setOnClickListener {
+                    AppUtils.stopAudioPlayback()
                     AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
                 }
             }

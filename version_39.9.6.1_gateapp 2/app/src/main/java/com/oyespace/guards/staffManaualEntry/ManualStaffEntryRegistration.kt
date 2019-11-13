@@ -461,6 +461,9 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                         )
                         Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
 
+                        button_done.isEnabled = true
+                        button_done.isClickable = true
+
                         dismissProgress()
                     }
 
@@ -810,7 +813,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
         RetrofitClinet.instance.getVisitorByWorkerId(OYE247TOKEN, workerID, assnID)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<getVisitorDataByWorker>() {
+            .subscribe(object : CommonDisposable<getVisitorDataByWorker>() {
 
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
 

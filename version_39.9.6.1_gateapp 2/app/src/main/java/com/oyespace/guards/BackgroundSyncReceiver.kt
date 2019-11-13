@@ -806,6 +806,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 override fun onSuccessResponse(any: Any) {
 
+                    Log.i("baaag", "cloud notification sent to -> $dataReq")
 
                 }
 
@@ -836,6 +837,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 override fun onSuccessResponse(notificationCreateResponse: NotificationCreateResponse) {
 
+                    Log.i("baaag", "notification sent to ${VLVisLgID} -> $dataReq")
+
                 }
 
 
@@ -857,7 +860,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<UnitlistbyUnitID>() {
+            .subscribe(object : CommonDisposable<UnitlistbyUnitID>() {
 
                 override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
                     if (UnitList.success == true) {
@@ -1014,7 +1017,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
 
                 override fun onErrorResponse(e: Throwable) {
-                    Log.d("cdvd", e.message)
+                    Log.d("cdvd", "$unitId ->>> ${e.message}")
 
 
                 }
@@ -1031,11 +1034,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId,assnID.toString(),accountId.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<GetFamilyMemberResponse>() {
+            .subscribe(object : CommonDisposable<GetFamilyMemberResponse>() {
 
                 override fun onSuccessResponse(getdata: GetFamilyMemberResponse) {
 
-                    if(getdata.success.equals(true)) {
+                    if (getdata.success) {
 
 
                         try {

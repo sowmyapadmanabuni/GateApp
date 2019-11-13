@@ -42,7 +42,6 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -140,7 +139,9 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                 if (textview.text.length == 13) {
 
-                    if (entryExists(ccd, mobileNumber)) {
+                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                    if (!allowEntry) {
 
                         val builder = AlertDialog.Builder(this@ManualMobileNumberScreen)
 

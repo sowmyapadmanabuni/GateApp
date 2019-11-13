@@ -2,6 +2,9 @@ package com.oyespace.guards.realm;
 
 import com.oyespace.guards.models.VisitorLog;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 
 import io.realm.Case;
@@ -169,6 +172,14 @@ public class VisitorEntryLogRealm {
 
         return (int) Realm.getDefaultInstance().where(VisitorLog.class).equalTo("vlMobile", phone).count();
 
+    }
+
+    @Nullable
+    public static ArrayList<VisitorLog> getVisitorsForName(@NotNull String name) {
+        Realm realm = Realm.getDefaultInstance();
+        return new ArrayList<>(realm.where(VisitorLog.class)
+                .equalTo("vlfName", name)
+                .findAll());
     }
 
     public interface VisitorEntryListener {

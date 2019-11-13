@@ -128,7 +128,7 @@ public class ConstantUtils {
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
     public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
-    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 5 : 3 * 60;// 7 mins
+    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 30 : 3 * 60;// 7 mins
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";
 

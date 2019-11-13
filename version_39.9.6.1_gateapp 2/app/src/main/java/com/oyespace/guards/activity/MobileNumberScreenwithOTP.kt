@@ -33,6 +33,7 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -72,12 +73,6 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
         when (v?.id) {
 
-            R.id.Btn_SendOtp ->
-            {
-
-                Toast.makeText(this@MobileNumberScreenwithOTP, "Coming soon", Toast.LENGTH_LONG)
-                    .show()
-            }
 
 //            R.id.buttonSkip -> {
 //                val d = Intent(this@MobileNumberScreenwithOTP, NameEntryScreen::class.java)
@@ -343,7 +338,8 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                 Toast.makeText(this, "Enter valid mobile number", Toast.LENGTH_LONG).show()
             } else {
 
-                if (entryExists(countryCode.toString(), phone)) {
+                val allowEntry = VisitorLogRepo.allowEntry(countryCode.toString(), phone)
+                if (!allowEntry) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                     val builder = AlertDialog.Builder(this@MobileNumberScreenwithOTP)
                     // builder.setTitle("Vendor Entry already done")

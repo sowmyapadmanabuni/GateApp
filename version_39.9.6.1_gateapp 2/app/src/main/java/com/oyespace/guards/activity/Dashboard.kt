@@ -37,7 +37,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.firebase.database.*
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.karumi.dexter.Dexter
@@ -478,6 +480,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
+        Log.i("taaag", "listening to $fbdbAssocName firebase object reference")
         walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("wt_audio").child(fbdbAssocName)
 
         removeWalkieTalkieAudioFirebase()
