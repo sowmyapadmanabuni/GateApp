@@ -41,6 +41,7 @@ import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -101,7 +102,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                 d.putExtra(MOBILENUMBER, "")
                 d.putExtra(COUNTRYCODE, "")
-                d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d)
                 finish()
@@ -136,13 +137,22 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                 if (textview.text.length == 13) {
 
-                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+                    val flow = intent.getStringExtra(FLOW_TYPE)
+                    val allowEntry = when (flow) {
+                        STAFF_REGISTRATION -> !StaffRepo.checkExistingStaffForPhone(mobileNumber!!)
+                        else -> VisitorLogRepo.allowEntry(ccd, mobileNumber)
+                    }
 
                     if (!allowEntry) {
-//                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
+                        //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@MobileNumberScreen)
                         // builder.setTitle("Vendor Entry already done")
-                        builder.setMessage("This number is being used by a person already in")
+                        builder.setMessage(
+                            when (flow) {
+                                STAFF_REGISTRATION -> "Staff already registered"
+                                else -> "This number is being used by a person already in"
+                            }
+                        )
                         builder.setPositiveButton("Ok") { dialog, which ->
 
 
@@ -153,6 +163,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                         }
                         builder.setCancelable(false)
                         builder.show()
+
                     } else {
 
                         if ((intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION))) {
@@ -168,9 +179,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                     }
 
-                }
-
-                else {
+                } else {
                     buttonNext.isEnabled = true
                     buttonNext.isClickable = true
                     Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
@@ -734,7 +743,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
                 }
             }
         }

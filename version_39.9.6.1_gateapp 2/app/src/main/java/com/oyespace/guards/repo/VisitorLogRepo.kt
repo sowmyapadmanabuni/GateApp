@@ -103,6 +103,15 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.entryExists(phone)
         }
 
+        fun check_IN_StaffVisitorByPhone(phone: String?): Boolean {
+            return if (phone != null)
+                VisitorEntryLogRealm.staffEntryExists(phone)
+            else {
+                false
+            }
+
+        }
+
         fun search_IN_Visitors(search: String): ArrayList<VisitorLog>? {
             if (search.isEmpty()) {
                 return getOverstaySortedList()
@@ -150,9 +159,9 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
         }
 
-        fun exitVisitor(context: Context, vLogId: Int) {
+        fun updateVisitorStatus(context: Context, vLogId: Int, status: String) {
 
-            val req = VisitorExitReq(DateTimeUtils.getCurrentTimeLocal(), 0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""))
+            val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status)
             CompositeDisposable().add(
                 RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
                     .subscribeOn(Schedulers.io())
@@ -279,7 +288,7 @@ class VisitorLogRepo {
 
         }
 
-        fun allowEntry(ccd: String?, mobileNumber: String?): Boolean {
+        fun allowEntry(ccd: String?, mobileNumber: String?, ignoreType: Boolean = false): Boolean {
 
 
             val entryExists = check_IN_VisitorByPhone(ccd + mobileNumber)
@@ -293,7 +302,7 @@ class VisitorLogRepo {
                     if (visitorLog != null) {
                         for (v in visitorLog) {
 
-                            if (v.vlVisType.contains(DELIVERY, true)) {
+                            if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
                                 if (v.vlApprStat.equals("Approved", true)) {
                                     return false
                                 }

@@ -44,6 +44,7 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.oyespace.guards.BackgroundSyncReceiver;
 import com.oyespace.guards.R;
+import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.activity.Biometric;
 import com.oyespace.guards.activity.StaffDetails;
 import com.oyespace.guards.activity.StaffEntryRegistration;
@@ -102,7 +103,7 @@ import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 
-public class AddCarFragment extends Activity implements ResponseHandler, View.OnClickListener {
+public class AddCarFragment extends BaseKotlinActivity implements ResponseHandler, View.OnClickListener {
 
     /*sumeeth fragment*/
     // File destination;
@@ -314,12 +315,22 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
         } else {
             if (getIntent().getIntExtra(ACCOUNT_ID, 0) != 0) {
 
+                if (getIntent().getStringExtra("Image") != null) {
 
-                Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
+                    Picasso.with(this)
+                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+                    Picasso.with(this)
+                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(target);
 
-                Log.v("CALLER IMAGEVIEW", IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
+                } else {
 
-                imageView1.setImageBitmap(photo);
+                    Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
+
+                    Log.v("CALLER IMAGEVIEW", IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
+
+                    imageView1.setImageBitmap(photo);
 
 //                Glide.with(this)
 //                        .load(Uri.parse(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg"))
@@ -328,11 +339,12 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
 //                        .skipMemoryCache(false)
 //                        .into(imageView1);
 
-                //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+                    //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
-                Picasso.with(this)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+                    Picasso.with(this)
+                            .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+                }
 
             }
 
@@ -445,6 +457,7 @@ public class AddCarFragment extends Activity implements ResponseHandler, View.On
                         d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
                         d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                         d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
+                        d.putExtras(getIntent());
                         startActivity(d);
                         finish();
 

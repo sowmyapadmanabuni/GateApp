@@ -712,7 +712,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
                     phone = Ed_phoneNum.text.toString().replace(" ", "")
                 }
             }

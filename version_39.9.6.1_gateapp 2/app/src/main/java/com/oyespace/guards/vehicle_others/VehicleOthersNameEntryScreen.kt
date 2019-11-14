@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -31,8 +30,8 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
         when (v?.id) {
 
             R.id.buttonNext ->{
-                buttonNext.setEnabled(false)
-                buttonNext.setClickable(false)
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 if(Ed_Name.text.length>2) {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
                     val d = Intent(this@VehicleOthersNameEntryScreen, VehicleOthersAddCarFragment::class.java)
@@ -52,8 +51,8 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
                     startActivity(d)
                     finish()
                 }else{
-                    buttonNext.setEnabled(true)
-                    buttonNext.setClickable(true)
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Toast.makeText(this,"Enter Valid Name", Toast.LENGTH_SHORT).show()
 
                 }
@@ -161,7 +160,7 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
             REQUEST_CODE_SPEECH_INPUT ->{
                 if (resultCode == Activity.RESULT_OK  && null!= data){
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_Name.setText(result[0]+"")
+                    Ed_Name.setText(result[0].replace(" ", "").trim())
 
                 }
             }

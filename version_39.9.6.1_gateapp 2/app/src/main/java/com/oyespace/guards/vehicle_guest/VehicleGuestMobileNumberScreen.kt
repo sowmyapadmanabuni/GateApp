@@ -252,7 +252,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
             }
         }
         timer.start()
-        Log.d("intentdata MobileNumber",""+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID));
+        Log.d("intentdata MobileNumber", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID))
 
         // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+ Prefs.getString(PrefKeys.MOBILE_NUMBER,""))
 
@@ -649,7 +649,7 @@ class VehicleGuestMobileNumberScreen : BaseKotlinActivity() , View.OnClickListen
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
                 }
             }
         }

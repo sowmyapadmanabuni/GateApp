@@ -51,7 +51,7 @@ import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.ServiceProviderListActivity
 import com.oyespace.guards.activity.StaffListActivity
 import com.oyespace.guards.adapter.ChildEventListenerAdapter
-import com.oyespace.guards.adapter.VistorEntryListAdapter
+import com.oyespace.guards.adapter.VisitorEntryListAdapter
 import com.oyespace.guards.adapter.VistorOutListAdapter
 import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
@@ -122,7 +122,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     lateinit var btn_mic: Button
 
     private var audiofile: File? = null
-    var vistorEntryListAdapter: VistorEntryListAdapter? = null
+    var visitorEntryListAdapter: VisitorEntryListAdapter? = null
     var vistorOutListAdapter: VistorOutListAdapter? = null
     private var mFileName = ""
     private var myAudioRecorder: MediaRecorder? = null
@@ -311,8 +311,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                         }
                     } else {
-                        if (vistorEntryListAdapter != null) {
-                            vistorEntryListAdapter!!.applySearch(charSequence.toString())
+                        if (visitorEntryListAdapter != null) {
+                            visitorEntryListAdapter!!.applySearch(charSequence.toString())
                         }
                     }
                 } catch (e: KotlinNullPointerException) {
@@ -804,16 +804,18 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                         tv_nodata.visibility = View.GONE
                     }
 
-                    if (vistorEntryListAdapter != null) {// it works second time and later
-                        vistorEntryListAdapter!!.setVisitorLog(newAl)
+                    if (visitorEntryListAdapter != null) {// it works second time and later
+                        visitorEntryListAdapter!!.setVisitorLog(newAl)
                     } else {
-                        vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
-                        rv_dashboard?.adapter = vistorEntryListAdapter
+                        visitorEntryListAdapter = VisitorEntryListAdapter(newAl!!, this@Dashboard)
+                        rv_dashboard?.adapter = visitorEntryListAdapter
                     }
+
+                    rv_dashboard?.smoothScrollToPosition(0)
 
                     val searchString = tv.text.toString()
                     if (!searchString.isEmpty()) {
-                        vistorEntryListAdapter!!.applySearch(searchString)
+                        visitorEntryListAdapter!!.applySearch(searchString)
                     }
 
                     callback()
@@ -1118,7 +1120,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     // if yes, then make exit call
                     if (staff != null) {
                         t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        VisitorLogRepo.exitVisitor(this, staff.vlVisLgID)
+                        VisitorLogRepo.updateVisitorStatus(this, staff.vlVisLgID, EXITED)
                         loadEntryVisitorLog()
                     } else {
 
@@ -1503,11 +1505,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 }
 
                 if (vistorOutListAdapter == null) {
-                    vistorEntryListAdapter = VistorEntryListAdapter(newAl!!, this@Dashboard)
+                    visitorEntryListAdapter = VisitorEntryListAdapter(newAl!!, this@Dashboard)
                 } else {
-                    vistorEntryListAdapter?.setVisitorLog(newAl)
+                    visitorEntryListAdapter?.setVisitorLog(newAl)
                 }
-                rv_dashboard?.adapter = vistorEntryListAdapter
+                rv_dashboard?.adapter = visitorEntryListAdapter
                 btn_in.setBackgroundColor(resources.getColor(R.color.orange))
                 btn_out.setBackgroundColor(resources.getColor(R.color.grey))
                 dismissProgress()
@@ -2418,7 +2420,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    tv.setText(result[0] + "".replace(" ", ""))
+                    tv.setText(result[0].replace(" ", "").trim())
 
 
                 }

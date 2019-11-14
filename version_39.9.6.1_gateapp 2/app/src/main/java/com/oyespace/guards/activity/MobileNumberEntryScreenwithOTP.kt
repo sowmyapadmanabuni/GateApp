@@ -150,7 +150,9 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 val phoneNumber = "" + phone
                 if (intent.getStringExtra(MOBILENUMBER).contains(phoneNumber) || debug) {
 
-                    if (VisitorLogRepo.check_IN_VisitorByPhone(phoneNumber)) {
+                    val allowEntry = VisitorLogRepo.allowEntry(countryCode, phone)
+
+                    if (!allowEntry) {
                         Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
                             .show()
                     } else {
@@ -434,7 +436,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
 
                     phone = Ed_phoneNum.text.toString().replace(" ", "")
 

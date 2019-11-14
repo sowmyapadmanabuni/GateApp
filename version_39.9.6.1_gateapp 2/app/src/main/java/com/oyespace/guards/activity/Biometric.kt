@@ -7,8 +7,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
-import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.*
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.os.Bundle
@@ -21,7 +20,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
@@ -44,7 +42,7 @@ import java.nio.ByteBuffer
 import java.util.*
 
 
-class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
+class Biometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
 
     var result: Long? = null
     lateinit var txt_assn_name: TextView
@@ -531,8 +529,8 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
         super.onPause()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val id = item?.itemId
 
         if (id == android.R.id.home) {
             onBackPressed()
@@ -709,10 +707,20 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
 
         }
 
-        val bmpGrayscale = Bitmap.createBitmap(mImageWidth, mImageHeight, Bitmap.Config.ARGB_4444)
+        val bmpGrayscale = Bitmap.createBitmap(mImageWidth, mImageHeight, Bitmap.Config.ARGB_8888)
         //Bitmap bm contains the fingerprint img
         bmpGrayscale.copyPixelsFromBuffer(ByteBuffer.wrap(Bits))
         return bmpGrayscale
+    }
+
+    fun tintImage(bitmap: Bitmap, color: Int): Bitmap {
+//        val bitmap = BitmapFactory.decodeByteArray(bitmapdata, 0, bitmapdata.size);
+        val paint = Paint();
+        paint.setColorFilter(PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        val bitmapResult = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        val canvas = Canvas(bitmapResult);
+        canvas.drawBitmap(bitmap, 0f, 0f, paint);
+        return bitmapResult;
     }
 
     override fun SGFingerPresentCallback() {
@@ -1088,7 +1096,7 @@ class Biometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Ru
                 t1.speak("Finger print data saved", TextToSpeech.QUEUE_FLUSH, null)
                 //  Toast.makeText(this@Biometric,dbh.fingercount(memId).toString()+".."+fingerId.toString()+".."+mFingerprint1Template.toString()+".."+mFingerprint2Template+".."+mFingerprint3Template,Toast.LENGTH_LONG).show()
 
-                Log.v("DATA SIZE",mFingerprint1Template.size.toString()+".."+mFingerprint2Template.size.toString()+".."+mFingerprint3Template.size.toString())
+                Log.v("DATA SIZE", mFingerprint1Template.size.toString() + ".." + mFingerprint2Template.size.toString() + ".." + mFingerprint3Template.size.toString())
 
 
                 uploadFingerPrint(mFingerprint1Template, mFingerprint2Template, mFingerprint3Template)

@@ -183,7 +183,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
         receiver = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
+            override fun onReceive(context: Context?, i: Intent?) {
 
                 val telephony = context?.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
                 telephony.listen(object : PhoneStateListener() {
@@ -192,7 +192,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                         super.onCallStateChanged(state, phoneNumber)
                         if (state == TelephonyManager.CALL_STATE_RINGING) {
 
-                            val bundle = intent?.extras
+                            val bundle = i?.extras
                             val number = bundle?.getString("incoming_number")
 
                             //   Toast.makeText(applicationContext, number, Toast.LENGTH_LONG).show();
@@ -215,7 +215,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                                     // builder.setTitle("Vendor Entry already done")
                                     builder.setMessage("Mobile number already exists. Please Try again")
                                     builder.setPositiveButton("Ok") { dialog, which ->
-                                        tv_mobilenumber!!.text = intent.getStringExtra(ConstantUtils.MOBILENUMBER)
+                                        tv_mobilenumber!!.text = intent.getStringExtra(MOBILENUMBER)
                                         dialog.dismiss()
                                     }
                                     builder.setCancelable(false)

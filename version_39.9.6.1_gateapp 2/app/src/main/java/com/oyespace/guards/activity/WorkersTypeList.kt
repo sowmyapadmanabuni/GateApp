@@ -6,6 +6,7 @@ import android.widget.TextView
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.WorkersTypeListAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE
 import com.oyespace.guards.utils.ConstantUtils.GATE_NO
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -48,7 +49,7 @@ class WorkersTypeList: BaseKotlinActivity() {
                 3
             )
         )
-        rv_workerlist.adapter = WorkersTypeListAdapter( workType,this)
+        rv_workerlist.adapter = WorkersTypeListAdapter(workType, this, intent.getStringExtra(FLOW_TYPE))
 
     }
 

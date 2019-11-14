@@ -1,6 +1,5 @@
 package com.oyespace.guards.realm;
 
-import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.models.Worker;
 
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class StaffRealm {
 
         Realm realm = Realm.getDefaultInstance();
         return realm.where(Worker.class)
-                .equalTo("wkMobile", phone)
+                .contains("wkMobile", phone)
                 .count() > 0;
 
     }

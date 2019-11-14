@@ -265,10 +265,10 @@ data class VisitorEntryReq(
 )
 //visitor exit request
 data class VisitorExitReq(
-    val VLExitT: String,
     val VLExitWID: Int,
     val VLVisLgID: Int,
-    val VLEXGName:String
+    val VLEXGName: String,
+    val VLApprStat: String
 )
 //Visitor exit response
 data class VisitorExitResp(

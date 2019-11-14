@@ -31,10 +31,10 @@ import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class VistorEntryListAdapter(
+class VisitorEntryListAdapter(
     private var visitorList: ArrayList<VisitorLog>,
     private val mcontext: Context
-) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
+) : RecyclerView.Adapter<VisitorEntryListAdapter.MenuHolder>() {
 
     val ACCEPTED_COLOR = "#75be6f"
     val REJECTED_COLOR = "#ff0000"
@@ -97,8 +97,9 @@ class VistorEntryListAdapter(
             val vlLogId = visitor.vlVisLgID.toString()
             val unitName = visitor.unUniName
             val unitID = visitor.uNUnitID
+            val phone = visitor.vlMobile
             Log.v("taaag", "refreshed IN list element at $position for vlID: $vlLogId unit: $unitName ($unitID)")
-            holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId)" else unitName
+            holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId) ($phone)" else unitName
             holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
             holder.entrydate.text = formatDateDMY(visitor.vldCreated)
 
@@ -129,7 +130,7 @@ class VistorEntryListAdapter(
                 holder.btn_makeexit.setOnClickListener {
                     holder.btn_makeexit.visibility = View.GONE
                     notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
-                    exitVisitor(vlLogId, position)
+                    updateVisitorStatus(vlLogId, position, EXITED)
                 }
 
             } else {
@@ -293,11 +294,11 @@ class VistorEntryListAdapter(
         }
     }
 
-    private fun exitVisitor(vlLogId: String, position: Int) {
+    private fun updateVisitorStatus(vlLogId: String, position: Int, status: String) {
 
         val lgid = vlLogId.toInt()
         deleteEntryFromList(lgid, position, false)
-        VisitorLogRepo.exitVisitor(mcontext, lgid)
+        VisitorLogRepo.updateVisitorStatus(mcontext, lgid, status)
 
     }
 
@@ -435,6 +436,8 @@ class VistorEntryListAdapter(
 
                         checkForAttachments(firebaseObject)
 
+                        val expiry_reject_time = if (debug) 30 else 3 * 60
+
                         when (fbColor) {
                             "#00ff00",
                             ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
@@ -462,19 +465,19 @@ class VistorEntryListAdapter(
                                     }
                                 }
                             }
-                            REJECTED_COLOR -> {// rejected by resident, start timer for 4hrs to remove
+                            REJECTED_COLOR -> {// rejected by resident, start timer for 30 mins to remove
                                 holder.btn_makeexit.visibility = View.INVISIBLE
-                                msLeft = msLeft(entryTime, 4 * 60 * 60)// 4 hrs
+                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
                                 timeupCallback = {
-                                    deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
+                                    updateVisitorStatus(vlLogId, holder.adapterPosition, REJECTED)
                                 }
 
                             }
-                            else -> {// pending, start timer for 24hrs to remove, hide exit button
+                            else -> {// pending, start timer for 30mins to remove, hide exit button
                                 holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-                                msLeft = msLeft(entryTime, 24 * 60 * 60)// 24 hrs
+                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
                                 timeupCallback = {
-                                    deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
+                                    updateVisitorStatus(vlLogId, holder.adapterPosition, EXPIRED)
                                 }
                             }
                         }

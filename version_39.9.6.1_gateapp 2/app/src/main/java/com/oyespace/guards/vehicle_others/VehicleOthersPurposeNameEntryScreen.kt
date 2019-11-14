@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -16,11 +15,7 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import kotlinx.android.synthetic.main.activity_mobile_number.*
-import kotlinx.android.synthetic.main.activity_name_entry.*
 import kotlinx.android.synthetic.main.activity_purpose.*
-import kotlinx.android.synthetic.main.activity_purpose.Btn_Mic
-import kotlinx.android.synthetic.main.activity_unit_list.*
 import java.util.*
 
 class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
@@ -33,8 +28,8 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
         when (v?.id) {
 
             R.id.buttonNextt -> {
-                buttonNextt.setEnabled(false)
-                buttonNextt.setClickable(false)
+                buttonNextt.isEnabled = false
+                buttonNextt.isClickable = false
 
                 if (Ed_Name_purp.text.length > 2) {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
@@ -70,8 +65,8 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
                     startActivity(d)
                     finish()
                 } else {
-                    buttonNextt.setEnabled(true)
-                    buttonNextt.setClickable(true)
+                    buttonNextt.isEnabled = true
+                    buttonNextt.isClickable = true
                     Toast.makeText(this, "Enter Valid Purpose", Toast.LENGTH_SHORT).show()
 
                 }
@@ -156,7 +151,7 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_Name_purp.setText(result[0] + "")
+                    Ed_Name_purp.setText(result[0].replace(" ", "").trim())
 
                 }
             }

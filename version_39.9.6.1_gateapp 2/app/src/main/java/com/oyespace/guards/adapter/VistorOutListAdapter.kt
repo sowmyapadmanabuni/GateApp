@@ -66,17 +66,20 @@ class VistorOutListAdapter(
 
         val position = holder.adapterPosition
 
-        val orderData = searchList!!.get(position)
-        val vistordate = orderData.asAssnID
-        var visitor: ExitVisitorLog? = null
+        val visitor: ExitVisitorLog?
         try {
             visitor = searchList!!.get(position)
         } catch (e: Exception) {
             return
         }
-        holder.apartmentNamee.text = orderData.unUniName
-        holder.entryTime.text = formatDateHM(orderData.vlEntryT) + " "
-        holder.entrydate.text = formatDateDMY(orderData.vldCreated)
+
+        if (!visitor.isValid) {
+            return
+        }
+
+        holder.apartmentNamee.text = "${visitor.unUniName} (${visitor.vlApprStat})"
+        holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
+        holder.entrydate.text = formatDateDMY(visitor.vldCreated)
 
         if (visitor.vlVenImg.isEmpty() and visitor.vlVoiceNote.isEmpty() and visitor.vlCmnts.isEmpty()) {
             holder.iv_attachment.visibility = View.GONE
@@ -129,13 +132,13 @@ class VistorOutListAdapter(
 
         }
 
-        if (orderData.vlExitT.equals("0001-01-01T00:00:00", true)) {
+        if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
             holder.exitTime.text = ""
             holder.exitdate.text = ""
             holder.btn_makeexit.visibility = View.VISIBLE
 
-            if (orderData.vlVisType.equals(DELIVERY) && deliveryTimeUp(
-                    orderData.vlEntryT,
+            if (visitor.vlVisType.equals(DELIVERY) && deliveryTimeUp(
+                    visitor.vlEntryT,
                     getCurrentTimeLocal(),
                     1
                 )
@@ -152,20 +155,20 @@ class VistorOutListAdapter(
         } else {
             // holder.exitTime.text = formatDateHM(orderData?.vlExitT)
 
-            holder.exitTime.text = formatDateHM(orderData.vlExitT)
+            holder.exitTime.text = formatDateHM(visitor.vlExitT)
             Log.v(
                 "Timme",
-                formatDateHM(orderData.vlExitT) + "..." + (orderData.vlExitT).substring(11, 19)
+                formatDateHM(visitor.vlExitT) + "..." + (visitor.vlExitT).substring(11, 19)
             )
-            holder.exitdate.text = formatDateDMY(orderData.vldUpdated)
+            holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
             holder.btn_makeexit.visibility = View.INVISIBLE
             holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
             holder.ll_card.animation = null
 
         }
 
-        holder.serviceProvider.text = orderData.vlComName + ", Visitors: " + orderData.vlVisCnt
-        holder.visitorName.text = orderData.vlfName
+        holder.serviceProvider.text = visitor.vlComName + ", Visitors: " + visitor.vlVisCnt
+        holder.visitorName.text = visitor.vlfName
         holder.btn_makeexit.setOnClickListener {
             listVistor.get(position).vlExitT = DateTimeUtils.getCurrentTimeLocal()
 
@@ -176,17 +179,17 @@ class VistorOutListAdapter(
         }
 
         try {
-            number = orderData.vlMobile.substring(3)
+            number = visitor.vlMobile.substring(3)
             //  number = orderData.vlMobile
         } catch (e: StringIndexOutOfBoundsException) {
         }
 
-        var imgPath = IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg
+        var imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
 
-        if (orderData.vlVisType.equals("STAFF", true)) {
+        if (visitor.vlVisType.contains("STAFF", true)) {
 
-            if (orderData.vlEntryImg.isEmpty()) {
-                imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg"
+            if (visitor.vlEntryImg.isEmpty()) {
+                imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
             }
 
         }
@@ -204,7 +207,7 @@ class VistorOutListAdapter(
             try {
 
 
-                mobnumber = orderData.vlMobile.substring(3)
+                mobnumber = visitor.vlMobile.substring(3)
             } catch (e: StringIndexOutOfBoundsException) {
             }
 
@@ -216,18 +219,18 @@ class VistorOutListAdapter(
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
 
-            if (orderData.vlVisType.equals("STAFF", true)) {
+            if (visitor.vlVisType.contains("STAFF", true)) {
 
-                if (orderData.vlEntryImg.equals("")) {
+                if (visitor.vlEntryImg.equals("")) {
                     Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + orderData.reRgVisID + ".jpg")
+                        .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg")
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                         .into(dialog_imageview)
                 } else {
 
 
                     Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
+                        .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
                         .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                         .into(dialog_imageview)
                 }
@@ -237,7 +240,7 @@ class VistorOutListAdapter(
 
 
                 Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL + "Images/" + orderData.vlEntryImg)
+                    .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
                     .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                     .into(dialog_imageview)
 
