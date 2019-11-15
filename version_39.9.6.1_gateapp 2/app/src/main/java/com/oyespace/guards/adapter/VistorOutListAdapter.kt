@@ -17,8 +17,7 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.ExitVisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.AppUtils
-import com.oyespace.guards.utils.ConstantUtils.DELIVERY
-import com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
@@ -77,7 +76,7 @@ class VistorOutListAdapter(
             return
         }
 
-        holder.apartmentNamee.text = "${visitor.unUniName} (${visitor.vlApprStat})"
+        holder.apartmentNamee.text = "${visitor.unUniName} " + if (debug) "(${visitor.vlApprStat})" else ""
         holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
         holder.entrydate.text = formatDateDMY(visitor.vldCreated)
 

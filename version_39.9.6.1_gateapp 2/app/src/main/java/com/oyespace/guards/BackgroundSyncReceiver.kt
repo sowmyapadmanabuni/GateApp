@@ -202,11 +202,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             .getStaffBiometric(OYE247TOKEN, workerID, "Regular")
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<StaffBiometricResp<StaffBiometricData>>() {
+            .subscribe(object : CommonDisposable<StaffBiometricResp<StaffBiometricData>>() {
 
                 override fun onSuccessResponse(staffBiometricResp: StaffBiometricResp<StaffBiometricData>) {
 
-                    if (staffBiometricResp.success == true) {
+                    if (staffBiometricResp.success) {
                         Log.d("getStaffBiometric", staffBiometricResp.data.toString())
                         try {
 

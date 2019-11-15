@@ -545,7 +545,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<GetVerifyOTPResponse>() {
                     override fun onSuccessResponse(globalApiObject: GetVerifyOTPResponse) {
-                        if (globalApiObject.success == true) {
+                        if (globalApiObject.success) {
                             dialogs!!.dismiss()
 
                            // getAccountDetails(countryCode.toString(), phone.toString());
@@ -630,6 +630,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //        if(!BASE_URL.contains("dev",true)){
 //            memID=410;
 //        }
+
         var SPPrdImg1=""
         var SPPrdImg2=""
         var SPPrdImg3=""
@@ -644,7 +645,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             unitName,unitId ,desgn,
             personName,"",0,"+",mobileNumb,
             "","","","",
-            1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+            1, workerType.toLowerCase().capitalize(), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             ,
             SPPrdImg6,
             SPPrdImg7,

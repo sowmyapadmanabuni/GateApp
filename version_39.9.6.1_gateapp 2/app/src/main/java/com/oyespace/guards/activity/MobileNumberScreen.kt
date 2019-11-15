@@ -308,9 +308,9 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
             // buttonSkip.setVisibility(View.VISIBLE)
             // if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
             if (workType.contains(intent.getStringExtra(COMPANY_NAME))) {
-                buttonSkip.visibility = View.INVISIBLE
-            } else {
                 buttonSkip.visibility = View.VISIBLE
+            } else {
+                buttonSkip.visibility = View.INVISIBLE
             }
             // }
 //        else{
@@ -779,19 +779,12 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
     }
 
     fun addEntries() {
-        workType.add("Security Guard")
-        workType.add("Security Supervisor")
-        workType.add("Manager")
-        workType.add("Assistant Manager")
+        workType.add("Sweeper")
+        workType.add("Maid")
+        workType.add("HouseKeeping")
+        workType.add("Cook")
         workType.add("Security Officer")
-        workType.add("Assistant Security Officer")
-        workType.add("Senior Supervisor")
-        workType.add("Head Guard")
-        workType.add("Senior Security")
-        workType.add("Lady Supervisor")
-        // workType.add("Lady Head Guard")
-        workType.add("Lady Senior Security Guard")
-        workType.add("Lady Security Guard")
+        workType.add("Gardener")
 
     }
 

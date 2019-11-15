@@ -625,7 +625,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         var SPPrdImg9=""
         var SPPrdImg10=""
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
-            unitName,unitId ,desgn,
+            unitName, unitId, desgn,
             personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
             1,

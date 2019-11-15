@@ -200,7 +200,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         } else {
             txt_header.text = LocalDb.getAssociation()!!.asAsnName
             tv_from.text =
-                intent.getStringExtra(COMPANY_NAME) + " " + intent.getStringExtra(FLOW_TYPE)
+                intent.getStringExtra(COMPANY_NAME)
         }
 
 
