@@ -129,9 +129,9 @@ class VisitorEntryListAdapter(
                 }
                 holder.btn_makeexit.setOnClickListener {
                     sendExitNotification(visitor)
-//                    holder.btn_makeexit.visibility = View.GONE
-//                    notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
-//                    updateVisitorStatus(vlLogId, position, EXITED)
+                    holder.btn_makeexit.visibility = View.GONE
+                    notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
+                    updateVisitorStatus(vlLogId, position, EXITED)
                 }
 
             } else {
