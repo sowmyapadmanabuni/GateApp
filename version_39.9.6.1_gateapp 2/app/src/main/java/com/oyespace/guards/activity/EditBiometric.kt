@@ -20,7 +20,6 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.Gson
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
@@ -42,7 +41,7 @@ import java.nio.ByteBuffer
 import java.util.*
 
 
-class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
+class EditBiometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
 
     var result:Long ?= null
     lateinit var txt_assn_name:TextView
@@ -518,8 +517,8 @@ class EditBiometric : AppCompatActivity(), ResponseHandler, View.OnClickListener
         super.onPause()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val id = item?.itemId
 
         if (id == android.R.id.home) {
             onBackPressed()

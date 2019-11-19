@@ -30,11 +30,13 @@ import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
@@ -49,6 +51,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     var count = 0
     val visitorsList: ArrayList<VisitorLog> = arrayListOf<VisitorLog>()
+    val unitNameIdMap = HashMap<String, String>()
 
     override fun onClick(v: View?) {
 
@@ -58,41 +61,64 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                 button_done.isEnabled = false
                 button_done.isClickable = false
 
-                if (intent.getStringExtra(UNITID).contains(",")) {
-
-
-                    var unitname_dataList: Array<String>
-                    var unitid_dataList: Array<String>
-                    var unitAccountId_dataList: Array<String>
-                    unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                    if (unitname_dataList.size > 0) {
-
-                        count = unitname_dataList.size
-                        showProgress()
-
-                        for (i in 0 until unitname_dataList.size) {
-
-                            visitorLog(
-                                unitname_dataList.get(i).replace(" ", ""),
-                                unitid_dataList.get(i).replace(" ", ""),
-                                unitAccountId_dataList.get(i).replace(" ", "")
-                            )
-
-
-                        }
-
-                    }
-                } else {
-
-                    visitorLog(
-                        intent.getStringExtra(UNITNAME),
-                        intent.getStringExtra(UNITID),
-                        intent.getStringExtra(UNIT_ACCOUNT_ID)
-                    )
+                if (!Utils.isNetworkAvailable(applicationContext)) {
+                    button_done.isEnabled = true
+                    button_done.isClickable = true
+                    Utils.showToast(applicationContext, getString(R.string.no_internet))
+                    return
                 }
 
+                if (intent.getStringExtra(VISITOR_TYPE).contains(STAFF, true)) {
+
+                    staffVisitorLog(
+                        intent.getStringExtra(UNITID),
+                        intent.getStringExtra(PERSONNAME),
+                        intent.getStringExtra(MOBILENUMBER),
+                        intent.getStringExtra("DESIGNATION"),
+                        intent.getStringExtra("WORKTYPE"),
+                        intent.getIntExtra("WORKERID", 0),
+                        intent.getStringExtra(UNITNAME)
+                    )
+
+
+                } else {
+
+                    if (intent.getStringExtra(UNITID).contains(",")) {
+
+
+                        var unitname_dataList: Array<String>
+                        var unitid_dataList: Array<String>
+                        var unitAccountId_dataList: Array<String>
+                        unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                        unitNameIdMap.clear()
+                        if (unitname_dataList.size > 0) {
+
+                            count = unitname_dataList.size
+                            showProgress()
+
+                            for (i in 0 until unitname_dataList.size) {
+
+                                visitorLog(
+                                    unitname_dataList.get(i).replace(" ", ""),
+                                    unitid_dataList.get(i).replace(" ", ""),
+                                    unitAccountId_dataList.get(i).replace(" ", "")
+                                )
+
+
+                            }
+
+                        }
+                    } else {
+
+                        visitorLog(
+                            intent.getStringExtra(UNITNAME),
+                            intent.getStringExtra(UNITID),
+                            intent.getStringExtra(UNIT_ACCOUNT_ID)
+                        )
+                    }
+                }
 
             }
 
@@ -174,7 +200,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         } else {
             txt_header.text = LocalDb.getAssociation()!!.asAsnName
             tv_from.text =
-                intent.getStringExtra(COMPANY_NAME) + " " + intent.getStringExtra(FLOW_TYPE)
+                intent.getStringExtra(COMPANY_NAME)
         }
 
 
@@ -248,11 +274,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
             when (i) {
 
-                0 -> {
-                    Log.d("CreateVisitorLogResp", "when destination " + i)
-
-                    SPPrdImg1 = list[i]
-                }
+                0 -> SPPrdImg1 = list[i]
                 1 -> SPPrdImg2 = list[i]
                 2 -> SPPrdImg3 = list[i]
                 3 -> SPPrdImg4 = list[i]
@@ -292,6 +314,9 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
         val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+        Log.e("taaag", "uploading image: $imgName")
+
+        unitNameIdMap[UNUniName] = UNUnitID
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
@@ -302,6 +327,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), getCurrentTimeLocal(), SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20
         )
+
+        Log.d("taaag", "log request: $req")
 
         compositeDisposable.add(
             RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
@@ -315,21 +342,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
                             Log.v("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
 
-
-                            val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
-                            d.putExtra(BSR_Action, VisitorEntryFCM)
-                            d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + UNUniName + ")")
-                            d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-                            d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                            d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            d.putExtra("unitname", UNUniName)
-                            d.putExtra("memType", "Owner")
-                            d.putExtra(UNITID, UNUnitID.toString())
-                            d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                            d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
-                            d.putExtra("VLVisLgID", vlid)
-                            d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                            sendBroadcast(d)
 
                             count--
                             Log.v("taaag", "count $count")
@@ -349,13 +361,29 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                        val visitors = VisitorLogRepo.get_IN_VisitorsForPhone(intent.getStringExtra(MOBILENUMBER))
+                                        val visitors = VisitorLogRepo.get_IN_VisitorsForName(intent.getStringExtra(PERSONNAME))
                                         if (debug) {
                                             Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
                                         }
+                                        Log.e("taaag", "map map: $unitNameIdMap")
                                         if (visitors != null) {
+
                                             for (visitor in visitors) {
                                                 updateFirebaseColor(visitor.vlVisLgID)
+                                                val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
+                                                d.putExtra(BSR_Action, VisitorEntryFCM)
+                                                d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
+                                                d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+                                                d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                                                d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                                                d.putExtra("unitname", visitor.unUniName)
+                                                d.putExtra("memType", "Owner")
+                                                d.putExtra(UNITID, unitNameIdMap[visitor.unUniName])
+                                                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                                d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
+                                                d.putExtra("VLVisLgID", visitor.vlVisLgID)
+                                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                                sendBroadcast(d)
                                             }
                                         }
                                         dismissProgress()
@@ -475,6 +503,108 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    private fun staffVisitorLog(
+        unitId: String, personName: String, mobileNumb: String, desgn: String,
+        workerType: String, staffID: Int, unitName: String
+    ) {
+
+
+        var memID: Int = 410
+        if (BASE_URL.contains("dev", true)) {
+            memID = 64
+        } else if (BASE_URL.contains("uat", true)) {
+            memID = 64
+        }
+//        var memID:Int=64;
+//        if(!BASE_URL.contains("dev",true)){
+//            memID=410;
+//        }
+        var SPPrdImg1 = ""
+        var SPPrdImg2 = ""
+        var SPPrdImg3 = ""
+        var SPPrdImg4 = ""
+        var SPPrdImg5 = ""
+        var SPPrdImg6 = ""
+        var SPPrdImg7 = ""
+        var SPPrdImg8 = ""
+        var SPPrdImg9 = ""
+        var SPPrdImg10 = ""
+        val req = CreateVisitorLogReq(
+            Prefs.getInt(ASSOCIATION_ID, 0), staffID,
+            unitName, unitId, desgn,
+            personName, "", 0, "+", mobileNumb,
+            "", "", "", "",
+            1, workerType, SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+            ,
+            SPPrdImg6,
+            SPPrdImg7,
+            SPPrdImg8,
+            SPPrdImg9,
+            SPPrdImg10,
+            "",
+            intent.getStringExtra("Image"),
+            Prefs.getString(ConstantUtils.GATE_NO, ""),
+            DateTimeUtils.getCurrentTimeLocal(),
+            "", "", "", "", "", "", "", "", "", ""
+        )
+        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
+
+        CompositeDisposable().add(
+            RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
+                    override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
+                        if (globalApiObject.success == true) {
+
+                            val id = globalApiObject.data.visitorLog.vlVisLgID
+                            updateFirebaseColor(id, "#f0f0f0")
+
+                            val ddc = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
+                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
+                            ddc.putExtra("msg", personName + " " + desgn + " is coming to your home")
+                            ddc.putExtra("mobNum", mobileNumb)
+                            ddc.putExtra("name", personName)
+                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                            ddc.putExtra("unitname", unitName)
+                            ddc.putExtra("memType", "Owner")
+                            ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            this@StaffEntryRegistration.sendBroadcast(ddc)
+
+                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
+                        } else {
+                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.toString())
+
+                            Utils.showToast(this@StaffEntryRegistration, "Entry not Saved" + globalApiObject.toString())
+                        }
+                        finish()
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+                        Log.d("onErrorResponse", "StaffEntry " + e.toString())
+                        button_done.isEnabled = true
+                        button_done.isClickable = true
+                        Utils.showToast(this@StaffEntryRegistration, "Something went wrong")
+//                    dismissProgress()
+                    }
+
+                    override fun noNetowork() {
+                        button_done.isEnabled = true
+                        button_done.isClickable = true
+                        Utils.showToast(this@StaffEntryRegistration, "No Internet")
+                    }
+
+                    override fun onShowProgress() {
+//                    showProgress()
+                    }
+
+                    override fun onDismissProgress() {
+//                    dismissProgress()
+                    }
+                })
+        )
     }
 
 }

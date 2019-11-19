@@ -70,6 +70,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra("DOB",s_dob.toString())
                         d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        d.putExtras(intent)
                         startActivity(d)
                         finish()
                     }
@@ -91,6 +92,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                     d.putExtra("DOB",s_dob.toString())
                     d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                    d.putExtras(intent)
                     startActivity(d)
                     finish()
 
@@ -246,7 +248,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
             REQUEST_CODE_SPEECH_INPUT ->{
                 if (resultCode == Activity.RESULT_OK  && null!= data){
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_Name.setText(result[0]+"")
+                    Ed_Name.setText(result[0].replace(" ", "").trim())
 
                 }
             }

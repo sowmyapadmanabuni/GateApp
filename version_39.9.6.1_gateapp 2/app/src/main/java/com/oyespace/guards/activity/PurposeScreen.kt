@@ -163,7 +163,7 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_Name_purp.setText(result[0] + "")
+                    Ed_Name_purp.setText(result[0].replace(" ", "").trim())
 
                 }
             }

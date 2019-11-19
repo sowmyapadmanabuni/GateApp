@@ -486,7 +486,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
                                 } else {
                                     iv_unit5!!.visibility = View.VISIBLE
                                     tv_number5.visibility = View.VISIBLE
-                                    tv_number5.setText(orderData.owner[0].uoMobile4)
+                                    tv_number5.text = orderData.owner[0].uoMobile4
                                 }
                             } catch (e: IndexOutOfBoundsException) {
 
@@ -647,7 +647,7 @@ class UnitListActivity : BaseKotlinActivity() , View.OnClickListener  {
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    edt_search_text1.setText(result[0] + "")
+                    edt_search_text1.setText(result[0].replace(" ", "").trim())
 
                 }
             }

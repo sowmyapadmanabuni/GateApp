@@ -16,7 +16,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 
 
-class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context) :
+class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context, val flowType: String) :
     androidx.recyclerview.widget.RecyclerView.Adapter<WorkersTypeListAdapter.WorkerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): WorkerViewHolder {
@@ -30,7 +30,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
         if (Prefs.getString(TYPE, "").equals("Create")) {
             holder.lv_staff.setOnClickListener {
                 val intent = Intent(mcontext, BlockSelectionActivity::class.java)
-                intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+                intent.putExtra(FLOW_TYPE, flowType)
                 intent.putExtra(VISITOR_TYPE, "STAFF")
                 intent.putExtra(COMPANY_NAME, items[position])
                 mcontext.startActivity(intent)
@@ -53,9 +53,10 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
                 d.putExtra(WORKER_ID, mcontext.intent.getIntExtra(WORKER_ID, 0))
                 d.putExtra("UNITNAME", mcontext.intent.getStringExtra("UNITNAME"))
                 d.putExtra("BIRTHDAY", mcontext.intent.getStringExtra("BIRTHDAY"))
-                d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+                d.putExtra(FLOW_TYPE, flowType)
                 d.putExtra(VISITOR_TYPE, "STAFF")
                 d.putExtra(COMPANY_NAME, items[position])
+                d.putExtras(mcontext.intent)
                 mcontext.startActivity(d)
                 mcontext.finish()
             }

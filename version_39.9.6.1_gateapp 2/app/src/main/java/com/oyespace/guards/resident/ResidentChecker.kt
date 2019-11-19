@@ -5,7 +5,9 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.ResidentCheckReq
 import com.oyespace.guards.pojo.ResidentCheckResponse
+import com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID
 import com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN
+import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
@@ -14,28 +16,33 @@ class ResidentChecker {
     @SuppressLint("CheckResult")
     fun isResident(phone: String, ascId: Int, listener: ResponseListener) {
 
-        RetrofitClinet.instance
-            .checkIfResident(OYE247TOKEN, ResidentCheckReq(phone, ascId))
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<ResidentCheckResponse>() {
+        if (Prefs.getInt(ASSOCIATION_ID, 0) != ascId) {
+            listener.onResult(false)
+        } else {
 
-                @SuppressLint("DefaultLocale")
-                override fun onSuccessResponse(data: ResidentCheckResponse) {
+            RetrofitClinet.instance
+                .checkIfResident(OYE247TOKEN, ResidentCheckReq(phone, ascId))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<ResidentCheckResponse>() {
 
-                    listener.onResult(data.data.`object`.message.toLowerCase().equals("Resident".toLowerCase()))
+                    @SuppressLint("DefaultLocale")
+                    override fun onSuccessResponse(data: ResidentCheckResponse) {
 
-                }
+                        listener.onResult(data.data.`object`.message.toLowerCase().equals("Resident".toLowerCase()))
 
-                override fun onErrorResponse(e: Throwable) {
-                    listener.onError(e.localizedMessage)
-                }
+                    }
 
-                override fun noNetowork() {
+                    override fun onErrorResponse(e: Throwable) {
+                        listener.onError(e.localizedMessage)
+                    }
 
-                }
+                    override fun noNetowork() {
 
-            })
+                    }
+
+                })
+        }
 
 
     }

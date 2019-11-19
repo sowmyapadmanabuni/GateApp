@@ -16,6 +16,7 @@ import com.oyespace.guards.pojo.VisitorLogResponse
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.ConstantUtils.DELIVERY
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
@@ -44,7 +45,7 @@ class VisitorLogRepo {
 
                         override fun onSuccessResponse(response: GetVisitorsResponse<ArrayList<VisitorLogResponse>>) {
 
-
+                            Log.e("get_IN_VisitorLog",""+response);
                             if (response.success) {
                                 val visitorsList = response.data.visitorLog
                                 if (visitorsList == null) {
@@ -86,8 +87,12 @@ class VisitorLogRepo {
         fun get_IN_VisitorForVisitorId(id: String) =
             VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt())
 
-        fun get_IN_VisitorsForPhone(phone: String): ArrayList<com.oyespace.guards.models.VisitorLog>? {
+        fun get_IN_VisitorsForPhone(phone: String): ArrayList<VisitorLog>? {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
+        }
+
+        fun get_IN_VisitorsForName(name: String): ArrayList<VisitorLog>? {
+            return VisitorEntryLogRealm.getVisitorsForName(name)
         }
 
         fun delete_IN_Visitor(lgid: Int) {
@@ -96,6 +101,15 @@ class VisitorLogRepo {
 
         fun check_IN_VisitorByPhone(phone: String): Boolean {
             return VisitorEntryLogRealm.entryExists(phone)
+        }
+
+        fun check_IN_StaffVisitorByPhone(phone: String?): Boolean {
+            return if (phone != null)
+                VisitorEntryLogRealm.staffEntryExists(phone)
+            else {
+                false
+            }
+
         }
 
         fun search_IN_Visitors(search: String): ArrayList<VisitorLog>? {
@@ -135,7 +149,7 @@ class VisitorLogRepo {
 
 
             }
-            Log.d("taaag", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
+            Log.d("taaag2", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
             overStaying.addAll(underStaying)
             return overStaying
 
@@ -145,9 +159,9 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
         }
 
-        fun exitVisitor(context: Context, vLogId: Int) {
+        fun updateVisitorStatus(context: Context, vLogId: Int, status: String) {
 
-            val req = VisitorExitReq(DateTimeUtils.getCurrentTimeLocal(), 0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""))
+            val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status)
             CompositeDisposable().add(
                 RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
                     .subscribeOn(Schedulers.io())
@@ -263,10 +277,18 @@ class VisitorLogRepo {
         fun exitYesterdaysINEntries() {
 
             // TODO work on this
+//            get_IN_VisitorLog(true, object : VisitorLogFetchListener{
+//                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+//
+//                    if()
+//
+//                }
+//            })
+
 
         }
 
-        fun allowEntry(ccd: String?, mobileNumber: String?): Boolean {
+        fun allowEntry(ccd: String?, mobileNumber: String?, ignoreType: Boolean = false): Boolean {
 
 
             val entryExists = check_IN_VisitorByPhone(ccd + mobileNumber)
@@ -280,7 +302,11 @@ class VisitorLogRepo {
                     if (visitorLog != null) {
                         for (v in visitorLog) {
 
-                            if (v.vlApprStat.equals("Approved", true)) {
+                            if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
+                                if (v.vlApprStat.equals("Approved", true)) {
+                                    return false
+                                }
+                            } else {
                                 return false
                             }
 

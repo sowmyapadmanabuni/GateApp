@@ -33,6 +33,8 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.StaffRepo
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -53,16 +55,16 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
     private var countryName: String? = null
     lateinit var pDialog: ProgressDialog
     var phonenumber: String? = null
-    lateinit var txt_assn_name:TextView
-    lateinit var txt_gate_name:TextView
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-   // lateinit var timer:TextView
-    val laststate:Int?=null
-    var progressBar: ProgressBar?=null
-    var mobilenumber:String?=null
+    // lateinit var timer:TextView
+    val laststate: Int? = null
+    var progressBar: ProgressBar? = null
+    var mobilenumber: String? = null
     var otpnumber: String? = null
-    var phone:String?=null
-    var dialogs:Dialog?=null
+    var phone: String? = null
+    var dialogs: Dialog? = null
 
     // private var Ed_phoneNum:String?=null
 
@@ -72,12 +74,6 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
         when (v?.id) {
 
-            R.id.Btn_SendOtp ->
-            {
-
-                Toast.makeText(this@MobileNumberScreenwithOTP, "Coming soon", Toast.LENGTH_LONG)
-                    .show()
-            }
 
 //            R.id.buttonSkip -> {
 //                val d = Intent(this@MobileNumberScreenwithOTP, NameEntryScreen::class.java)
@@ -122,10 +118,10 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 //                   finish();
 //                     deliveryFlow_launchNameEntryScreen()
 
-                   if (entryExists(countryCode.toString(), phone)) {
-                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
+                    if (entryExists(countryCode.toString(), phone)) {
+                        Toast.makeText(this, "Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@MobileNumberScreenwithOTP)
-                       // builder.setTitle("Vendor Entry already done")
+                        // builder.setTitle("Vendor Entry already done")
                         builder.setMessage("Number is already registered")
                         builder.setPositiveButton("Ok") { dialog, which ->
 
@@ -135,12 +131,12 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             startActivity(d)
                             finish()
                         }
-                       builder.setCancelable(false)
-                       builder.show()
+                        builder.setCancelable(false)
+                        builder.show()
                     } else {
-                       getAccountDetails(countryCode.toString(), phone.toString())
+                        getAccountDetails(countryCode.toString(), phone.toString())
 
-                   }
+                    }
 
                 }
 //                else if(Ed_phoneNum.text.length > 0) {
@@ -176,7 +172,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 //TODO sumeeth has reomoved this fucntion for crashing porpose
 
     val entries: ArrayList<String> = ArrayList()
-    var receiver:BroadcastReceiver?=null
+    var receiver: BroadcastReceiver? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -214,12 +210,12 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
         addEntries()
         progressBar = this.progressBar1
-       // timer=findViewById(R.id.timer)
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
+        // timer=findViewById(R.id.timer)
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
         //txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
-        txt_assn_name.text =  LocalDb.getAssociation()!!.asAsnName
+        txt_assn_name.text = LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
         try {
             var appVersion = ""
@@ -259,18 +255,17 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
         }
 
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
-           // buttonSkip.setVisibility(View.VISIBLE)
+            // buttonSkip.setVisibility(View.VISIBLE)
             if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
-            if(workType.contains(intent.getStringExtra(COMPANY_NAME))){
-                buttonSkip.visibility=View.INVISIBLE
+                if (workType.contains(intent.getStringExtra(COMPANY_NAME))) {
+                    buttonSkip.visibility = View.INVISIBLE
+                } else {
+                    buttonSkip.visibility = View.VISIBLE
+                }
+            } else {
+                buttonSkip.visibility = View.INVISIBLE
             }
-            else{
-                buttonSkip.visibility=View.VISIBLE
-            }
-            }else{
-                buttonSkip.visibility=View.INVISIBLE
-            }
-            img_logo.visibility=View.VISIBLE
+            img_logo.visibility = View.VISIBLE
             Ed_phoneNum.visibility = View.VISIBLE
             textview.visibility = View.GONE
 //            Ed_phoneNum.setVisibility(View.GONE)
@@ -279,18 +274,17 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
             buttonSkip.visibility = View.INVISIBLE
         }
 
-        val mobilePHONEDATA:String = Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
+        val mobilePHONEDATA: String = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
 
 
+        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE, "")
 
-        val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
-
-        val input =Prefs.getString(PrefKeys.MOBILE_NUMBER,"")
-       // val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
+        val input = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
+        // val number = input.replaceFirst("(\\d{3})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
-      //  tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
+        //  tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" +"+number)
 
-       // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+"+"+countrycode+" "+number)
+        // tv_guardnumber.setText(resources.getString(R.string.textgivemissedcall)+" "+"+"+countrycode+" "+number)
 
 
 //        Ed_phoneNum.addTextChangedListener(object : TextWatcher {
@@ -332,22 +326,36 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
         Btn_SendOtp.setOnClickListener {
 
-            mobilenumber= phone
+            mobilenumber = phone
             phone = Ed_phoneNum.text.toString().replace(" ", "")
             if (TextUtils.isEmpty(Ed_phoneNum.text.trim().toString()) || countryCode!!.startsWith("+91")) {
                 Toast.makeText(this, "Enter your phone number", Toast.LENGTH_SHORT).show()
                 val maxLength = 10
                 Ed_phoneNum.filters = arrayOf<InputFilter>(InputFilter.LengthFilter(maxLength))
 
-            } else if ( phone!!.length < 10) {
+            } else if (phone!!.length < 10) {
                 Toast.makeText(this, "Enter valid mobile number", Toast.LENGTH_LONG).show()
             } else {
 
-                if (entryExists(countryCode.toString(), phone)) {
+                val flow = intent.getStringExtra(FLOW_TYPE)
+
+                val allowEntry = when (flow) {
+                    STAFF_REGISTRATION -> !StaffRepo.checkExistingStaffForPhone(phone!!)
+                    FULL_MANUAL_STAFF_ENTRY -> !VisitorLogRepo.check_IN_StaffVisitorByPhone(phone)
+                    else -> VisitorLogRepo.allowEntry(countryCode.toString(), phone)
+                }
+
+                if (!allowEntry) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                     val builder = AlertDialog.Builder(this@MobileNumberScreenwithOTP)
                     // builder.setTitle("Vendor Entry already done")
-                    builder.setMessage("Number is already registered")
+                    builder.setMessage(
+                        if (flow == STAFF_REGISTRATION) {
+                            "Number is already registered"
+                        } else {
+                            "Duplicate entry not allowed"
+                        }
+                    )
                     builder.setPositiveButton("Ok") { dialog, which ->
 
 
@@ -359,7 +367,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                     builder.setCancelable(false)
                     builder.show()
                 } else {
-                   // getAccountDetails(countryCode.toString(), textview.getText().toString());
+                    // getAccountDetails(countryCode.toString(), textview.getText().toString());
                     sendotp()
 
                 }
@@ -579,6 +587,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                            d.putExtras(intent)
                             startActivity(d)
                             finish()
 
@@ -618,10 +627,10 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
         d.putExtra(UNITID, intent.getStringExtra(UNITID))
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-        d.putExtra(MOBILENUMBER, textview.text.toString())
+        d.putExtra(MOBILENUMBER, phone.toString())
         d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
         d.putExtra(COUNTRYCODE, countryCode)
-
+        d.putExtras(intent)
         startActivity(d)
         finish()
     }
@@ -696,7 +705,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
 
                     phone = Ed_phoneNum.text.toString().replace(" ", "")
                     //  Toast.makeText(this@MobileNumberScreenwithOTP,phone,Toast.LENGTH_LONG).show()
@@ -706,6 +715,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
             }
         }
     }
+
     fun setLocale(lang: String?) {
         var lang = lang
         if (lang == null) {
@@ -722,7 +732,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
 
     //  override fun onResume() {
-       // super.onResume()
+    // super.onResume()
 
 //        Toast.makeText(this, "Inside OnResume",Toast.LENGTH_LONG).show()
 //
@@ -791,12 +801,12 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 //    Toast.makeText(this@MobileNumberScreen,"MissedCall Not Working",Toast.LENGTH_LONG).show()
 //}
 
-//        if(textview.text.toString().length==0){
+    //        if(textview.text.toString().length==0){
 //            val i=Intent(this@MobileNumberScreen,DashBoard::class.java)
 //            startActivity(i)
 //
-      //  }
-   // }
+    //  }
+    // }
     fun addEntries() {
         workType.add("Security Guard")
         workType.add("Security Supervisor")
@@ -815,14 +825,14 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
     }
 
     private fun showDialog(title: String) {
-         dialogs = Dialog(this@MobileNumberScreenwithOTP)
+        dialogs = Dialog(this@MobileNumberScreenwithOTP)
 
         dialogs!!.setCancelable(false)
         dialogs!!.setContentView(R.layout.layout_otp_dialog)
         val ed_otp = dialogs!!.findViewById(R.id.ed_otp) as EditText
         otpnumber = ed_otp.text.toString()
         val btn_verifyotp = dialogs!!.findViewById(R.id.btn_verifyotp) as Button
-        val btn_cancel= dialogs!!.findViewById(R.id.btn_cancel) as Button
+        val btn_cancel = dialogs!!.findViewById(R.id.btn_cancel) as Button
         btn_verifyotp.setOnClickListener {
 
 
@@ -857,6 +867,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
         dialogs!!.show()
 
     }
+
     fun verifyOTP(number: String) {
 
         countryCode.toString()

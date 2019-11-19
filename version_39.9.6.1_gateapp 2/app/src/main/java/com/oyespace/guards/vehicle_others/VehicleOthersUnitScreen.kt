@@ -348,7 +348,7 @@ class VehicleOthersUnitScreen : BaseKotlinActivity() , View.OnClickListener  {
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    edt_search_text1.setText(result[0] + "")
+                    edt_search_text1.setText(result[0].replace(" ", "").trim())
 
                 }
             }

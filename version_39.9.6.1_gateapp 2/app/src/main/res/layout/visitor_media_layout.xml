@@ -9,7 +9,7 @@
         android:background="#FFCC80"
         android:orientation="vertical"
         android:padding="16dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
     <!--    <ImageView-->
     <!--            android:id="@+id/iv_guard"-->

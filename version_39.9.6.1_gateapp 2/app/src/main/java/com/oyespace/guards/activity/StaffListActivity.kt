@@ -44,6 +44,7 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
                 buttonAdd.isEnabled = false
                 buttonAdd.isClickable = false
                 val intentReg = Intent(this@StaffListActivity, WorkersTypeList::class.java)
+                intentReg.putExtra(ConstantUtils.FLOW_TYPE, ConstantUtils.STAFF_REGISTRATION)
                 startActivity(intentReg)
                 finish()
 
@@ -184,7 +185,7 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    tv.setText(result[0] + "")
+                    tv.setText(result[0].replace(" ", "").trim())
 
                 }
             }

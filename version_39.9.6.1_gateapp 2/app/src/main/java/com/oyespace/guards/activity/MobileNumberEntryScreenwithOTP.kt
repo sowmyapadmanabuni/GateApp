@@ -150,7 +150,9 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 val phoneNumber = "" + phone
                 if (intent.getStringExtra(MOBILENUMBER).contains(phoneNumber) || debug) {
 
-                    if (VisitorLogRepo.check_IN_VisitorByPhone(phoneNumber)) {
+                    val allowEntry = VisitorLogRepo.allowEntry(countryCode, phone)
+
+                    if (!allowEntry) {
                         Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
                             .show()
                     } else {
@@ -434,7 +436,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
 
                     phone = Ed_phoneNum.text.toString().replace(" ", "")
 
@@ -543,7 +545,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<GetVerifyOTPResponse>() {
                     override fun onSuccessResponse(globalApiObject: GetVerifyOTPResponse) {
-                        if (globalApiObject.success == true) {
+                        if (globalApiObject.success) {
                             dialogs!!.dismiss()
 
                            // getAccountDetails(countryCode.toString(), phone.toString());
@@ -628,6 +630,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 //        if(!BASE_URL.contains("dev",true)){
 //            memID=410;
 //        }
+
         var SPPrdImg1=""
         var SPPrdImg2=""
         var SPPrdImg3=""
@@ -642,7 +645,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             unitName,unitId ,desgn,
             personName,"",0,"+",mobileNumb,
             "","","","",
-            1,workerType,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
+            1, workerType.toLowerCase().capitalize(), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             ,
             SPPrdImg6,
             SPPrdImg7,

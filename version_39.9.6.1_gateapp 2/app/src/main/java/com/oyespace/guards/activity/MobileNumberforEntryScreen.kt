@@ -112,10 +112,12 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 if (textview.text.isNotEmpty()) {
 
                     Log.v("NUMBER MATCH", intent.getStringExtra(MOBILENUMBER) + ".." + textview.text)
-                    val phoneNumber = textview.text.toString()
-                    if (intent.getStringExtra(MOBILENUMBER).equals(textview.text)) {
+                    val phoneNumber: String = textview.text.toString()
+                    if (phoneNumber.contains(intent.getStringExtra(MOBILENUMBER))) {
 
-                        if (VisitorLogRepo.check_IN_VisitorByPhone(phoneNumber)) {
+                        val allowEntry = VisitorLogRepo.allowEntry(countryCode, phoneNumber)
+
+                        if (!allowEntry) {
                             Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
@@ -162,6 +164,8 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
             d.putExtra("UNITNAME", intent.getStringExtra("UNITNAME"))
             d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+            d.putExtra(FLOW_TYPE, FULL_MANUAL_STAFF_ENTRY)
+            d.putExtras(intent)
             startActivity(d)
             finish()
 
@@ -501,7 +505,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
                 }
             }
         }
@@ -621,7 +625,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         var SPPrdImg9=""
         var SPPrdImg10=""
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), staffID,
-            unitName,unitId ,desgn,
+            unitName, unitId, desgn,
             personName,LocalDb.getAssociation()!!.asAsnName,0,"",mobileNumb,
             "","","","",
             1,

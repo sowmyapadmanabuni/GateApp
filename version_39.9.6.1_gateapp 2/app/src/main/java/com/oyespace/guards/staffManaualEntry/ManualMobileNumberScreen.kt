@@ -33,6 +33,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.MobileNumberScreenwithOTP
+import com.oyespace.guards.activity.NameEntryScreen
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -42,7 +43,6 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -106,7 +106,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
                 d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-
+                d.putExtras(intent)
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 startActivity(d)
                 finish()
@@ -129,6 +129,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                d.putExtras(intent)
                 startActivity(d)
                 finish()
 
@@ -138,9 +139,17 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
+                if (useDummyValues) {
+                    textview.text = "+919930620323"
+                    ccd = "+91"
+                    mobileNumber = "9930620323"
+                }
+
                 if (textview.text.length == 13) {
 
-                    if (entryExists(ccd, mobileNumber)) {
+                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                    if (!allowEntry) {
 
                         val builder = AlertDialog.Builder(this@ManualMobileNumberScreen)
 
@@ -154,7 +163,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                     } else {
 
 
-                        val d = Intent(this@ManualMobileNumberScreen, ManualNameEntryScreen::class.java)
+                        val d = Intent(this@ManualMobileNumberScreen, NameEntryScreen::class.java)
                         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
@@ -170,6 +179,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                         d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                         d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
                         d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                        d.putExtras(intent)
                         startActivity(d)
                         finish()
 
@@ -722,7 +732,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
             REQUEST_CODE_SPEECH_INPUT -> {
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
-                    Ed_phoneNum.text = result[0].trim() + ""
+                    Ed_phoneNum.text = result[0].replace(" ", "").trim()
                 }
             }
         }

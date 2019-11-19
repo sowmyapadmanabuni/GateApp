@@ -322,6 +322,7 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                         "RESIDENT_NUMBER",
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
                     )
+                    d.putExtras(intent)
 
 
                     startActivity(d)

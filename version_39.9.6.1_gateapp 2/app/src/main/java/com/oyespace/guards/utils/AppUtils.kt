@@ -112,8 +112,19 @@ class AppUtils {
 
         }
 
+        var mediaPlayer: MediaPlayer? = null
+
         fun playAttachementAudio(context: Context, filename: String) {
             playAudio(context, filename, "http://mediaupload.oyespace.com/")
+        }
+
+        fun stopAudioPlayback() {
+            try {
+                mediaPlayer?.stop()
+                mediaPlayer?.release()
+            } catch (e: Exception) {
+
+            }
         }
 
         private fun playAudio(context: Context, filename: String, baseUrl: String? = null) {
@@ -132,23 +143,26 @@ class AppUtils {
             val attributes = AudioAttributes.Builder().setLegacyStreamType(AudioManager.STREAM_MUSIC).build()
             SoundPool.Builder().setMaxStreams(10).setAudioAttributes(attributes).build()
 
-            val mediaPlayer = MediaPlayer()
+//            if(mediaPlayer == null) {
+            mediaPlayer = MediaPlayer()
+//            }
             if (baseUrl == null) {
-                mediaPlayer.setDataSource(filename)
+                mediaPlayer?.setDataSource(filename)
             } else {
-                mediaPlayer.setDataSource(baseUrl + filename)
+                mediaPlayer?.setDataSource(baseUrl + filename)
             }
-            mediaPlayer.setOnPreparedListener {
+            mediaPlayer?.setOnPreparedListener {
                 progressDialog.dismiss()
-                mediaPlayer.start()
+                mediaPlayer?.start()
                 val baseDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                     .absolutePath
                 val f = File(baseDir + filename)
                 f.delete()
             }
+
             try {
                 progressDialog.show()
-                mediaPlayer.prepareAsync()
+                mediaPlayer?.prepareAsync()
 //                progressDialog.dismiss()
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -30,6 +30,7 @@ public class ConstantUtils {
     public static final String DELIVERY = "Delivery";
     public static final String STAFF = "Staff";
     public static final String STAFF_REGISTRATION = "STAFF_REGISTRATION";
+    public static final String FULL_MANUAL_STAFF_ENTRY = "FULL_MANUAL_STAFF_ENTRY";
     public static final String WORKER_ID = "worker_id";
     public static final String ASSOCIATION_ID = "ASSOCIATION_ID";
     public static final String GATE_NO = "GATE_NO";
@@ -109,7 +110,7 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 19f;
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 20f;
     public static final int PATROLLING_PAUSE_TIMER = 10;
     public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
     public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
@@ -119,18 +120,22 @@ public class ConstantUtils {
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
 
-    public static final boolean debug = false;
-    public static final boolean useDummyValues = false;
+    public static final boolean debug = true;
+    public static final boolean useDummyValues = true;
 
-    public static final String SNOOZE_SCHEDULE_TIME="SNOOZE_SCHEDULE_TIME";
+    public static final String SNOOZE_SCHEDULE_TIME = "SNOOZE_SCHEDULE_TIME";
     public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
     public static final String SNOOZE_COUNT = "SNOOZED_COUNT_";
     public static final String SNOOZE_TIME = "SNOOZED_TIME_";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
     public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
-    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 5 : 3 * 60;// 7 mins
+    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 30 : 3 * 60;// 7 mins
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";
+
+    public static final String EXPIRED = "Expired";
+    public static final String REJECTED = "Rejected";
+    public static final String EXITED = "Exited";
 
 }

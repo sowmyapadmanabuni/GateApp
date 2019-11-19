@@ -31,10 +31,10 @@ import com.squareup.picasso.Picasso
 import java.util.*
 
 
-class VistorEntryListAdapter(
+class VisitorEntryListAdapter(
     private var visitorList: ArrayList<VisitorLog>,
     private val mcontext: Context
-) : RecyclerView.Adapter<VistorEntryListAdapter.MenuHolder>() {
+) : RecyclerView.Adapter<VisitorEntryListAdapter.MenuHolder>() {
 
     val ACCEPTED_COLOR = "#75be6f"
     val REJECTED_COLOR = "#ff0000"
@@ -48,7 +48,6 @@ class VistorEntryListAdapter(
     val timerHashMap: HashMap<String, TimerUtil>
     var notificationSyncFBRef: DatabaseReference
     var fbdbAssocName: String
-    var imgPath: String? = null
 
     init {
         this.searchList = visitorList
@@ -98,24 +97,24 @@ class VistorEntryListAdapter(
             val vlLogId = visitor.vlVisLgID.toString()
             val unitName = visitor.unUniName
             val unitID = visitor.uNUnitID
+            val phone = visitor.vlMobile
             Log.v("taaag", "refreshed IN list element at $position for vlID: $vlLogId unit: $unitName ($unitID)")
-            holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId)" else unitName
+            holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId) ($phone)" else unitName
             holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
             holder.entrydate.text = formatDateDMY(visitor.vldCreated)
 
 
             if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
                 holder.exitTime.text = ""
-                holder.btn_makeexit.visibility = View.VISIBLE
                 val fbEventListener = FBValueEventListener(visitor, holder)
 
                 updateAttachments(visitor, holder)
 
                 val type = visitor.vlVisType
-                when (type) {
+                when {
 
-                    DELIVERY -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
-                    STAFF -> {
+                    type.contains(DELIVERY, true) -> notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
+                    type.contains(STAFF, true) -> {
                         notificationSyncFBRef.child(vlLogId).addValueEventListener(fbEventListener)
                         holder.btn_makeexit.visibility = View.VISIBLE
                     }
@@ -130,9 +129,9 @@ class VistorEntryListAdapter(
                 }
                 holder.btn_makeexit.setOnClickListener {
                     sendExitNotification(visitor)
-                    holder.btn_makeexit.visibility = View.GONE
-                    notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
-                    exitVisitor(vlLogId, position)
+//                    holder.btn_makeexit.visibility = View.GONE
+//                    notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
+//                    updateVisitorStatus(vlLogId, position, EXITED)
                 }
 
             } else {
@@ -148,16 +147,13 @@ class VistorEntryListAdapter(
             holder.visitorName.text = visitor.vlfName
 
 
-            if (visitor.vlVisType.equals(STAFF, true)) {
-                if (visitor.vlEntryImg.isEmpty()) {
+            val entryImg = visitor.vlEntryImg
+            var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
+            Log.e("taaag", "downloading image: $imgPath")
+            if (visitor.vlVisType.contains(STAFF, true)) {
+                if (entryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
-            } else {
-
-                imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
-//                if (visitor.vlEntryImg.isEmpty()) {
-//                    imgPath = IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg"
-//                }
             }
 
             Glide.with(mcontext)
@@ -181,25 +177,21 @@ class VistorEntryListAdapter(
                 // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
 
 
-                if (visitor.vlVisType.equals(STAFF, true)) {
+                if (visitor.vlVisType.contains(STAFF, true)) {
 
-                    if (visitor.vlEntryImg.equals("")) {
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg")
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
+                    var img = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
 
+                    if (visitor.vlEntryImg.isEmpty()) {
 
-                    } else {
+                        img = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
 
-
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
                     }
+
+                    Picasso.with(mcontext)
+                        .load(img)
+                        .placeholder(R.drawable.user_icon_black)
+                        .error(R.drawable.user_icon_black)
+                        .into(dialog_imageview)
 
                 } else {
 
@@ -236,6 +228,7 @@ class VistorEntryListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
             }
+
             holder.iv_play.setOnClickListener {
                 AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
             }
@@ -256,13 +249,15 @@ class VistorEntryListAdapter(
             holder.iv_attachment.visibility = View.GONE
             holder.expanded_view.visibility = View.GONE
         } else {
+
             holder.iv_attachment.visibility = View.VISIBLE
-            holder.lyt_text.setOnClickListener {
+            holder.iv_attachment.setOnClickListener {
 
                 if (holder.expanded_view.visibility == View.GONE) {
                     holder.expanded_view.visibility = View.VISIBLE
                 } else {
                     holder.expanded_view.visibility = View.GONE
+                    AppUtils.stopAudioPlayback()
                 }
             }
             if (visitor.vlVoiceNote.isEmpty()) {
@@ -270,6 +265,7 @@ class VistorEntryListAdapter(
             } else {
                 holder.iv_play.visibility = View.VISIBLE
                 holder.iv_play.setOnClickListener {
+                    AppUtils.stopAudioPlayback()
                     AppUtils.playAttachementAudio(mcontext, visitor.vlVoiceNote)
                 }
             }
@@ -299,29 +295,35 @@ class VistorEntryListAdapter(
         }
     }
 
-    private fun exitVisitor(vlLogId: String, position: Int) {
+    private fun updateVisitorStatus(vlLogId: String, position: Int, status: String) {
 
         val lgid = vlLogId.toInt()
         deleteEntryFromList(lgid, position, false)
-        VisitorLogRepo.exitVisitor(mcontext, lgid)
+        VisitorLogRepo.updateVisitorStatus(mcontext, lgid, status)
 
     }
     
     private fun sendExitNotification(visitor: VisitorLog){
-        Toast.makeText(mcontext,"Exit",Toast.LENGTH_LONG).show();
-        Log.e("sendExitNotification",""+visitor);
-        val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
-        intentAction1.putExtra(BSR_Action, ConstantUtils.VISITOR_EXIT_NOTIFY)
-        intentAction1.putExtra("associationID",visitor.asAssnID)
-        intentAction1.putExtra("associationName", LocalDb.getAssociation()!!.asAsnName)
-        intentAction1.putExtra("ntDesc",visitor.vlfName+" from "+visitor.vlComName+" has left your premises")
-        intentAction1.putExtra("ntTitle",visitor.vlfName+" left")
-        intentAction1.putExtra("ntType","gate_app")
-        intentAction1.putExtra("sbSubID",visitor.uNUnitID)
-        intentAction1.putExtra("userID",visitor.reRgVisID)
-        intentAction1.putExtra("unitID",visitor.uNUnitID)
+        try {
+            Toast.makeText(mcontext, "Exit", Toast.LENGTH_LONG).show();
+            Log.e("sendExitNotification", "" + visitor);
+            if(visitor.isValid) {
+                val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
+                intentAction1.putExtra(BSR_Action, ConstantUtils.VISITOR_EXIT_NOTIFY)
+                intentAction1.putExtra("associationID", visitor.asAssnID)
+                intentAction1.putExtra("associationName", LocalDb.getAssociation()!!.asAsnName)
+                intentAction1.putExtra("ntDesc", visitor.vlfName + " from " + visitor.vlComName + " has left your premises")
+                intentAction1.putExtra("ntTitle", visitor.vlfName + " left")
+                intentAction1.putExtra("ntType", "gate_app")
+                intentAction1.putExtra("sbSubID", visitor.uNUnitID)
+                intentAction1.putExtra("userID", visitor.reRgVisID)
+                intentAction1.putExtra("unitID", visitor.uNUnitID)
 
-        mcontext.sendBroadcast(intentAction1)
+                mcontext.sendBroadcast(intentAction1)
+            }
+        }catch (e:Exception){
+            e.printStackTrace()
+        }
 
 
     }
@@ -430,8 +432,8 @@ class VistorEntryListAdapter(
             if (firebaseObject != null) {
 
                 var msLeft: Long = 0
-                when (visitorType) {
-                    DELIVERY -> {
+                when {
+                    visitorType.contains(DELIVERY, true) -> {
                         var timeupCallback: () -> Unit = {}
 
                         holder.isAnimating = false
@@ -460,6 +462,8 @@ class VistorEntryListAdapter(
 
                         checkForAttachments(firebaseObject)
 
+                        val expiry_reject_time = if (debug) 30 else 3 * 60
+
                         when (fbColor) {
                             "#00ff00",
                             ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
@@ -487,19 +491,19 @@ class VistorEntryListAdapter(
                                     }
                                 }
                             }
-                            REJECTED_COLOR -> {// rejected by resident, start timer for 4hrs to remove
+                            REJECTED_COLOR -> {// rejected by resident, start timer for 30 mins to remove
                                 holder.btn_makeexit.visibility = View.INVISIBLE
-                                msLeft = msLeft(entryTime, 4 * 60 * 60)// 4 hrs
+                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
                                 timeupCallback = {
-                                    deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
+                                    updateVisitorStatus(vlLogId, holder.adapterPosition, REJECTED)
                                 }
 
                             }
-                            else -> {// pending, start timer for 24hrs to remove, hide exit button
+                            else -> {// pending, start timer for 30mins to remove, hide exit button
                                 holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-                                msLeft = msLeft(entryTime, 24 * 60 * 60)// 24 hrs
+                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
                                 timeupCallback = {
-                                    deleteEntryFromList(vlLogId.toInt(), holder.adapterPosition)
+                                    updateVisitorStatus(vlLogId, holder.adapterPosition, EXPIRED)
                                 }
                             }
                         }
@@ -514,7 +518,7 @@ class VistorEntryListAdapter(
                         }
                         timerHashMap[vlLogId]?.start()
                     }
-                    STAFF -> {
+                    visitorType.contains(STAFF, true) -> {
                         holder.btn_makeexit.visibility = View.VISIBLE
                         checkForAttachments(firebaseObject)
                     }

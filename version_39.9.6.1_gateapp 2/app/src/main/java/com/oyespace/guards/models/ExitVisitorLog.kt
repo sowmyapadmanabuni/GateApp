@@ -36,6 +36,8 @@ open class ExitVisitorLog : RealmObject() {
     var vlVenImg: String = ""
     var vlVoiceNote: String = ""
     var vlCmnts: String = ""
+    var vlApprStat: String = ""
+    var vlsActTm: String = ""
 
 
 }

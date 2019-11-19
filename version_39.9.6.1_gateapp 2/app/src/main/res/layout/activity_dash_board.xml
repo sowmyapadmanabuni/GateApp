@@ -28,7 +28,7 @@
                         android:layout_weight="1"
                         android:layout_height="40dp"
                         android:layout_margin="5dp"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         android:id="@+id/iv_help"
                         android:layout_gravity="center_vertical"
                         android:src="@drawable/helpline"/>
