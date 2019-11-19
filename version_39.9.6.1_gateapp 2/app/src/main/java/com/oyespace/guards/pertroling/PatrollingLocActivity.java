@@ -263,7 +263,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             mAccuracyText.setText("Accuracy: " + currentLocationAccuracy + "m");
             ;
 
-            if (currentSatelliteCount > 4 && currentLocationAge < 15) {
+            if ((currentSatelliteCount > 4 && currentLocationAge < 15) || (currentSatelliteCount <=4 && currentLocationAccuracy < 15)) {
                 //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_online));
                 Glide.with(this).load(R.drawable.gps_online).into(mGPSIcon);
             } else {
@@ -406,11 +406,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         @Override
                         public void noNetowork() {
                             dismissProgressrefresh();
+                            showAnimatedDialog("No internet connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
                         public void onErrorResponse(@NotNull Throwable e) {
                             dismissProgressrefresh();
+                            showAnimatedDialog("No internet connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -705,28 +707,31 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 //setSatellitesAccuracy();
                 if(currentSatelliteCount > 4) {
                     //if(currentLocationAccuracy < 8){
-                        if (currentLocationAge < 15) {
-                            if (isValidCheckPoint(qrCheckpoint)) {
-
-
-                            } else {
-                                // showAnimatedDialog("Invalid QR Code.", R.raw.error, true, "OK");
-                            }
-                        }else{
-                            showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
-                            gpsTracker.getLocation();
-                        }
+                        //if (currentLocationAge < 15) {
+                            isValidCheckPoint(qrCheckpoint);
+//                        }else{
+//                            showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
+//                            gpsTracker.getLocation();
+//                        }
 //                    } else {
 //                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
 //                        gpsTracker.getLocation();
 //                    }
                 }else{
-                    String msg = "No Satellites found. Unable to calculate location";
-                    if(currentSatelliteCount > 0){
-                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+//                    String msg = "No Satellites found. Unable to calculate location";
+//                    if(currentSatelliteCount > 0){
+//                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+//                    }
+//                    showAnimatedDialog(msg, R.raw.error, true, "OK");
+//                    gpsTracker.getLocation();
+
+                    if(currentLocationAccuracy < 15){
+                        isValidCheckPoint(qrCheckpoint);
+                    }else{
+                        String msg = "Low location accuracy. Please try again";
+                        showAnimatedDialog(msg, R.raw.error, true, "OK");
+                        gpsTracker.getLocation();
                     }
-                    showAnimatedDialog(msg, R.raw.error, true, "OK");
-                    gpsTracker.getLocation();
                 }
 
             } else {
@@ -1004,12 +1009,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     .subscribeWith(new CommonDisposable<GetCheckPointResponse<CheckPointData>>() {
                         @Override
                         public void noNetowork() {
-
+                            showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
                         public void onErrorResponse(@NotNull Throwable e) {
                             //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
+                            showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -1053,12 +1059,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                     @Override
                     public void noNetowork() {
-
+                        showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                     }
 
                     @Override
                     public void onErrorResponse(@NotNull Throwable e) {
                         //Log.e("SCNANNED_ERR",""+e);
+                        showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                     }
 
                     @Override

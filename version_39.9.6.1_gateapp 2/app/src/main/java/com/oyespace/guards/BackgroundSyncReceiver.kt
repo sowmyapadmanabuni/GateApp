@@ -189,6 +189,20 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             }
         }else if(intent.getStringExtra(BSR_Action).equals(BGS_PATROLLING_ALARM)){
             getPatrollingSchedules()
+        }else if(intent.getStringExtra(BSR_Action).equals(VISITOR_EXIT_NOTIFY)){
+            try {
+                val associationID: Int = intent.getIntExtra("associationID", 0)//14948
+                val associationName: String = intent.getStringExtra("associationName")
+                val ntDesc: String = intent.getStringExtra("ntDesc")
+                val ntTitle: String = intent.getStringExtra("ntTitle")
+                val ntType: String = intent.getStringExtra("ntType")
+                val sbSubID: String = intent.getStringExtra("sbSubID")//40841
+                val userID: Int = intent.getIntExtra("userID", 0)
+                val unitID: String = intent.getStringExtra("unitID")//40841
+                sendCloudFunctionNotification(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID)
+            }catch (e:Exception){
+                e.printStackTrace()
+            }
         }
 
     }
@@ -800,6 +814,32 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
         CloudFunctionRetrofitClinet.instance
             .sendCloud_VisitorEntry(dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<Any>() {
+
+                override fun onSuccessResponse(any: Any) {
+
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.d("Error WorkerList", e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
+
+    private fun sendCloudFunctionNotificationAdmin(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
+
+        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
+
+
+        CloudFunctionRetrofitClinet.instance
+            .sendResidentAdminNotification(dataReq)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<Any>() {

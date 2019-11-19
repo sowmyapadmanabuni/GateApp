@@ -2,6 +2,7 @@ package com.oyespace.guards.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Handler
 import android.util.Log
@@ -17,16 +18,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.database.*
+import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
-import com.oyespace.guards.utils.AppUtils
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.TimerUtil
 import com.squareup.picasso.Picasso
 import java.util.*
 
@@ -129,6 +129,7 @@ class VistorEntryListAdapter(
                     holder.btn_makeexit.visibility = View.VISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
+                    sendExitNotification(visitor)
                     holder.btn_makeexit.visibility = View.GONE
                     notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
                     exitVisitor(vlLogId, position)
@@ -303,6 +304,25 @@ class VistorEntryListAdapter(
         val lgid = vlLogId.toInt()
         deleteEntryFromList(lgid, position, false)
         VisitorLogRepo.exitVisitor(mcontext, lgid)
+
+    }
+    
+    private fun sendExitNotification(visitor: VisitorLog){
+        Toast.makeText(mcontext,"Exit",Toast.LENGTH_LONG).show();
+        Log.e("sendExitNotification",""+visitor);
+        val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
+        intentAction1.putExtra(BSR_Action, ConstantUtils.VISITOR_EXIT_NOTIFY)
+        intentAction1.putExtra("associationID",visitor.asAssnID)
+        intentAction1.putExtra("associationName", LocalDb.getAssociation()!!.asAsnName)
+        intentAction1.putExtra("ntDesc",visitor.vlfName+" from "+visitor.vlComName+" has left your premises")
+        intentAction1.putExtra("ntTitle",visitor.vlfName+" left")
+        intentAction1.putExtra("ntType","gate_app")
+        intentAction1.putExtra("sbSubID",visitor.uNUnitID)
+        intentAction1.putExtra("userID",visitor.reRgVisID)
+        intentAction1.putExtra("unitID",visitor.uNUnitID)
+
+        mcontext.sendBroadcast(intentAction1)
+
 
     }
 
