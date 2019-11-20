@@ -101,6 +101,7 @@ class VisitorLogRepo {
 
         fun check_IN_VisitorByPhone(phone: String): Boolean {
             return VisitorEntryLogRealm.entryExists(phone)
+
         }
 
         fun check_IN_StaffVisitorByPhone(phone: String?): Boolean {

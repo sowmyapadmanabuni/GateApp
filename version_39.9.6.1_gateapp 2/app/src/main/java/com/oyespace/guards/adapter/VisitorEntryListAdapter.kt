@@ -125,7 +125,7 @@ class VisitorEntryListAdapter(
                 }
 
                 if (debug) {
-                    holder.btn_makeexit.visibility = View.VISIBLE
+                    holder.btn_makeexit.visibility = View.INVISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
                     holder.btn_makeexit.visibility = View.GONE
@@ -474,11 +474,11 @@ class VisitorEntryListAdapter(
 
                             }
                             else -> {// pending, start timer for 30mins to remove, hide exit button
-                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
-                                timeupCallback = {
-                                    updateVisitorStatus(vlLogId, holder.adapterPosition, EXPIRED)
-                                }
+//                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
+//                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
+//                                timeupCallback = {
+//                                    updateVisitorStatus(vlLogId, holder.adapterPosition, EXPIRED)
+//                                }
                             }
                         }
 

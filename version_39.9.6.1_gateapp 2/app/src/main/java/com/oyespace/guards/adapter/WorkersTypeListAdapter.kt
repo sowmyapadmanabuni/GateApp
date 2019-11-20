@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BlockSelectionActivity
@@ -29,6 +30,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
 
         if (Prefs.getString(TYPE, "").equals("Create")) {
             holder.lv_staff.setOnClickListener {
+
                 val intent = Intent(mcontext, BlockSelectionActivity::class.java)
                 intent.putExtra(FLOW_TYPE, flowType)
                 intent.putExtra(VISITOR_TYPE, "STAFF")

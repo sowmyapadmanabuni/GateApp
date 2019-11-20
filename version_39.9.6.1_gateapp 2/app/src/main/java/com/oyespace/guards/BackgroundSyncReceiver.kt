@@ -828,6 +828,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
         val dataReq = NotificationCreateReq(ACAccntID,ASAssnID,NTType,NTDesc,SBUnitID,SBMemID,SBSubID,SBRoleID ,ASAsnName,MRRolName,NTDUpdated,NTDCreated,VLVisLgID,"","")
 
+Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
 
         RetrofitClinet.instance
             .getNotificationCreate(OYE247TOKEN, dataReq)
