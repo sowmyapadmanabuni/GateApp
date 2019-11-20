@@ -83,7 +83,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 intent.getStringExtra("nr_id")
                             )
                         }catch (e:Exception){
-
+                            e.printStackTrace()
                         }
 //                        sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
 //                            intent.getStringExtra("name"), intent.getStringExtra("nr_id"),
@@ -105,7 +105,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
 
                 } catch (e: Exception) {
-
+                    e.printStackTrace()
                 }
 //                sendFCM(intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                    intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
@@ -199,6 +199,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 val sbSubID: String = intent.getStringExtra("sbSubID")//40841
                 val userID: Int = intent.getIntExtra("userID", 0)
                 val unitID: String = intent.getStringExtra("unitID")//40841
+                Log.e("BEFORE_",""+associationID+"-"+associationName+"-"+ntDesc+"-"+ntTitle+"-"+ntType+"-"+sbSubID+"-"+userID+"-"+unitID);
                 sendCloudFunctionNotification(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID)
             }catch (e:Exception){
                 e.printStackTrace()
@@ -810,7 +811,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
 
         val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
-
+        Log.e("CloudFunctionNotificationReq",""+dataReq);
 
         CloudFunctionRetrofitClinet.instance
             .sendCloud_VisitorEntry(dataReq)
@@ -895,7 +896,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
                            workerType:String,staffID:Int,unitName:String,vlVisLgID:Int,msg:String,nrId:String) {
 
-
+        Log.e("getUnitLog_SAV",""+unitId+" - "+personName);
         RetrofitClinet.instance
             .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
             .subscribeOn(Schedulers.io())

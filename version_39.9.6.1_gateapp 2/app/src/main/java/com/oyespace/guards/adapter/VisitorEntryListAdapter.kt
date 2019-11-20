@@ -20,14 +20,19 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.database.*
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
+import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.pojo.CloudFunctionNotificationReq
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
 import com.squareup.picasso.Picasso
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 
 
@@ -98,6 +103,17 @@ class VisitorEntryListAdapter(
             val unitName = visitor.unUniName
             val unitID = visitor.uNUnitID
             val phone = visitor.vlMobile
+
+
+            val asAssnID =  visitor.asAssnID
+            val asAsnName = LocalDb.getAssociation()!!.asAsnName
+            val ntDesc = visitor.vlfName + " from " + visitor.vlComName + " has left your premises"
+            val ntTitle = visitor.vlfName + " left"
+            val ntType = "gate_app";
+            val sbSubID = visitor.uNUnitID
+            val userID = visitor.reRgVisID
+
+            Log.e("VISITOR_DAT",""+visitor);
             Log.v("taaag", "refreshed IN list element at $position for vlID: $vlLogId unit: $unitName ($unitID)")
             holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId) ($phone)" else unitName
             holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
@@ -128,7 +144,7 @@ class VisitorEntryListAdapter(
                     holder.btn_makeexit.visibility = View.VISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
-                    sendExitNotification(visitor)
+                    sendCloudFunctionNotification(asAssnID,asAsnName,ntDesc,ntTitle,ntType,""+sbSubID,userID,""+unitID)
                     holder.btn_makeexit.visibility = View.GONE
                     notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
                     updateVisitorStatus(vlLogId, position, EXITED)
@@ -303,30 +319,58 @@ class VisitorEntryListAdapter(
 
     }
     
-    private fun sendExitNotification(visitor: VisitorLog){
+    private fun sendExitNotification(asAssnID:Int,asAsnName:String,ntDesc:String,ntTitle:String,ntType:String,sbSubID:Int,userID:Int,unitID:Int){
         try {
-            Toast.makeText(mcontext, "Exit", Toast.LENGTH_LONG).show();
-            Log.e("sendExitNotification", "" + visitor);
-            if(visitor.isValid) {
+
+
                 val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
                 intentAction1.putExtra(BSR_Action, ConstantUtils.VISITOR_EXIT_NOTIFY)
-                intentAction1.putExtra("associationID", visitor.asAssnID)
-                intentAction1.putExtra("associationName", LocalDb.getAssociation()!!.asAsnName)
-                intentAction1.putExtra("ntDesc", visitor.vlfName + " from " + visitor.vlComName + " has left your premises")
-                intentAction1.putExtra("ntTitle", visitor.vlfName + " left")
-                intentAction1.putExtra("ntType", "gate_app")
-                intentAction1.putExtra("sbSubID", visitor.uNUnitID)
-                intentAction1.putExtra("userID", visitor.reRgVisID)
-                intentAction1.putExtra("unitID", visitor.uNUnitID)
-
+                intentAction1.putExtra("associationID", asAssnID)
+                intentAction1.putExtra("associationName", asAsnName)
+                intentAction1.putExtra("ntDesc", ntDesc)
+                intentAction1.putExtra("ntTitle", ntTitle)
+                intentAction1.putExtra("ntType", ntType)
+                intentAction1.putExtra("sbSubID", sbSubID)
+                intentAction1.putExtra("userID", userID)
+                intentAction1.putExtra("unitID", unitID)
+                Log.e("intentAction1",""+intentAction1);
+                Toast.makeText(mcontext, "Exit", Toast.LENGTH_LONG).show();
                 mcontext.sendBroadcast(intentAction1)
-            }
+
         }catch (e:Exception){
             e.printStackTrace()
         }
 
 
     }
+
+    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
+        Log.e("BEFORE_",""+associationID+"-"+associationName+"-"+ntDesc+"-"+ntTitle+"-"+ntType+"-"+sbSubID+"-"+userID+"-"+unitID);
+        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
+        Log.e("CloudFunctionNotificationReq",""+dataReq);
+
+        CloudFunctionRetrofitClinet.instance
+            .sendCloud_VisitorEntry(dataReq)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(object : CommonDisposable<Any>() {
+
+                override fun onSuccessResponse(any: Any) {
+
+                    Log.e("baaag", "cloud notification sent to -> $dataReq")
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+                    Log.e("Error WorkerList", e.toString())
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+    }
+
 
     private fun deleteEntryFromList(lgid: Int, position: Int, updateSearchList: Boolean = true) {
         try {
