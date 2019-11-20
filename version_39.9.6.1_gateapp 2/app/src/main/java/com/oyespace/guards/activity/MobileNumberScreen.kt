@@ -128,11 +128,11 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
-                if (useDummyValues) {
-                    textview.text = "+919930620323"
-                    ccd = "+91"
-                    mobileNumber = "9930620323"
-                }
+//                if (useDummyValues) {
+//                    textview.text = "+919930620323"
+//                    ccd = "+91"
+//                    mobileNumber = "9930620323"
+//                }
 
 
                 if (textview.text.length == 13) {
@@ -151,6 +151,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                             when (flow) {
                                 STAFF_REGISTRATION -> "Staff already registered"
                                 else -> "This number is being used by a person already in"
+
                             }
                         )
                         builder.setPositiveButton("Ok") { dialog, which ->

@@ -33,7 +33,6 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.MobileNumberScreenwithOTP
-import com.oyespace.guards.activity.NameEntryScreen
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
@@ -101,7 +100,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
                 d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+               // d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
@@ -125,7 +124,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
                 d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+               // d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
@@ -139,11 +138,11 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
-                if (useDummyValues) {
-                    textview.text = "+919930620323"
-                    ccd = "+91"
-                    mobileNumber = "9930620323"
-                }
+//                if (useDummyValues) {
+//                    textview.text = "+919930620323"
+//                    ccd = "+91"
+//                    mobileNumber = "9930620323"
+//                }
 
                 if (textview.text.length == 13) {
 
@@ -162,8 +161,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                         builder.show()
                     } else {
 
-
-                        val d = Intent(this@ManualMobileNumberScreen, NameEntryScreen::class.java)
+                        val d = Intent(this@ManualMobileNumberScreen, ManualNameEntryScreen::class.java)
                         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
@@ -182,6 +180,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                         d.putExtras(intent)
                         startActivity(d)
                         finish()
+
 
                     }
 
@@ -294,13 +293,14 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
             Speak()
         }
 
-        if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
+     //   if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
             // buttonSkip.setVisibility(View.VISIBLE)
             // if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
             if (workType.contains(intent.getStringExtra(COMPANY_NAME))) {
-                buttonSkip.visibility = View.INVISIBLE
-            } else {
                 buttonSkip.visibility = View.VISIBLE
+            } else {
+                buttonSkip.visibility = View.INVISIBLE
+
             }
             // }
 //        else{
@@ -311,10 +311,11 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 //            textview.visibility = View.GONE
             Ed_phoneNum.visibility = View.GONE
             textview.visibility = View.VISIBLE
-        } else {
-            buttonSkip.visibility = View.INVISIBLE
-            textview.visibility = View.VISIBLE
-        }
+       // }
+//        else {
+//            buttonSkip.visibility = View.INVISIBLE
+//            textview.visibility = View.VISIBLE
+//        }
 
         val mobilePHONEDATA: String = Prefs.getString(PrefKeys.MOBILE_NUMBER, "")
 
@@ -561,6 +562,8 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                             Prefs.putString("Retake", "Yes")
 
                             if ((intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION))) {
+
+
                                 val d = Intent(
                                     this@ManualMobileNumberScreen,
                                     ManualNameEntryScreen::class.java
@@ -584,7 +587,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                                 )
                                 d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
                                 d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-                                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                               // d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
@@ -844,19 +847,12 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
     //  }
     // }
     fun addEntries() {
-        workType.add("Security Guard")
-        workType.add("Security Supervisor")
-        workType.add("Manager")
-        workType.add("Assistant Manager")
+        workType.add("Sweeper")
+        workType.add("Maid")
+        workType.add("HouseKeeping")
+        workType.add("Cook")
         workType.add("Security Officer")
-        workType.add("Assistant Security Officer")
-        workType.add("Senior Supervisor")
-        workType.add("Head Guard")
-        workType.add("Senior Security")
-        workType.add("Lady Supervisor")
-        // workType.add("Lady Head Guard")
-        workType.add("Lady Senior Security Guard")
-        workType.add("Lady Security Guard")
+        workType.add("Gardener")
 
     }
 

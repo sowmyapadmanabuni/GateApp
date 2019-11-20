@@ -363,7 +363,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
                                         val visitors = VisitorLogRepo.get_IN_VisitorsForName(intent.getStringExtra(PERSONNAME))
                                         if (debug) {
-                                            Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
+                                        //    Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
                                         }
                                         Log.e("taaag", "map map: $unitNameIdMap")
                                         if (visitors != null) {
