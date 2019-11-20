@@ -110,10 +110,11 @@ public class ConstantUtils {
     public static final String CHECKPOINT_TYPE_START = "StartPoint";
     public static final String CHECKPOINT_TYPE_NORMAL = "Checkpoint";
     public static final String CHECKPOINT_TYPE_END = "EndPoint";
-    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 16f;
+    public static final float CHECKPOINT_DISTANCE_THRESHOLD = 20f;
     public static final int PATROLLING_PAUSE_TIMER = 10;
     public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
-    public static final String BGS_PATROLLING_ALARM = "BGS_PATROLLING_ALARM";
+    public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
+    public static final String VISITOR_EXIT_NOTIFY="VISITOR_EXIT_NOTIFY";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";

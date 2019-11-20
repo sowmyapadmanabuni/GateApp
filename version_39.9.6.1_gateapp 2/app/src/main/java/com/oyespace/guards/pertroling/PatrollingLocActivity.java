@@ -60,6 +60,8 @@ import com.oyespace.guards.pojo.CheckPointScanResponse;
 import com.oyespace.guards.pojo.GetCheckPointResponse;
 import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.Prefs;
+import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker;
+import com.treebo.internetavailabilitychecker.InternetConnectivityListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -95,7 +97,7 @@ import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_HIDDEN_SELFIE;
 import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
 import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
 
-public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void>, View.OnClickListener, OnLocationUpdate {
+public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void>, View.OnClickListener, OnLocationUpdate, InternetConnectivityListener {
 
     public LocationService locationService;
     public Location mLocation, mPredictedLocation;
@@ -122,13 +124,20 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private long currentLocationAge = 0;
     private float currentLocationAccuracy = 0;
     private int currentSatelliteCount = 0;
-
+    private  InternetAvailabilityChecker mInternetAvailabilityChecker;
 
     @Override
     public void onGPSLocationUpdate(Location location) {
         mPredictedLocation = location;
         mLocation = location;
         setSatellitesAccuracy();
+    }
+
+    @Override
+    public void onInternetConnectivityChanged(boolean isConnected) {
+        if(!isConnected){
+            showAnimatedDialog("No Internet Connectivity..",R.raw.error_alert,true,"OK");
+        }
     }
 
 
@@ -173,6 +182,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_scanner_point);
+
+        InternetAvailabilityChecker.init(this);
+        mInternetAvailabilityChecker = InternetAvailabilityChecker.getInstance();
+        mInternetAvailabilityChecker.addInternetConnectivityListener(this);
 
         initSpeech();
         mActiveSchedule = getIntent().getIntExtra(PATROLLING_SCHEDULE_ID,0);
@@ -263,7 +276,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             mAccuracyText.setText("Accuracy: " + currentLocationAccuracy + "m");
             ;
 
-            if (currentSatelliteCount > 4 && currentLocationAge < 15) {
+            if ((currentSatelliteCount > 4 && currentLocationAge < 15) || (currentSatelliteCount <=4 && currentLocationAccuracy < 15)) {
                 //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_online));
                 Glide.with(this).load(R.drawable.gps_online).into(mGPSIcon);
             } else {
@@ -406,11 +419,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         @Override
                         public void noNetowork() {
                             dismissProgressrefresh();
+                            showAnimatedDialog("No internet connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
                         public void onErrorResponse(@NotNull Throwable e) {
                             dismissProgressrefresh();
+                           // showAnimatedDialog("No internet connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -703,30 +718,38 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 //int satellites = getAvailableSatellites(mPredictedLocation);
                 //float accuracy = getAccuracy(mPredictedLocation);
                 //setSatellitesAccuracy();
-                if(currentSatelliteCount > 4) {
-                    //if(currentLocationAccuracy < 8){
-                        if (currentLocationAge < 15) {
-                            if (isValidCheckPoint(qrCheckpoint)) {
-
-
-                            } else {
-                                // showAnimatedDialog("Invalid QR Code.", R.raw.error, true, "OK");
-                            }
-                        }else{
-                            showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
-                            gpsTracker.getLocation();
-                        }
+                boolean hasInternet = mInternetAvailabilityChecker.getCurrentInternetAvailabilityStatus();
+                if(hasInternet) {
+                    if (currentSatelliteCount > 4) {
+                        //if(currentLocationAccuracy < 8){
+                        //if (currentLocationAge < 15) {
+                        isValidCheckPoint(qrCheckpoint);
+//                        }else{
+//                            showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
+//                            gpsTracker.getLocation();
+//                        }
 //                    } else {
 //                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
 //                        gpsTracker.getLocation();
 //                    }
-                }else{
-                    String msg = "No Satellites found. Unable to calculate location";
-                    if(currentSatelliteCount > 0){
-                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+                    } else {
+//                    String msg = "No Satellites found. Unable to calculate location";
+//                    if(currentSatelliteCount > 0){
+//                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+//                    }
+//                    showAnimatedDialog(msg, R.raw.error, true, "OK");
+//                    gpsTracker.getLocation();
+
+                        if (currentLocationAccuracy < 15) {
+                            isValidCheckPoint(qrCheckpoint);
+                        } else {
+                            String msg = "Low location accuracy. Please try again";
+                            showAnimatedDialog(msg, R.raw.error, true, "OK");
+                            gpsTracker.getLocation();
+                        }
                     }
-                    showAnimatedDialog(msg, R.raw.error, true, "OK");
-                    gpsTracker.getLocation();
+                }else{
+                    showAnimatedDialog("Poor connectivity", R.raw.error_alert, true, "OK");
                 }
 
             } else {
@@ -902,7 +925,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         float result = calculateDistance(mCPLatitude, mCPLongitude);
         //return true;
         //Log.e("DISTANCE_LOC",""+result);
-        //Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
         return result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
     }
 
@@ -1004,12 +1027,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     .subscribeWith(new CommonDisposable<GetCheckPointResponse<CheckPointData>>() {
                         @Override
                         public void noNetowork() {
-
+                            showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
                         public void onErrorResponse(@NotNull Throwable e) {
                             //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
+                           // showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -1044,7 +1068,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),checkPointData.getCpgpsPnt(),
                 checkPointData.getCpCkPName(),MEDIA_URL+Prefs.getString(PATROLLING_HIDDEN_SELFIE,""),Prefs.getInt(GATE_DEVICE_ID,0),checkPointData.getCpcPntAt());
 
-        //Log.e("scanRequest",""+scanRequest);
+        Log.e("scanRequest",""+scanRequest);
             RetrofitClinet.Companion.getInstance()
                 .scanCheckPoint(OYE247TOKEN, scanRequest)
                 .subscribeOn(Schedulers.io())
@@ -1053,17 +1077,19 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                     @Override
                     public void noNetowork() {
-
+                        Log.e("sendScannedCheckPoint","No Netwrok");
+                        showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                     }
 
                     @Override
                     public void onErrorResponse(@NotNull Throwable e) {
-                        //Log.e("SCNANNED_ERR",""+e);
+                        Log.e("SCNANNED_ERR",""+e);
+                       // showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                     }
 
                     @Override
                     public void onSuccessResponse(CheckPointScanResponse checkPointScanResponse) {
-                        //Log.e("SCNANNED_NETWR",""+checkPointScanResponse);
+                        Log.e("SCNANNED_NETWR",""+checkPointScanResponse);
                     }
                 });
     }
@@ -1101,6 +1127,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     protected void onDestroy() {
         try {
             Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false);
+            mInternetAvailabilityChecker.removeInternetConnectivityChangeListener(this);
             stopSiren();
             if (toSpeech != null) {
                 toSpeech.stop();

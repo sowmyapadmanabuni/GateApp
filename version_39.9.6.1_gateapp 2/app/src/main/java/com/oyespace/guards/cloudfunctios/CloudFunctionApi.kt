@@ -12,6 +12,10 @@ interface CloudFunctionApi {
     fun sendCloud_VisitorEntry(@Body cloudFunctionNotificationReq: CloudFunctionNotificationReq)
             : Single<Any>
 
+    @POST("sendAdminCustomNotification")
+    fun sendResidentAdminNotification(@Body cloudFunctionNotificationReq: CloudFunctionNotificationReq)
+            : Single<Any>
+
     @POST("sendGateAppNotification")
     fun getNotification(@Body sendGateAppNotificationRequest: SendGateAppNotificationRequest)
             : Single<Any>

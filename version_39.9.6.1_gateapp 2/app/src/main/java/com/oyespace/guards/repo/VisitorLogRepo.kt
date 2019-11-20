@@ -45,7 +45,7 @@ class VisitorLogRepo {
 
                         override fun onSuccessResponse(response: GetVisitorsResponse<ArrayList<VisitorLogResponse>>) {
 
-
+                            Log.e("get_IN_VisitorLog",""+response);
                             if (response.success) {
                                 val visitorsList = response.data.visitorLog
                                 if (visitorsList == null) {
@@ -150,7 +150,7 @@ class VisitorLogRepo {
 
 
             }
-            Log.d("taaag", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
+            Log.d("taaag2", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
             overStaying.addAll(underStaying)
             return overStaying
 
