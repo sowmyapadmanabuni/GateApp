@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,9 +25,11 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.TimerUtil
 import com.squareup.picasso.Picasso
 import java.util.*
 
@@ -96,7 +99,7 @@ class VisitorEntryListAdapter(
         if (visitor.isValid) {
             val vlLogId = visitor.vlVisLgID.toString()
             val unitName = visitor.unUniName
-            val unitID = visitor.uNUnitID
+            val unitID = visitor.unUnitID
             val phone = visitor.vlMobile
             Log.v("taaag", "refreshed IN list element at $position for vlID: $vlLogId unit: $unitName ($unitID)")
             holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId) ($phone)" else unitName
@@ -128,10 +131,10 @@ class VisitorEntryListAdapter(
                     holder.btn_makeexit.visibility = View.INVISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
-                    sendExitNotification(visitor)
+                    //                    sendExitNotification(visitor)
                     holder.btn_makeexit.visibility = View.GONE
                     notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
-                    updateVisitorStatus(vlLogId, position, EXITED)
+                    updateVisitorStatus(visitor, position, EXITED)
                 }
 
             } else {
@@ -237,6 +240,14 @@ class VisitorEntryListAdapter(
 
             holder.expanded_view.visibility = View.GONE
 
+            holder.iv_call.visibility = if (visitor.vlMobile.length > 5) View.VISIBLE else View.INVISIBLE
+            holder.iv_call.setOnClickListener {
+
+                val intent = Intent(Intent.ACTION_CALL)
+                intent.data = Uri.parse("tel:" + visitor.vlMobile)
+                mcontext.startActivity(intent)
+            }
+
         }
 
 
@@ -295,36 +306,35 @@ class VisitorEntryListAdapter(
         }
     }
 
-    private fun updateVisitorStatus(vlLogId: String, position: Int, status: String) {
+    private fun updateVisitorStatus(visitor: VisitorLog, position: Int, status: String) {
 
-        val lgid = vlLogId.toInt()
+        val lgid = visitor.vlVisLgID.toInt()
         deleteEntryFromList(lgid, position, false)
         VisitorLogRepo.updateVisitorStatus(mcontext, lgid, status)
 
-    }
-    
-    private fun sendExitNotification(visitor: VisitorLog){
-        try {
-            Toast.makeText(mcontext, "Exit", Toast.LENGTH_LONG).show();
-            Log.e("sendExitNotification", "" + visitor);
-            if(visitor.isValid) {
-                val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
-                intentAction1.putExtra(BSR_Action, ConstantUtils.VISITOR_EXIT_NOTIFY)
-                intentAction1.putExtra("associationID", visitor.asAssnID)
-                intentAction1.putExtra("associationName", LocalDb.getAssociation()!!.asAsnName)
-                intentAction1.putExtra("ntDesc", visitor.vlfName + " from " + visitor.vlComName + " has left your premises")
-                intentAction1.putExtra("ntTitle", visitor.vlfName + " left")
-                intentAction1.putExtra("ntType", "gate_app")
-                intentAction1.putExtra("sbSubID", visitor.uNUnitID)
-                intentAction1.putExtra("userID", visitor.reRgVisID)
-                intentAction1.putExtra("unitID", visitor.uNUnitID)
 
-                mcontext.sendBroadcast(intentAction1)
+        if (status == EXITED) {
+            try {
+                if (visitor.isValid) {
+                    val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
+                    d.putExtra(BSR_Action, VisitorEntryFCM)
+                    d.putExtra("msg", " $lgid")
+                    d.putExtra("mobNum", visitor.vlMobile)
+                    d.putExtra("name", visitor.vlfName)
+                    d.putExtra("nr_id", visitor.vlVisLgID.toString())
+                    d.putExtra("unitname", visitor.unUniName)
+                    d.putExtra("memType", "Owner")
+                    d.putExtra(UNITID, visitor.unUnitID)
+                    d.putExtra(COMPANY_NAME, visitor.vlComName)
+                    d.putExtra(UNIT_ACCOUNT_ID, visitor.unUnitID)
+                    d.putExtra("VLVisLgID", visitor.vlVisLgID)
+                    d.putExtra(VISITOR_TYPE, visitor.vlVisType)
+                    mcontext.sendBroadcast(d)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        }catch (e:Exception){
-            e.printStackTrace()
         }
-
 
     }
 
@@ -462,7 +472,7 @@ class VisitorEntryListAdapter(
 
                         checkForAttachments(firebaseObject)
 
-                        val expiry_reject_time = if (debug) 30 else 3 * 60
+                        val expiry_reject_time = 30 * 60
 
                         when (fbColor) {
                             "#00ff00",
@@ -495,16 +505,16 @@ class VisitorEntryListAdapter(
                                 holder.btn_makeexit.visibility = View.INVISIBLE
                                 msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
                                 timeupCallback = {
-                                    updateVisitorStatus(vlLogId, holder.adapterPosition, REJECTED)
+                                    updateVisitorStatus(visitor, holder.adapterPosition, REJECTED)
                                 }
 
                             }
                             else -> {// pending, start timer for 30mins to remove, hide exit button
-//                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-//                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
-//                                timeupCallback = {
-//                                    updateVisitorStatus(vlLogId, holder.adapterPosition, EXPIRED)
-//                                }
+                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
+                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
+                                timeupCallback = {
+                                    updateVisitorStatus(visitor, holder.adapterPosition, EXPIRED)
+                                }
                             }
                         }
 

@@ -103,11 +103,11 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
             R.id.buttonNext -> {
 
-               /* if (useDummyValues) {
+                if (useDummyValues) {
                     textview.text = "+919930620323"
                     ccd = "+91"
                     mobileNumber = "9930620323"
-                }*/
+                }
 
                 if (textview.text.isNotEmpty()) {
 

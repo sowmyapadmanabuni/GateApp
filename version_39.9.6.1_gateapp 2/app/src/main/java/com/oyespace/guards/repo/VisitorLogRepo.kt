@@ -1,9 +1,7 @@
 package com.oyespace.guards.repo
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
-import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.models.ExitVisitorLog
 import com.oyespace.guards.models.GetExitVisitorsResponse
 import com.oyespace.guards.models.GetVisitorsResponse
@@ -45,7 +43,7 @@ class VisitorLogRepo {
 
                         override fun onSuccessResponse(response: GetVisitorsResponse<ArrayList<VisitorLogResponse>>) {
 
-                            Log.e("get_IN_VisitorLog",""+response);
+                            Log.e("get_IN_VisitorLog", "" + response)
                             if (response.success) {
                                 val visitorsList = response.data.visitorLog
                                 if (visitorsList == null) {
@@ -178,11 +176,11 @@ class VisitorLogRepo {
                                 s += "$vLogId,"
                                 Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
-                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
-                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                                context.sendBroadcast(intentAction1)
+//                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
+//                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
+//                                context.sendBroadcast(intentAction1)
 
-                            } else {
+
 
                             }
                         }

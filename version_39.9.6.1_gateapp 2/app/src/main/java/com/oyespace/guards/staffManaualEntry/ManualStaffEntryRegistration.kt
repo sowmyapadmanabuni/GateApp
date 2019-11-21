@@ -34,7 +34,6 @@ import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
-import com.oyespace.guards.utils.NumberUtils.toInteger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
@@ -337,7 +336,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                             vlog!!.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
                             vlog.mEMemID = memID
                             vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
-                            vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
+                            vlog.unUnitID = intent.getStringExtra(UNITID)
                             vlog.vlfName = intent.getStringExtra(PERSONNAME)
                             vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
                             vlog.vlComName = intent.getStringExtra(COMPANY_NAME)

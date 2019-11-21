@@ -32,7 +32,7 @@ public class RealmDataMigration implements io.realm.RealmMigration {
                     .addField("unUniName", String.class)
                     .addField("vLVerStat", String.class)
                     .addField("vLGtName", String.class)
-                    .addField("uNUnitID", int.class)
+                    .addField("unUnitID", int.class)
                     .addField("asAssnID", int.class)
                     .addField("vlEntryT", String.class)
                     .addField("vlExitT", String.class)
