@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.database.*
-import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.NotificationSyncModel
@@ -308,33 +307,33 @@ class VisitorEntryListAdapter(
 
     private fun updateVisitorStatus(visitor: VisitorLog, position: Int, status: String) {
 
-        val lgid = visitor.vlVisLgID.toInt()
+        val lgid = visitor.vlVisLgID
         deleteEntryFromList(lgid, position, false)
-        VisitorLogRepo.updateVisitorStatus(mcontext, lgid, status)
+        VisitorLogRepo.updateVisitorStatus(mcontext, visitor, status)
 
 
-        if (status == EXITED) {
-            try {
-                if (visitor.isValid) {
-                    val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
-                    d.putExtra(BSR_Action, VisitorEntryFCM)
-                    d.putExtra("msg", " $lgid")
-                    d.putExtra("mobNum", visitor.vlMobile)
-                    d.putExtra("name", visitor.vlfName)
-                    d.putExtra("nr_id", visitor.vlVisLgID.toString())
-                    d.putExtra("unitname", visitor.unUniName)
-                    d.putExtra("memType", "Owner")
-                    d.putExtra(UNITID, visitor.unUnitID)
-                    d.putExtra(COMPANY_NAME, visitor.vlComName)
-                    d.putExtra(UNIT_ACCOUNT_ID, visitor.unUnitID)
-                    d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                    d.putExtra(VISITOR_TYPE, visitor.vlVisType)
-                    mcontext.sendBroadcast(d)
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+//        if (status == EXITED) {
+//            try {
+//                if (visitor.isValid) {
+//                    val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
+//                    d.putExtra(BSR_Action, VisitorEntryFCM)
+//                    d.putExtra("msg", " $lgid")
+//                    d.putExtra("mobNum", visitor.vlMobile)
+//                    d.putExtra("name", visitor.vlfName)
+//                    d.putExtra("nr_id", visitor.vlVisLgID.toString())
+//                    d.putExtra("unitname", visitor.unUniName)
+//                    d.putExtra("memType", "Owner")
+//                    d.putExtra(UNITID, visitor.unUnitID)
+//                    d.putExtra(COMPANY_NAME, visitor.vlComName)
+//                    d.putExtra(UNIT_ACCOUNT_ID, visitor.unUnitID)
+//                    d.putExtra("VLVisLgID", visitor.vlVisLgID)
+//                    d.putExtra(VISITOR_TYPE, visitor.vlVisType)
+//                    mcontext.sendBroadcast(d)
+//                }
+//            } catch (e: Exception) {
+//                e.printStackTrace()
+//            }
+//        }
 
     }
 

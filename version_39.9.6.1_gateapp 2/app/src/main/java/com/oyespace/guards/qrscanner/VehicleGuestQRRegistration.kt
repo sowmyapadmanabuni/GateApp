@@ -17,10 +17,6 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -105,10 +101,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
         //  tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER))
 
-        tv_totalperson.text =
-            resources.getString(R.string.textperson) + ": " + intent.getStringExtra(
-                NUMBEROFPERSONS
-            ).toInt()
+        menuCount.text = "$minteger"
         tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
@@ -116,7 +109,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
             minteger++
             //  menuCount.setText("" + minteger)
-            tv_totalperson.text = resources.getString(R.string.textperson) + ": " + minteger
+            menuCount.text = "$minteger"
 
         }
 
@@ -124,7 +117,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             if (minteger > 1) {
                 minteger--
                 //  menuCount.setText("" + minteger)
-                tv_totalperson.text = resources.getString(R.string.textperson) + ": " + minteger
+                menuCount.text = "$minteger"
 
             } else {
 

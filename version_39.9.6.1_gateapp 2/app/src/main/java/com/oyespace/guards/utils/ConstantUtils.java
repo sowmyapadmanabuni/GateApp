@@ -120,8 +120,8 @@ public class ConstantUtils {
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
 
-    public static final boolean debug = false;
-    public static final boolean useDummyValues = false;
+    public static final boolean debug = true;
+    public static final boolean useDummyValues = true;
 
     public static final String SNOOZE_SCHEDULE_TIME = "SNOOZE_SCHEDULE_TIME";
     public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
