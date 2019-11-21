@@ -97,7 +97,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra("WORKERID", intent.getIntExtra("WORKERID", 0))
-                d.putExtra("UNITNAME", intent.getStringExtra("UNITNAME"))
+                d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                 d.putExtra("Image", intent.getStringExtra("Image"))
                 startActivity(d)
                 finish()
@@ -125,7 +125,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                             Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("UNITNAME"), intent.getStringExtra("Image"))
+                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITNAME), intent.getStringExtra("Image"))
                         }
 
 
@@ -186,7 +186,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
             d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
             d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-            d.putExtra("UNITNAME", intent.getStringExtra("UNITNAME"))
+            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
             d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
             d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
             d.putExtra(VISITOR_TYPE, "STAFF")
@@ -966,13 +966,13 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
 
                     visitorLog(
-                        intent.getStringExtra("UNITID"),
+                        intent.getStringExtra(UNITID),
                         intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
                         intent.getStringExtra(MOBILENUMBER),
                         intent.getStringExtra("DESIGNATION"),
                         intent.getStringExtra("WORKTYPE"),
                         workerID.toInt(),
-                        intent.getStringExtra("UNITNAME")
+                        intent.getStringExtra(UNITNAME)
                     )
                     //   }
 

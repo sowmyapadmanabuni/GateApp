@@ -370,7 +370,7 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         _intent.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
         _intent.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
         _intent.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-        _intent.putExtra("UNITNAME", intent.getStringExtra("UNITNAME"))
+        _intent.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
         startActivity(_intent)
         finish()
     }
