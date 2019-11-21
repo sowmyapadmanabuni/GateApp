@@ -17,6 +17,7 @@ import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
+import com.oyespace.guards.utils.ConstantUtils.PENDING
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
@@ -133,7 +134,7 @@ class VisitorLogRepo {
                 val actTime = vl.vlsActTm
                 val status = vl.vlApprStat
 
-                if (status.equals("pending", true)) {
+                if (status.equals(PENDING, true)) {
                     underStaying.add(vl)
                 } else {
                     val msLeft = DateTimeUtils.msLeft(actTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)

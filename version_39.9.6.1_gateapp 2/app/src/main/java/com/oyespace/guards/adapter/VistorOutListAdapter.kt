@@ -133,7 +133,7 @@ class VistorOutListAdapter(
 
         if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
             holder.exitTime.text = ""
-            holder.exitdate.text = ""
+//            holder.exitdate.text = ""
             holder.btn_makeexit.visibility = View.VISIBLE
 
             if (visitor.vlVisType.equals(DELIVERY) && deliveryTimeUp(
@@ -159,7 +159,7 @@ class VistorOutListAdapter(
                 "Timme",
                 formatDateHM(visitor.vlExitT) + "..." + (visitor.vlExitT).substring(11, 19)
             )
-            holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
+//            holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
             holder.btn_makeexit.visibility = View.INVISIBLE
             holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
             holder.ll_card.animation = null
@@ -280,7 +280,7 @@ class VistorOutListAdapter(
         val iv_call: ImageButton
         val iv_user: ImageView
         val entrydate: TextView
-        val exitdate: TextView
+        //        val exitdate: TextView
         val ll_card: LinearLayout
         val rv_images: RecyclerView
         val expanded_view: ConstraintLayout
@@ -305,7 +305,7 @@ class VistorOutListAdapter(
             iv_user = view.findViewById(R.id.iv_user)
             expanded_view = view.findViewById(R.id.expanded_view)
             entrydate = view.findViewById(R.id.tv_entrydate)
-            exitdate = view.findViewById(R.id.tv_exitdate)
+//            exitdate = view.findViewById(R.id.tv_exitdate)
             ll_card = view.findViewById(R.id.ll_card)
             lyt_text = view.findViewById(R.id.lyt_text)
             iv_attachment = view.findViewById(R.id.iv_attachment)

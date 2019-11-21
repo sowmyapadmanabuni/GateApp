@@ -87,9 +87,11 @@
                         android:text="Unit Name"
                         android:paddingTop="2dp"
                         />
-                <RelativeLayout android:layout_width="match_parent"
+
+                <View
+                        android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/orange"></RelativeLayout>
+                        android:background="@color/orange" />
                 <LinearLayout android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         >
@@ -135,16 +137,16 @@
                             android:paddingLeft="10dp"
                             android:text="Entry Date"
                             />
-                    <TextView
-                            android:id="@+id/tv_exitdate"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:textSize="10sp"
-                            android:textColor="@color/black"
-                            android:paddingLeft="10dp"
-                            android:text="Exit Date"
-                            />
+                    <!--                    <TextView-->
+                    <!--                            android:id="@+id/tv_exitdate"-->
+                    <!--                            android:layout_width="0dp"-->
+                    <!--                            android:layout_height="wrap_content"-->
+                    <!--                            android:layout_weight="1"-->
+                    <!--                            android:textSize="10sp"-->
+                    <!--                            android:textColor="@color/black"-->
+                    <!--                            android:paddingLeft="10dp"-->
+                    <!--                            android:text="Exit Date"-->
+                    <!--                            />-->
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout android:layout_width="0dp"
