@@ -551,13 +551,13 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                            // getAccountDetails(countryCode.toString(), phone.toString());
 
                             visitorLog(
-                                intent.getStringExtra("UNITID"),
+                                intent.getStringExtra(UNITID),
                                 intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
                                 intent.getStringExtra(MOBILENUMBER),
                                 intent.getStringExtra("DESIGNATION"),
                                 intent.getStringExtra("WORKTYPE"),
                                 intent.getIntExtra("WORKERID", 0),
-                                intent.getStringExtra("UNITNAME")
+                                intent.getStringExtra(UNITNAME)
                             )
 
                             buttonNext.isEnabled = false
@@ -779,13 +779,13 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                 override fun onErrorResponse(e: Throwable) {
 
                     visitorLog(
-                        intent.getStringExtra("UNITID"),
+                        intent.getStringExtra(UNITID),
                         intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
                         intent.getStringExtra(MOBILENUMBER),
                         intent.getStringExtra("DESIGNATION"),
                         intent.getStringExtra("WORKTYPE"),
                         intent.getIntExtra("WORKERID", 0),
-                        intent.getStringExtra("UNITNAME")
+                        intent.getStringExtra(UNITNAME)
                     )
 
                     buttonNext.isEnabled = false

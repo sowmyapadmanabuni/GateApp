@@ -94,21 +94,23 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             holder.btn_makeentry.isEnabled = false
             holder.btn_makeentry.isClickable = false
 
+if(staffdata.isValid){
             val d = Intent(mcontext, MobileNumberforEntryScreen::class.java)
-            d.putExtra("UNITID", staffdata.unUnitID)
+            d.putExtra(UNITID, staffdata.unUnitID)
             d.putExtra("FIRSTNAME", staffdata.wkfName)
             d.putExtra("LASTNAME", staffdata.wklName)
             d.putExtra(MOBILENUMBER, staffdata.wkMobile)
             d.putExtra("DESIGNATION", staffdata.wkDesgn)
             d.putExtra("WORKTYPE", staffdata.wkWrkType)
             d.putExtra(ConstantUtils.WORKER_ID, staffdata.wkWorkID)
-            d.putExtra("UNITNAME", staffdata.unUniName)
+            d.putExtra(UNITNAME, staffdata.unUniName)
             d.putExtra("Image", staffdata.wkEntryImg)
             d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
             d.putExtra("BIRTHDAY", staffdata.wkdob)
 
             mcontext.startActivity(d)
             (mcontext as Activity).finish()
+}
 
         }
 
@@ -117,14 +119,14 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
 
             val intent = Intent(mcontext, EditStaffActivity::class.java)
 
-            intent.putExtra("UNITID", staffdata.unUnitID)
+            intent.putExtra(UNITID, staffdata.unUnitID)
             intent.putExtra("FIRSTNAME", staffdata.wkfName)
             intent.putExtra("LASTNAME", staffdata.wklName)
             intent.putExtra(MOBILENUMBER, staffdata.wkMobile)
             intent.putExtra("DESIGNATION", staffdata.wkDesgn)
             intent.putExtra("WORKTYPE", staffdata.wkWrkType)
             intent.putExtra(WORKER_ID, staffdata.wkWorkID)
-            intent.putExtra("UNITNAME", staffdata.unUniName)
+            intent.putExtra(UNITNAME, staffdata.unUniName)
             intent.putExtra("IMAGE", staffdata.wkEntryImg)
             intent.putExtra("DOB", staffdata.wkdob)
 

@@ -492,6 +492,11 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
 
+        <activity
+                android:name=".resident.ResidentMobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+
     </application>
 
 </manifest>

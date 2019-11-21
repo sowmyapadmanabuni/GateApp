@@ -378,6 +378,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                                 d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                                                 sendBroadcast(d)
+
+                                                Log.v("DELIVERY",visitor.vlVisLgID.toString())
                                             }
                                         }
                                         dismissProgress()
