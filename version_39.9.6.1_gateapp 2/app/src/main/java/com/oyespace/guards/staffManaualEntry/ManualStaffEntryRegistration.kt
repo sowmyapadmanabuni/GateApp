@@ -821,13 +821,13 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
 
                         if(getdata.data.visitorLog.vlMobile.equals(intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER))) {
-                            Toast.makeText(this@ManualStaffEntryRegistration,getdata.data.visitorLog.vlMobile+".."+intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),Toast.LENGTH_LONG).show()
+                           // Toast.makeText(this@ManualStaffEntryRegistration,getdata.data.visitorLog.vlMobile+".."+intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),Toast.LENGTH_LONG).show()
 
-//                            Utils.showToast(
-//                                this@ManualStaffEntryRegistration,
-//                                "Duplicate Entry not allowed"
-//                            )
-                            //  showToast(this@Dashboard,workerID.toString())
+                            Utils.showToast(
+                                this@ManualStaffEntryRegistration,
+                                "Duplicate Entry not allowed"
+                            )
+                             // showToast(this@Dashboard,workerID.toString())
                         }
                         else{
                             visitorLog(intent.getStringExtra(UNITNAME), intent.getStringExtra(UNITID), intent.getStringExtra(UNIT_ACCOUNT_ID))
