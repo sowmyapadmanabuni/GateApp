@@ -45,7 +45,7 @@ class VisitorLogRepo {
 
                         override fun onSuccessResponse(response: GetVisitorsResponse<ArrayList<VisitorLogResponse>>) {
 
-                            Log.e("get_IN_VisitorLog",""+response);
+                            Log.e("get_IN_VisitorLog", "" + response)
                             if (response.success) {
                                 val visitorsList = response.data.visitorLog
                                 if (visitorsList == null) {
@@ -160,7 +160,9 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
         }
 
-        fun updateVisitorStatus(context: Context, vLogId: Int, status: String) {
+        fun updateVisitorStatus(context: Context, visitor: VisitorLog, status: String) {
+
+            val vLogId = visitor.vlVisLgID
 
             val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status)
             CompositeDisposable().add(
@@ -178,11 +180,33 @@ class VisitorLogRepo {
                                 s += "$vLogId,"
                                 Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
-                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
-                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                                context.sendBroadcast(intentAction1)
+//                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
+//                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
+//                                context.sendBroadcast(intentAction1)
+                                if (status == ConstantUtils.EXITED) {
+                                    try {
+                                        if (visitor.isValid) {
+                                            val d = Intent(context, BackgroundSyncReceiver::class.java)
+                                            d.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                            d.putExtra("msg", "exited staff: $vLogId")
+                                            d.putExtra("mobNum", visitor.vlMobile)
+                                            d.putExtra("name", visitor.vlfName)
+                                            d.putExtra("nr_id", visitor.vlVisLgID.toString())
+                                            d.putExtra("unitname", visitor.unUniName)
+                                            d.putExtra("memType", "Owner")
+                                            d.putExtra(ConstantUtils.UNITID, visitor.unUnitID)
+                                            d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
+                                            d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
+                                            d.putExtra("VLVisLgID", visitor.vlVisLgID)
+                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                            context.sendBroadcast(d)
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
 
-                            } else {
+
 
                             }
                         }

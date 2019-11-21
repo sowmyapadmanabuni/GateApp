@@ -1,7 +1,5 @@
 package com.oyespace.guards.responce;
 
-import java.io.Serializable;
-
 public class RequestDTO {
 	public String vLFName;
 	public String vLLName;
@@ -185,9 +183,9 @@ public class RequestDTO {
 			",uNUniName = '" + uNUniName + '\'' + 
 			",rERgVisID = '" + rERgVisID + '\'' + 
 			",mEMemID = '" + mEMemID + '\'' + 
-			",vLVerStat = '" + vLVerStat + '\'' + 
-			",vLGtName = '" + vLGtName + '\'' + 
-			",uNUnitID = '" + uNUnitID + '\'' + 
+			",vLVerStat = '" + vLVerStat + '\'' +
+                    ",vLGtName = '" + vLGtName + '\'' +
+                    ",unUnitID = '" + uNUnitID + '\'' +
 			",aSAssnID = '" + aSAssnID + '\'' +
 					",VLEntryImg = '" + VLEntryImg + '\'' +
 					"}";

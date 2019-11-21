@@ -1120,7 +1120,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     // if yes, then make exit call
                     if (staff != null) {
                         t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        VisitorLogRepo.updateVisitorStatus(this, staff.vlVisLgID, EXITED)
+                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
                         loadEntryVisitorLog()
                     } else {
 

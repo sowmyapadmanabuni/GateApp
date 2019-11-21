@@ -65,7 +65,7 @@ public class VisitorEntryLogRealm {
 //                    vlog.setAsAssnID(assId);
 //                    vlog.setMEMemID(memID);
 //                    vlog.setReRgVisID(regVisID);
-//                    vlog.setUNUnitID(unitID);
+//                    vlog.setUnUnitID(unitID);
 //                    vlog.setVlfName(fName);
 //                    vlog.setVlMobile(mobile);
 //                    vlog.setVlComName(compName);

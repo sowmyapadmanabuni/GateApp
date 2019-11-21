@@ -36,7 +36,6 @@ import kotlinx.android.synthetic.main.activity_final_registration.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
@@ -50,8 +49,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_device_name: TextView
 
     var count = 0
-    val visitorsList: ArrayList<VisitorLog> = arrayListOf<VisitorLog>()
-    val unitNameIdMap = HashMap<String, String>()
 
     override fun onClick(v: View?) {
 
@@ -92,7 +89,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                         unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                         unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                        unitNameIdMap.clear()
+
                         if (unitname_dataList.size > 0) {
 
                             count = unitname_dataList.size
@@ -316,8 +313,6 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
         Log.e("taaag", "uploading image: $imgName")
 
-        unitNameIdMap[UNUniName] = UNUnitID
-
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),
@@ -363,9 +358,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
                                         val visitors = VisitorLogRepo.get_IN_VisitorsForName(intent.getStringExtra(PERSONNAME))
                                         if (debug) {
-                                        //    Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
                                         }
-                                        Log.e("taaag", "map map: $unitNameIdMap")
                                         if (visitors != null) {
 
                                             for (visitor in visitors) {
@@ -378,7 +372,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                                 d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
                                                 d.putExtra("unitname", visitor.unUniName)
                                                 d.putExtra("memType", "Owner")
-                                                d.putExtra(UNITID, unitNameIdMap[visitor.unUniName])
+                                                d.putExtra(UNITID, visitor.unUnitID)
                                                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                                                 d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
                                                 d.putExtra("VLVisLgID", visitor.vlVisLgID)

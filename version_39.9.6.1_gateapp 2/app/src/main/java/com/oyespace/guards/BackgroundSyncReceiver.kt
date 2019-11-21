@@ -105,7 +105,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
 
                 } catch (e: Exception) {
-
+                    e.printStackTrace()
                 }
 //                sendFCM(intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                    intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
