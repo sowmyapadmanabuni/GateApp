@@ -134,12 +134,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
             e.printStackTrace()
         }
 
-//
-        //  ed_dob?.setText(sDOB.substring(0,10))
-//        month = calendar!!.get(Calendar.MONTH);
-//        day = calendar!!.get(Calendar.DAY_OF_MONTH);
 
-        // showDate(year, month+1, day);
 
         tv_name = findViewById(R.id.tv_name)
         overlapImage = findViewById(R.id.overlapImage)
@@ -311,13 +306,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                     editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
 
                 }
-//                    }else {
-//                        GetWorkersListByMobileNumberAndAssocID(
-//                            tv_mobilenumber!!.text.toString(),
-//                            Prefs.getInt(ASSOCIATION_ID, 0)
-//                        )
-//
-//                    }
+
 
 
             }
@@ -345,14 +334,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
     }
 
 
-//    override fun onCreateDialog(id: Int): Dialog? {
-//        // TODO Auto-generated method stub
-//        return if (id == 999) {
-//            DatePickerDialog(this,myDateListener, year, month, day)
-//
-//
-//        } else null
-//    }
+
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -369,40 +351,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         }
 
     }
-//    fun setDate() {
-//        showDialog(999)
-////        Toast.makeText(
-////            applicationContext, "ca",
-////            Toast.LENGTH_SHORT
-////        )
-////            .show()
-//    }
-//    private fun showDate(year: Int, month: Int, day: Int) {
-//        ed_dob!!.setText(
-//            StringBuilder().append(day).append("/")
-//                .append(month).append("/").append(year)
-//        )
-//    }
-//    private val myDateListener = DatePickerDialog.OnDateSetListener { arg0, arg1, arg2, arg3 ->
-//        // TODO Auto-generated method stub
-//        // arg1 = year
-//        // arg2 = month
-//        // arg3 = day
-//        showDate(arg1, arg2 + 1, arg3)
-//    }
 
-
-    //    {
-//        "WKFName"	 : "knlk",
-//        "WKMobile"   : "+919490791523",
-//        "WKImgName"  : "sdsd",
-//        "WKWrkType"  : "sdsd",
-//        "WKDesgn"    : "ddf00",
-//        "WKIDCrdNo"  : "sdfds",
-//        "WKDOB"		 : "11-09-2019",
-//        "WKIsActive" : "true",
-//        "WKWorkID"   : 8
-//    }
     private fun editStaff(
         WKFName: String,
         WKMobile: String,
@@ -644,79 +593,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         registerReceiver(receiver, IntentFilter(action))
     }
 
-    private fun GetWorkersListByMobileNumberAndAssocID(WKMobile: String, ASAssnID: Int) {
 
-
-        val req = GetWorkersListByMobileNumberReq(WKMobile, ASAssnID)
-
-        compositeDisposable.add(
-            RetrofitClinet.instance.GetWorkersListByMobileNumberAndAssocID(ConstantUtils.OYE247TOKEN, req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<GetWorkersListByMobileNumberResp>() {
-                    override fun onSuccessResponse(globalApiObject: GetWorkersListByMobileNumberResp) {
-                        if (globalApiObject.success == true) {
-
-                            if (globalApiObject.data.message.equals("Invalid MobileNumber")) {
-
-//                            showProgress()
-//
-//                            if(imgName!=null) {
-//                                editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), imgName!!, "Staff", tv_designation!!.text.toString(), "", ed_dob!!.text.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
-//
-//                            }
-//                            else{
-//                                editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", ed_dob!!.text.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
-//
-//                            }
-
-                            } else {
-
-                                if (output!!.format(oneWayTripDate).equals("01-01-0001")) {
-                                    ed_dob?.hint =
-                                        resources.getString(R.string.textselectdob)    // format output
-                                } else {
-                                    ed_dob?.text = output!!.format(oneWayTripDate)
-                                }
-                                val builder = AlertDialog.Builder(this@EditStaffActivity)
-                                // builder.setTitle("Vendor Entry already done")
-                                builder.setMessage(globalApiObject.data.message + ". Please Try again")
-                                builder.setPositiveButton("Ok") { dialog, which ->
-
-
-                                    dialog.dismiss()
-                                    tv_mobilenumber!!.text = intent.getStringExtra(ConstantUtils.MOBILENUMBER)
-
-
-//                                    val d = Intent(this@MobileNumberScreen, Dashboard::class.java)
-//                                    startActivity(d)
-//                                    finish()
-                                }
-                                builder.setCancelable(false)
-                                builder.show()
-                                // Toast.makeText(this@EditStaffActivity,globalApiObject.data.message,Toast.LENGTH_LONG).show()
-
-                            }
-                        }
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-//                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                        Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
-                    }
-
-                    override fun noNetowork() {
-//                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                    }
-
-                    override fun onShowProgress() {
-                    }
-
-                    override fun onDismissProgress() {
-                    }
-                })
-        )
-    }
 
 
 }

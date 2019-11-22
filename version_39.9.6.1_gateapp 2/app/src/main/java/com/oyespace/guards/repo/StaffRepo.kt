@@ -13,6 +13,9 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.RealmResults
+
 
 class StaffRepo {
 
@@ -35,10 +38,10 @@ class StaffRepo {
 
 
                             if (workerListResponse.data.worker != null) {
-
+                                val realm = Realm.getDefaultInstance()
                                 val arrayList = workerListResponse.data.worker
 
-
+                             //   val result: RealmResults<Worker> = realm.where(Worker::class.java).findAllSorted("wkfName")
                                 if (arrayList == null) {
                                     listener?.onFetch(null)
                                 } else {

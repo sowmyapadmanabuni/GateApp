@@ -12,7 +12,7 @@ public class StaffRealm {
     public static ArrayList<Worker> getStaff() {
         Realm realm = Realm.getDefaultInstance();
         ArrayList<Worker> list = new ArrayList<>();
-        list.addAll(realm.where(Worker.class).findAll());
+        list.addAll(realm.where(Worker.class).findAll().sort("wkfName"));
         realm.close();
         return list;
 
