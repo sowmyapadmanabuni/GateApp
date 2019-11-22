@@ -57,15 +57,17 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         mcontext = context
         if (intent.getStringExtra(BSR_Action).equals(VisitorEntryFCM)) {
 
+            val sendNotification = intent.getBooleanExtra(SEND_NOTIFICATION, true)
+
             if (intent.getStringExtra("unitname").contains(",")) {
 
-                var unitname_dataList: Array<String>
-                var unitid_dataList: Array<String>
+                val unitname_dataList: Array<String>
+                val unitid_dataList: Array<String>
                 var unitAccountId_dataList: Array<String>
                 unitname_dataList = intent.getStringExtra("unitname").split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                unitid_dataList=intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                if(unitid_dataList.size>0) {
+                if (unitid_dataList.size > 0) {
                     for (i in 0 until unitid_dataList.size) {
 
                         try {
@@ -80,9 +82,10 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 unitname_dataList.get(i).replace(" ", ""),
                                 intent.getIntExtra("VLVisLgID", 0),
                                 intent.getStringExtra("msg"),
-                                intent.getStringExtra("nr_id")
+                                intent.getStringExtra("nr_id"),
+                                sendNotification
                             )
-                        }catch (e:Exception){
+                        } catch (e: Exception) {
 
                         }
 //                        sendFCM(intent.getStringExtra("msg"), intent.getStringExtra("mobNum"),
@@ -101,8 +104,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 }
             } else {
 
-                try{
-                    getUnitLog(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra("name"),"",intent.getStringExtra(VISITOR_TYPE),"Staff",0, intent.getStringExtra("name"),intent.getIntExtra("VLVisLgID",0),intent.getStringExtra("msg"),intent.getStringExtra("nr_id"))
+                try {
+                    getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), "Staff", 0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0), intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification)
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -182,14 +185,14 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             val sosStatus = intent.getStringExtra("sos_status")
             val gateNumber = Prefs.getString(ConstantUtils.GATE_NO, "")
             val gateMob = Prefs.getString(ConstantUtils.GATE_MOB, "")
-            if(sosId != 0 && !sosStatus.equals("")) {
+            if (sosId != 0 && !sosStatus.equals("")) {
                 Log.e("BGS_SOS_STATUS", "" + sosId + " " + gateNumber + " " + gateMob + " " + sosStatus)
                 val sosObj: SOSUpdateReq = SOSUpdateReq(sosId, gateNumber, gateMob, sosStatus)
                 updateSOS(sosObj)
             }
-        }else if(intent.getStringExtra(BSR_Action).equals(BGS_PATROLLING_ALARM)){
+        } else if (intent.getStringExtra(BSR_Action).equals(BGS_PATROLLING_ALARM)) {
             getPatrollingSchedules()
-        }else if(intent.getStringExtra(BSR_Action).equals(VISITOR_EXIT_NOTIFY)){
+        } else if (intent.getStringExtra(BSR_Action).equals(VISITOR_EXIT_NOTIFY)) {
             try {
                 val associationID: Int = intent.getIntExtra("associationID", 0)//14948
                 val associationName: String = intent.getStringExtra("associationName")
@@ -199,8 +202,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 val sbSubID: String = intent.getStringExtra("sbSubID")//40841
                 val userID: Int = intent.getIntExtra("userID", 0)
                 val unitID: String = intent.getStringExtra("unitID")//40841
-                sendCloudFunctionNotification(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID)
-            }catch (e:Exception){
+                sendCloudFunctionNotification(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
@@ -226,9 +229,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                             for (i in 0 until staffBiometricResp.data.fingerPrint.size) {
 
-                                Log.d("getStaffBiometric",
-                                    "finger " + " " +intToString(staffBiometricResp.data.fingerPrint.get(i).fmid)+ " " +
-                                            staffBiometricResp.data.fingerPrint.get(i).fpFngName+ " " )
+                                Log.d(
+                                    "getStaffBiometric",
+                                    "finger " + " " + intToString(staffBiometricResp.data.fingerPrint.get(i).fmid) + " " +
+                                            staffBiometricResp.data.fingerPrint.get(i).fpFngName + " "
+                                )
                                 val fp1 = staffBiometricResp.data.fingerPrint.get(i).fpImg1
                                 val fp2 = staffBiometricResp.data.fingerPrint.get(i).fpImg2
                                 val fp3 = staffBiometricResp.data.fingerPrint.get(i).fpImg3
@@ -281,15 +286,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     }
 
-    private fun sendFCM(msg :String,  mobNum : String,name :String,nr_id :String,unitname:String,memType:String) {
+    private fun sendFCM(msg: String, mobNum: String, name: String, nr_id: String, unitname: String, memType: String) {
 
-        val dataReq = VisitorEntryFCMData("visitorEntryApproval", Prefs.getInt(ASSOCIATION_ID,0), msg, mobNum, name, nr_id )
-        Log.d("sendFCM","dataReq "+dataReq.toString())
-        var req =VisitorEntryFCMReq(dataReq, "/topics/UnitOwner" + unitname.trim()+"Assn"+Prefs.getInt(ASSOCIATION_ID,0) )
-        Log.d("sendFCM","req "+req.toString())
+        val dataReq = VisitorEntryFCMData("visitorEntryApproval", Prefs.getInt(ASSOCIATION_ID, 0), msg, mobNum, name, nr_id)
+        Log.d("sendFCM", "dataReq " + dataReq.toString())
+        var req = VisitorEntryFCMReq(dataReq, "/topics/UnitOwner" + unitname.trim() + "Assn" + Prefs.getInt(ASSOCIATION_ID, 0))
+        Log.d("sendFCM", "req " + req.toString())
 
-        if(memType.equals("Tenant")) {
-            req = VisitorEntryFCMReq(dataReq, "/topics/UnitTenant" + unitname + "Assn" + Prefs.getInt(ASSOCIATION_ID,0))
+        if (memType.equals("Tenant")) {
+            req = VisitorEntryFCMReq(dataReq, "/topics/UnitTenant" + unitname + "Assn" + Prefs.getInt(ASSOCIATION_ID, 0))
         }
 
         val compositeDisposable = CompositeDisposable()
@@ -300,7 +305,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
                     override fun onSuccessResponse(globalApiObject: VisitorEntryFCMResp) {
-                        Log.d("sendFCM","StaffEntry "+globalApiObject.message_id+" "+globalApiObject.toString())
+                        Log.d("sendFCM", "StaffEntry " + globalApiObject.message_id + " " + globalApiObject.toString())
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -387,9 +392,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     }
 
-    private fun getPatrollingSchedules(){
+    private fun getPatrollingSchedules() {
         RetrofitClinet.instance
-            .patrolScheduleList(OYE247TOKEN,(Prefs.getString(GATE_NO, "")), AppUtils.intToString(Prefs.getInt(ASSOCIATION_ID, 0)))
+            .patrolScheduleList(OYE247TOKEN, (Prefs.getString(GATE_NO, "")), AppUtils.intToString(Prefs.getInt(ASSOCIATION_ID, 0)))
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<ShiftsListResponse<ArrayList<PatrolShift>>>() {
@@ -398,12 +403,12 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                     if (PatrolList.success == true) {
                         Log.e("ALARM_PATR", "" + PatrolList.data.patrollingShifts)
-                        for(schedules:PatrolShift in PatrolList.data.patrollingShifts){
-                            val sdf:SimpleDateFormat = SimpleDateFormat("EEEE")
-                            val d:Date = Date()
+                        for (schedules: PatrolShift in PatrolList.data.patrollingShifts) {
+                            val sdf: SimpleDateFormat = SimpleDateFormat("EEEE")
+                            val d: Date = Date()
                             val day = sdf.format(d)
                             Log.e("ALARM_DAY", "" + day)
-                            if(schedules.psRepDays.contains(day,ignoreCase = true)){
+                            if (schedules.psRepDays.contains(day, ignoreCase = true)) {
                                 Log.e("ALARM_DAYFOUND", "" + day)
                                 val timeFormat = SimpleDateFormat("yyyy-MM-dd")
                                 var currentTimeObj = timeFormat.format(Date())
@@ -413,70 +418,70 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 val formatter = SimpleDateFormat("HH:mm:ss")
                                 val formattedDate = formatter.format(parser.parse(schedules.pssTime))
 
-                                currentTimeObj = currentTimeObj+"T"+formattedDate
+                                currentTimeObj = currentTimeObj + "T" + formattedDate
 
                                 //val startTime:String = AppUtils.getTimeFromDate(schedules.pssTime)
                                 //var startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(schedules.pssTime)
                                 val startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(currentTimeObj)
 
-                                Log.e("startTimeObj_NEW",""+ currentTimeObj)
-                                Log.e("startTimeObj",""+ startTimeObj.time)
-                                Log.e("endTime",""+ Date().time)
-                                val diff = startTimeObj.time-Date().time
+                                Log.e("startTimeObj_NEW", "" + currentTimeObj)
+                                Log.e("startTimeObj", "" + startTimeObj.time)
+                                Log.e("endTime", "" + Date().time)
+                                val diff = startTimeObj.time - Date().time
                                 val seconds = diff / 1000
                                 val minutes = seconds / 60
 
-                                val snoozeScheduleTime = Prefs.getString(SNOOZE_SCHEDULE_TIME+schedules.psPtrlSID,"")
-                                val tempIsSnoozed = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
-                                if(tempIsSnoozed && !snoozeScheduleTime.equals("") && !snoozeScheduleTime.equals(schedules.pssTime)){
-                                    Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_IS_ACTIVE+schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_TIME+schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_SCHEDULE_TIME+schedules.psPtrlSID)
+                                val snoozeScheduleTime = Prefs.getString(SNOOZE_SCHEDULE_TIME + schedules.psPtrlSID, "")
+                                val tempIsSnoozed = Prefs.getBoolean("IS_SNOOZED_" + schedules.psPtrlSID, false)
+                                if (tempIsSnoozed && !snoozeScheduleTime.equals("") && !snoozeScheduleTime.equals(schedules.pssTime)) {
+                                    Prefs.remove(SNOOZE_COUNT + schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_IS_ACTIVE + schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_TIME + schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_SCHEDULE_TIME + schedules.psPtrlSID)
                                 }
 
-                                val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+schedules.psPtrlSID,false)
-                                val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+schedules.psPtrlSID,0)
-                                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+schedules.psPtrlSID,"")
-                                val snoozeMins:Long = getTimeDifference(snoozedTime)
-                                val completedTime = Prefs.getString(PATROLLING_COMPLETED_ON+schedules.psPtrlSID,"")
+                                val isSnoozed: Boolean = Prefs.getBoolean("IS_SNOOZED_" + schedules.psPtrlSID, false)
+                                val snoozeCount: Int = Prefs.getInt(SNOOZE_COUNT + schedules.psPtrlSID, 0)
+                                val snoozedTime: String = Prefs.getString(SNOOZE_TIME + schedules.psPtrlSID, "")
+                                val snoozeMins: Long = getTimeDifference(snoozedTime)
+                                val completedTime = Prefs.getString(PATROLLING_COMPLETED_ON + schedules.psPtrlSID, "")
                                 var isPatrollingCompleted = false
-                                if(!completedTime.equals("")){
-                                    val completedMins:Long = getTimeDifference(completedTime)
+                                if (!completedTime.equals("")) {
+                                    val completedMins: Long = getTimeDifference(completedTime)
                                     isPatrollingCompleted = completedMins < 6
                                 }
 
-                                Log.e("THE_DIFF",""+minutes+" - "+isSnoozed+" - "+snoozeMins+"  - "+isPatrollingCompleted)
+                                Log.e("THE_DIFF", "" + minutes + " - " + isSnoozed + " - " + snoozeMins + "  - " + isPatrollingCompleted)
 
-                                if(((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount<3 && snoozeMins>=5 && snoozeMins<17)) && !isPatrollingCompleted){
-                                    Log.e("INSIDE_1",""+(minutes <= 5 && minutes > -1)+" - "+(isSnoozed && snoozeCount<3 && snoozeMins>=5 && snoozeMins<17))
-                                    if(schedules.psSnooze){
+                                if (((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount < 3 && snoozeMins >= 5 && snoozeMins < 17)) && !isPatrollingCompleted) {
+                                    Log.e("INSIDE_1", "" + (minutes <= 5 && minutes > -1) + " - " + (isSnoozed && snoozeCount < 3 && snoozeMins >= 5 && snoozeMins < 17))
+                                    if (schedules.psSnooze) {
                                         //Snooze enabled
-                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID,schedules.pssTime)
-                                    }else{
-                                        showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID,"")
+                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID, schedules.pssTime)
+                                    } else {
+                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "OK", schedules.psPtrlSID, "")
                                     }
                                     break
 
-                                }else if(isSnoozed && snoozeCount>=3 && snoozeMins>=20){
-                                    Log.e("INSIDE_2",""+(isSnoozed && snoozeCount>=3 && snoozeMins>=20))
-                                    Prefs.remove(SNOOZE_COUNT+schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_IS_ACTIVE+schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_TIME+schedules.psPtrlSID)
+                                } else if (isSnoozed && snoozeCount >= 3 && snoozeMins >= 20) {
+                                    Log.e("INSIDE_2", "" + (isSnoozed && snoozeCount >= 3 && snoozeMins >= 20))
+                                    Prefs.remove(SNOOZE_COUNT + schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_IS_ACTIVE + schedules.psPtrlSID)
+                                    Prefs.remove(SNOOZE_TIME + schedules.psPtrlSID)
 
-                                    if(minutes <= 5 && minutes > -1 && !isPatrollingCompleted){
+                                    if (minutes <= 5 && minutes > -1 && !isPatrollingCompleted) {
 
-                                        if(schedules.psSnooze){
+                                        if (schedules.psSnooze) {
                                             //Snooze enabled
-                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID,schedules.pssTime)
-                                        }else{
-                                            showDialog("Active patrolling starts in few minutes","Patrolling",true,"OK",schedules.psPtrlSID,"")
+                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID, schedules.pssTime)
+                                        } else {
+                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "OK", schedules.psPtrlSID, "")
                                         }
                                         break
 
                                     }
                                 }
-                                Log.e("TIME_DIFF",""+ minutes)
+                                Log.e("TIME_DIFF", "" + minutes)
 
                             }
                         }
@@ -493,45 +498,45 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
-    fun showDialog(desc: String, title: String, isCancellable: Boolean, btnText: String, id:Int, scheduleTime:String) {
-        val isSOS:Boolean = Prefs.getBoolean("ACTIVE_SOS",false)
-        val isActiveAlert:Boolean = Prefs.getBoolean("ACTIVE_ALERT",false)
-        val isSnoozed:Boolean = Prefs.getBoolean("IS_SNOOZED_"+id,false)
+    fun showDialog(desc: String, title: String, isCancellable: Boolean, btnText: String, id: Int, scheduleTime: String) {
+        val isSOS: Boolean = Prefs.getBoolean("ACTIVE_SOS", false)
+        val isActiveAlert: Boolean = Prefs.getBoolean("ACTIVE_ALERT", false)
+        val isSnoozed: Boolean = Prefs.getBoolean("IS_SNOOZED_" + id, false)
 
 
-        Log.e("IS_SNOOZED_"+id,""+isSnoozed+" - ATCVE? "+isActiveAlert)
+        Log.e("IS_SNOOZED_" + id, "" + isSnoozed + " - ATCVE? " + isActiveAlert)
 
-        if(!isSOS && !isActiveAlert) {
+        if (!isSOS && !isActiveAlert) {
             val alertDlg =
                 Intent(mcontext, PatrollingAlert::class.java)
             alertDlg.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             alertDlg.putExtra("MSG", desc)
-            alertDlg.putExtra("BTN_TEXT",btnText)
-            alertDlg.putExtra("ANIM",R.raw.alarm)
-            alertDlg.putExtra("TYPE","PATROLLING_ALARM")
-            alertDlg.putExtra("SCHEDULEID",id)
-            alertDlg.putExtra("SNOOZED_SCHEDULE_TIME",scheduleTime)
+            alertDlg.putExtra("BTN_TEXT", btnText)
+            alertDlg.putExtra("ANIM", R.raw.alarm)
+            alertDlg.putExtra("TYPE", "PATROLLING_ALARM")
+            alertDlg.putExtra("SCHEDULEID", id)
+            alertDlg.putExtra("SNOOZED_SCHEDULE_TIME", scheduleTime)
 
-            if(isSnoozed){
-                val snoozeCount:Int = Prefs.getInt(SNOOZE_COUNT+id,0)
-                val snoozedTime:String = Prefs.getString(SNOOZE_TIME+id,"")
+            if (isSnoozed) {
+                val snoozeCount: Int = Prefs.getInt(SNOOZE_COUNT + id, 0)
+                val snoozedTime: String = Prefs.getString(SNOOZE_TIME + id, "")
                 val minutes = getTimeDifference(snoozedTime)
 
-                Log.e(SNOOZE_COUNT+id,""+snoozeCount)
-                Log.e(SNOOZE_TIME+id,""+snoozedTime)
-                Log.e(SNOOZE_TIME+id,"DIFFERE: "+minutes)
+                Log.e(SNOOZE_COUNT + id, "" + snoozeCount)
+                Log.e(SNOOZE_TIME + id, "" + snoozedTime)
+                Log.e(SNOOZE_TIME + id, "DIFFERE: " + minutes)
 
-                if(snoozeCount < 3 && snoozedTime != null && !snoozedTime.equals("") && minutes >= 5){
+                if (snoozeCount < 3 && snoozedTime != null && !snoozedTime.equals("") && minutes >= 5) {
                     mcontext.startActivity(alertDlg)
                 }
-            }else {
+            } else {
                 mcontext.startActivity(alertDlg)
             }
         }
     }
 
 
-    private fun getTimeDifference(dateTime:String):Long{
+    private fun getTimeDifference(dateTime: String): Long {
 
         try {
             val snoozedTimeObj = SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse(dateTime)
@@ -543,7 +548,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             val seconds = diff / 1000
             val minutes = seconds / 60
             return minutes
-        }catch (e:java.lang.Exception){
+        } catch (e: java.lang.Exception) {
             return 0
         }
     }
@@ -651,11 +656,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     fun sendFCM_toSyncNonreg() {
 
-        Log.d("SYCNCHECK","in 452")
-        val dataReq = VisitorEntryFCMData(BACKGROUND_SYNC, Prefs.getInt(ASSOCIATION_ID,0), "", "", NONREGULAR, "" )
-        Log.d("sendFCM","dataReq "+dataReq.toString())
-        var req =VisitorEntryFCMReq(dataReq, "/topics/AllGuards" +Prefs.getInt(ASSOCIATION_ID,0) )
-        Log.d("sendFCM","req "+req.toString())
+        Log.d("SYCNCHECK", "in 452")
+        val dataReq = VisitorEntryFCMData(BACKGROUND_SYNC, Prefs.getInt(ASSOCIATION_ID, 0), "", "", NONREGULAR, "")
+        Log.d("sendFCM", "dataReq " + dataReq.toString())
+        var req = VisitorEntryFCMReq(dataReq, "/topics/AllGuards" + Prefs.getInt(ASSOCIATION_ID, 0))
+        Log.d("sendFCM", "req " + req.toString())
 
         val compositeDisposable = CompositeDisposable()
 
@@ -665,14 +670,14 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
                     override fun onSuccessResponse(globalApiObject: VisitorEntryFCMResp) {
-                        Log.d("sendFCM","StaffEntry "+globalApiObject.message_id+" "+globalApiObject.toString())
-                        Log.d("SYCNCHECK","in 468")
+                        Log.d("sendFCM", "StaffEntry " + globalApiObject.message_id + " " + globalApiObject.toString())
+                        Log.d("SYCNCHECK", "in 468")
                     }
 
                     override fun onErrorResponse(e: Throwable) {
 //                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                        Log.d("sendFCM","onErrorResponse  "+e.toString())
-                        Log.d("SYCNCHECK","in 473")
+                        Log.d("sendFCM", "onErrorResponse  " + e.toString())
+                        Log.d("SYCNCHECK", "in 473")
                     }
 
                     override fun noNetowork() {
@@ -690,11 +695,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     fun sendFCM_toStopEmergencyAlert() {
 
-        Log.d("toStopEmergencyAlert","in 452")
-        val dataReq = VisitorEntryFCMData("emergencyAttend", Prefs.getInt(ASSOCIATION_ID,0), "", "", "", "" )
-        Log.d("sendFCM","dataReq "+dataReq.toString())
-        var req =VisitorEntryFCMReq(dataReq, "/topics/AllGuards" +Prefs.getInt(ASSOCIATION_ID,0) )
-        Log.d("toStopEmergencyAlert","req "+req.toString())
+        Log.d("toStopEmergencyAlert", "in 452")
+        val dataReq = VisitorEntryFCMData("emergencyAttend", Prefs.getInt(ASSOCIATION_ID, 0), "", "", "", "")
+        Log.d("sendFCM", "dataReq " + dataReq.toString())
+        var req = VisitorEntryFCMReq(dataReq, "/topics/AllGuards" + Prefs.getInt(ASSOCIATION_ID, 0))
+        Log.d("toStopEmergencyAlert", "req " + req.toString())
 
         val compositeDisposable = CompositeDisposable()
 
@@ -704,8 +709,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
                     override fun onSuccessResponse(globalApiObject: VisitorEntryFCMResp) {
-                        Log.d("sendFCM","StaffEntry "+globalApiObject.message_id+" "+globalApiObject.toString())
-                        Log.d("toStopEmergencyAlert","in 468")
+                        Log.d("sendFCM", "StaffEntry " + globalApiObject.message_id + " " + globalApiObject.toString())
+                        Log.d("toStopEmergencyAlert", "in 468")
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -730,10 +735,10 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     fun sendFCM_forAudioMessage(filename: String) {
 
 
-        val dataReq = VisitorEntryFCMData("audiomessage", Prefs.getInt(ASSOCIATION_ID,0), filename, "", "", "" )
-        Log.d("sendFCM","dataReq "+dataReq.toString())
-        var req =VisitorEntryFCMReq(dataReq, "/topics/AllGuards" +Prefs.getInt(ASSOCIATION_ID,0) )
-        Log.d("toStopEmergencyAlert","req "+req.toString())
+        val dataReq = VisitorEntryFCMData("audiomessage", Prefs.getInt(ASSOCIATION_ID, 0), filename, "", "", "")
+        Log.d("sendFCM", "dataReq " + dataReq.toString())
+        var req = VisitorEntryFCMReq(dataReq, "/topics/AllGuards" + Prefs.getInt(ASSOCIATION_ID, 0))
+        Log.d("toStopEmergencyAlert", "req " + req.toString())
 
         val compositeDisposable = CompositeDisposable()
 
@@ -743,8 +748,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(object : CommonDisposable<VisitorEntryFCMResp>() {
                     override fun onSuccessResponse(globalApiObject: VisitorEntryFCMResp) {
-                        Log.d("SENDAUDIO","StaffEntry "+globalApiObject.message_id+" "+globalApiObject.toString())
-                        Log.d("SENDAUDIO","in 549")
+                        Log.d("SENDAUDIO", "StaffEntry " + globalApiObject.message_id + " " + globalApiObject.toString())
+                        Log.d("SENDAUDIO", "in 549")
                     }
 
                     override fun onErrorResponse(e: Throwable) {
@@ -783,8 +788,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                         arrayList = ArrayList()
                         arrayList = workerListResponse.data.checkPointListByAssocID
 
-                        Collections.sort(arrayList, object : Comparator<CheckPointByAssocID>{
-                            override  fun compare(lhs: CheckPointByAssocID, rhs: CheckPointByAssocID): Int {
+                        Collections.sort(arrayList, object : Comparator<CheckPointByAssocID> {
+                            override fun compare(lhs: CheckPointByAssocID, rhs: CheckPointByAssocID): Int {
                                 return lhs.cpCkPName.compareTo(rhs.cpCkPName)
                             }
                         })
@@ -807,9 +812,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
+    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int, unitID: String) {
 
-        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
+        val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
 
 
         CloudFunctionRetrofitClinet.instance
@@ -834,9 +839,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
-    private fun sendCloudFunctionNotificationAdmin(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
+    private fun sendCloudFunctionNotificationAdmin(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int, unitID: String) {
 
-        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
+        val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
 
 
         CloudFunctionRetrofitClinet.instance
@@ -861,14 +866,12 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
+    private fun getNotificationCreate(ACAccntID: String, ASAssnID: String, NTType: String, NTDesc: String, SBUnitID: String, SBMemID: String, SBSubID: String, SBRoleID: String, ASAsnName: String, MRRolName: String, NTDUpdated: String, NTDCreated: String, VLVisLgID: String) {
 
 
-    private fun getNotificationCreate(ACAccntID:String,ASAssnID:String,NTType:String,NTDesc:String,SBUnitID:String,SBMemID:String,SBSubID:String,SBRoleID:String,ASAsnName:String,MRRolName:String,NTDUpdated:String,NTDCreated:String,VLVisLgID:String) {
+        val dataReq = NotificationCreateReq(ACAccntID, ASAssnID, NTType, NTDesc, SBUnitID, SBMemID, SBSubID, SBRoleID, ASAsnName, MRRolName, NTDUpdated, NTDCreated, VLVisLgID, "", "")
 
-
-        val dataReq = NotificationCreateReq(ACAccntID,ASAssnID,NTType,NTDesc,SBUnitID,SBMemID,SBSubID,SBRoleID ,ASAsnName,MRRolName,NTDUpdated,NTDCreated,VLVisLgID,"","")
-
-Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
+        Log.v("VisitorLog Id DATA", dataReq.SBMemID + ".." + dataReq.SBUnitID)
 
         RetrofitClinet.instance
             .getNotificationCreate(OYE247TOKEN, dataReq)
@@ -893,8 +896,8 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
             })
     }
 
-    private fun getUnitLog(unitId:Int,personName:String,mobileNumb:String, desgn:String,
-                           workerType:String,staffID:Int,unitName:String,vlVisLgID:Int,msg:String,nrId:String) {
+    private fun getUnitLog(unitId: Int, personName: String, mobileNumb: String, desgn: String,
+                           workerType: String, staffID: Int, unitName: String, vlVisLgID: Int, msg: String, nrId: String, sendNotification: Boolean) {
 
 
         RetrofitClinet.instance
@@ -904,7 +907,7 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
             .subscribe(object : CommonDisposable<UnitlistbyUnitID>() {
 
                 override fun onSuccessResponse(UnitList: UnitlistbyUnitID) {
-                    if (UnitList.success == true) {
+                    if (UnitList.success) {
 
                         if (UnitList.data.unit.unOcStat.contains("Sold Owner Occupied Unit")) {
 
@@ -915,7 +918,8 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
                                         unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
-                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID,
+                                            sendNotification
                                         )
                                     }
                                 } catch (e: IndexOutOfBoundsException) {
@@ -934,7 +938,8 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
                                         unAccountID = UnitList.data.unit.tenant[i].acAccntID.toString()
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
-                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID,
+                                            sendNotification
                                         )
 
                                     }
@@ -956,7 +961,8 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
                                             UnitList.data.unit.tenant[i].acAccntID.toString()
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
-                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID,
+                                            sendNotification
                                         )
 
                                     }
@@ -983,7 +989,8 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
                                         unAccountID = UnitList.data.unit.owner[i].acAccntID.toString()
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
-                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID
+                                            unAccountID!!.toInt(), desgn, msg, vlVisLgID,
+                                            sendNotification
                                         )
                                     }
                                 } catch (e: IndexOutOfBoundsException) {
@@ -1009,12 +1016,16 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
 
                         }
 
-                        try {     getNotificationCreate(unAccountID.toString(),Prefs.getInt(ASSOCIATION_ID,0).toString(),"gate_app",msg,unitId.toString(),vlVisLgID.toString(),vlVisLgID.toString()+"admin","gate_app",LocalDb.getAssociation()!!.asAsnName,"gate_app",
-                            DateTimeUtils.getCurrentTimeLocal(),
-                            DateTimeUtils.getCurrentTimeLocal(),
-                            vlVisLgID.toString()
-                        )
-                        }catch (e:KotlinNullPointerException){
+                        try {
+                            if (sendNotification) {
+                                getNotificationCreate(
+                                    unAccountID.toString(), Prefs.getInt(ASSOCIATION_ID, 0).toString(), "gate_app", msg, unitId.toString(), vlVisLgID.toString(), vlVisLgID.toString() + "admin", "gate_app", LocalDb.getAssociation()!!.asAsnName, "gate_app",
+                                    DateTimeUtils.getCurrentTimeLocal(),
+                                    DateTimeUtils.getCurrentTimeLocal(),
+                                    vlVisLgID.toString()
+                                )
+                            }
+                        } catch (e: KotlinNullPointerException) {
 
                         }
 //                        sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,msg,desgn,"gate_app",
@@ -1071,8 +1082,8 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
     }
 
 
-    fun getFamilyMemberData(unitId: String,assnID: Int,accountId:Int,desgn:String,msg:String,vlVisLgID:Int){
-        RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId,assnID.toString(),accountId.toString())
+    fun getFamilyMemberData(unitId: String, assnID: Int, accountId: Int, desgn: String, msg: String, vlVisLgID: Int, sendNotification: Boolean) {
+        RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId, assnID.toString(), accountId.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(object : CommonDisposable<GetFamilyMemberResponse>() {
@@ -1085,24 +1096,26 @@ Log.v("VisitorLog Id DATA",dataReq.SBMemID+".."+dataReq.SBUnitID)
                         try {
 
                             for (i in 0..getdata.data.familyMembers.size) {
-                                try {
-                                    getNotificationCreate(
-                                        getdata.data.familyMembers[i].acAccntID.toString(),
-                                        Prefs.getInt(ASSOCIATION_ID, 0).toString(),
-                                        "gate_app",
-                                        msg,
-                                        unitId.toString(),
-                                        vlVisLgID.toString(),
-                                        vlVisLgID.toString() + "admin",
-                                        "gate_app",
-                                        LocalDb.getAssociation()!!.asAsnName,
-                                        "gate_app",
-                                        DateTimeUtils.getCurrentTimeLocal(),
-                                        DateTimeUtils.getCurrentTimeLocal(),
-                                        vlVisLgID.toString()
-                                    )
-                                } catch (e: KotlinNullPointerException) {
+                                if (sendNotification) {
+                                    try {
+                                        getNotificationCreate(
+                                            getdata.data.familyMembers[i].acAccntID.toString(),
+                                            Prefs.getInt(ASSOCIATION_ID, 0).toString(),
+                                            "gate_app",
+                                            msg,
+                                            unitId.toString(),
+                                            vlVisLgID.toString(),
+                                            vlVisLgID.toString() + "admin",
+                                            "gate_app",
+                                            LocalDb.getAssociation()!!.asAsnName,
+                                            "gate_app",
+                                            DateTimeUtils.getCurrentTimeLocal(),
+                                            DateTimeUtils.getCurrentTimeLocal(),
+                                            vlVisLgID.toString()
+                                        )
+                                    } catch (e: KotlinNullPointerException) {
 
+                                    }
                                 }
                                 sendCloudFunctionNotification(
                                     Prefs.getInt(ASSOCIATION_ID, 0),

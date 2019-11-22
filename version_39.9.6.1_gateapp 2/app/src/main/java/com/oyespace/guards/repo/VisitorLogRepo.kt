@@ -114,11 +114,11 @@ class VisitorLogRepo {
 
         }
 
-        fun search_IN_Visitors(search: String): ArrayList<VisitorLog>? {
-            if (search.isEmpty()) {
+        fun search_IN_Visitors(searchStr: String): ArrayList<VisitorLog>? {
+            if (searchStr.isEmpty()) {
                 return getOverstaySortedList()
             } else {
-                return VisitorEntryLogRealm.searchVisitorLog(search)
+                return VisitorEntryLogRealm.searchVisitorLog(searchStr)
             }
         }
 
@@ -200,6 +200,7 @@ class VisitorLogRepo {
                                             d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                             d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                             d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                            d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
                                             context.sendBroadcast(d)
                                         }
                                     } catch (e: Exception) {

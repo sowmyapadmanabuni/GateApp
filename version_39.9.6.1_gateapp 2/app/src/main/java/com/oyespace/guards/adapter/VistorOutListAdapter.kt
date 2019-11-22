@@ -210,7 +210,6 @@ class VistorOutListAdapter(
             } catch (e: StringIndexOutOfBoundsException) {
             }
 
-
             val alertadd = AlertDialog.Builder(mcontext)
             val factory = LayoutInflater.from(mcontext)
             val view = factory.inflate(R.layout.dialog_big_image, null)
