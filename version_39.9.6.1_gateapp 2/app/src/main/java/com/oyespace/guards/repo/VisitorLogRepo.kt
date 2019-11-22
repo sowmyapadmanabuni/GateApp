@@ -17,6 +17,7 @@ import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.DELIVERY
+import com.oyespace.guards.utils.ConstantUtils.PENDING
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
@@ -91,8 +92,8 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
         }
 
-        fun get_IN_VisitorsForName(name: String): ArrayList<VisitorLog>? {
-            return VisitorEntryLogRealm.getVisitorsForName(name)
+        fun get_IN_PendingVisitorsForName(name: String): ArrayList<VisitorLog>? {
+            return VisitorEntryLogRealm.getPendingVisitorsForName(name)
         }
 
         fun delete_IN_Visitor(lgid: Int) {
@@ -113,11 +114,11 @@ class VisitorLogRepo {
 
         }
 
-        fun search_IN_Visitors(search: String): ArrayList<VisitorLog>? {
-            if (search.isEmpty()) {
+        fun search_IN_Visitors(searchStr: String): ArrayList<VisitorLog>? {
+            if (searchStr.isEmpty()) {
                 return getOverstaySortedList()
             } else {
-                return VisitorEntryLogRealm.searchVisitorLog(search)
+                return VisitorEntryLogRealm.searchVisitorLog(searchStr)
             }
         }
 
@@ -133,7 +134,7 @@ class VisitorLogRepo {
                 val actTime = vl.vlsActTm
                 val status = vl.vlApprStat
 
-                if (status.equals("pending", true)) {
+                if (status.equals(PENDING, true)) {
                     underStaying.add(vl)
                 } else {
                     val msLeft = DateTimeUtils.msLeft(actTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
@@ -199,6 +200,7 @@ class VisitorLogRepo {
                                             d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                             d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                             d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                            d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
                                             context.sendBroadcast(d)
                                         }
                                     } catch (e: Exception) {

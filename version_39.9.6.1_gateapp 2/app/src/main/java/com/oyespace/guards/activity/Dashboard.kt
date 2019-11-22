@@ -2192,6 +2192,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                             val visitorLogID = globalApiObject.data.visitorLog.vlVisLgID
 
                             updateFirebaseColor(visitorLogID, "#f0f0f0")
+                            loadEntryVisitorLog()
 
                             if (unitId.contains(",")) {
 

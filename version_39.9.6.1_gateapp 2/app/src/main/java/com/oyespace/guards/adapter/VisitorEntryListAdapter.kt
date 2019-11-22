@@ -138,7 +138,7 @@ class VisitorEntryListAdapter(
 
             } else {
                 holder.exitTime.text = formatDateHM(visitor.vlExitT)
-                holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
+//                holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
                 holder.btn_makeexit.visibility = View.INVISIBLE
                 holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
                 holder.ll_card.animation = null
@@ -151,7 +151,7 @@ class VisitorEntryListAdapter(
 
             val entryImg = visitor.vlEntryImg
             var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
-            Log.e("taaag", "downloading image: $imgPath")
+
             if (visitor.vlVisType.contains(STAFF, true)) {
                 if (entryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
@@ -307,33 +307,14 @@ class VisitorEntryListAdapter(
 
     private fun updateVisitorStatus(visitor: VisitorLog, position: Int, status: String) {
 
-        val lgid = visitor.vlVisLgID
-        deleteEntryFromList(lgid, position, false)
-        VisitorLogRepo.updateVisitorStatus(mcontext, visitor, status)
+        try {
+            val lgid = visitor.vlVisLgID
+            deleteEntryFromList(lgid, position, false)
+            VisitorLogRepo.updateVisitorStatus(mcontext, visitor, status)
+        } catch (e: Exception) {
 
+        }
 
-//        if (status == EXITED) {
-//            try {
-//                if (visitor.isValid) {
-//                    val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
-//                    d.putExtra(BSR_Action, VisitorEntryFCM)
-//                    d.putExtra("msg", " $lgid")
-//                    d.putExtra("mobNum", visitor.vlMobile)
-//                    d.putExtra("name", visitor.vlfName)
-//                    d.putExtra("nr_id", visitor.vlVisLgID.toString())
-//                    d.putExtra("unitname", visitor.unUniName)
-//                    d.putExtra("memType", "Owner")
-//                    d.putExtra(UNITID, visitor.unUnitID)
-//                    d.putExtra(COMPANY_NAME, visitor.vlComName)
-//                    d.putExtra(UNIT_ACCOUNT_ID, visitor.unUnitID)
-//                    d.putExtra("VLVisLgID", visitor.vlVisLgID)
-//                    d.putExtra(VISITOR_TYPE, visitor.vlVisType)
-//                    mcontext.sendBroadcast(d)
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
 
     }
 
@@ -373,7 +354,7 @@ class VisitorEntryListAdapter(
         val iv_call: ImageButton
         val iv_user: ImageView
         val entrydate: TextView
-        val exitdate: TextView
+        //        val exitdate: TextView
         val ll_card: LinearLayout
         val expanded_view: ConstraintLayout
         val lyt_text: LinearLayout
@@ -401,7 +382,7 @@ class VisitorEntryListAdapter(
             iv_user = view.findViewById(R.id.iv_user)
 
             entrydate = view.findViewById(R.id.tv_entrydate)
-            exitdate = view.findViewById(R.id.tv_exitdate)
+//            exitdate = view.findViewById(R.id.tv_exitdate)
             ll_card = view.findViewById(R.id.ll_card)
             expanded_view = view.findViewById(R.id.expanded_view)
             lyt_text = view.findViewById(R.id.lyt_text)
@@ -429,7 +410,7 @@ class VisitorEntryListAdapter(
         val venImg = visitor.vlVenImg
         val voiceNote = visitor.vlVoiceNote
         val cmnts = visitor.vlCmnts
-        var entryTime = visitor.vlEntryT
+        var actionTime = visitor.vlEntryT
         var visitorType = visitor.vlVisType
 
         override fun onCancelled(p0: DatabaseError) {}
@@ -449,7 +430,7 @@ class VisitorEntryListAdapter(
                         holder.ll_card.clearAnimation()
 
                         val fbColor = firebaseObject.buttonColor.toLowerCase()
-                        entryTime = if (dataSnapshot.hasChild("updatedTime")) {
+                        actionTime = if (dataSnapshot.hasChild("updatedTime")) {
                             firebaseObject.updatedTime
                         } else {
                             visitor.vlEntryT
@@ -471,13 +452,15 @@ class VisitorEntryListAdapter(
 
                         checkForAttachments(firebaseObject)
 
-                        val expiry_reject_time = 30 * 60
+                        val expiry_reject_time = if (debug) 30 * 60 else 30 * 60
+
+                        var onTick: (ms: Long) -> Unit = {}
 
                         when (fbColor) {
                             "#00ff00",
                             ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
                                 holder.btn_makeexit.visibility = View.VISIBLE
-                                msLeft = msLeft(entryTime, MAX_DELIVERY_ALLOWED_SEC)
+                                msLeft = msLeft(actionTime, MAX_DELIVERY_ALLOWED_SEC)
                                 if (msLeft < 0) {// time is up
                                     holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
                                     holder.isAnimating = true
@@ -485,34 +468,32 @@ class VisitorEntryListAdapter(
                                     holder.btn_makeexit.visibility = View.VISIBLE
                                 } else {
                                     timeupCallback = {
-                                        Handler().post {
-                                            VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
-                                                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                                    searchList = visitorLog
-                                                    if (visitorLog != null) {
-                                                        visitorList = visitorLog
-                                                    }
-                                                    notifyDataSetChanged()
-                                                }
-
-                                            })
-                                        }
+                                        Toast.makeText(mcontext, "overtime", Toast.LENGTH_SHORT).show()
+                                        refreshList()
                                     }
                                 }
                             }
                             REJECTED_COLOR -> {// rejected by resident, start timer for 30 mins to remove
                                 holder.btn_makeexit.visibility = View.INVISIBLE
-                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
+                                msLeft = msLeft(actionTime, expiry_reject_time)// 30 mins
+                                Toast.makeText(mcontext, "rejected $msLeft", Toast.LENGTH_SHORT).show()
                                 timeupCallback = {
+                                    Toast.makeText(mcontext, "move rejected", Toast.LENGTH_SHORT).show()
                                     updateVisitorStatus(visitor, holder.adapterPosition, REJECTED)
+                                    refreshList()
+                                }
+                                onTick = {
+                                    Log.e("taaag", "after reject: $it")
                                 }
 
                             }
                             else -> {// pending, start timer for 30mins to remove, hide exit button
                                 holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
+                                msLeft = msLeft(actionTime, expiry_reject_time)// 30 mins
                                 timeupCallback = {
+                                    Toast.makeText(mcontext, "expired", Toast.LENGTH_SHORT).show()
                                     updateVisitorStatus(visitor, holder.adapterPosition, EXPIRED)
+                                    refreshList()
                                 }
                             }
                         }
@@ -520,10 +501,10 @@ class VisitorEntryListAdapter(
                         if (timerHashMap.contains(vlLogId)) {
 
                             timerHashMap[vlLogId]?.cancel()
-                            timerHashMap.replace(vlLogId, TimerUtil(msLeft, timeupCallback))
+                            timerHashMap.replace(vlLogId, TimerUtil(msLeft, timeupCallback, onTick))
 
                         } else {
-                            timerHashMap[vlLogId] = TimerUtil(msLeft, timeupCallback)
+                            timerHashMap[vlLogId] = TimerUtil(msLeft, timeupCallback, onTick)
                         }
                         timerHashMap[vlLogId]?.start()
                     }
@@ -534,7 +515,7 @@ class VisitorEntryListAdapter(
                 }
 
                 try {
-                    Log.i("taaag", "vlID: $vlLogId, time: $entryTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
+                    Log.d("taaag", "vlID: $vlLogId, time: $actionTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
                 } catch (ignored: IllegalStateException) {
                 }
 
@@ -559,6 +540,23 @@ class VisitorEntryListAdapter(
                 }
 
             }
+        }
+
+        private fun refreshList() {
+
+            Handler().post {
+                VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                    override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+                        searchList = visitorLog
+                        if (visitorLog != null) {
+                            visitorList = visitorLog
+                        }
+                        notifyDataSetChanged()
+                    }
+
+                })
+            }
+
         }
 
     }
