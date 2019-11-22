@@ -356,7 +356,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                        val visitors = VisitorLogRepo.get_IN_VisitorsForName(intent.getStringExtra(PERSONNAME))
+                                        val visitors = VisitorLogRepo.get_IN_PendingVisitorsForName(intent.getStringExtra(PERSONNAME))
                                         if (debug) {
                                             Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
                                         }
@@ -369,7 +369,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                                 d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
                                                 d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                                                 d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                                                d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                                                d.putExtra("nr_id", intToString(visitor.vlVisLgID))
                                                 d.putExtra("unitname", visitor.unUniName)
                                                 d.putExtra("memType", "Owner")
                                                 d.putExtra(UNITID, visitor.unUnitID)

@@ -515,7 +515,7 @@ class VisitorEntryListAdapter(
                 }
 
                 try {
-                    Log.i("taaag", "vlID: $vlLogId, time: $actionTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
+                    Log.d("taaag", "vlID: $vlLogId, time: $actionTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
                 } catch (ignored: IllegalStateException) {
                 }
 

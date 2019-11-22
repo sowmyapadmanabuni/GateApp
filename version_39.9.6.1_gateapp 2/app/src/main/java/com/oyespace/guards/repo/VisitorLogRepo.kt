@@ -92,8 +92,8 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
         }
 
-        fun get_IN_VisitorsForName(name: String): ArrayList<VisitorLog>? {
-            return VisitorEntryLogRealm.getVisitorsForName(name)
+        fun get_IN_PendingVisitorsForName(name: String): ArrayList<VisitorLog>? {
+            return VisitorEntryLogRealm.getPendingVisitorsForName(name)
         }
 
         fun delete_IN_Visitor(lgid: Int) {
