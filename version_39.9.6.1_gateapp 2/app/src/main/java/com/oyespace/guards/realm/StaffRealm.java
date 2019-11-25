@@ -36,16 +36,13 @@ public class StaffRealm {
     }
 
     public static void updateStaffsList(RealmList<Worker> arrayList) {
-        Realm realm = Realm.getDefaultInstance();
 
-
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
+        try (Realm realmInstance = Realm.getDefaultInstance()) {
+            realmInstance.executeTransaction((realm) -> {
+                realm.delete(Worker.class);
+                realm.copyToRealmOrUpdate(arrayList);
+            });
         }
-        realm.delete(Worker.class);
-        realm.copyToRealmOrUpdate(arrayList);
-        realm.commitTransaction();
-        realm.close();
     }
 
     public static ArrayList<Worker> searchVisitorLog(String searchQuery) {

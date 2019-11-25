@@ -101,25 +101,21 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
         //  tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER))
 
-        menuCount.text = "$minteger"
+        updateCounterUI(minteger)
         tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
 
 
             minteger++
-            //  menuCount.setText("" + minteger)
-            menuCount.text = "$minteger"
+            updateCounterUI(minteger)
 
         }
 
         menuRemove.setOnClickListener {
             if (minteger > 1) {
                 minteger--
-                //  menuCount.setText("" + minteger)
-                menuCount.text = "$minteger"
-
-            } else {
+                updateCounterUI(minteger)
 
             }
         }
@@ -139,6 +135,15 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             }
         }
 
+    }
+
+    private fun updateCounterUI(number: Int) {
+        menuCount.text = "$number"
+        if (number > 1) {
+            menuRemove.visibility = View.VISIBLE
+        } else {
+            menuRemove.visibility = View.GONE
+        }
     }
 
     private fun visitorLog() {

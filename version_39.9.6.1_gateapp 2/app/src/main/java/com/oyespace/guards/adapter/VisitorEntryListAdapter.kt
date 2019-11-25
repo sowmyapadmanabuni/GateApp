@@ -127,7 +127,7 @@ class VisitorEntryListAdapter(
                 }
 
                 if (debug) {
-                    holder.btn_makeexit.visibility = View.INVISIBLE
+                    holder.btn_makeexit.visibility = View.VISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
                     //                    sendExitNotification(visitor)
@@ -412,6 +412,7 @@ class VisitorEntryListAdapter(
         val cmnts = visitor.vlCmnts
         var actionTime = visitor.vlEntryT
         var visitorType = visitor.vlVisType
+        var apprStat = visitor.vlApprStat
 
         override fun onCancelled(p0: DatabaseError) {}
 
@@ -461,6 +462,9 @@ class VisitorEntryListAdapter(
                             ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
                                 holder.btn_makeexit.visibility = View.VISIBLE
                                 msLeft = msLeft(actionTime, MAX_DELIVERY_ALLOWED_SEC)
+                                if (!apprStat.equals(APPROVED, true)) {
+                                    VisitorLogRepo.get_IN_VisitorLog(true)
+                                }
                                 if (msLeft < 0) {// time is up
                                     holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
                                     holder.isAnimating = true
@@ -481,9 +485,6 @@ class VisitorEntryListAdapter(
                                     Toast.makeText(mcontext, "move rejected", Toast.LENGTH_SHORT).show()
                                     updateVisitorStatus(visitor, holder.adapterPosition, REJECTED)
                                     refreshList()
-                                }
-                                onTick = {
-                                    Log.e("taaag", "after reject: $it")
                                 }
 
                             }

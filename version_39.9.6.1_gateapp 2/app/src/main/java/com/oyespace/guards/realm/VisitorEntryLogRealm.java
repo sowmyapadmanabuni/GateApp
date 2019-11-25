@@ -197,6 +197,16 @@ public class VisitorEntryLogRealm {
                 .count() != 0;
     }
 
+    @Nullable
+    public static ArrayList<VisitorLog> getVisitorsForDateTime(String date, String time) {
+        Realm realm = Realm.getDefaultInstance();
+        return new ArrayList<>(realm.where(VisitorLog.class)
+                .contains("vldCreated", date)
+                .and()
+                .contains("vlEntryT", time)
+                .findAll());
+    }
+
     public interface VisitorEntryListener {
         void onEntrySave(boolean success);
     }
