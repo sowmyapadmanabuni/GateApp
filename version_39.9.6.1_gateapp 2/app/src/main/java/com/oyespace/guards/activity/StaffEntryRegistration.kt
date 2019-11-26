@@ -60,7 +60,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                 button_done.isEnabled = false
                 button_done.isClickable = false
 
-                if (!Utils.isNetworkAvailable(applicationContext)) {
+                if (!Utils.isConnectedToInternet()) {
                     button_done.isEnabled = true
                     button_done.isClickable = true
                     Utils.showToast(applicationContext, getString(R.string.no_internet))
