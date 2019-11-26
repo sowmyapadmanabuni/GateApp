@@ -186,12 +186,12 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
         // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
         tv_name.text = intent.getStringExtra(PERSONNAME)
-        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
+         tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": "+intent.getStringExtra(MOBILENUMBER))
 
         val input = intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
+        //tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
 
 
         tv_for.text = resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
