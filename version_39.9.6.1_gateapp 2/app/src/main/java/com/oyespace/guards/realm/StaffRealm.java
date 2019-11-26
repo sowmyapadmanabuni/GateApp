@@ -45,7 +45,7 @@ public class StaffRealm {
         }
     }
 
-    public static ArrayList<Worker> searchVisitorLog(String searchQuery) {
+    public static ArrayList<Worker> searchStaff(String searchQuery) {
 
         Realm realm = Realm.getDefaultInstance();
         return new ArrayList<>(realm.where(Worker.class)

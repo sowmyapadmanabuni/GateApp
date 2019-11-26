@@ -14,7 +14,6 @@ import com.oyespace.guards.utils.LocalDb
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
-import io.realm.RealmResults
 
 
 class StaffRepo {
@@ -92,7 +91,7 @@ class StaffRepo {
             if (search.isEmpty()) {
                 return getStaffList()
             } else {
-                return StaffRealm.searchVisitorLog(search)
+                return StaffRealm.searchStaff(search)
             }
         }
 
