@@ -230,36 +230,6 @@ if(staffdata.isValid){
 
     }
 
-//    override fun getFilter(): Filter {
-//
-//        return object : Filter() {
-//            override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-//                searchList = results?.values as ArrayList<Worker>
-//                notifyDataSetChanged()
-//            }
-//
-//            override fun performFiltering(charSequence: CharSequence): Filter.FilterResults {
-//                val charString = charSequence.toString()
-//                if (charString.isEmpty()) {
-//                    searchList = items
-//                } else {
-//                    val filteredList = ArrayList<Worker>()
-//                    for (row in items) {
-//                        // if (row.wkfName!!.toLowerCase().contains(charString.toLowerCase()) || row.age!!.contains(charSequence)) {
-//                        if (row.wkfName.toLowerCase().contains(charString.toLowerCase())) {
-//                            filteredList.add(row)
-//                        }
-//                    }
-//                    searchList = filteredList
-//                }
-//                val filterResults = Filter.FilterResults()
-//                filterResults.values = searchList
-//                return filterResults
-//            }
-//        }
-//
-//    }
-
     fun applySearch(search: String) {
 
         this.searchString = search

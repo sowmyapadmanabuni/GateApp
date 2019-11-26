@@ -16,8 +16,7 @@ import com.oyespace.guards.pojo.VisitorLogResponse
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.ConstantUtils.DELIVERY
-import com.oyespace.guards.utils.ConstantUtils.PENDING
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
@@ -94,6 +93,11 @@ class VisitorLogRepo {
 
         fun get_IN_PendingVisitorsForName(name: String): ArrayList<VisitorLog>? {
             return VisitorEntryLogRealm.getPendingVisitorsForName(name)
+        }
+
+        fun get_IN_VisitorsForTimeTime(time: String): ArrayList<VisitorLog>? {
+            val str = time.split("T")
+            return VisitorEntryLogRealm.getVisitorsForDateTime(str[0], str[1])
         }
 
         fun delete_IN_Visitor(lgid: Int) {
@@ -207,7 +211,6 @@ class VisitorLogRepo {
                                         e.printStackTrace()
                                     }
                                 }
-
 
 
                             }
@@ -329,8 +332,10 @@ class VisitorLogRepo {
                     if (visitorLog != null) {
                         for (v in visitorLog) {
 
+                            val apprStat = v.vlApprStat
+                            Log.i("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
                             if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
-                                if (v.vlApprStat.equals("Approved", true)) {
+                                if (apprStat.equals(APPROVED, true)) {
                                     return false
                                 }
                             } else {

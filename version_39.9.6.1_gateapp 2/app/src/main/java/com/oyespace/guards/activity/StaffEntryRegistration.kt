@@ -50,6 +50,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     var count = 0
 
+    lateinit var curTime: String
+
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -64,6 +66,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     Utils.showToast(applicationContext, getString(R.string.no_internet))
                     return
                 }
+
+                curTime = getCurrentTimeLocal()
 
                 if (intent.getStringExtra(VISITOR_TYPE).contains(STAFF, true)) {
 
@@ -308,10 +312,10 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     }
 
-
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
         val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
-        Log.e("taaag", "uploading image: $imgName")
+
+        Log.i("taaag", "cutTIme: $curTime")
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
@@ -319,7 +323,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
             intToString(minteger), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), getCurrentTimeLocal(), SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20
         )
 
@@ -335,7 +339,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         if (globalApiObject.success) {
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
-                            Log.v("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
+                            Log.e("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
 
 
                             count--
@@ -356,7 +360,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                        val visitors = VisitorLogRepo.get_IN_PendingVisitorsForName(intent.getStringExtra(PERSONNAME))
+
+                                        val visitors = VisitorLogRepo.get_IN_VisitorsForTimeTime(curTime)
                                         if (debug) {
                                             Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
                                         }

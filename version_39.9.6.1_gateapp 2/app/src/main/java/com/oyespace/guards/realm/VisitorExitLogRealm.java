@@ -19,23 +19,22 @@ public class VisitorExitLogRealm {
 
             @Override
             protected Void doInBackground(Void... voids) {
-                Realm realm = Realm.getDefaultInstance();
-                if (!realm.isInTransaction()) {
-                    realm.beginTransaction();
-                }
-                realm.delete(ExitVisitorLog.class);
-                Log.d("taaag", "about to put " + visitorsList.size() + " objects in realm on Thread: " + Thread.currentThread().getName());
-                visitorsList.sort((rhs, lhs) -> (DateTimeUtils.formatDateDMY(lhs.getVldUpdated()) + " " + (lhs.getVlExitT()).replace(
-                        "1900-01-01T",
-                        ""
-                )).compareTo(
-                        DateTimeUtils.formatDateDMY(rhs.getVldUpdated()) + " " + (rhs.getVlExitT()).replace(
-                                "1900-01-01T",
-                                ""
-                        )
-                ));
-                realm.insertOrUpdate(visitorsList);
-                realm.commitTransaction();
+
+                Realm.getDefaultInstance().executeTransaction(realm -> {
+                    realm.delete(ExitVisitorLog.class);
+                    Log.d("taaag", "about to put " + visitorsList.size() + " objects in realm on Thread: " + Thread.currentThread().getName());
+                    visitorsList.sort((rhs, lhs) -> (DateTimeUtils.formatDateDMY(lhs.getVldUpdated()) + " " + (lhs.getVlExitT()).replace(
+                            "1900-01-01T",
+                            ""
+                    )).compareTo(
+                            DateTimeUtils.formatDateDMY(rhs.getVldUpdated()) + " " + (rhs.getVlExitT()).replace(
+                                    "1900-01-01T",
+                                    ""
+                            )
+                    ));
+                    realm.insertOrUpdate(visitorsList);
+
+                });
 
                 return null;
 
