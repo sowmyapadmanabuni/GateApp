@@ -67,6 +67,9 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                         buttonNext.isClickable = true
                         Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
                     } else {
+
+
+
                         val d = Intent(this@ManualNameEntryScreen, ManualAddCarFragment::class.java)
                         d.putExtra(UNITID, intent.getStringExtra(UNITID))
                         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))

@@ -163,6 +163,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                             builder.show()
                         } else {
 
+
                             val d = Intent(this@ManualMobileNumberScreen, ManualNameEntryScreen::class.java)
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
