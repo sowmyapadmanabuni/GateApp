@@ -467,7 +467,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             val info = manager.getPackageInfo(baseContext.packageName, 0)
             appVersion = info.versionName
             Log.d("tag", "app " + appVersion + " " + info.versionName)
-            txt_device_name?.text = "V: $appVersion"
+            txt_device_name?.text = "V: $appVersion${if (debug) "D" else ""}"
 
         } catch (ex: Exception) {
             ex.printStackTrace()

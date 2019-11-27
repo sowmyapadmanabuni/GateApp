@@ -117,11 +117,11 @@ class ResidentMissedCallActivity : BaseKotlinActivity() {
 
     fun onClick(v: View) {
 
-        when (v.getId()) {
+        when (v.id) {
 
             R.id.buttonNext -> {
                 if (ConstantUtils.useDummyValues) {
-                    mobileNumberString = "+919930620323"
+                    mobileNumberString = "+91${ConstantUtils.dummyPhone}"
                 }
 
                 if (mobileNumberString == null) {

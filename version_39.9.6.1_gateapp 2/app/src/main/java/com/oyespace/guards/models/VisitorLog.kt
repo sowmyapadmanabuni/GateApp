@@ -64,6 +64,12 @@ data class GetVisitorsResponse<T>(
     val `data`: VisitorsList,
     val success: Boolean
 )
+
+data class GetVisitorForIdResponse(
+    val apiVersion: String,
+    val `data`: VisitorLog,
+    val success: Boolean
+)
 data class VisitorsList(
     val visitorLog: RealmList<VisitorLog>?
 )

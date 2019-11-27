@@ -139,9 +139,9 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isClickable = false
 
                 if (useDummyValues) {
-                    textview.text = "+919930620323"
+                    textview.text = "+91${dummyPhone}"
                     ccd = "+91"
-                    mobileNumber = "9930620323"
+                    mobileNumber = dummyPhone
                 }
 
                 if (textview.text.length == 13) {

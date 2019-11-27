@@ -4,10 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.oyespace.guards.BackgroundSyncReceiver
-import com.oyespace.guards.models.ExitVisitorLog
-import com.oyespace.guards.models.GetExitVisitorsResponse
-import com.oyespace.guards.models.GetVisitorsResponse
-import com.oyespace.guards.models.VisitorLog
+import com.oyespace.guards.models.*
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VisitorExitReq
@@ -84,8 +81,33 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getVisitorForId(id)
         }
 
-        fun get_IN_VisitorForVisitorId(id: String) =
-            VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt())
+        fun get_IN_VisitorForVisitorId(id: String, fromBackend: Boolean = false, callback: (visitor: VisitorLog?) -> Unit = {}): VisitorLog? {
+            if (fromBackend) {
+                RetrofitClinet.instance
+                    .getVisitorEntryForId(OYE247TOKEN, id)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(object :
+                        CommonDisposable<GetVisitorForIdResponse>() {
+                        override fun onSuccessResponse(response: GetVisitorForIdResponse) {
+
+                            VisitorEntryLogRealm.updateVisitorLog(response.data)
+                            callback(VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt()))
+
+                        }
+
+                        override fun onErrorResponse(e: Throwable) {
+                            callback(null)
+                        }
+
+                        override fun noNetowork() {
+                            callback(null)
+                        }
+                    })
+                return null
+            }
+            return VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt())
+        }
 
         fun get_IN_VisitorsForPhone(phone: String): ArrayList<VisitorLog>? {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
@@ -128,6 +150,8 @@ class VisitorLogRepo {
 
         fun getOverstaySortedList(): ArrayList<VisitorLog>? {
 
+            Log.i("taaag", "getting overstaying sorted list")
+
             val listFromRealm = VisitorEntryLogRealm.getVisitorEntryLog()
 
             val overStaying = ArrayList<VisitorLog>()
@@ -138,24 +162,25 @@ class VisitorLogRepo {
                 val actTime = vl.vlsActTm
                 val status = vl.vlApprStat
 
-                if (status.equals(PENDING, true)) {
-                    underStaying.add(vl)
-                } else {
-                    val msLeft = DateTimeUtils.msLeft(actTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
+                if (status.equals(APPROVED, true)) {
+
+                    val msLeft = DateTimeUtils.msLeft(actTime, MAX_DELIVERY_ALLOWED_SEC)
                     Log.v("taaag", "vlID: ${vl.vlVisLgID} actTIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
                     if (msLeft <= 0) {
-                        if (status.equals("approved", true)) {
+                        if (status.equals(APPROVED, true)) {
                             overStaying.add(vl)
                             Log.v("taaag", "overstaying: ${vl.vlVisLgID} actIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
                         }
                     } else {
                         underStaying.add(vl)
                     }
+
+                } else {
+                    underStaying.add(vl)
                 }
 
-
             }
-            Log.d("taaag2", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
+            Log.d("taaag", "got visitorLog from realm with ${overStaying.size} overtaying and ${underStaying.size} understaying")
             overStaying.addAll(underStaying)
             return overStaying
 
@@ -165,9 +190,14 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
         }
 
-        fun updateVisitorStatus(context: Context, visitor: VisitorLog, status: String) {
+        fun updateVisitorStatus(context: Context, visitor: VisitorLog, status: String, onlyLocalUpdate: Boolean = false) {
 
             val vLogId = visitor.vlVisLgID
+
+            if (onlyLocalUpdate) {
+                VisitorEntryLogRealm.updateVisitorStatus(visitor, status)
+                return
+            }
 
             val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status)
             CompositeDisposable().add(

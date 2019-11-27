@@ -122,6 +122,7 @@ public class ConstantUtils {
 
     public static final boolean debug = true;
     public static final boolean useDummyValues = false;
+    public static final String dummyPhone = "8660692521";
 
     public static final String SNOOZE_SCHEDULE_TIME = "SNOOZE_SCHEDULE_TIME";
     public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";
@@ -130,7 +131,8 @@ public class ConstantUtils {
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
     public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
-    public static final int MAX_DELIVERY_ALLOWED_SEC = useDummyValues ? 30 : 3 * 60;// 7 mins
+    public static final int MAX_DELIVERY_ALLOWED_SEC = debug ? 3 * 60 : 3 * 60;// 7 mins
+    public static final int MAX_ENTRY_EXPIRY_SEC = debug ? 30 * 60 : 30 * 60;// 30 mins
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";
 
