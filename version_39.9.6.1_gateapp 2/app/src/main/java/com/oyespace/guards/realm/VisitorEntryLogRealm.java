@@ -19,7 +19,7 @@ import io.realm.Sort;
 import static com.oyespace.guards.utils.ConstantUtils.PENDING;
 
 public class VisitorEntryLogRealm {
-
+    Realm realm = Realm.getDefaultInstance();
 
     public static ArrayList<VisitorLog> getVisitorEntryLog() {
         Realm realm = Realm.getDefaultInstance();

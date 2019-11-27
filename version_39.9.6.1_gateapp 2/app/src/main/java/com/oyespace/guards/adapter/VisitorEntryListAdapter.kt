@@ -30,6 +30,8 @@ import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.TimerUtil
 import com.squareup.picasso.Picasso
+import io.realm.RealmChangeListener
+import io.realm.RealmResults
 import java.util.*
 
 
@@ -95,6 +97,14 @@ class VisitorEntryListAdapter(
             return
         }
 
+//        visitor.addChangeListener( RealmChangeListener() {
+//    @Override
+//    public void onChange(RealmResults<VisitorLog> results) {
+//      // results and puppies point are both up to date
+//      results.size(); // => 1
+//      puppies.size(); // => 1
+//    }
+//});
         if (visitor.isValid) {
             val vlLogId = visitor.vlVisLgID.toString()
             val unitName = visitor.unUniName

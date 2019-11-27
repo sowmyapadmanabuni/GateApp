@@ -855,6 +855,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         workType.add("Maid")
         workType.add("HouseKeeping")
         workType.add("Cook")
+        //workType.add("Security Officer")
         workType.add("Gardener")
 
     }
