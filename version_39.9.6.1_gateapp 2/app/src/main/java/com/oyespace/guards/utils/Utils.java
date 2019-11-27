@@ -406,6 +406,14 @@ public class Utils {
         return false;
     }
 
+    public static boolean isConnectedToInternet() {
+
+
+        ConnectivityManager connectivityManager = ((ConnectivityManager) Myapp.getInstance().getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+
+    }
+
 
 //    public static boolean isLoggedIn() {
 //        LoginDetails loginDetails = LocalDb.getLoginDetails();
