@@ -1,5 +1,7 @@
 package com.oyespace.guards
 
+
+
 import SecuGen.FDxSDKPro.*
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
@@ -435,9 +437,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-//        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-//            registerReceiver(mUsbReceiver, filter)
-//        }
+
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -593,11 +593,17 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
     override fun onResume() {
+
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+
+            registerReceiver(mUsbReceiver, filter)
+        }
+
         if(pTimerChecker == null) {
             runTimerCheck()
         }
 
-        registerReceiver(mUsbReceiver, filter)
+        //registerReceiver(mUsbReceiver, filter)
 
 
 
@@ -1098,8 +1104,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         autoooooo++
 
-        fingerDetectedHandler.sendMessage(Message())
+        if(usbConnected) {
 
+            fingerDetectedHandler.sendMessage(Message())
+        }
     }
 
     fun CaptureFingerPrint() {
@@ -1112,9 +1120,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 Log.d("taaag", "fp: ${fp.size}")
                 val id = matchFingerprint(fp)
                 Log.d("taaag", "check result: $id")
-                if (id > 0) {
 
-                    // check if staff has already entered
+
+                    if (id > 0) {
+
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
                     // if yes, then make exit call
@@ -1147,11 +1156,15 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                     }
 
-                } else {
 
-                    t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
                 }
+                    else {
+
+                        showToast(applicationContext,id.toString())
+                        t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
+
+                    }
 
                 mVerifyImage = null
                 this.sgfplib!!.SetBrightness(100)
@@ -1177,20 +1190,21 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         val fpImg = ByteArray(mImageWidth * mImageHeight)
         var code = 0L
         try {
+
             sgfplib!!.GetImageEx(fpImg, 10000, 50)
             code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
         } catch (e: NullPointerException) {
 
         }
-        when (code) {
-            SGFDX_ERROR_NONE -> {
-                showToast(this, "fingerprint captured")
-            }
-            SGFDX_ERROR_EXTRACT_FAIL -> {
-                showToast(this, "error capturing fingerprint")
-                return null
-            }
-        }
+//        when (code) {
+//            SGFDX_ERROR_NONE -> {
+//                showToast(this, "fingerprint captured")
+//            }
+//            SGFDX_ERROR_EXTRACT_FAIL -> {
+//                showToast(this, "error capturing fingerprint")
+//                return null
+//            }
+//        }
         Log.d("taaag", "capture code: $code")
         return fpTemp
 
