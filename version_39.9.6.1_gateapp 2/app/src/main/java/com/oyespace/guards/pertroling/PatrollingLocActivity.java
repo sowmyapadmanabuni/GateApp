@@ -719,8 +719,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 //float accuracy = getAccuracy(mPredictedLocation);
                 //setSatellitesAccuracy();
                 boolean hasInternet = mInternetAvailabilityChecker.getCurrentInternetAvailabilityStatus();
-                if(hasInternet) {
-                    if (currentSatelliteCount > 4) {
+//                if(hasInternet) {
+//                    if (currentSatelliteCount > 4) {
                         //if(currentLocationAccuracy < 8){
                         //if (currentLocationAge < 15) {
                         isValidCheckPoint(qrCheckpoint);
@@ -732,25 +732,25 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 //                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
 //                        gpsTracker.getLocation();
 //                    }
-                    } else {
-//                    String msg = "No Satellites found. Unable to calculate location";
-//                    if(currentSatelliteCount > 0){
-//                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+//                    } else {
+////                    String msg = "No Satellites found. Unable to calculate location";
+////                    if(currentSatelliteCount > 0){
+////                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
+////                    }
+////                    showAnimatedDialog(msg, R.raw.error, true, "OK");
+////                    gpsTracker.getLocation();
+//
+//                        if (currentLocationAccuracy < 15) {
+//                            isValidCheckPoint(qrCheckpoint);
+//                        } else {
+//                            String msg = "Low location accuracy. Please try again";
+//                            showAnimatedDialog(msg, R.raw.error, true, "OK");
+//                            gpsTracker.getLocation();
+//                        }
 //                    }
-//                    showAnimatedDialog(msg, R.raw.error, true, "OK");
-//                    gpsTracker.getLocation();
-
-                        if (currentLocationAccuracy < 15) {
-                            isValidCheckPoint(qrCheckpoint);
-                        } else {
-                            String msg = "Low location accuracy. Please try again";
-                            showAnimatedDialog(msg, R.raw.error, true, "OK");
-                            gpsTracker.getLocation();
-                        }
-                    }
-                }else{
-                    showAnimatedDialog("Poor connectivity", R.raw.error_alert, true, "OK");
-                }
+//                }else{
+//                    showAnimatedDialog("Poor connectivity", R.raw.error_alert, true, "OK");
+//                }
 
             } else {
                // showAnimatedDialog("Wrong QR Code.", R.raw.error, true, "OK");
@@ -926,7 +926,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //return true;
         //Log.e("DISTANCE_LOC",""+result);
         Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
-        return result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
+        return true;//result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
     }
 
     private float calculateDistance(Double mCPLatitude, Double mCPLongitude) {

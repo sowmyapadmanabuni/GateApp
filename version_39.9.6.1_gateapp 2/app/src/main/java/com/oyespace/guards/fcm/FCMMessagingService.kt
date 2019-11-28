@@ -79,7 +79,7 @@ class FCMMessagingService : FirebaseMessagingService() {
         }
 
 
-        Log.d("JSON s", "From:  " + remoteMessage!!.from)
+        Log.e("NOTIF_JSON", "From:  " + remoteMessage!!.from)
 //        getNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,"Oyespace","Gate App",
 //            "gate_app","Gate",Prefs.getInt(DEVICE_ID,0))
 

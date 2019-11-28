@@ -5,16 +5,14 @@ import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.PendingIntent
+import android.app.*
 import android.content.*
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
+import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
@@ -288,6 +286,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        createNotificationChannel();
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
 
@@ -504,6 +503,29 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     }
 
+
+    @SuppressLint("NewApi")
+    fun createNotificationChannel(){
+        var notificationManager:NotificationManager =
+            getSystemService(
+                Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
+        val importance = NotificationManager.IMPORTANCE_HIGH
+        val channel = NotificationChannel(resources.getString(R.string.gate_channel), resources.getString(R.string.gate_channel), importance)
+
+
+        val sound:Uri = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.siren)
+        val audioAttributes:AudioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build()
+
+        channel.description = resources.getString(R.string.gate_channel)
+        channel.enableLights(true)
+        channel.lightColor = Color.RED
+        channel.enableVibration(true)
+        channel.setSound(sound,audioAttributes)
+        channel.vibrationPattern =
+            longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
+        notificationManager?.createNotificationChannel(channel)
+    }
     fun stopSiren() {
         val intent = Intent(this, SOSSirenService::class.java)
         this.stopService(intent)

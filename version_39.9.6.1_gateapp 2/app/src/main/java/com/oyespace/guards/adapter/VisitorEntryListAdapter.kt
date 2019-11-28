@@ -318,31 +318,7 @@ class VisitorEntryListAdapter(
         VisitorLogRepo.updateVisitorStatus(mcontext, lgid, status)
 
     }
-    
-    private fun sendExitNotification(asAssnID:Int,asAsnName:String,ntDesc:String,ntTitle:String,ntType:String,sbSubID:Int,userID:Int,unitID:Int){
-        try {
 
-
-                val intentAction1 = Intent(mcontext, BackgroundSyncReceiver::class.java)
-                intentAction1.putExtra(BSR_Action, ConstantUtils.VISITOR_EXIT_NOTIFY)
-                intentAction1.putExtra("associationID", asAssnID)
-                intentAction1.putExtra("associationName", asAsnName)
-                intentAction1.putExtra("ntDesc", ntDesc)
-                intentAction1.putExtra("ntTitle", ntTitle)
-                intentAction1.putExtra("ntType", ntType)
-                intentAction1.putExtra("sbSubID", sbSubID)
-                intentAction1.putExtra("userID", userID)
-                intentAction1.putExtra("unitID", unitID)
-                Log.e("intentAction1",""+intentAction1);
-                Toast.makeText(mcontext, "Exit", Toast.LENGTH_LONG).show();
-                mcontext.sendBroadcast(intentAction1)
-
-        }catch (e:Exception){
-            e.printStackTrace()
-        }
-
-
-    }
 
     private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
         Log.e("BEFORE_",""+associationID+"-"+associationName+"-"+ntDesc+"-"+ntTitle+"-"+ntType+"-"+sbSubID+"-"+userID+"-"+unitID);
