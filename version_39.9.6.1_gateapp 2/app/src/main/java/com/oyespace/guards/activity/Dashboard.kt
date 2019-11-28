@@ -437,7 +437,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
+            registerReceiver(mUsbReceiver, filter)
+        }
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -594,10 +597,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     override fun onResume() {
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
-            registerReceiver(mUsbReceiver, filter)
-        }
 
         if(pTimerChecker == null) {
             runTimerCheck()
@@ -1122,8 +1122,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 Log.d("taaag", "check result: $id")
 
 
-                    if (id > 0) {
-
+                    if (id > 0&& id >43) {
+                        showToast(applicationContext,id.toString())
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
                     // if yes, then make exit call
@@ -1159,9 +1159,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
                 }
-                    else {
+                    else if (id==43){
 
-                        showToast(applicationContext,id.toString())
+
                         t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
                     }
@@ -1212,6 +1212,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     fun matchFingerprint(fingerPrint: ByteArray): Int {
 
+        var number=0
+
         val asscId = Prefs.getInt(ASSOCIATION_ID, 0)
 
         val fps = RealmDB.getRegularVisitorsFingerPrint(asscId)
@@ -1219,10 +1221,12 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         val result = BooleanArray(1)
         for (fp in fps) {
 
+            number++
             Log.d("taaag", "matching with ${fp.userName}'s fingerprint")
 
             sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_NORMAL, result)
             if (result[0]) return fp.userName.toInt()
+
 
             sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg2, SGFDxSecurityLevel.SL_NORMAL, result)
             if (result[0]) return fp.userName.toInt()
@@ -1231,8 +1235,15 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             if (result[0]) return fp.userName.toInt()
 
         }
+        if (number > 0) {
+            return number
+        }
+        else{
+            number=0
+        }
 
-        return -1
+
+        return number
 
     }
 
