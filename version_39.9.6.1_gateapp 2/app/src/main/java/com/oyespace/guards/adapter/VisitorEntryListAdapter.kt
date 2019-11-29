@@ -30,8 +30,6 @@ import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.TimerUtil
 import com.squareup.picasso.Picasso
-import io.realm.RealmChangeListener
-import io.realm.RealmResults
 import java.util.*
 
 
@@ -133,7 +131,7 @@ class VisitorEntryListAdapter(
                     }
                     else -> {
                         holder.btn_makeexit.visibility = View.VISIBLE
-                        Log.d("taaag", "fb child listener not attached")
+                        Log.v("taaag", "fb child listener not attached")
                     }
                 }
 
@@ -543,12 +541,6 @@ class VisitorEntryListAdapter(
                     }
                 }
 
-                try {
-                    Log.d("taaag", "vlID: $vlLogId, time: $actionTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
-                } catch (ignored: IllegalStateException) {
-                }
-
-
             }
 
         }
@@ -572,6 +564,9 @@ class VisitorEntryListAdapter(
                     updateAttachments(visitor, holder)
                 }
 
+            } else {
+                holder.iv_attachment.visibility = View.GONE
+                holder.expanded_view.visibility = View.GONE
             }
         }
 

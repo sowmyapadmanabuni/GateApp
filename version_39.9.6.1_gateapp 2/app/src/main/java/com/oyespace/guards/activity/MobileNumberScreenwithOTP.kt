@@ -35,6 +35,7 @@ import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
+import com.oyespace.guards.staffManaualEntry.ManualNameEntryScreen
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -100,23 +101,52 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                 buttonNext.isClickable = false
 
                 if (textview.text.length == 10) {
-//                    val d = Intent(this@MobileNumberScreen, NameEntryScreen::class.java)
-//                    Log.d(
-//                        "intentdata MobileNumber",
-//                        "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-//                                + " " + textview.text + " " + countryCode
-//                    );
-//                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-//                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-//                    d.putExtra(UNITID, intent.getStringExtra(UNITID))
-//                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//                    d.putExtra(MOBILENUMBER, textview.getText().toString())
-//                    d.putExtra(COUNTRYCODE, countryCode)
 
-//                    startActivity(d);
-//                   finish();
-//                     deliveryFlow_launchNameEntryScreen()
+                    val clazz = intent.getIntExtra("class", -1)
+                    if (clazz == 123) {
+
+
+                        val ccd = countryCode.toString()
+                        val mobileNumber = phone
+
+                        val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                        if (!allowEntry) {
+
+                            val builder = AlertDialog.Builder(this)
+
+                            builder.setMessage("This number is being used by a person already in")
+                            builder.setPositiveButton("Ok") { dialog, which ->
+                                dialog.cancel()
+                                finish()
+                            }
+                            builder.setCancelable(false)
+                            builder.show()
+                        } else {
+
+                            val d = Intent(this, ManualNameEntryScreen::class.java)
+                            d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                            d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                            d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                            d.putExtra(MOBILENUMBER, mobileNumber)
+                            d.putExtra(COUNTRYCODE, ccd)
+                            d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                            d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                            d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                            d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                            d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                            d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                            d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                            d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                            d.putExtras(intent)
+                            startActivity(d)
+                            finish()
+
+
+                        }
+                    }
 
                     if (entryExists(countryCode.toString(), phone)) {
                         Toast.makeText(this, "Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()

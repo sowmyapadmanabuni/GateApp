@@ -135,7 +135,7 @@ public class VisitorEntryLogRealm {
         Realm.getDefaultInstance().executeTransaction(realm -> {
             realm.delete(VisitorLog.class);
             realm.insertOrUpdate(visitorsList);
-            Log.i("taaaag", "refreshed realm visitorLog");
+            Log.d("taaaag", "refreshed realm visitorLog");
         });
     }
 

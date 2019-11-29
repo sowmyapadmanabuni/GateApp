@@ -19,11 +19,11 @@ import kotlinx.android.synthetic.main.activity_purpose.*
 import java.util.*
 
 
-class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
+class PurposeScreen : BaseKotlinActivity(), View.OnClickListener {
     private val REQUEST_CODE_SPEECH_INPUT = 100
-    lateinit var txt_assn_name:TextView
+    lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
-    lateinit var txt_device_name:TextView
+    lateinit var txt_device_name: TextView
     internal var language: String? = ""
     override fun onClick(v: View?) {
 
@@ -34,7 +34,7 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                 buttonNextt.isClickable = false
                 if (Ed_Name_purp.text.length > 2) {
 
-                   // if (Prefs.getString(TYPE, "").equals("Create")) {
+                    if (Prefs.getString(TYPE, "").equals("Create")) {
 
                         val d = Intent(this@PurposeScreen, MobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
@@ -49,30 +49,31 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                         d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
                         startActivity(d)
                         finish()
-//                    }else{
-//                        val d = Intent(
-//                            this@PurposeScreen, ManualMobileNumberScreen::class.java)
-//                        d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
-//                        d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
-//                        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-//                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-//                        d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
-//                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-//                        d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
-//                        d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-//                        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-//                        d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
-//                        d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
-//                        d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-//                        d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-//                        d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
-//
-//
-//
-//                        startActivity(d)
-//                        finish()
-//                    }
+                    } else {
+                        val d = Intent(
+                            this@PurposeScreen, ManualMobileNumberScreen::class.java
+                        )
+                        d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
+                        d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
+                        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                        d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                        d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                        d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                        d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                        d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                        d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
+
+
+
+                        startActivity(d)
+                        finish()
+                    }
                 } else {
                     buttonNextt.isEnabled = true
                     buttonNextt.isClickable = true
@@ -90,9 +91,9 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_purpose)
-        txt_assn_name=findViewById(R.id.txt_assn_name)
-        txt_gate_name=findViewById(R.id.txt_gate_name)
-        txt_device_name=findViewById(R.id.txt_device_name)
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
         try {

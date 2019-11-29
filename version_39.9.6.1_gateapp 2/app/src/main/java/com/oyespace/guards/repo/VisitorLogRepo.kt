@@ -91,7 +91,8 @@ class VisitorLogRepo {
                         CommonDisposable<GetVisitorForIdResponse>() {
                         override fun onSuccessResponse(response: GetVisitorForIdResponse) {
 
-                            VisitorEntryLogRealm.updateVisitorLog(response.data)
+                            Log.i("taaag", "updated visitor from backend: ${response.data}, ${response.data.visitorLog.vlVenImg}, ${response.data.visitorLog.vlVoiceNote}")
+                            VisitorEntryLogRealm.updateVisitorLog(response.data.visitorLog)
                             callback(VisitorEntryLogRealm.getVisitorForVisitorId(id.toInt()))
 
                         }

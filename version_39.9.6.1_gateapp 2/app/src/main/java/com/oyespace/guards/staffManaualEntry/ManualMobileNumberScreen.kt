@@ -128,6 +128,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                d.putExtra("class", 123)
                 d.putExtras(intent)
                 startActivity(d)
                 finish()
