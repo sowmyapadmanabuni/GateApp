@@ -16,7 +16,6 @@ import android.speech.RecognizerIntent
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -108,9 +107,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             R.id.buttonNext -> {
 
                 if (useDummyValues) {
-                    textview.text = "+919930620323"
+                    textview.text = "+91${dummyPhone}"
                     ccd = "+91"
-                    mobileNumber = "9930620323"
+                    mobileNumber = dummyPhone
                 }
 
                 if (textview.text.isNotEmpty()) {

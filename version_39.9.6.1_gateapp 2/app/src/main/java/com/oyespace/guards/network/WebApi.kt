@@ -118,6 +118,10 @@ interface WebApi {
     fun getVisitorLogEntryList(@Header(OYE247KEY) token: String, @Path("id") assnId: Int)
             : Single<GetVisitorsResponse<ArrayList<VisitorLogResponse>>>
 
+    @GET("oyesafe/api/v1/VisitorLog/GetVisitorLogListByVisLogID/{id}")
+    fun getVisitorEntryForId(@Header(OYE247KEY) token: String, @Path("id") VisitorLogID: String)
+            : Single<GetVisitorForIdResponse>
+
     @GET("oye247/api/v1/GetVisitorLogExitListByAssocID/{id}")
     fun getVisitorLogExitList(@Header(OYE247KEY) token: String, @Path("id") associationID: Int)
             : Single<GetExitVisitorsResponse<ArrayList<VisitorLogResponse>>>
