@@ -212,14 +212,16 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             if (mAutoOnEnabled) {
 
                 Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
-                if (usbConnected) {
+
+
                     CaptureFingerPrint()
-                }
+
                 Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 mAutoOnEnabled = false
                 val myRunnable = Runnable {
                     // your code here
                     mAutoOnEnabled = true
+                    mLed=true
                 }
 
                 val myHandler = Handler()
@@ -691,13 +693,13 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
 
-        bSecuGenDeviceOpened = false
-        usbPermissionRequested = false
-
-        mLed = false
-        mAutoOnEnabled = true
-        autoOn = SGAutoOnEventNotifier(sgfplib, this)
-        nCaptureModeN = 0
+//        bSecuGenDeviceOpened = false
+//        usbPermissionRequested = false
+//
+//        mLed = false
+//        mAutoOnEnabled = true
+//        autoOn = SGAutoOnEventNotifier(sgfplib, this)
+//        nCaptureModeN = 0
 
 
 
@@ -1103,11 +1105,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     override fun SGFingerPresentCallback() {
 
         autoooooo++
-
-        if(usbConnected) {
-
+        if (usbConnected) {
+            Log.v("BIOMETRIC","ERROR")
             fingerDetectedHandler.sendMessage(Message())
         }
+
     }
 
     fun CaptureFingerPrint() {
@@ -1122,7 +1124,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 Log.d("taaag", "check result: $id")
 
 
-                    if (id > 0&& id >43) {
+                    if ( id == 0) {
+                        Toast.makeText(this, "Now Zero " + id, Toast.LENGTH_LONG).show();
                         showToast(applicationContext,id.toString())
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
@@ -1159,8 +1162,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
                 }
-                    else if (id==43){
-
+                    else if (id>43){
+                        Toast.makeText(this, "idvalue "+id, Toast.LENGTH_LONG).show();
 
                         t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
@@ -1196,17 +1199,18 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         } catch (e: NullPointerException) {
 
         }
-//        when (code) {
-//            SGFDX_ERROR_NONE -> {
-//                showToast(this, "fingerprint captured")
-//            }
-//            SGFDX_ERROR_EXTRACT_FAIL -> {
-//                showToast(this, "error capturing fingerprint")
-//                return null
-//            }
-//        }
-        Log.d("taaag", "capture code: $code")
-        return fpTemp
+
+            when (code) {
+                SGFDX_ERROR_NONE -> {
+                    showToast(this, "fingerprint captured")
+                }
+                SGFDX_ERROR_EXTRACT_FAIL -> {
+                    showToast(this, "error capturing fingerprint")
+                    return null
+                }
+            }
+            Log.d("taaag", "capture code: $code")
+            return fpTemp
 
     }
 

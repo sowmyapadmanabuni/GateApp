@@ -53,31 +53,34 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         setContentView(R.layout.activity_block_selection)
         //setDarkStatusBar()
 
+try {
+    if (!intent.getStringExtra(UNITNAME).equals("")) {
 
-        if (!intent.getStringExtra(UNITNAME).equals("")) {
+        if (intent.getStringExtra(UNITNAME).contains(",")) {
+            var unitname_dataList: Array<String>
+            unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
+                .dropLastWhile({ it.isEmpty() }).toTypedArray()
+            if (unitname_dataList.size > 0) {
 
-            if (intent.getStringExtra(UNITNAME).contains(",")) {
-                var unitname_dataList: Array<String>
-                unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
-                    .dropLastWhile({ it.isEmpty() }).toTypedArray()
-                if (unitname_dataList.size > 0) {
+                for (i in 0 until unitname_dataList.size) {
 
-                    for (i in 0 until unitname_dataList.size) {
+                    try {
+                        selectedUnits(unitname_dataList.get(i).replace(" ", ""))
 
-                        try {
-                            selectedUnits(unitname_dataList.get(i).replace(" ", ""))
+                    } catch (e: Exception) {
 
-                        } catch (e: Exception) {
-
-                        }
-//
                     }
-
+//
                 }
-            } else {
-                selectedUnits(intent.getStringExtra(UNITNAME))
+
             }
+        } else {
+            selectedUnits(intent.getStringExtra(UNITNAME))
         }
+    }
+}catch (e:NullPointerException){
+    
+}
 
         try {
             try {

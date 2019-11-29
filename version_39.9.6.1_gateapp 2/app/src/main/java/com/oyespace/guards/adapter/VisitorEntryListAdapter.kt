@@ -542,7 +542,11 @@ class VisitorEntryListAdapter(
                     VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                         override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
                             val v = VisitorLogRepo.get_IN_VisitorForVisitorId(vlLogId)
-                            updateAttachments(v!!, holder)
+                          try {
+                              updateAttachments(v!!, holder)
+                          }catch (e:KotlinNullPointerException){
+
+                          }
                         }
 
                     })

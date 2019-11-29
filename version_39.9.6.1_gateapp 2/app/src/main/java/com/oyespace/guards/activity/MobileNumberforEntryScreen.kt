@@ -96,7 +96,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
-                d.putExtra("WORKERID", intent.getIntExtra("WORKERID", 0))
+                d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
                 d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                 d.putExtra("Image", intent.getStringExtra("Image"))
                 startActivity(d)
