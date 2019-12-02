@@ -35,7 +35,6 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                 if (Ed_Name_purp.text.length > 2) {
 
                    if (Prefs.getString(TYPE, "").equals("Create")) {
-
                         val d = Intent(this@PurposeScreen, MobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
                         d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
@@ -50,6 +49,7 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                         startActivity(d)
                         finish()
                     }else{
+
                         val d = Intent(
                             this@PurposeScreen, ManualMobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))

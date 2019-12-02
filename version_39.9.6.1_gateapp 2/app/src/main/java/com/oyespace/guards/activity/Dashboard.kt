@@ -95,9 +95,7 @@ import java.io.IOException
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class Dashboard : BaseKotlinActivity(), View.OnClickListener,
-    ResponseHandler,
-    SGFingerPresentEvent {
+class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, SGFingerPresentEvent {
 
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
@@ -693,13 +691,13 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
 
-//        bSecuGenDeviceOpened = false
-//        usbPermissionRequested = false
-//
-//        mLed = false
-//        mAutoOnEnabled = true
-//        autoOn = SGAutoOnEventNotifier(sgfplib, this)
-//        nCaptureModeN = 0
+        bSecuGenDeviceOpened = false
+        usbPermissionRequested = false
+
+        mLed = false
+        mAutoOnEnabled = true
+        autoOn = SGAutoOnEventNotifier(sgfplib, this)
+        nCaptureModeN = 0
 
 
 
@@ -1116,60 +1114,80 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         if (bSecuGenDeviceOpened == true) {
 
-            try {
 
-                val fp: ByteArray = getFingerprintFromScanner() ?: return
-                Log.d("taaag", "fp: ${fp.size}")
-                val id = matchFingerprint(fp)
+
+//                val fp: ByteArray = getFingerprintFromScanner() ?: return
+
+                if (mVerifyImage != null)
+                    mVerifyImage = null
+                mVerifyImage = ByteArray(mImageWidth * mImageHeight)
+
+                try {
+                    var result = sgfplib!!.GetImage(mVerifyImage)
+                    Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
+
+                    result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                    Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
+
+                    var fpInfo: SGFingerInfo? = SGFingerInfo()
+                    for (i in mVerifyTemplate!!.indices)
+                        mVerifyTemplate!![i] = 0
+
+                    result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
+                    Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
+
+                    var matched: BooleanArray? = BooleanArray(1)
+              //  Log.d("taaag", "fp: ${fp.size}")
+                val id = matchFingerprint(mVerifyTemplate!!)
                 Log.d("taaag", "check result: $id")
 
 
-                    if ( id == 0) {
-                        Toast.makeText(this, "Now Zero " + id, Toast.LENGTH_LONG).show();
+                    if (id > 0&& id >43) {
                         showToast(applicationContext,id.toString())
-                    val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
+                        val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
-                    // if yes, then make exit call
-                    if (staff != null) {
-                        t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
-                        loadEntryVisitorLog()
-                    } else {
-
-                        // get staff for id
-                        val worker: Worker? = StaffRepo.getStaffForId(id)
-                        Log.d("taaag", "worker found: $worker")
-                        if (worker == null) {
-                            showToast(this, "No staff found")
+                        // if yes, then make exit call
+                        if (staff != null) {
+                            t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
+                            VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
+                            loadEntryVisitorLog()
                         } else {
-                            getVisitorByWorkerId(
-                                Prefs.getInt(ASSOCIATION_ID, 0),
-                                worker.wkWorkID,
-                                worker.unUnitID,
-                                "${worker.wkfName} ${worker.wklName}",
-                                worker.wkMobile,
-                                worker.wkDesgn,
-                                worker.wkWrkType,
-                                worker.wkWorkID,
-                                worker.unUniName,
-                                worker.wkEntryImg
-                            )
+
+                            // get staff for id
+                            val worker: Worker? = StaffRepo.getStaffForId(id)
+                            Log.d("taaag", "worker found: $worker")
+                            if (worker == null) {
+                                showToast(this, "No staff found")
+                            } else {
+                                getVisitorByWorkerId(
+                                    Prefs.getInt(ASSOCIATION_ID, 0),
+                                    worker.wkWorkID,
+                                    worker.unUnitID,
+                                    "${worker.wkfName} ${worker.wklName}",
+                                    worker.wkMobile,
+                                    worker.wkDesgn,
+                                    worker.wkWrkType,
+                                    worker.wkWorkID,
+                                    worker.unUniName,
+                                    worker.wkEntryImg
+                                )
+                            }
+
+
                         }
 
 
+
                     }
+                    else if (id==43){
 
-
-
-                }
-                    else if (id>43){
-                        Toast.makeText(this, "idvalue "+id, Toast.LENGTH_LONG).show();
 
                         t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
                     }
 
-                mVerifyImage = null
+
+                    mVerifyImage = null
                 this.sgfplib!!.SetBrightness(100)
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
