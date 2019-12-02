@@ -113,15 +113,15 @@ public class ConstantUtils {
     public static final float CHECKPOINT_DISTANCE_THRESHOLD = 20f;
     public static final int PATROLLING_PAUSE_TIMER = 10;
     public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
-    public static final String BGS_PATROLLING_ALARM="BGS_PATROLLING_ALARM";
-    public static final String VISITOR_EXIT_NOTIFY="VISITOR_EXIT_NOTIFY";
+    public static final String BGS_PATROLLING_ALARM = "BGS_PATROLLING_ALARM";
+    public static final String VISITOR_EXIT_NOTIFY = "VISITOR_EXIT_NOTIFY";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
 
-    public static final boolean debug = true;
-    public static final boolean useDummyValues = true;
+    public static final boolean debug = false;
+    public static final boolean useDummyValues = false;
     public static final String dummyPhone = "8660692521";
 
     public static final String SNOOZE_SCHEDULE_TIME = "SNOOZE_SCHEDULE_TIME";
