@@ -1,6 +1,7 @@
 package com.oyespace.guards
 
 
+
 import SecuGen.FDxSDKPro.*
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
@@ -94,9 +95,7 @@ import java.io.IOException
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class Dashboard : BaseKotlinActivity(), View.OnClickListener,
-    ResponseHandler,
-    SGFingerPresentEvent {
+class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, SGFingerPresentEvent {
 
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
@@ -206,21 +205,21 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         // @Override
         override fun handleMessage(msg: Message) {
             //Handle the message +sgfplib.DeviceInUse()
-            Log.d("SecuGen", "finger press handleMessage autoEnabled? $mAutoOnEnabled")
+            Log.d("Dgddfdfhhjhj : ", "ff bf entrybywalk $autoooooo   $mAutoOnEnabled $usbConnected")
 
             if (mAutoOnEnabled) {
 
-//                Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
-                if (usbConnected) {
+                Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
+
+
                     CaptureFingerPrint()
-                }
-//                Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
+
+                Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 mAutoOnEnabled = false
                 val myRunnable = Runnable {
-
+                    // your code here
                     mAutoOnEnabled = true
-                    Log.d("SecuGen", "autoEnabled: $mAutoOnEnabled")
-
+                    mLed=true
                 }
 
                 val myHandler = Handler()
@@ -231,7 +230,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             }
         }
     }
-
     private var mReceiver: BroadcastReceiver? = null
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -266,7 +264,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
             }
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED == action) {
-                Log.d("SecuGen", "usb attached")
                 onResume()
                 sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
                 bSecuGenDeviceOpened = false
@@ -279,7 +276,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 nCaptureModeN = 0
                 usbConnected = true
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED == action) {
-                Log.d("SecuGen", "usb detached")
                 usbConnected = false
             }
         }
@@ -705,7 +701,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         try {
             var error = sgfplib!!.Init(SGFDxDeviceName.SG_DEV_AUTO)
-            Log.i("SecuGen", "Init: $error")
+            Log.d("onResume", "onResume( )$nnnn")
             if (error != SGFDxErrorCode.SGFDX_ERROR_NONE) {
                 val dlgAlert = android.app.AlertDialog.Builder(this)
                 if (error == SGFDxErrorCode.SGFDX_ERROR_DEVICE_NOT_FOUND)
@@ -752,7 +748,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     }
                     if (hasPermission) {
                         error = sgfplib!!.OpenDevice(0)
-                        Log.i("SecuGen", "OpenDevice: $error")
                         if (error == SGFDxErrorCode.SGFDX_ERROR_NONE) {
                             bSecuGenDeviceOpened = true
                             val deviceInfo = SecuGen.FDxSDKPro.SGDeviceInfoParam()
@@ -1025,13 +1020,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     public override fun onPause() {
         Log.e("DB_ONPAUSE", "ONPAUSE" + pTimer)
-
-
-//        stopAutoOn("onPause")
-//        sgfplib!!.CloseDevice();
-
-//        unregisterReceiver(mUsbReceiver);
-
         if (pTimer != null) {
             Log.e("PTIMER", "CANCELLED")
             pTimer!!.cancel()
@@ -1058,10 +1046,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         mVerifyImage = null
         mVerifyTemplate = null
-//        sgfplib!!.Close()
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-            unregisterReceiver(mUsbReceiver)
-        }
+        //        sgfplib.Close();
+        //if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+        unregisterReceiver(mUsbReceiver)
+        //}
         val ddc2 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         Log.d("SYNC_UNIT_LIST", "af ")
         ddc2.putExtra(BSR_Action, SYNC_UNIT_LIST)
@@ -1112,7 +1100,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         autoooooo++
 
-        if (usbConnected) {
+        if(usbConnected) {
+
             fingerDetectedHandler.sendMessage(Message())
         }
     }
@@ -1121,53 +1110,66 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         if (bSecuGenDeviceOpened == true) {
 
-            try {
 
+
+//                val fp: ByteArray = getFingerprintFromScanner() ?: return
+
+                if (mVerifyImage != null)
+                    mVerifyImage = null
                 mVerifyImage = ByteArray(mImageWidth * mImageHeight)
-                sgfplib!!.GetImage(mVerifyImage)
-                sgfplib!!.SetTemplateFormat(SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
-                val result = sgfplib!!.CreateTemplate(SGFingerInfo(), mVerifyImage, mVerifyTemplate)
-                when (result) {
-                    SGFDX_ERROR_EXTRACT_FAIL -> {
-                        showToast(this, "error capturing fingerprint")
-                        return
-                    }
-                }
+
+                try {
+                    var result = sgfplib!!.GetImage(mVerifyImage)
+                    Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
+
+                    result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                    Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
+
+                    var fpInfo: SGFingerInfo? = SGFingerInfo()
+                    for (i in mVerifyTemplate!!.indices)
+                        mVerifyTemplate!![i] = 0
+
+                    result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
+                    Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
+
+                    var matched: BooleanArray? = BooleanArray(1)
+              //  Log.d("taaag", "fp: ${fp.size}")
                 val id = matchFingerprint(mVerifyTemplate!!)
+                Log.d("taaag", "check result: $id")
 
 
                 if (id > 0) {
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
-                    // if yes, then make exit call
-                    if (staff != null) {
-                        t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
-                        loadEntryVisitorLog()
-                    } else {
-
-                        // get staff for id
-                        val worker: Worker? = StaffRepo.getStaffForId(id)
-                        Log.d("taaag", "worker found: $worker")
-                        if (worker == null) {
-                            showToast(this, "No staff found")
+                        // if yes, then make exit call
+                        if (staff != null) {
+                            t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
+                            VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
+                            loadEntryVisitorLog()
                         } else {
-                            getVisitorByWorkerId(
-                                Prefs.getInt(ASSOCIATION_ID, 0),
-                                worker.wkWorkID,
-                                worker.unUnitID,
-                                "${worker.wkfName} ${worker.wklName}",
-                                worker.wkMobile,
-                                worker.wkDesgn,
-                                worker.wkWrkType,
-                                worker.wkWorkID,
-                                worker.unUniName,
-                                worker.wkEntryImg
-                            )
+
+                            // get staff for id
+                            val worker: Worker? = StaffRepo.getStaffForId(id)
+                            Log.d("taaag", "worker found: $worker")
+                            if (worker == null) {
+                                showToast(this, "No staff found")
+                            } else {
+                                getVisitorByWorkerId(
+                                    Prefs.getInt(ASSOCIATION_ID, 0),
+                                    worker.wkWorkID,
+                                    worker.unUnitID,
+                                    "${worker.wkfName} ${worker.wklName}",
+                                    worker.wkMobile,
+                                    worker.wkDesgn,
+                                    worker.wkWrkType,
+                                    worker.wkWorkID,
+                                    worker.unUniName,
+                                    worker.wkEntryImg
+                                )
+                            }
+
+
                         }
-
-
-                    }
 
 
                 } else {

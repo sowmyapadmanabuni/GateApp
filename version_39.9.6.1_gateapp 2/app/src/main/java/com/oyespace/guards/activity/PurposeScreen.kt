@@ -19,11 +19,11 @@ import kotlinx.android.synthetic.main.activity_purpose.*
 import java.util.*
 
 
-class PurposeScreen : BaseKotlinActivity(), View.OnClickListener {
+class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
     private val REQUEST_CODE_SPEECH_INPUT = 100
-    lateinit var txt_assn_name: TextView
+    lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name: TextView
-    lateinit var txt_device_name: TextView
+    lateinit var txt_device_name:TextView
     internal var language: String? = ""
     override fun onClick(v: View?) {
 
@@ -34,8 +34,7 @@ class PurposeScreen : BaseKotlinActivity(), View.OnClickListener {
                 buttonNextt.isClickable = false
                 if (Ed_Name_purp.text.length > 2) {
 
-                    if (Prefs.getString(TYPE, "").equals("Create")) {
-
+                   if (Prefs.getString(TYPE, "").equals("Create")) {
                         val d = Intent(this@PurposeScreen, MobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
                         d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
@@ -49,10 +48,10 @@ class PurposeScreen : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
                         startActivity(d)
                         finish()
-                    } else {
+                    }else{
+
                         val d = Intent(
-                            this@PurposeScreen, ManualMobileNumberScreen::class.java
-                        )
+                            this@PurposeScreen, ManualMobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
                         d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
                         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -91,9 +90,9 @@ class PurposeScreen : BaseKotlinActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_purpose)
-        txt_assn_name = findViewById(R.id.txt_assn_name)
-        txt_gate_name = findViewById(R.id.txt_gate_name)
-        txt_device_name = findViewById(R.id.txt_device_name)
+        txt_assn_name=findViewById(R.id.txt_assn_name)
+        txt_gate_name=findViewById(R.id.txt_gate_name)
+        txt_device_name=findViewById(R.id.txt_device_name)
         txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
         txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
         try {
