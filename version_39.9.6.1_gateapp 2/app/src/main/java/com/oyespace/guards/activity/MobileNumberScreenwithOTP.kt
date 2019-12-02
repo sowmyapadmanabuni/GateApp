@@ -65,7 +65,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
     var mobilenumber: String? = null
     var otpnumber: String? = null
     var phone: String? = null
-    val clazz:Int?=0
+    var clazz:Int?=0
     var dialogs: Dialog? = null
 
     // private var Ed_phoneNum:String?=null
@@ -103,7 +103,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
                 if (textview.text.length == 10) {
 
-                    val clazz = intent.getIntExtra("class", -1)
+
                     if (clazz == 123) {
 
                         val ccd = countryCode.toString()
@@ -212,6 +212,8 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
 
         setContentView(R.layout.layout_mobilenumber_otp)
+
+         clazz = intent.getIntExtra("class", -1)
 
 
 //        receiver =  object : BroadcastReceiver() {
