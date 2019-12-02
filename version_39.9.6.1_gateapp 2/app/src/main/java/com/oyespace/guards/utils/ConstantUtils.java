@@ -80,7 +80,7 @@ public class ConstantUtils {
 //    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
 //    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
     public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
-    //    public static final String BASE_URL = "https://api.oyespace.com/";
+//        public static final String BASE_URL = "https://api.oyespace.com/";
 //    public static final String BASE_URL = "https://apidev.oyespace.com/";
     public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
@@ -121,7 +121,7 @@ public class ConstantUtils {
     public static final String SOS_STATUS_CANCELLED = "Cancelled";
 
     public static final boolean debug = true;
-    public static final boolean useDummyValues = false;
+    public static final boolean useDummyValues = true;
     public static final String dummyPhone = "8660692521";
 
     public static final String SNOOZE_SCHEDULE_TIME = "SNOOZE_SCHEDULE_TIME";
@@ -131,7 +131,7 @@ public class ConstantUtils {
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
     public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
-    public static final int MAX_DELIVERY_ALLOWED_SEC = debug ? 3 * 60 : 3 * 60;// 7 mins
+    public static final int MAX_DELIVERY_ALLOWED_SEC = debug ? 3 * 60 : 7 * 60;// 7 mins
     public static final int MAX_ENTRY_EXPIRY_SEC = debug ? 30 * 60 : 30 * 60;// 30 mins
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";

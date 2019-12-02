@@ -1,7 +1,6 @@
 package com.oyespace.guards
 
 
-
 import SecuGen.FDxSDKPro.*
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
@@ -207,19 +206,21 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         // @Override
         override fun handleMessage(msg: Message) {
             //Handle the message +sgfplib.DeviceInUse()
-            Log.d("Dgddfdfhhjhj : ", "ff bf entrybywalk $autoooooo   $mAutoOnEnabled $usbConnected")
+            Log.d("SecuGen", "finger press handleMessage autoEnabled? $mAutoOnEnabled")
 
             if (mAutoOnEnabled) {
 
-                Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
+//                Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 if (usbConnected) {
                     CaptureFingerPrint()
                 }
-                Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
+//                Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 mAutoOnEnabled = false
                 val myRunnable = Runnable {
-                    // your code here
+
                     mAutoOnEnabled = true
+                    Log.d("SecuGen", "autoEnabled: $mAutoOnEnabled")
+
                 }
 
                 val myHandler = Handler()
@@ -230,6 +231,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             }
         }
     }
+
     private var mReceiver: BroadcastReceiver? = null
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -264,6 +266,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
             }
             if (UsbManager.ACTION_USB_DEVICE_ATTACHED == action) {
+                Log.d("SecuGen", "usb attached")
                 onResume()
                 sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
                 bSecuGenDeviceOpened = false
@@ -276,6 +279,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 nCaptureModeN = 0
                 usbConnected = true
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED == action) {
+                Log.d("SecuGen", "usb detached")
                 usbConnected = false
             }
         }
@@ -483,7 +487,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
-        Log.i("taaag", "listening to $fbdbAssocName firebase object reference")
+        Log.d("taaag", "listening to $fbdbAssocName firebase object reference")
         walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("wt_audio").child(fbdbAssocName)
 
         removeWalkieTalkieAudioFirebase()
@@ -598,13 +602,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     override fun onResume() {
 
 
-
-        if(pTimerChecker == null) {
+        if (pTimerChecker == null) {
             runTimerCheck()
         }
 
         //registerReceiver(mUsbReceiver, filter)
-
 
 
         fixedRateTimer("timer", false, 0, 60000) {
@@ -703,7 +705,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         try {
             var error = sgfplib!!.Init(SGFDxDeviceName.SG_DEV_AUTO)
-            Log.d("onResume", "onResume( )$nnnn")
+            Log.i("SecuGen", "Init: $error")
             if (error != SGFDxErrorCode.SGFDX_ERROR_NONE) {
                 val dlgAlert = android.app.AlertDialog.Builder(this)
                 if (error == SGFDxErrorCode.SGFDX_ERROR_DEVICE_NOT_FOUND)
@@ -730,8 +732,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                         if (!usbPermissionRequested) {
                             //Log.d(TAG, "Call GetUsbManager().requestPermission()");
                             usbPermissionRequested = true
-                            sgfplib!!.GetUsbManager()
-                                .requestPermission(usbDevice, mPermissionIntent)
+                            sgfplib!!.GetUsbManager().requestPermission(usbDevice, mPermissionIntent)
                         } else {
                             //wait up to 20 seconds for the system to grant USB permission
                             hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
@@ -751,6 +752,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     }
                     if (hasPermission) {
                         error = sgfplib!!.OpenDevice(0)
+                        Log.i("SecuGen", "OpenDevice: $error")
                         if (error == SGFDxErrorCode.SGFDX_ERROR_NONE) {
                             bSecuGenDeviceOpened = true
                             val deviceInfo = SecuGen.FDxSDKPro.SGDeviceInfoParam()
@@ -774,8 +776,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 }
             }
         } catch (ex: Exception) {
-            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT).show()
         }
 
 
@@ -1024,6 +1025,13 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     public override fun onPause() {
         Log.e("DB_ONPAUSE", "ONPAUSE" + pTimer)
+
+
+//        stopAutoOn("onPause")
+//        sgfplib!!.CloseDevice();
+
+//        unregisterReceiver(mUsbReceiver);
+
         if (pTimer != null) {
             Log.e("PTIMER", "CANCELLED")
             pTimer!!.cancel()
@@ -1050,10 +1058,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         mVerifyImage = null
         mVerifyTemplate = null
-        //        sgfplib.Close();
-        //if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-        unregisterReceiver(mUsbReceiver)
-        //}
+//        sgfplib!!.Close()
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+            unregisterReceiver(mUsbReceiver)
+        }
         val ddc2 = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
         Log.d("SYNC_UNIT_LIST", "af ")
         ddc2.putExtra(BSR_Action, SYNC_UNIT_LIST)
@@ -1104,8 +1112,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         autoooooo++
 
-        if(usbConnected) {
-
+        if (usbConnected) {
             fingerDetectedHandler.sendMessage(Message())
         }
     }
@@ -1116,14 +1123,20 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
             try {
 
-                val fp: ByteArray = getFingerprintFromScanner() ?: return
-                Log.d("taaag", "fp: ${fp.size}")
-                val id = matchFingerprint(fp)
-                Log.d("taaag", "check result: $id")
+                mVerifyImage = ByteArray(mImageWidth * mImageHeight)
+                sgfplib!!.GetImage(mVerifyImage)
+                sgfplib!!.SetTemplateFormat(SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                val result = sgfplib!!.CreateTemplate(SGFingerInfo(), mVerifyImage, mVerifyTemplate)
+                when (result) {
+                    SGFDX_ERROR_EXTRACT_FAIL -> {
+                        showToast(this, "error capturing fingerprint")
+                        return
+                    }
+                }
+                val id = matchFingerprint(mVerifyTemplate!!)
 
 
-                    if (id > 0&& id >43) {
-                        showToast(applicationContext,id.toString())
+                if (id > 0) {
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
                     // if yes, then make exit call
@@ -1157,14 +1170,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                     }
 
 
+                } else {
+
+                    t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
                 }
-                    else if (id==43){
-
-
-                        t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
-
-                    }
 
                 mVerifyImage = null
                 this.sgfplib!!.SetBrightness(100)
@@ -1181,69 +1191,30 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     }
 
-    fun getFingerprintFromScanner(): ByteArray? {
-
-
-        val templateSize = IntArray(1)
-        sgfplib!!.GetMaxTemplateSize(templateSize)
-        val fpTemp = ByteArray(templateSize[0])
-        val fpImg = ByteArray(mImageWidth * mImageHeight)
-        var code = 0L
-        try {
-
-            sgfplib!!.GetImageEx(fpImg, 10000, 50)
-            code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
-        } catch (e: NullPointerException) {
-
-        }
-//        when (code) {
-//            SGFDX_ERROR_NONE -> {
-//                showToast(this, "fingerprint captured")
-//            }
-//            SGFDX_ERROR_EXTRACT_FAIL -> {
-//                showToast(this, "error capturing fingerprint")
-//                return null
-//            }
-//        }
-        Log.d("taaag", "capture code: $code")
-        return fpTemp
-
-    }
-
     fun matchFingerprint(fingerPrint: ByteArray): Int {
-
-        var number=0
 
         val asscId = Prefs.getInt(ASSOCIATION_ID, 0)
 
         val fps = RealmDB.getRegularVisitorsFingerPrint(asscId)
-        Log.d("taaag", "got ${fps.size} fingerprints from realm")
+        Log.v("taaag", "got ${fps.size} fingerprints from realm")
         val result = BooleanArray(1)
         for (fp in fps) {
 
-            number++
-            Log.d("taaag", "matching with ${fp.userName}'s fingerprint")
+            Log.v("taaag", "matching with ${fp.userName}'s fingerprint")
 
-            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_NORMAL, result)
+            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_HIGH, result)
             if (result[0]) return fp.userName.toInt()
 
 
-            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg2, SGFDxSecurityLevel.SL_NORMAL, result)
+            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg2, SGFDxSecurityLevel.SL_HIGH, result)
             if (result[0]) return fp.userName.toInt()
 
-            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg3, SGFDxSecurityLevel.SL_NORMAL, result)
+            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg3, SGFDxSecurityLevel.SL_HIGH, result)
             if (result[0]) return fp.userName.toInt()
 
         }
-        if (number > 0) {
-            return number
-        }
-        else{
-            number=0
-        }
 
-
-        return number
+        return -1
 
     }
 
