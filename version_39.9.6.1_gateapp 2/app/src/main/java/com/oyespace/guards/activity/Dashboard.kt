@@ -216,7 +216,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 val myRunnable = Runnable {
                     // your code here
                     mAutoOnEnabled = true
-                    mLed = true
+                    mLed=true
                 }
 
                 val myHandler = Handler()
@@ -600,6 +600,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         }
 
         //registerReceiver(mUsbReceiver, filter)
+
 
 
         fixedRateTimer("timer", false, 0, 60000) {
@@ -1097,7 +1098,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
         autoooooo++
 
-        if (usbConnected) {
+        if(usbConnected) {
 
             fingerDetectedHandler.sendMessage(Message())
         }
@@ -1110,26 +1111,26 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
 //                val fp: ByteArray = getFingerprintFromScanner() ?: return
 
-            if (mVerifyImage != null)
-                mVerifyImage = null
-            mVerifyImage = ByteArray(mImageWidth * mImageHeight)
+                if (mVerifyImage != null)
+                    mVerifyImage = null
+                mVerifyImage = ByteArray(mImageWidth * mImageHeight)
 
-            try {
-                var result = sgfplib!!.GetImage(mVerifyImage)
-                Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
+                try {
+                    var result = sgfplib!!.GetImage(mVerifyImage)
+                    Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
 
-                result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
-                Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
+                    result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                    Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
 
-                var fpInfo: SGFingerInfo? = SGFingerInfo()
-                for (i in mVerifyTemplate!!.indices)
-                    mVerifyTemplate!![i] = 0
+                    var fpInfo: SGFingerInfo? = SGFingerInfo()
+                    for (i in mVerifyTemplate!!.indices)
+                        mVerifyTemplate!![i] = 0
 
-                result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
-                Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
+                    result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
+                    Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
 
-                var matched: BooleanArray? = BooleanArray(1)
-                //  Log.d("taaag", "fp: ${fp.size}")
+                    var matched: BooleanArray? = BooleanArray(1)
+              //  Log.d("taaag", "fp: ${fp.size}")
                 val id = matchFingerprint(mVerifyTemplate!!)
                 Log.d("taaag", "check result: $id")
 
@@ -1310,6 +1311,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         when (v.id) {
 
             R.id.re_delivery -> {
+
+                Prefs.putString(ConstantUtils.TYPE, "Create")
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
 

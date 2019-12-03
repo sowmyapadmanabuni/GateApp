@@ -374,7 +374,32 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                 val clazz = intent.getIntExtra("class", -1)
                 if (clazz == 123) {
 
-                    sendotp()
+                    var phoneNumber="+91"+phone.toString()
+                    if(phoneNumber.contains(intent.getStringExtra(MOBILENUMBER))){
+
+                        val ccd = countryCode.toString()
+                        val mobileNumber = phone
+
+                        val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                        if (!allowEntry) {
+
+                            val builder = AlertDialog.Builder(this@MobileNumberScreenwithOTP)
+
+                            builder.setMessage("This number is being used by a person already in")
+                            builder.setPositiveButton("Ok") { dialog, which ->
+                                dialog.cancel()
+                                finish()
+                            }
+                            builder.setCancelable(false)
+                            builder.show()
+                        }else {
+                            sendotp()
+                        }
+                    }else {
+
+                        Toast.makeText(this, "Enter valid mobile number", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     val flow = intent.getStringExtra(FLOW_TYPE)
 
