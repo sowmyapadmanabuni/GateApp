@@ -118,7 +118,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     val phoneNumber: String = textview.text.toString()
                     if (phoneNumber.contains(intent.getStringExtra(MOBILENUMBER))) {
 
-                        val allowEntry = VisitorLogRepo.allowEntry(countryCode, phoneNumber)
+                        val allowEntry = VisitorLogRepo.allowEntry("", phoneNumber)
 
                         if (!allowEntry) {
                             Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)

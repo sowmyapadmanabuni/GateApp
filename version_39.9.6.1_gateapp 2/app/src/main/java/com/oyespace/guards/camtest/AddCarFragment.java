@@ -22,13 +22,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
-
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
@@ -36,7 +30,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -49,11 +42,7 @@ import com.oyespace.guards.activity.Biometric;
 import com.oyespace.guards.activity.StaffDetails;
 import com.oyespace.guards.activity.StaffEntryRegistration;
 import com.oyespace.guards.constants.PrefKeys;
-import com.oyespace.guards.network.ChampApiClient;
-import com.oyespace.guards.network.ChampApiInterface;
-import com.oyespace.guards.network.ResponseHandler;
-import com.oyespace.guards.network.RestClient;
-import com.oyespace.guards.network.URLData;
+import com.oyespace.guards.network.*;
 import com.oyespace.guards.request.SendStaffImageReq;
 import com.oyespace.guards.request.StaffRegistrationReqJv;
 import com.oyespace.guards.responce.StaffImageRes;
@@ -62,6 +51,9 @@ import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -72,34 +64,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
-import static com.oyespace.guards.utils.ConstantUtils.ACCOUNT_ID;
-import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
-import static com.oyespace.guards.utils.ConstantUtils.BLOCK_ID;
-import static com.oyespace.guards.utils.ConstantUtils.BSR_Action;
-import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
-import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
-import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
-import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
-import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
-import static com.oyespace.guards.utils.ConstantUtils.ITEMS_PHOTO_LIST;
-import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
-import static com.oyespace.guards.utils.ConstantUtils.OYE247KEY;
-import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
-import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
-import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
-import static com.oyespace.guards.utils.ConstantUtils.STAFF_REGISTRATION;
-import static com.oyespace.guards.utils.ConstantUtils.SYNC_STAFF_LIST;
-import static com.oyespace.guards.utils.ConstantUtils.UNITID;
-import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
-import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
-import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
-import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
-import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
+import static com.oyespace.guards.utils.ConstantUtils.*;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 
@@ -326,11 +292,11 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
                 } else {
 
-                    Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
+                    String image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg";
 
-                    Log.v("CALLER IMAGEVIEW", IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
+                    Picasso.with(this).load(image).into(target);
 
-                    imageView1.setImageBitmap(photo);
+//                    imageView1.setImageBitmap(photo);
 
 //                Glide.with(this)
 //                        .load(Uri.parse(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg"))
@@ -342,7 +308,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                     //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
                     Picasso.with(this)
-                            .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+                            .load(image)
                             .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
                 }
 

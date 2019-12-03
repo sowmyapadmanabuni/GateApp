@@ -1,10 +1,7 @@
 package com.oyespace.guards
 
 
-
 import SecuGen.FDxSDKPro.*
-import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
-import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -212,14 +209,14 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
 
 
-                    CaptureFingerPrint()
+                CaptureFingerPrint()
 
                 Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 mAutoOnEnabled = false
                 val myRunnable = Runnable {
                     // your code here
                     mAutoOnEnabled = true
-                    mLed=true
+                    mLed = true
                 }
 
                 val myHandler = Handler()
@@ -1100,7 +1097,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
         autoooooo++
 
-        if(usbConnected) {
+        if (usbConnected) {
 
             fingerDetectedHandler.sendMessage(Message())
         }
@@ -1111,29 +1108,28 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         if (bSecuGenDeviceOpened == true) {
 
 
-
 //                val fp: ByteArray = getFingerprintFromScanner() ?: return
 
-                if (mVerifyImage != null)
-                    mVerifyImage = null
-                mVerifyImage = ByteArray(mImageWidth * mImageHeight)
+            if (mVerifyImage != null)
+                mVerifyImage = null
+            mVerifyImage = ByteArray(mImageWidth * mImageHeight)
 
-                try {
-                    var result = sgfplib!!.GetImage(mVerifyImage)
-                    Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
+            try {
+                var result = sgfplib!!.GetImage(mVerifyImage)
+                Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
 
-                    result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
-                    Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
+                result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
 
-                    var fpInfo: SGFingerInfo? = SGFingerInfo()
-                    for (i in mVerifyTemplate!!.indices)
-                        mVerifyTemplate!![i] = 0
+                var fpInfo: SGFingerInfo? = SGFingerInfo()
+                for (i in mVerifyTemplate!!.indices)
+                    mVerifyTemplate!![i] = 0
 
-                    result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
-                    Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
+                result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
+                Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
 
-                    var matched: BooleanArray? = BooleanArray(1)
-              //  Log.d("taaag", "fp: ${fp.size}")
+                var matched: BooleanArray? = BooleanArray(1)
+                //  Log.d("taaag", "fp: ${fp.size}")
                 val id = matchFingerprint(mVerifyTemplate!!)
                 Log.d("taaag", "check result: $id")
 
@@ -1141,19 +1137,23 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 if (id > 0) {
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
-                        // if yes, then make exit call
-                        if (staff != null) {
-                            t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                            VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
-                            loadEntryVisitorLog()
+                    // if yes, then make exit call
+                    if (staff != null) {
+                        t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
+                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
+                    } else {
+
+                        // get staff for id
+                        val worker: Worker? = StaffRepo.getStaffForId(id)
+
+                        Log.d("taaag", "worker found: $worker")
+                        if (worker == null) {
+                            showToast(this, "No staff found")
                         } else {
 
-                            // get staff for id
-                            val worker: Worker? = StaffRepo.getStaffForId(id)
-                            Log.d("taaag", "worker found: $worker")
-                            if (worker == null) {
-                                showToast(this, "No staff found")
-                            } else {
+                            val phone = worker.wkMobile
+
+                            if (phone == null || phone.isEmpty()) {
                                 getVisitorByWorkerId(
                                     Prefs.getInt(ASSOCIATION_ID, 0),
                                     worker.wkWorkID,
@@ -1166,10 +1166,33 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                     worker.unUniName,
                                     worker.wkEntryImg
                                 )
+                            } else {
+
+                                val allowEntry = VisitorLogRepo.allowEntry("", phone)
+
+                                if (allowEntry) {
+                                    getVisitorByWorkerId(
+                                        Prefs.getInt(ASSOCIATION_ID, 0),
+                                        worker.wkWorkID,
+                                        worker.unUnitID,
+                                        "${worker.wkfName} ${worker.wklName}",
+                                        worker.wkMobile,
+                                        worker.wkDesgn,
+                                        worker.wkWrkType,
+                                        worker.wkWorkID,
+                                        worker.unUniName,
+                                        worker.wkEntryImg
+                                    )
+                                } else {
+                                    showToast(this, "Duplicate entries not allowed")
+                                }
                             }
 
 
                         }
+
+
+                    }
 
 
                 } else {

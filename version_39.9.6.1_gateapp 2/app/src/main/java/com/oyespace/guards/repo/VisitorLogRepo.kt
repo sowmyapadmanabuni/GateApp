@@ -364,7 +364,7 @@ class VisitorLogRepo {
                         for (v in visitorLog) {
 
                             val apprStat = v.vlApprStat
-                            Log.i("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
+                            Log.d("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
                             if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
                                 if (apprStat.equals(APPROVED, true)) {
                                     return false
