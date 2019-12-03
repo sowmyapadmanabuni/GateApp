@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.CallLog
@@ -34,6 +35,7 @@ import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.MobileNumberScreenwithOTP
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
@@ -124,7 +126,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
                 d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-               // d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
@@ -209,6 +211,18 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_mobile_number)
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            requestPermission(arrayOf(
+                Manifest.permission.ANSWER_PHONE_CALLS
+            ), 1, PermissionCallback { isGranted ->
+                if (isGranted) {
+
+                } else {
+
+                }
+            })
+        }
 
         receiver = object : BroadcastReceiver() {
 

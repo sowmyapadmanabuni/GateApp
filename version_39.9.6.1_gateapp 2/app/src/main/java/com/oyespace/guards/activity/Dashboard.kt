@@ -1330,6 +1330,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         when (v.id) {
 
             R.id.re_delivery -> {
+
+                Prefs.putString(ConstantUtils.TYPE, "Create")
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
 
