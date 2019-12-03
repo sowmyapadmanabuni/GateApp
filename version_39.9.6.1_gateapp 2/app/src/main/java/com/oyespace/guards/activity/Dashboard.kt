@@ -437,10 +437,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
-            registerReceiver(mUsbReceiver, filter)
-        }
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -597,7 +594,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
     override fun onResume() {
 
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
+            registerReceiver(mUsbReceiver, filter)
+        }
 
         if(pTimerChecker == null) {
             runTimerCheck()
@@ -1142,7 +1142,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 Log.d("taaag", "check result: $id")
 
 
-                    if (id > 0&& id >43) {
+                    if (id > 0) {
                         showToast(applicationContext,id.toString())
                         val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
@@ -1179,7 +1179,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
 
                     }
-                    else if (id==43){
+                    else {
 
 
                         t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
@@ -1234,7 +1234,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
     fun matchFingerprint(fingerPrint: ByteArray): Int {
 
-        var number=0
+
 
         val asscId = Prefs.getInt(ASSOCIATION_ID, 0)
 
@@ -1243,7 +1243,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         val result = BooleanArray(1)
         for (fp in fps) {
 
-            number++
+
             Log.d("taaag", "matching with ${fp.userName}'s fingerprint")
 
             sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_NORMAL, result)
@@ -1257,15 +1257,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             if (result[0]) return fp.userName.toInt()
 
         }
-        if (number > 0) {
-            return number
-        }
-        else{
-            number=0
-        }
 
 
-        return number
+        return -1
 
     }
 
