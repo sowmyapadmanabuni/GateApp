@@ -1,13 +1,7 @@
 package com.oyespace.guards.pertroling;
 
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
+import android.content.*;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -15,11 +9,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.SystemClock;
+import android.os.*;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -32,11 +22,9 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-
 import com.bumptech.glide.Glide;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -62,40 +50,19 @@ import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.Prefs;
 import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker;
 import com.treebo.internetavailabilitychecker.InternetConnectivityListener;
-
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import me.dm7.barcodescanner.core.IViewFinder;
 import me.dm7.barcodescanner.core.ViewFinderView;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
+import org.jetbrains.annotations.NotNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_LAST_CP;
-import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_LAST_TIME;
-import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_SCHEDULE;
-import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
-import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_DISTANCE_THRESHOLD;
-import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
-import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
-import static com.oyespace.guards.utils.ConstantUtils.GATE_DEVICE_ID;
-import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
-import static com.oyespace.guards.utils.ConstantUtils.MEDIA_URL;
-import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
-import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_COMPLETED_ON;
-import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_HIDDEN_SELFIE;
-import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
-import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static com.oyespace.guards.utils.ConstantUtils.*;
 
 public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void>, View.OnClickListener, OnLocationUpdate, InternetConnectivityListener {
 
@@ -136,7 +103,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     @Override
     public void onInternetConnectivityChanged(boolean isConnected) {
         if(!isConnected){
-            showAnimatedDialog("No Internet Connectivity..",R.raw.error_alert,true,"OK");
+            showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error_alert, true, "OK");
         }
     }
 
@@ -274,7 +241,6 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
             mSatellitesText.setText("Satellites: " + currentSatelliteCount);
             mAccuracyText.setText("Accuracy: " + currentLocationAccuracy + "m");
-            ;
 
             if ((currentSatelliteCount > 4 && currentLocationAge < 15) || (currentSatelliteCount <=4 && currentLocationAccuracy < 15)) {
                 //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_online));
@@ -419,7 +385,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         @Override
                         public void noNetowork() {
                             dismissProgressrefresh();
-                            showAnimatedDialog("No internet connectivity", R.raw.error, true, "OK");
+                            showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -926,7 +892,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //return true;
         //Log.e("DISTANCE_LOC",""+result);
         Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
-        return result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
+        return result <= CHECKPOINT_DISTANCE_THRESHOLD;
     }
 
     private float calculateDistance(Double mCPLatitude, Double mCPLongitude) {
@@ -1027,7 +993,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     .subscribeWith(new CommonDisposable<GetCheckPointResponse<CheckPointData>>() {
                         @Override
                         public void noNetowork() {
-                            showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
+                            showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -1077,8 +1043,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                     @Override
                     public void noNetowork() {
-                        Log.e("sendScannedCheckPoint","No Netwrok");
-                        showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
+                        Log.e("sendScannedCheckPoint", "No Netwrok");
+                        showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error, true, "OK");
                     }
 
                     @Override

@@ -177,6 +177,8 @@ if(staffdata.isValid){
 
             }
 
+
+
             if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 1") {
                 holder.btn_biometric.visibility = View.INVISIBLE
             } else {

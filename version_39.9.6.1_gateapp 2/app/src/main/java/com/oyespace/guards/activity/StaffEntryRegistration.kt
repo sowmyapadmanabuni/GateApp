@@ -601,7 +601,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     override fun noNetowork() {
                         button_done.isEnabled = true
                         button_done.isClickable = true
-                        Utils.showToast(this@StaffEntryRegistration, "No Internet")
+                        Utils.showToast(this@StaffEntryRegistration, resources.getString(R.string.no_internet))
                     }
 
                     override fun onShowProgress() {
