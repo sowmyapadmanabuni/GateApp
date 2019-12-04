@@ -166,9 +166,11 @@ public class VisitorEntryLogRealm {
 
     public static void deleteAllVisitorLogs() {
         Realm r = Realm.getDefaultInstance();
-
-        r.executeTransaction(realm -> realm.delete(VisitorLog.class));
-
+        if(r.isInTransaction()){
+            r.delete(VisitorLog.class);
+        }else {
+            r.executeTransaction(realm -> realm.delete(VisitorLog.class));
+        }
     }
 
     public static int getUnitCountForVisitor(String phone) {

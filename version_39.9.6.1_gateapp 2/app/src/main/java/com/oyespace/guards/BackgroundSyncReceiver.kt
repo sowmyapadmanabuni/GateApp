@@ -14,9 +14,7 @@ import com.google.gson.Gson
 import com.oyespace.guards.activity.PatrollingAlert
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.fcm.FCMRetrofitClinet
-import com.oyespace.guards.models.PatrolShift
-import com.oyespace.guards.models.ShiftsListResponse
-import com.oyespace.guards.models.VisitorLog
+import com.oyespace.guards.models.*
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -31,6 +29,12 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.RealmResults
+import io.realm.exceptions.RealmPrimaryKeyConstraintException
+import io.realm.kotlin.createObject
+import io.realm.kotlin.delete
+import io.realm.kotlin.where
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -202,8 +206,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 val sbSubID: String = intent.getStringExtra("sbSubID")//40841
                 val userID: Int = intent.getIntExtra("userID", 0)
                 val unitID: String = intent.getStringExtra("unitID")//40841
-                sendCloudFunctionNotification(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
-            } catch (e: Exception) {
+                Log.e("BEFORE_",""+associationID+"-"+associationName+"-"+ntDesc+"-"+ntTitle+"-"+ntType+"-"+sbSubID+"-"+userID+"-"+unitID);
+                sendCloudFunctionNotification(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID)
+            }catch (e:Exception){
                 e.printStackTrace()
             }
         }
@@ -402,89 +407,68 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun onSuccessResponse(PatrolList: ShiftsListResponse<ArrayList<PatrolShift>>) {
 
                     if (PatrolList.success == true) {
-                        Log.e("ALARM_PATR", "" + PatrolList.data.patrollingShifts)
-                        for (schedules: PatrolShift in PatrolList.data.patrollingShifts) {
-                            val sdf: SimpleDateFormat = SimpleDateFormat("EEEE")
-                            val d: Date = Date()
-                            val day = sdf.format(d)
-                            Log.e("ALARM_DAY", "" + day)
-                            if (schedules.psRepDays.contains(day, ignoreCase = true)) {
-                                Log.e("ALARM_DAYFOUND", "" + day)
-                                val timeFormat = SimpleDateFormat("yyyy-MM-dd")
-                                var currentTimeObj = timeFormat.format(Date())
-
-
-                                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                                val formatter = SimpleDateFormat("HH:mm:ss")
-                                val formattedDate = formatter.format(parser.parse(schedules.pssTime))
-
-                                currentTimeObj = currentTimeObj + "T" + formattedDate
-
-                                //val startTime:String = AppUtils.getTimeFromDate(schedules.pssTime)
-                                //var startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(schedules.pssTime)
-                                val startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(currentTimeObj)
-
-                                Log.e("startTimeObj_NEW", "" + currentTimeObj)
-                                Log.e("startTimeObj", "" + startTimeObj.time)
-                                Log.e("endTime", "" + Date().time)
-                                val diff = startTimeObj.time - Date().time
-                                val seconds = diff / 1000
-                                val minutes = seconds / 60
-
-                                val snoozeScheduleTime = Prefs.getString(SNOOZE_SCHEDULE_TIME + schedules.psPtrlSID, "")
-                                val tempIsSnoozed = Prefs.getBoolean("IS_SNOOZED_" + schedules.psPtrlSID, false)
-                                if (tempIsSnoozed && !snoozeScheduleTime.equals("") && !snoozeScheduleTime.equals(schedules.pssTime)) {
-                                    Prefs.remove(SNOOZE_COUNT + schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_IS_ACTIVE + schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_TIME + schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_SCHEDULE_TIME + schedules.psPtrlSID)
-                                }
-
-                                val isSnoozed: Boolean = Prefs.getBoolean("IS_SNOOZED_" + schedules.psPtrlSID, false)
-                                val snoozeCount: Int = Prefs.getInt(SNOOZE_COUNT + schedules.psPtrlSID, 0)
-                                val snoozedTime: String = Prefs.getString(SNOOZE_TIME + schedules.psPtrlSID, "")
-                                val snoozeMins: Long = getTimeDifference(snoozedTime)
-                                val completedTime = Prefs.getString(PATROLLING_COMPLETED_ON + schedules.psPtrlSID, "")
-                                var isPatrollingCompleted = false
-                                if (!completedTime.equals("")) {
-                                    val completedMins: Long = getTimeDifference(completedTime)
-                                    isPatrollingCompleted = completedMins < 6
-                                }
-
-                                Log.e("THE_DIFF", "" + minutes + " - " + isSnoozed + " - " + snoozeMins + "  - " + isPatrollingCompleted)
-
-                                if (((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount < 3 && snoozeMins >= 5 && snoozeMins < 17)) && !isPatrollingCompleted) {
-                                    Log.e("INSIDE_1", "" + (minutes <= 5 && minutes > -1) + " - " + (isSnoozed && snoozeCount < 3 && snoozeMins >= 5 && snoozeMins < 17))
-                                    if (schedules.psSnooze) {
-                                        //Snooze enabled
-                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID, schedules.pssTime)
-                                    } else {
-                                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "OK", schedules.psPtrlSID, "")
-                                    }
-                                    break
-
-                                } else if (isSnoozed && snoozeCount >= 3 && snoozeMins >= 20) {
-                                    Log.e("INSIDE_2", "" + (isSnoozed && snoozeCount >= 3 && snoozeMins >= 20))
-                                    Prefs.remove(SNOOZE_COUNT + schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_IS_ACTIVE + schedules.psPtrlSID)
-                                    Prefs.remove(SNOOZE_TIME + schedules.psPtrlSID)
-
-                                    if (minutes <= 5 && minutes > -1 && !isPatrollingCompleted) {
-
-                                        if (schedules.psSnooze) {
-                                            //Snooze enabled
-                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID, schedules.pssTime)
-                                        } else {
-                                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "OK", schedules.psPtrlSID, "")
-                                        }
-                                        break
-
-                                    }
-                                }
-                                Log.e("TIME_DIFF", "" + minutes)
-
+                        var realm:Realm = Realm.getDefaultInstance()
+                        var mTempShifts = PatrolList.data.patrollingShifts;
+                        try {
+                            if(!realm.isInTransaction) {
+                                realm.beginTransaction()
+                                realm.delete<CheckPointsOfSchedule>()
                             }
+                            for (shift: PatrolShift in mTempShifts) {
+                                var schedule: PatrolShiftRealm;
+                                try {
+                                    schedule = realm.createObject<PatrolShiftRealm>(shift.psPtrlSID)
+                                }catch (e: RealmPrimaryKeyConstraintException){
+                                    schedule = realm.where<PatrolShiftRealm>().equalTo("psPtrlSID",shift.psPtrlSID).findFirstAsync()
+                                }
+                                schedule.asAssnID = shift.asAssnID
+                                schedule.deName = shift.deName;
+                                schedule.psIsActive = shift.psIsActive
+                                schedule.psRepDays = shift.psRepDays
+                                schedule.psSltName = shift.psSltName
+                                schedule.psSnooze = shift.psSnooze
+                                schedule.psdCreated = shift.psdCreated
+                                schedule.psdUpdated = shift.psdUpdated
+                                schedule.pseTime = shift.pseTime
+                                schedule.pssTime = shift.pssTime
+                                realm.insertOrUpdate(schedule)
+
+                                var maxId:Number? = realm.where<CheckPointsOfSchedule>().max("id")
+                                if(maxId != null){
+                                    maxId = maxId.toInt()+1
+                                }else{
+                                    maxId = 1
+                                }
+                                for(checkpointInfo: ScheduleCheckPointsData in shift.point){
+                                    Log.e("MAXID",""+maxId)
+                                    val checkPoint = realm.createObject<CheckPointsOfSchedule>(maxId)
+                                    checkPoint.psPtrlSID = shift.psPtrlSID
+                                    checkPoint.asAssnID = checkpointInfo.asAssnID
+                                    checkPoint.cpCkPName = checkpointInfo.checks.get(0).cpCkPName
+                                    checkPoint.cpcPntAt = checkpointInfo.checks.get(0).cpcPntAt
+                                    checkPoint.cpgpsPnts = checkpointInfo.cpgpsPnts
+                                    checkPoint.pcIsActive = checkpointInfo.pcIsActive
+                                    checkPoint.pcid = checkpointInfo.pcid
+                                    checkPoint.psChkPID = checkpointInfo.psChkPID
+                                    checkPoint.cpOrder = checkpointInfo.cpOrder
+                                    realm.insertOrUpdate(checkPoint)
+                                    maxId +=1
+                                }
+                            }
+                            if(realm.isInTransaction()){
+                                realm.commitTransaction()
+                            }
+                            realm.close()
+                        }catch (e: java.lang.Exception){
+                            e.printStackTrace()
                         }
+
+
+
+                        Log.e("ALARM_PATR", "" + PatrolList.data.patrollingShifts)
+
+                        processPatrollingAlarm()
+
                     }
                 }
 
@@ -496,6 +480,94 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 override fun noNetowork() {
                 }
             })
+    }
+
+    fun processPatrollingAlarm(){
+        val realm = Realm.getDefaultInstance()
+        val patrollingShifts: RealmResults<PatrolShiftRealm> = realm.where<PatrolShiftRealm>()
+            .findAllAsync()
+        for (schedules: PatrolShiftRealm in patrollingShifts) {
+            val sdf: SimpleDateFormat = SimpleDateFormat("EEEE")
+            val d: Date = Date()
+            val day = sdf.format(d)
+            Log.e("ALARM_DAY", "" + day)
+            if (schedules.psRepDays.contains(day, ignoreCase = true)) {
+                Log.e("ALARM_DAYFOUND", "" + day)
+                val timeFormat = SimpleDateFormat("yyyy-MM-dd")
+                var currentTimeObj = timeFormat.format(Date())
+
+
+                val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                val formatter = SimpleDateFormat("HH:mm:ss")
+                val formattedDate = formatter.format(parser.parse(schedules.pssTime))
+
+                currentTimeObj = currentTimeObj + "T" + formattedDate
+
+                //val startTime:String = AppUtils.getTimeFromDate(schedules.pssTime)
+                //var startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(schedules.pssTime)
+                val startTimeObj = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(currentTimeObj)
+
+                Log.e("startTimeObj_NEW", "" + currentTimeObj)
+                Log.e("startTimeObj", "" + startTimeObj.time)
+                Log.e("endTime", "" + Date().time)
+                val diff = startTimeObj.time - Date().time
+                val seconds = diff / 1000
+                val minutes = seconds / 60
+
+                val snoozeScheduleTime = Prefs.getString(SNOOZE_SCHEDULE_TIME + schedules.psPtrlSID, "")
+                val tempIsSnoozed = Prefs.getBoolean("IS_SNOOZED_" + schedules.psPtrlSID, false)
+                if (tempIsSnoozed && !snoozeScheduleTime.equals("") && !snoozeScheduleTime.equals(schedules.pssTime)) {
+                    Prefs.remove(SNOOZE_COUNT + schedules.psPtrlSID)
+                    Prefs.remove(SNOOZE_IS_ACTIVE + schedules.psPtrlSID)
+                    Prefs.remove(SNOOZE_TIME + schedules.psPtrlSID)
+                    Prefs.remove(SNOOZE_SCHEDULE_TIME + schedules.psPtrlSID)
+                }
+
+                val isSnoozed: Boolean = Prefs.getBoolean("IS_SNOOZED_" + schedules.psPtrlSID, false)
+                val snoozeCount: Int = Prefs.getInt(SNOOZE_COUNT + schedules.psPtrlSID, 0)
+                val snoozedTime: String = Prefs.getString(SNOOZE_TIME + schedules.psPtrlSID, "")
+                val snoozeMins: Long = getTimeDifference(snoozedTime)
+                val completedTime = Prefs.getString(PATROLLING_COMPLETED_ON + schedules.psPtrlSID, "")
+                var isPatrollingCompleted = false
+                if (!completedTime.equals("")) {
+                    val completedMins: Long = getTimeDifference(completedTime)
+                    isPatrollingCompleted = completedMins < 6
+                }
+
+                Log.e("THE_DIFF", "" + minutes + " - " + isSnoozed + " - " + snoozeMins + "  - " + isPatrollingCompleted)
+
+                if (((minutes <= 5 && minutes > -1) || (isSnoozed && snoozeCount < 3 && snoozeMins >= 5 && snoozeMins < 17)) && !isPatrollingCompleted) {
+                    Log.e("INSIDE_1", "" + (minutes <= 5 && minutes > -1) + " - " + (isSnoozed && snoozeCount < 3 && snoozeMins >= 5 && snoozeMins < 17))
+                    if (schedules.psSnooze) {
+                        //Snooze enabled
+                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID, schedules.pssTime)
+                    } else {
+                        showDialog("Active patrolling starts in few minutes", "Patrolling", true, "OK", schedules.psPtrlSID, "")
+                    }
+                    break
+
+                } else if (isSnoozed && snoozeCount >= 3 && snoozeMins >= 20) {
+                    Log.e("INSIDE_2", "" + (isSnoozed && snoozeCount >= 3 && snoozeMins >= 20))
+                    Prefs.remove(SNOOZE_COUNT + schedules.psPtrlSID)
+                    Prefs.remove(SNOOZE_IS_ACTIVE + schedules.psPtrlSID)
+                    Prefs.remove(SNOOZE_TIME + schedules.psPtrlSID)
+
+                    if (minutes <= 5 && minutes > -1 && !isPatrollingCompleted) {
+
+                        if (schedules.psSnooze) {
+                            //Snooze enabled
+                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "Snooze", schedules.psPtrlSID, schedules.pssTime)
+                        } else {
+                            showDialog("Active patrolling starts in few minutes", "Patrolling", true, "OK", schedules.psPtrlSID, "")
+                        }
+                        break
+
+                    }
+                }
+                Log.e("TIME_DIFF", "" + minutes)
+
+            }
+        }
     }
 
     fun showDialog(desc: String, title: String, isCancellable: Boolean, btnText: String, id: Int, scheduleTime: String) {
@@ -786,7 +858,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
         val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
 
-
         CloudFunctionRetrofitClinet.instance
             .sendCloud_VisitorEntry(dataReq)
             .subscribeOn(Schedulers.io())
@@ -869,7 +940,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     private fun getUnitLog(unitId: Int, personName: String, mobileNumb: String, desgn: String,
                            workerType: String, staffID: Int, unitName: String, vlVisLgID: Int, msg: String, nrId: String, sendNotification: Boolean) {
 
-
+        Log.e("getUnitLog_SAV",""+unitId+" - "+personName);
         RetrofitClinet.instance
             .getUnitListbyUnitId("1FDF86AF-94D7-4EA9-8800-5FBCCFF8E5C1", unitId)
             .subscribeOn(Schedulers.io())

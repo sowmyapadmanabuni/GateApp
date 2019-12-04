@@ -1,7 +1,13 @@
 package com.oyespace.guards.pertroling;
 
 import android.app.PendingIntent;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,7 +15,11 @@ import android.location.Location;
 import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
-import android.os.*;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.speech.tts.TextToSpeech;
@@ -22,9 +32,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.bumptech.glide.Glide;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -37,6 +49,7 @@ import com.oyespace.guards.R;
 import com.oyespace.guards.SGPatrollingService;
 import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.broadcastreceiver.GeofenceBroadcastReceiver;
+import com.oyespace.guards.models.CheckPointsOfSchedule;
 import com.oyespace.guards.models.CheckPointsOfSheduleListResponse;
 import com.oyespace.guards.models.PatrolShift;
 import com.oyespace.guards.models.ScheduleCheckPointsData;
@@ -50,19 +63,43 @@ import com.oyespace.guards.utils.ConstantUtils;
 import com.oyespace.guards.utils.Prefs;
 import com.treebo.internetavailabilitychecker.InternetAvailabilityChecker;
 import com.treebo.internetavailabilitychecker.InternetConnectivityListener;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import me.dm7.barcodescanner.core.IViewFinder;
-import me.dm7.barcodescanner.core.ViewFinderView;
-import me.dm7.barcodescanner.zxing.ZXingScannerView;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import static com.oyespace.guards.utils.ConstantUtils.*;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import io.realm.RealmQuery;
+import io.realm.RealmResults;
+import io.realm.Sort;
+import me.dm7.barcodescanner.core.IViewFinder;
+import me.dm7.barcodescanner.core.ViewFinderView;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
+
+import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_LAST_CP;
+import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_LAST_TIME;
+import static com.oyespace.guards.utils.ConstantUtils.ACTIVE_PATROLLING_SCHEDULE;
+import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_DISTANCE_THRESHOLD;
+import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_END;
+import static com.oyespace.guards.utils.ConstantUtils.CHECKPOINT_TYPE_START;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_DEVICE_ID;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
+import static com.oyespace.guards.utils.ConstantUtils.MEDIA_URL;
+import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
+import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_COMPLETED_ON;
+import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_HIDDEN_SELFIE;
+import static com.oyespace.guards.utils.ConstantUtils.PATROLLING_SCHEDULE_ID;
+import static com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO;
 
 public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingScannerView.ResultHandler, OnCompleteListener<Void>, View.OnClickListener, OnLocationUpdate, InternetConnectivityListener {
 
@@ -85,7 +122,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private boolean isScanEnabled =false;
     private int mActiveSchedule = 0;
     private boolean isPlayingSiren = false;
-    ArrayList<ScheduleCheckPointsData> scheduleCheckPoints = new ArrayList<ScheduleCheckPointsData>();
+    RealmResults<CheckPointsOfSchedule> scheduleCheckPoints = null;
+    private long totalCheckPoints = 0;
     private GPSTracker gpsTracker;
     private Timer gpsTimeTimer;
     private long currentLocationAge = 0;
@@ -103,7 +141,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     @Override
     public void onInternetConnectivityChanged(boolean isConnected) {
         if(!isConnected){
-            showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error_alert, true, "OK");
+            showAnimatedDialog("No Internet Connectivity..",R.raw.error_alert,true,"OK");
         }
     }
 
@@ -150,13 +188,14 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_scanner_point);
 
+        initRealm();
         InternetAvailabilityChecker.init(this);
         mInternetAvailabilityChecker = InternetAvailabilityChecker.getInstance();
         mInternetAvailabilityChecker.addInternetConnectivityListener(this);
 
         initSpeech();
         mActiveSchedule = getIntent().getIntExtra(PATROLLING_SCHEDULE_ID,0);
-        getScheduleCheckPoints();
+
 
         byte[] wrrw = getIntent().getByteArrayExtra(PERSON_PHOTO);
         if(wrrw != null){
@@ -171,7 +210,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         mStopBtn.setVisibility(View.GONE);
         mScanTitle = findViewById(R.id.toolbar);
 
-
+        getScheduleCheckPoints();
         startLocationListener();
         initScanner();
 
@@ -241,6 +280,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
             mSatellitesText.setText("Satellites: " + currentSatelliteCount);
             mAccuracyText.setText("Accuracy: " + currentLocationAccuracy + "m");
+            ;
 
             if ((currentSatelliteCount > 4 && currentLocationAge < 15) || (currentSatelliteCount <=4 && currentLocationAccuracy < 15)) {
                 //mGPSIcon.setImageDrawable(getResources().getDrawable(R.drawable.gps_online));
@@ -260,10 +300,12 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         //0 = No more checkpoints (Reached Last Checkpoint)
         int lastCheckPoint = Prefs.getInt(ACTIVE_PATROLLING_LAST_CP, -1);
         //Log.e("setNextCheckPointLabel",""+lastCheckPoint);
-        if(scheduleCheckPoints.size() > 0) {
-            //Log.e("setNextCheckPointLabel","Size > 0");
+        if(scheduleCheckPoints != null && totalCheckPoints > 0) {
+            Log.e("setNextCheckPointLabel_N",""+scheduleCheckPoints.get(0).getCpCkPName());
             if (lastCheckPoint == -1) {
-                mScanTitle.setText("Scan First Checkpoint\n"+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
+                String name = scheduleCheckPoints.get(0).getCpCkPName();
+                Log.e("setNextCheckPointLabel_NME",""+name);
+                mScanTitle.setText("Scan First Checkpoint\n"+name);
                 toSpeech.speak("Scan First Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
             } else {
                 //Log.e("setNextCheckPointLabel","is not -1");
@@ -271,8 +313,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                     int currentIndex = -1;
                     int nextCheckPoint = -1;
-                    for (int i = 0; i < scheduleCheckPoints.size(); i++) {
-                        ScheduleCheckPointsData cp = scheduleCheckPoints.get(i);
+                    for (int i = 0; i < totalCheckPoints; i++) {
+                        CheckPointsOfSchedule cp = scheduleCheckPoints.get(i);
                         //Log.e("setNextCheckPointLabel",""+cp.getPsChkPID()+" - "+lastCheckPoint);
                         if (cp.getPsChkPID() == lastCheckPoint) {
                             //Log.e("setNextCheckPointLabel","Found "+i);
@@ -281,20 +323,20 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                             break;
                         }
                     }
-                    //Log.e("setNextCheckPointLabel",""+isCheckPointFound+" - "+currentIndex);
+                    Log.e("setNextCheckPointLabel",""+isCheckPointFound+" - "+currentIndex);
                     if (isCheckPointFound) {
-                        if (scheduleCheckPoints.size() == currentIndex + 1) {
-                            //Log.e("setNextCheckPointLabel","Next_LAST "+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
-                            mScanTitle.setText("Scan First Checkpoint\n"+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
+                        if (totalCheckPoints == currentIndex + 1) {
+                            Log.e("setNextCheckPointLabel","Next_LAST "+scheduleCheckPoints.get(0).getCpCkPName());
+                            mScanTitle.setText("Scan First Checkpoint\n"+scheduleCheckPoints.get(0).getCpCkPName());
                             toSpeech.speak("Scan First Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                         } else {
                             try {
-                                //Log.e("setNextCheckPointLabel","Next_ELSE "+scheduleCheckPoints.get(currentIndex + 1).getChecks().get(0).getCpCkPName());
-                                mScanTitle.setText("Scan Checkpoint\n"+scheduleCheckPoints.get(currentIndex + 1).getChecks().get(0).getCpCkPName());
+                                Log.e("setNextCheckPointLabel","Next_ELSE "+scheduleCheckPoints.get(currentIndex + 1).getCpCkPName());
+                                mScanTitle.setText("Scan Checkpoint\n"+scheduleCheckPoints.get(currentIndex + 1).getCpCkPName());
                                 toSpeech.speak("Scan Next Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                mScanTitle.setText("Scan Checkpoint\n"+scheduleCheckPoints.get(0).getChecks().get(0).getCpCkPName());
+                                mScanTitle.setText("Scan Checkpoint\n"+scheduleCheckPoints.get(0).getCpCkPName());
                                 toSpeech.speak("Scan Next Checkpoint", TextToSpeech.QUEUE_FLUSH, null);
                                 //return 0;
                             }
@@ -306,6 +348,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 }
 
 
+        }else{
+            Log.e("setNextCheckPointLabel","NULL:"+scheduleCheckPoints);
         }
     }
 
@@ -372,9 +416,19 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         }
     }
 
-
-
     private void getScheduleCheckPoints(){
+        if(mActiveSchedule != 0) {
+            RealmQuery<CheckPointsOfSchedule> scheduleRealmQuery = realm.where(CheckPointsOfSchedule.class).equalTo("psPtrlSID",mActiveSchedule).sort("cpOrder", Sort.ASCENDING);
+            scheduleCheckPoints = scheduleRealmQuery.findAllAsync();
+            totalCheckPoints = scheduleRealmQuery.count();
+            //Log.e("schedules::: ",""+schedules.get(0).getCpCkPName());
+            //scheduleCheckPoints.addAll(realm.copyFromRealm(schedules));
+            Log.e("Arrschedules::: ",""+scheduleCheckPoints.get(0).getCpCkPName());
+            setNextCheckPointLabel();
+        }
+    }
+
+    private void _getScheduleCheckPoints(){
         if(mActiveSchedule != 0) {
             showProgressrefresh();
             RetrofitClinet.Companion.getInstance()
@@ -385,7 +439,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         @Override
                         public void noNetowork() {
                             dismissProgressrefresh();
-                            showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error, true, "OK");
+                            showAnimatedDialog("No internet connectivity", R.raw.error, true, "OK");
                         }
 
                         @Override
@@ -402,7 +456,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                                 if(checkPointResponse.getSuccess() && checkPointResponse.getData().getCheckPointsBySchedule().size()>0){
                                     isScanEnabled = true;
                                     PatrolShift patrolShift = checkPointResponse.getData().getCheckPointsBySchedule().get(0);
-                                    scheduleCheckPoints = patrolShift.getPoint();
+                                   // scheduleCheckPoints = patrolShift.getPoint();
                                     setNextCheckPointLabel();
 
                                 }
@@ -685,7 +739,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 //float accuracy = getAccuracy(mPredictedLocation);
                 //setSatellitesAccuracy();
                 boolean hasInternet = mInternetAvailabilityChecker.getCurrentInternetAvailabilityStatus();
-                if(hasInternet) {
+                //if(hasInternet) {
                     if (currentSatelliteCount > 4) {
                         //if(currentLocationAccuracy < 8){
                         //if (currentLocationAge < 15) {
@@ -714,12 +768,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                             gpsTracker.getLocation();
                         }
                     }
-                }else{
-                    showAnimatedDialog("Poor connectivity", R.raw.error_alert, true, "OK");
-                }
+//                }else{
+//                    showAnimatedDialog("Poor connectivity", R.raw.error_alert, true, "OK");
+//                }
+
 
             } else {
-               // showAnimatedDialog("Wrong QR Code.", R.raw.error, true, "OK");
+                showAnimatedDialog("Wrong QR Code.", R.raw.error, true, "OK");
             }
 
             //Log.e("PATROLL", "Patroling Data " + qrCheckpoint);
@@ -747,12 +802,13 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         String mCPType = checkPointData.getCpcPntAt();
         String locationStr = checkPointData.getCpgpsPnt();
         CoordinateFromString coordinate = new CoordinateFromString(locationStr);
-        //Log.e("CHECKPOIINT:: ", "" + checkPointData);
+        Log.e("CHECKPOIINT:: ", "" + checkPointData);
         //calculateWifiSignalWeightage(checkPointData.getCpSurrName());
         if (ongoingSchedule == -1) {
             //Fresh Start
             int nextCP = getNextCheckPoint(-1);
-            //Log.e("NEXT_CHECKPOINT",""+nextCP);
+            Log.e("NEXT_CHECKPOINT",""+nextCP+" -- "+checkPointData.getCpChkPntID());
+
             if(nextCP==checkPointData.getCpChkPntID()){
                 if (mCPType.equals(CHECKPOINT_TYPE_START)) {
 
@@ -848,8 +904,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
         //-1 = Error
         //0 = No more checkpoints (Reached Last Checkpoint)
-
-        if(scheduleCheckPoints.size() > 0){
+            Log.e("schedulesize()",""+totalCheckPoints);
+        if(scheduleCheckPoints!=null){
             boolean isCheckPointFound = false;
             if(lastCheckPoint == -1){
                 return scheduleCheckPoints.get(0).getPsChkPID();
@@ -857,8 +913,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
             int currentIndex = -1;
             int nextCheckPoint = -1;
-            for(int i=0;i<scheduleCheckPoints.size();i++){
-                ScheduleCheckPointsData cp = scheduleCheckPoints.get(i);
+            for(int i=0;i<totalCheckPoints;i++){
+                CheckPointsOfSchedule cp = scheduleCheckPoints.get(i);
                 if(cp.getPsChkPID() == lastCheckPoint){
                     currentIndex = i;
                     isCheckPointFound = true;
@@ -867,7 +923,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
             }
 
             if(isCheckPointFound) {
-                if (scheduleCheckPoints.size() == currentIndex + 1) {
+                if (totalCheckPoints == currentIndex + 1) {
                     return 0;
                 } else {
                     try {
@@ -891,8 +947,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
         float result = calculateDistance(mCPLatitude, mCPLongitude);
         //return true;
         //Log.e("DISTANCE_LOC",""+result);
-        Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
-        return result <= CHECKPOINT_DISTANCE_THRESHOLD;
+        //Toast.makeText(this,"Distance: "+result,Toast.LENGTH_LONG).show();
+        return result <= CHECKPOINT_DISTANCE_THRESHOLD ? true : false;
     }
 
     private float calculateDistance(Double mCPLatitude, Double mCPLongitude) {
@@ -986,37 +1042,54 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
     private void getCheckPoint(String[] patrolingdataList) {
         try {
             int mCPIdentifier = Integer.parseInt(patrolingdataList[4]);
-            RetrofitClinet.Companion.getInstance()
-                    .getCheckPointInfo(OYE247TOKEN, "" + mCPIdentifier)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new CommonDisposable<GetCheckPointResponse<CheckPointData>>() {
-                        @Override
-                        public void noNetowork() {
-                            showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error, true, "OK");
-                        }
 
-                        @Override
-                        public void onErrorResponse(@NotNull Throwable e) {
-                            //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
-                           // showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
-                        }
+            CheckPointsOfSchedule checkPointsOfSchedule = realm.where(CheckPointsOfSchedule.class).equalTo("psChkPID",mCPIdentifier).equalTo("psPtrlSID",mActiveSchedule).findFirst();
+            Log.e("checkPointsOfSchedule_sc",""+checkPointsOfSchedule);
+            if(checkPointsOfSchedule != null) {
+                CheckPointData cpData = new CheckPointData(
+                        checkPointsOfSchedule.getAsAssnID(),
+                        checkPointsOfSchedule.getPsChkPID(),
+                        checkPointsOfSchedule.getCpCkPName(),
+                        checkPointsOfSchedule.getPcIsActive(),
+                        "", "", checkPointsOfSchedule.getCpgpsPnts(),
+                        0, "", checkPointsOfSchedule.getCpcPntAt()
+                );
+                parseCheckPoint(cpData);
+            }else{
+                showAnimatedDialog("Wrong Checkpoint",R.raw.error,true,"OK");
+            }
 
-                        @Override
-                        public void onSuccessResponse(GetCheckPointResponse<CheckPointData> checkPointResponse) {
-                            try {
-                                //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
-                                if (checkPointResponse.getData().getCheckPointListByChkPntID() != null) {
-                                    CheckPointData cpData = checkPointResponse.getData().getCheckPointListByChkPntID();
-                                    parseCheckPoint(cpData);
-                                }else{
-                                    showAnimatedDialog("Checkpoint does not exist",R.raw.error,true,"OK");
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+//            RetrofitClinet.Companion.getInstance()
+//                    .getCheckPointInfo(OYE247TOKEN, "" + mCPIdentifier)
+//                    .subscribeOn(Schedulers.io())
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribeWith(new CommonDisposable<GetCheckPointResponse<CheckPointData>>() {
+//                        @Override
+//                        public void noNetowork() {
+//                            showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
+//                        }
+//
+//                        @Override
+//                        public void onErrorResponse(@NotNull Throwable e) {
+//                            //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
+//                           // showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
+//                        }
+//
+//                        @Override
+//                        public void onSuccessResponse(GetCheckPointResponse<CheckPointData> checkPointResponse) {
+//                            try {
+//                                //mScannerView.resumeCameraPreview(PatrollingLocActivity.this);
+//                                if (checkPointResponse.getData().getCheckPointListByChkPntID() != null) {
+//                                    CheckPointData cpData = checkPointResponse.getData().getCheckPointListByChkPntID();
+//                                    parseCheckPoint(cpData);
+//                                }else{
+//                                    showAnimatedDialog("Checkpoint does not exist",R.raw.error,true,"OK");
+//                                }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1043,8 +1116,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 
                     @Override
                     public void noNetowork() {
-                        Log.e("sendScannedCheckPoint", "No Netwrok");
-                        showAnimatedDialog(getResources().getString(R.string.no_internet), R.raw.error, true, "OK");
+                        Log.e("sendScannedCheckPoint","No Netwrok");
+                       // showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
                     }
 
                     @Override

@@ -45,9 +45,11 @@ data class ScheduleCheckPointsData(
     val cpgpsPnts:String,
     val cpCkPName:String,
     val checks:ArrayList<CheckpointDetail>,
-    val pcid:Int
+    val pcid:Int,
+    val cpOrder:String
 )
 
 data class CheckpointDetail(
-    val cpCkPName:String
+    val cpCkPName:String,
+    val cpcPntAt:String
 )

@@ -232,10 +232,10 @@
                 android:name=".activity.ImgView"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-        <activity
-                android:name=".activity.TicketingDetailsActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
+<!--        <activity-->
+<!--                android:name=".activity.TicketingDetailsActivity"-->
+<!--                android:screenOrientation="portrait"-->
+<!--                android:theme="@style/noActionBar" />-->
         <activity
                 android:name=".Dashboard"
                 android:screenOrientation="portrait"
@@ -492,6 +492,9 @@
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
 
+        <meta-data
+                android:name="com.google.firebase.messaging.default_notification_channel_id"
+                android:value="@string/gate_channel"/>
         <activity
                 android:name=".resident.ResidentMobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"

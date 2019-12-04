@@ -1,5 +1,7 @@
 package com.oyespace.guards.activity
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
@@ -153,6 +155,12 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sos_screen_gate)
+
+        var notificationManager: NotificationManager =
+            getSystemService(
+                Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.cancelAll()
+
         initRealm()
         getSOS()
         initMap()
