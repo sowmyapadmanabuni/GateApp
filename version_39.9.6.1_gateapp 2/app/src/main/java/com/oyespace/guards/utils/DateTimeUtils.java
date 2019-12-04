@@ -91,19 +91,13 @@ public class DateTimeUtils {
 
         try {
 
-            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-
             Calendar c1 = Calendar.getInstance();
-            final String timeString = "1900-01-01T" + dateFormatLocal.format(DATE_FORMAT_YMDHMS.parse(et));
-            c1.setTime(DATE_FORMAT_YMDHMS.parse(timeString));
-            String t = "t= " + timeString;
+            c1.setTime(DATE_FORMAT_YMDHMS.parse(et));
             c1.add(Calendar.SECOND, maxSec);
-            t += " t+" + maxSec + "= " + timeString;
+
             Calendar c2 = Calendar.getInstance();
-            final String currentString = "1900-01-01T" + dateFormatLocal.format(DATE_FORMAT_YMDHMS.parse(getCurrentTimeLocal()));
-            c2.setTime(DATE_FORMAT_YMDHMS.parse(currentString));
-            t += ", c: " + currentString;
-            Log.v("taaag", t);
+            c2.setTime(DATE_FORMAT_YMDHMS.parse(getCurrentTimeLocal()));
+
             //get Time in milli seconds
             long ms1 = c1.getTimeInMillis();
             long ms2 = c2.getTimeInMillis();

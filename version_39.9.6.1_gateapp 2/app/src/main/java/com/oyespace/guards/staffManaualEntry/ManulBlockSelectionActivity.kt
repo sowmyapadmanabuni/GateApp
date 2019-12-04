@@ -54,11 +54,11 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         //setDarkStatusBar()
 
 
-        if (!intent.getStringExtra("UNITNAME").equals("")) {
+        if (!intent.getStringExtra(UNITNAME).equals("")) {
 
-            if (intent.getStringExtra("UNITNAME").contains(",")) {
+            if (intent.getStringExtra(UNITNAME).contains(",")) {
                 var unitname_dataList: Array<String>
-                unitname_dataList = intent.getStringExtra("UNITNAME").split(",".toRegex())
+                unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex())
                     .dropLastWhile({ it.isEmpty() }).toTypedArray()
                 if (unitname_dataList.size > 0) {
 
@@ -75,7 +75,7 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                 }
             } else {
-                selectedUnits(intent.getStringExtra("UNITNAME"))
+                selectedUnits(intent.getStringExtra(UNITNAME))
             }
         }
 
@@ -290,43 +290,54 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     startActivity(d)
                     finish()
                 } else {
+                    if( intent.getStringExtra(MOBILENUMBER).isEmpty()){
+                        val d = Intent(this@ManulBlockSelectionActivity, ManualNameEntryScreen::class.java)
 
-                    val d = Intent(
-                        this@ManulBlockSelectionActivity,
-                        ManualMobileNumberScreen::class.java
-                    )
-                    Log.d(
-                        "intentdata NameEntr",
-                        "buttonNext " + intent.getStringExtra(UNITNAME) + " "
-                                + intent.getStringExtra(UNITID) + " " + intent.getStringExtra(
-                            MOBILENUMBER
-                        ) + " "
-                                + intent.getStringExtra(COUNTRYCODE) + " "
-                    )
-                    d.putExtra(UNITID, unitId)
-                    d.putExtra(UNITNAME, unitNames)
-                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                    d.putExtra(UNIT_ACCOUNT_ID, acAccntID)
-                    d.putExtra(BLOCK_ID, blockID)
-                    d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
-                    d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-                    d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-                    d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
-                    d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
-                    d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-                    d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-                    //d.putExtra("RESIDENT_NUMBER",unitNumber1)
-                    d.putExtra(
-                        "RESIDENT_NUMBER",
-                        unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
-                    )
-                    d.putExtras(intent)
+                        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                        d.putExtra(MOBILENUMBER, "")
+                        d.putExtra(COUNTRYCODE, "")
+                        d.putExtra(UNIT_ACCOUNT_ID, acAccntID)
+                        d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                        d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                         d.putExtra(MOBILENUMBER, "")
+                        d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                        d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                        d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                        d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                        d.putExtras(intent)
+                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        startActivity(d)
+                        finish()                    }
+                    else {
 
-
-                    startActivity(d)
-                    finish()
+                        val d = Intent(this@ManulBlockSelectionActivity, ManualMobileNumberScreen::class.java)
+                        d.putExtra(UNITID, unitId)
+                        d.putExtra(UNITNAME, unitNames)
+                        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(UNIT_ACCOUNT_ID, acAccntID)
+                        d.putExtra(BLOCK_ID, blockID)
+                        d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                        d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                        d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                        d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                        d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                        d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                        //d.putExtra("RESIDENT_NUMBER",unitNumber1)
+                        d.putExtra(
+                            "RESIDENT_NUMBER",
+                            unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
+                        )
+                        d.putExtras(intent)
+                        startActivity(d)
+                        finish()
+                    }
                 }
 
             } else {
@@ -359,7 +370,7 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         _intent.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
         _intent.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
         _intent.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-        _intent.putExtra("UNITNAME", intent.getStringExtra("UNITNAME"))
+        _intent.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
         startActivity(_intent)
         finish()
     }

@@ -107,21 +107,11 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
                 if (textview.text.length == 13) {
-//                    val d = Intent(this@GuestMobileNumberScreen, GuestNameEntryScreen::class.java)
-////                    Log.d(
-////                        "intentdata MobileNumber",
-////                        "buttonNext " + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-////                                + " " + textview.text + " " + countryCode
-////                    )
-//                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-//                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-//                    d.putExtra(UNITID, intent.getStringExtra(UNITID))
-//                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//                    d.putExtra(MOBILENUMBER, mobileNumber)
-//                    d.putExtra(COUNTRYCODE, ccd)
 
-                    if (VisitorLogRepo.check_IN_VisitorByPhone(ccd + mobileNumber)) {
+                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                    if(!allowEntry) {
+                    //if (VisitorLogRepo.check_IN_VisitorByPhone(ccd + mobileNumber)) {
 
 
                         val builder = AlertDialog.Builder(this@GuestMobileNumberScreen)

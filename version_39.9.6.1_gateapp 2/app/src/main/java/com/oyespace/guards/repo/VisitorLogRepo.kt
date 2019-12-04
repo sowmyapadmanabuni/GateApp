@@ -16,7 +16,7 @@ import com.oyespace.guards.pojo.VisitorLogResponse
 import com.oyespace.guards.realm.VisitorEntryLogRealm
 import com.oyespace.guards.realm.VisitorExitLogRealm
 import com.oyespace.guards.utils.ConstantUtils
-import com.oyespace.guards.utils.ConstantUtils.DELIVERY
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
 import com.oyespace.guards.utils.Prefs
@@ -45,7 +45,7 @@ class VisitorLogRepo {
 
                         override fun onSuccessResponse(response: GetVisitorsResponse<ArrayList<VisitorLogResponse>>) {
 
-                            Log.e("get_IN_VisitorLog",""+response);
+                            Log.e("get_IN_VisitorLog", "" + response)
                             if (response.success) {
                                 val visitorsList = response.data.visitorLog
                                 if (visitorsList == null) {
@@ -91,8 +91,13 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getVisitorsForMobile(phone)
         }
 
-        fun get_IN_VisitorsForName(name: String): ArrayList<VisitorLog>? {
-            return VisitorEntryLogRealm.getVisitorsForName(name)
+        fun get_IN_PendingVisitorsForName(name: String): ArrayList<VisitorLog>? {
+            return VisitorEntryLogRealm.getPendingVisitorsForName(name)
+        }
+
+        fun get_IN_VisitorsForTimeTime(time: String): ArrayList<VisitorLog>? {
+            val str = time.split("T")
+            return VisitorEntryLogRealm.getVisitorsForDateTime(str[0], str[1])
         }
 
         fun delete_IN_Visitor(lgid: Int) {
@@ -113,11 +118,11 @@ class VisitorLogRepo {
 
         }
 
-        fun search_IN_Visitors(search: String): ArrayList<VisitorLog>? {
-            if (search.isEmpty()) {
+        fun search_IN_Visitors(searchStr: String): ArrayList<VisitorLog>? {
+            if (searchStr.isEmpty()) {
                 return getOverstaySortedList()
             } else {
-                return VisitorEntryLogRealm.searchVisitorLog(search)
+                return VisitorEntryLogRealm.searchVisitorLog(searchStr)
             }
         }
 
@@ -133,7 +138,7 @@ class VisitorLogRepo {
                 val actTime = vl.vlsActTm
                 val status = vl.vlApprStat
 
-                if (status.equals("pending", true)) {
+                if (status.equals(PENDING, true)) {
                     underStaying.add(vl)
                 } else {
                     val msLeft = DateTimeUtils.msLeft(actTime, ConstantUtils.MAX_DELIVERY_ALLOWED_SEC)
@@ -160,7 +165,9 @@ class VisitorLogRepo {
             return VisitorEntryLogRealm.getUnitCountForVisitor(phone)
         }
 
-        fun updateVisitorStatus(context: Context, vLogId: Int, status: String) {
+        fun updateVisitorStatus(context: Context, visitor: VisitorLog, status: String) {
+
+            val vLogId = visitor.vlVisLgID
 
             val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status)
             CompositeDisposable().add(
@@ -178,11 +185,33 @@ class VisitorLogRepo {
                                 s += "$vLogId,"
                                 Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
-                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
-                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                                context.sendBroadcast(intentAction1)
+//                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
+//                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
+//                                context.sendBroadcast(intentAction1)
+                                if (status == ConstantUtils.EXITED) {
+                                    try {
+                                        if (visitor.isValid) {
+                                            val d = Intent(context, BackgroundSyncReceiver::class.java)
+                                            d.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                            d.putExtra("msg", "exited staff: $vLogId")
+                                            d.putExtra("mobNum", visitor.vlMobile)
+                                            d.putExtra("name", visitor.vlfName)
+                                            d.putExtra("nr_id", visitor.vlVisLgID.toString())
+                                            d.putExtra("unitname", visitor.unUniName)
+                                            d.putExtra("memType", "Owner")
+                                            d.putExtra(ConstantUtils.UNITID, visitor.unUnitID)
+                                            d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
+                                            d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
+                                            d.putExtra("VLVisLgID", visitor.vlVisLgID)
+                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                            d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
+                                            context.sendBroadcast(d)
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
 
-                            } else {
 
                             }
                         }
@@ -303,8 +332,10 @@ class VisitorLogRepo {
                     if (visitorLog != null) {
                         for (v in visitorLog) {
 
+                            val apprStat = v.vlApprStat
+                            Log.i("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
                             if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
-                                if (v.vlApprStat.equals("Approved", true)) {
+                                if (apprStat.equals(APPROVED, true)) {
                                     return false
                                 }
                             } else {

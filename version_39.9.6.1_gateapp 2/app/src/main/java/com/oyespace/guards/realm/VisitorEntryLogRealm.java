@@ -14,8 +14,10 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-public class VisitorEntryLogRealm {
+import static com.oyespace.guards.utils.ConstantUtils.PENDING;
 
+public class VisitorEntryLogRealm {
+    Realm realm = Realm.getDefaultInstance();
 
     public static ArrayList<VisitorLog> getVisitorEntryLog() {
         Realm realm = Realm.getDefaultInstance();
@@ -65,7 +67,7 @@ public class VisitorEntryLogRealm {
 //                    vlog.setAsAssnID(assId);
 //                    vlog.setMEMemID(memID);
 //                    vlog.setReRgVisID(regVisID);
-//                    vlog.setUNUnitID(unitID);
+//                    vlog.setUnUnitID(unitID);
 //                    vlog.setVlfName(fName);
 //                    vlog.setVlMobile(mobile);
 //                    vlog.setVlComName(compName);
@@ -164,9 +166,11 @@ public class VisitorEntryLogRealm {
 
     public static void deleteAllVisitorLogs() {
         Realm r = Realm.getDefaultInstance();
-
-        r.executeTransaction(realm -> realm.delete(VisitorLog.class));
-
+        if(r.isInTransaction()){
+            r.delete(VisitorLog.class);
+        }else {
+            r.executeTransaction(realm -> realm.delete(VisitorLog.class));
+        }
     }
 
     public static int getUnitCountForVisitor(String phone) {
@@ -176,10 +180,12 @@ public class VisitorEntryLogRealm {
     }
 
     @Nullable
-    public static ArrayList<VisitorLog> getVisitorsForName(@NotNull String name) {
+    public static ArrayList<VisitorLog> getPendingVisitorsForName(@NotNull String name) {
         Realm realm = Realm.getDefaultInstance();
         return new ArrayList<>(realm.where(VisitorLog.class)
                 .equalTo("vlfName", name)
+                .and()
+                .equalTo("vlApprStat", PENDING, Case.INSENSITIVE)
                 .findAll());
     }
 
@@ -191,6 +197,16 @@ public class VisitorEntryLogRealm {
                 .and()
                 .contains("vlVisType", ConstantUtils.STAFF, Case.INSENSITIVE)
                 .count() != 0;
+    }
+
+    @Nullable
+    public static ArrayList<VisitorLog> getVisitorsForDateTime(String date, String time) {
+        Realm realm = Realm.getDefaultInstance();
+        return new ArrayList<>(realm.where(VisitorLog.class)
+                .contains("vldCreated", date)
+                .and()
+                .contains("vlEntryT", time)
+                .findAll());
     }
 
     public interface VisitorEntryListener {

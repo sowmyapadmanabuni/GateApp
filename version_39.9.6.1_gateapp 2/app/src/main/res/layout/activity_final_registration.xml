@@ -235,72 +235,70 @@
             <!--android:text="Toatal Persons"/>-->
 
 
-
-
             <RelativeLayout
                     android:id="@+id/itemLyt"
                     android:layout_width="match_parent"
-                    android:visibility="gone"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
 
                 <TextView
                         android:id="@+id/tv_totalperson"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
+                        android:text="@string/textperson"
                         android:textColor="@android:color/black"
                         android:layout_marginLeft="15dp"
-                        android:textStyle="bold"
-                        android:text="@string/textperson"/>
+                        android:textSize="18sp"
+                        android:textStyle="bold" />
 
 
                 <LinearLayout
                         android:id="@+id/lyt_count"
                         android:layout_width="@dimen/dp_100"
                         android:layout_height="wrap_content"
-                        android:layout_toRightOf="@+id/tv_totalperson"
                         android:layout_marginLeft="@dimen/_10sdp"
+                        android:layout_toRightOf="@+id/tv_totalperson"
                         android:layout_centerVertical="true"
-                        android:visibility="gone"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:visibility="gone">
 
                     <TextView
                             android:id="@+id/menuRemove"
-                            android:textSize="18sp"
                             android:layout_weight="1"
+                            android:textColor="@color/black"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:gravity="center"
                             android:padding="@dimen/dp_5"
-                            android:textStyle="bold"
+                            android:textSize="18sp"
                             android:text="-"
-                            android:textColor="@color/black"/>
+                            android:textStyle="bold" />
 
                     <TextView
                             android:id="@+id/menuCount"
-                            android:textSize="18sp"
+                            android:textColor="@color/black"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:gravity="center"
                             android:padding="@dimen/dp_5"
                             android:text=""
-                            android:textStyle="bold"
+                            android:textSize="18sp"
 
-                            android:textColor="@color/black"/>
+                            android:textStyle="bold" />
 
                     <TextView
                             android:id="@+id/menuAdd"
-                            android:textSize="18sp"
                             android:layout_weight="1"
+                            android:textColor="@color/black"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:padding="@dimen/dp_5"
                             android:text="+"
-                            android:textStyle="bold"
+                            android:textSize="18sp"
 
-                            android:textColor="@color/black"/>
+                            android:textStyle="bold" />
 
                 </LinearLayout>
             </RelativeLayout>

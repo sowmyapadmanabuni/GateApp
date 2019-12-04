@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
+import android.net.Uri
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.database.*
-import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys
@@ -27,12 +27,15 @@ import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.pojo.CloudFunctionNotificationReq
 import com.oyespace.guards.repo.VisitorLogRepo
-import com.oyespace.guards.utils.*
+import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.TimerUtil
 import com.squareup.picasso.Picasso
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
+import io.realm.RealmChangeListener
+import io.realm.RealmResults
 import java.util.*
 
 
@@ -98,10 +101,18 @@ class VisitorEntryListAdapter(
             return
         }
 
+//        visitor.addChangeListener( RealmChangeListener() {
+//    @Override
+//    public void onChange(RealmResults<VisitorLog> results) {
+//      // results and puppies point are both up to date
+//      results.size(); // => 1
+//      puppies.size(); // => 1
+//    }
+//});
         if (visitor.isValid) {
             val vlLogId = visitor.vlVisLgID.toString()
             val unitName = visitor.unUniName
-            val unitID = visitor.uNUnitID
+            val unitID = visitor.unUnitID
             val phone = visitor.vlMobile
 
 
@@ -110,7 +121,7 @@ class VisitorEntryListAdapter(
             val ntDesc = visitor.vlfName + " from " + visitor.vlComName + " has left your premises"
             val ntTitle = visitor.vlfName + " left"
             val ntType = "gate_app";
-            val sbSubID = visitor.uNUnitID
+            val sbSubID = visitor.unUnitID
             val userID = visitor.reRgVisID
 
             Log.e("VISITOR_DAT",""+visitor);
@@ -141,18 +152,18 @@ class VisitorEntryListAdapter(
                 }
 
                 if (debug) {
-                    holder.btn_makeexit.visibility = View.INVISIBLE
+                    holder.btn_makeexit.visibility = View.VISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
-                    sendCloudFunctionNotification(asAssnID,asAsnName,ntDesc,ntTitle,ntType,""+sbSubID,userID,""+unitID)
+                    //                    sendExitNotification(visitor)
                     holder.btn_makeexit.visibility = View.GONE
                     notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)
-                    updateVisitorStatus(vlLogId, position, EXITED)
+                    updateVisitorStatus(visitor, position, EXITED)
                 }
 
             } else {
                 holder.exitTime.text = formatDateHM(visitor.vlExitT)
-                holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
+//                holder.exitdate.text = formatDateDMY(visitor.vldUpdated)
                 holder.btn_makeexit.visibility = View.INVISIBLE
                 holder.ll_card.setBackgroundColor(Color.parseColor("#ffffff"))
                 holder.ll_card.animation = null
@@ -165,7 +176,7 @@ class VisitorEntryListAdapter(
 
             val entryImg = visitor.vlEntryImg
             var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
-            Log.e("taaag", "downloading image: $imgPath")
+
             if (visitor.vlVisType.contains(STAFF, true)) {
                 if (entryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
@@ -253,6 +264,14 @@ class VisitorEntryListAdapter(
 
             holder.expanded_view.visibility = View.GONE
 
+            holder.iv_call.visibility = if (visitor.vlMobile.length > 5) View.VISIBLE else View.INVISIBLE
+            holder.iv_call.setOnClickListener {
+
+                val intent = Intent(Intent.ACTION_CALL)
+                intent.data = Uri.parse("tel:" + visitor.vlMobile)
+                mcontext.startActivity(intent)
+            }
+
         }
 
 
@@ -311,40 +330,15 @@ class VisitorEntryListAdapter(
         }
     }
 
-    private fun updateVisitorStatus(vlLogId: String, position: Int, status: String) {
+    private fun updateVisitorStatus(visitor: VisitorLog, position: Int, status: String) {
 
-        val lgid = vlLogId.toInt()
-        deleteEntryFromList(lgid, position, false)
-        VisitorLogRepo.updateVisitorStatus(mcontext, lgid, status)
+        try {
+            val lgid = visitor.vlVisLgID
+            deleteEntryFromList(lgid, position, false)
+            VisitorLogRepo.updateVisitorStatus(mcontext, visitor, status)
+        } catch (e: Exception) {
 
-    }
-
-
-    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int,unitID:String) {
-        Log.e("BEFORE_",""+associationID+"-"+associationName+"-"+ntDesc+"-"+ntTitle+"-"+ntType+"-"+sbSubID+"-"+userID+"-"+unitID);
-        val dataReq = CloudFunctionNotificationReq(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID )
-        Log.e("CloudFunctionNotificationReq",""+dataReq);
-
-        CloudFunctionRetrofitClinet.instance
-            .sendCloud_VisitorEntry(dataReq)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<Any>() {
-
-                override fun onSuccessResponse(any: Any) {
-
-                    Log.e("baaag", "cloud notification sent to -> $dataReq")
-
-                }
-
-                override fun onErrorResponse(e: Throwable) {
-                    Log.e("Error WorkerList", e.toString())
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
+        }
     }
 
 
@@ -384,7 +378,7 @@ class VisitorEntryListAdapter(
         val iv_call: ImageButton
         val iv_user: ImageView
         val entrydate: TextView
-        val exitdate: TextView
+        //        val exitdate: TextView
         val ll_card: LinearLayout
         val expanded_view: ConstraintLayout
         val lyt_text: LinearLayout
@@ -412,7 +406,7 @@ class VisitorEntryListAdapter(
             iv_user = view.findViewById(R.id.iv_user)
 
             entrydate = view.findViewById(R.id.tv_entrydate)
-            exitdate = view.findViewById(R.id.tv_exitdate)
+//            exitdate = view.findViewById(R.id.tv_exitdate)
             ll_card = view.findViewById(R.id.ll_card)
             expanded_view = view.findViewById(R.id.expanded_view)
             lyt_text = view.findViewById(R.id.lyt_text)
@@ -440,8 +434,9 @@ class VisitorEntryListAdapter(
         val venImg = visitor.vlVenImg
         val voiceNote = visitor.vlVoiceNote
         val cmnts = visitor.vlCmnts
-        var entryTime = visitor.vlEntryT
+        var actionTime = visitor.vlEntryT
         var visitorType = visitor.vlVisType
+        var apprStat = visitor.vlApprStat
 
         override fun onCancelled(p0: DatabaseError) {}
 
@@ -460,7 +455,7 @@ class VisitorEntryListAdapter(
                         holder.ll_card.clearAnimation()
 
                         val fbColor = firebaseObject.buttonColor.toLowerCase()
-                        entryTime = if (dataSnapshot.hasChild("updatedTime")) {
+                        actionTime = if (dataSnapshot.hasChild("updatedTime")) {
                             firebaseObject.updatedTime
                         } else {
                             visitor.vlEntryT
@@ -482,13 +477,18 @@ class VisitorEntryListAdapter(
 
                         checkForAttachments(firebaseObject)
 
-                        val expiry_reject_time = if (debug) 30 else 3 * 60
+                        val expiry_reject_time = if (debug) 30 * 60 else 30 * 60
+
+                        var onTick: (ms: Long) -> Unit = {}
 
                         when (fbColor) {
                             "#00ff00",
                             ACCEPTED_COLOR -> {// accepted by resident, start timer for 7 mins to overstay
                                 holder.btn_makeexit.visibility = View.VISIBLE
-                                msLeft = msLeft(entryTime, MAX_DELIVERY_ALLOWED_SEC)
+                                msLeft = msLeft(actionTime, MAX_DELIVERY_ALLOWED_SEC)
+                                if (!apprStat.equals(APPROVED, true)) {
+                                    VisitorLogRepo.get_IN_VisitorLog(true)
+                                }
                                 if (msLeft < 0) {// time is up
                                     holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
                                     holder.isAnimating = true
@@ -496,45 +496,40 @@ class VisitorEntryListAdapter(
                                     holder.btn_makeexit.visibility = View.VISIBLE
                                 } else {
                                     timeupCallback = {
-                                        Handler().post {
-                                            VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
-                                                override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                                    searchList = visitorLog
-                                                    if (visitorLog != null) {
-                                                        visitorList = visitorLog
-                                                    }
-                                                    notifyDataSetChanged()
-                                                }
-
-                                            })
-                                        }
+                                        Toast.makeText(mcontext, "overtime", Toast.LENGTH_SHORT).show()
+                                        refreshList()
                                     }
                                 }
                             }
                             REJECTED_COLOR -> {// rejected by resident, start timer for 30 mins to remove
                                 holder.btn_makeexit.visibility = View.INVISIBLE
-                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
+                                msLeft = msLeft(actionTime, expiry_reject_time)// 30 mins
+                                Toast.makeText(mcontext, "rejected $msLeft", Toast.LENGTH_SHORT).show()
                                 timeupCallback = {
-                                    updateVisitorStatus(vlLogId, holder.adapterPosition, REJECTED)
+                                    Toast.makeText(mcontext, "move rejected", Toast.LENGTH_SHORT).show()
+                                    updateVisitorStatus(visitor, holder.adapterPosition, REJECTED)
+                                    refreshList()
                                 }
 
                             }
                             else -> {// pending, start timer for 30mins to remove, hide exit button
-//                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
-//                                msLeft = msLeft(entryTime, expiry_reject_time)// 30 mins
-//                                timeupCallback = {
-//                                    updateVisitorStatus(vlLogId, holder.adapterPosition, EXPIRED)
-//                                }
+                                holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
+                                msLeft = msLeft(actionTime, expiry_reject_time)// 30 mins
+                                timeupCallback = {
+                                    Toast.makeText(mcontext, "expired", Toast.LENGTH_SHORT).show()
+                                    updateVisitorStatus(visitor, holder.adapterPosition, EXPIRED)
+                                    refreshList()
+                                }
                             }
                         }
 
                         if (timerHashMap.contains(vlLogId)) {
 
                             timerHashMap[vlLogId]?.cancel()
-                            timerHashMap.replace(vlLogId, TimerUtil(msLeft, timeupCallback))
+                            timerHashMap.replace(vlLogId, TimerUtil(msLeft, timeupCallback, onTick))
 
                         } else {
-                            timerHashMap[vlLogId] = TimerUtil(msLeft, timeupCallback)
+                            timerHashMap[vlLogId] = TimerUtil(msLeft, timeupCallback, onTick)
                         }
                         timerHashMap[vlLogId]?.start()
                     }
@@ -545,7 +540,7 @@ class VisitorEntryListAdapter(
                 }
 
                 try {
-                    Log.i("taaag", "vlID: $vlLogId, time: $entryTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
+                    Log.d("taaag", "vlID: $vlLogId, time: $actionTime, msleft: $msLeft, actTime: ${visitor.vlsActTm}, status: ${visitor.vlApprStat}, type: $visitorType")
                 } catch (ignored: IllegalStateException) {
                 }
 
@@ -570,6 +565,23 @@ class VisitorEntryListAdapter(
                 }
 
             }
+        }
+
+        private fun refreshList() {
+
+            Handler().post {
+                VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
+                    override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
+                        searchList = visitorLog
+                        if (visitorLog != null) {
+                            visitorList = visitorLog
+                        }
+                        notifyDataSetChanged()
+                    }
+
+                })
+            }
+
         }
 
     }

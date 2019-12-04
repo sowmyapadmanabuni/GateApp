@@ -128,11 +128,11 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
-//                if (useDummyValues) {
-//                    textview.text = "+919930620323"
-//                    ccd = "+91"
-//                    mobileNumber = "9930620323"
-//                }
+                if (useDummyValues) {
+                    textview.text = "+919930620323"
+                    ccd = "+91"
+                    mobileNumber = "9930620323"
+                }
 
 
                 if (textview.text.length == 13) {
@@ -784,7 +784,6 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         workType.add("Maid")
         workType.add("HouseKeeping")
         workType.add("Cook")
-        workType.add("Security Officer")
         workType.add("Gardener")
 
     }

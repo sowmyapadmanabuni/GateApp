@@ -67,6 +67,9 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                         buttonNext.isClickable = true
                         Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
                     } else {
+
+
+
                         val d = Intent(this@ManualNameEntryScreen, ManualAddCarFragment::class.java)
                         d.putExtra(UNITID, intent.getStringExtra(UNITID))
                         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
@@ -244,28 +247,10 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         Btn_Mic.setOnClickListener {
             Speak()
         }
-//        supportActionBar!!.setTitle("Enter your Name")
-//        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-//        Log.d("intentdata NameEntr",""+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
-//        +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE));
 
     }
 
-//    override fun onBackPressed() {
-//        super.onBackPressed()
-//
-//        val d = Intent(this@NameEntryScreen, MobileNumberScreen::class.java)
-//        d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
-//        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
-//        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-//        d.putExtra(UNITID, intent.getStringExtra(UNITID))
-//        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-//        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
-//        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE))
-//        startActivity(d)
-//
-//    }
 
     fun Speak() {
 
@@ -301,16 +286,7 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
             }
         }
 
-//        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
-//        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"say something")
-//
-//        try {
-//            startActivityForResult(intent,REQUEST_CODE_SPEECH_INPUT)
-//        }catch (e: Exception){
-//            Toast.makeText(this,e.message, Toast.LENGTH_SHORT).show()
-//        }
+
 
     }
 
@@ -342,42 +318,13 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
         res.updateConfiguration(conf, dm)
     }
 
-//    override fun onCreateDialog(id: Int): Dialog? {
-//        // TODO Auto-generated method stub
-//        return if (id == 999) {
-//            DatePickerDialog(
-//                this,
-//                myDateListener, year, month, day
-//            )
-//        } else null
-//    }
+
 
     override fun onBackPressed() {
         super.onBackPressed()
-//        val i_delivery = Intent(this@NameEntryScreen, Dashboard::class.java)
-//        startActivity(i_delivery)
+
         finish()
     }
-//    fun setDate() {
-//        showDialog(999)
-////        Toast.makeText(
-////            applicationContext, "ca",
-////            Toast.LENGTH_SHORT
-////        )
-////            .show()
-//    }
-//    private fun showDate(year: Int, month: Int, day: Int) {
-//        ed_dob!!.setText(
-//            StringBuilder().append(day).append("-")
-//                .append(month).append("-").append(year)
-//        )
-//    }
-//    private val myDateListener = DatePickerDialog.OnDateSetListener { arg0, arg1, arg2, arg3 ->
-//        // TODO Auto-generated method stub
-//        // arg1 = year
-//        // arg2 = month
-//        // arg3 = day
-//        showDate(arg1, arg2 + 1, arg3)
-//    }
+
 
 }

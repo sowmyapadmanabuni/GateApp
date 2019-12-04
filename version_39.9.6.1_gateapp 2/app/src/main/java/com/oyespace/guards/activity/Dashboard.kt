@@ -1,5 +1,7 @@
 package com.oyespace.guards
 
+
+
 import SecuGen.FDxSDKPro.*
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
 import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
@@ -434,9 +436,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-//        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-//            registerReceiver(mUsbReceiver, filter)
-//        }
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+
+            registerReceiver(mUsbReceiver, filter)
+        }
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -615,11 +618,14 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
 
     override fun onResume() {
+
+
+
         if(pTimerChecker == null) {
             runTimerCheck()
         }
 
-        registerReceiver(mUsbReceiver, filter)
+        //registerReceiver(mUsbReceiver, filter)
 
 
 
@@ -1120,8 +1126,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
         autoooooo++
 
-        fingerDetectedHandler.sendMessage(Message())
+        if(usbConnected) {
 
+            fingerDetectedHandler.sendMessage(Message())
+        }
     }
 
     fun CaptureFingerPrint() {
@@ -1134,15 +1142,16 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                 Log.d("taaag", "fp: ${fp.size}")
                 val id = matchFingerprint(fp)
                 Log.d("taaag", "check result: $id")
-                if (id > 0) {
 
-                    // check if staff has already entered
+
+                    if (id > 0&& id >43) {
+                        showToast(applicationContext,id.toString())
                     val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
                     // if yes, then make exit call
                     if (staff != null) {
                         t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        VisitorLogRepo.updateVisitorStatus(this, staff.vlVisLgID, EXITED)
+                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
                         loadEntryVisitorLog()
                     } else {
 
@@ -1169,11 +1178,15 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
                     }
 
-                } else {
 
-                    t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
                 }
+                    else if (id==43){
+
+
+                        t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
+
+                    }
 
                 mVerifyImage = null
                 this.sgfplib!!.SetBrightness(100)
@@ -1199,26 +1212,29 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         val fpImg = ByteArray(mImageWidth * mImageHeight)
         var code = 0L
         try {
+
             sgfplib!!.GetImageEx(fpImg, 10000, 50)
             code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
         } catch (e: NullPointerException) {
 
         }
-        when (code) {
-            SGFDX_ERROR_NONE -> {
-                showToast(this, "fingerprint captured")
-            }
-            SGFDX_ERROR_EXTRACT_FAIL -> {
-                showToast(this, "error capturing fingerprint")
-                return null
-            }
-        }
+//        when (code) {
+//            SGFDX_ERROR_NONE -> {
+//                showToast(this, "fingerprint captured")
+//            }
+//            SGFDX_ERROR_EXTRACT_FAIL -> {
+//                showToast(this, "error capturing fingerprint")
+//                return null
+//            }
+//        }
         Log.d("taaag", "capture code: $code")
         return fpTemp
 
     }
 
     fun matchFingerprint(fingerPrint: ByteArray): Int {
+
+        var number=0
 
         val asscId = Prefs.getInt(ASSOCIATION_ID, 0)
 
@@ -1227,10 +1243,12 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         val result = BooleanArray(1)
         for (fp in fps) {
 
+            number++
             Log.d("taaag", "matching with ${fp.userName}'s fingerprint")
 
             sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_NORMAL, result)
             if (result[0]) return fp.userName.toInt()
+
 
             sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg2, SGFDxSecurityLevel.SL_NORMAL, result)
             if (result[0]) return fp.userName.toInt()
@@ -1239,8 +1257,15 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             if (result[0]) return fp.userName.toInt()
 
         }
+        if (number > 0) {
+            return number
+        }
+        else{
+            number=0
+        }
 
-        return -1
+
+        return number
 
     }
 
@@ -2214,6 +2239,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
                             val visitorLogID = globalApiObject.data.visitorLog.vlVisLgID
 
                             updateFirebaseColor(visitorLogID, "#f0f0f0")
+                            loadEntryVisitorLog()
 
                             if (unitId.contains(",")) {
 

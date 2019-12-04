@@ -17,10 +17,6 @@ import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
@@ -105,28 +101,21 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
         //  tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER))
 
-        tv_totalperson.text =
-            resources.getString(R.string.textperson) + ": " + intent.getStringExtra(
-                NUMBEROFPERSONS
-            ).toInt()
+        updateCounterUI(minteger)
         tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
 
         menuAdd.setOnClickListener {
 
 
             minteger++
-            //  menuCount.setText("" + minteger)
-            tv_totalperson.text = resources.getString(R.string.textperson) + ": " + minteger
+            updateCounterUI(minteger)
 
         }
 
         menuRemove.setOnClickListener {
             if (minteger > 1) {
                 minteger--
-                //  menuCount.setText("" + minteger)
-                tv_totalperson.text = resources.getString(R.string.textperson) + ": " + minteger
-
-            } else {
+                updateCounterUI(minteger)
 
             }
         }
@@ -146,6 +135,15 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             }
         }
 
+    }
+
+    private fun updateCounterUI(number: Int) {
+        menuCount.text = "$number"
+        if (number > 1) {
+            menuRemove.visibility = View.VISIBLE
+        } else {
+            menuRemove.visibility = View.GONE
+        }
     }
 
     private fun visitorLog() {

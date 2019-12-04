@@ -12,7 +12,7 @@ public class StaffRealm {
     public static ArrayList<Worker> getStaff() {
         Realm realm = Realm.getDefaultInstance();
         ArrayList<Worker> list = new ArrayList<>();
-        list.addAll(realm.where(Worker.class).findAll());
+        list.addAll(realm.where(Worker.class).findAll().sort("wkfName"));
         realm.close();
         return list;
 
@@ -36,19 +36,21 @@ public class StaffRealm {
     }
 
     public static void updateStaffsList(RealmList<Worker> arrayList) {
-        Realm realm = Realm.getDefaultInstance();
 
-
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
+        try (Realm realmInstance = Realm.getDefaultInstance()) {
+            if(realmInstance.isInTransaction()){
+                realmInstance.delete(Worker.class);
+                realmInstance.copyToRealmOrUpdate(arrayList);
+            }else {
+                realmInstance.executeTransaction((realm) -> {
+                    realm.delete(Worker.class);
+                    realm.copyToRealmOrUpdate(arrayList);
+                });
+            }
         }
-        realm.delete(Worker.class);
-        realm.copyToRealmOrUpdate(arrayList);
-        realm.commitTransaction();
-        realm.close();
     }
 
-    public static ArrayList<Worker> searchVisitorLog(String searchQuery) {
+    public static ArrayList<Worker> searchStaff(String searchQuery) {
 
         Realm realm = Realm.getDefaultInstance();
         return new ArrayList<>(realm.where(Worker.class)

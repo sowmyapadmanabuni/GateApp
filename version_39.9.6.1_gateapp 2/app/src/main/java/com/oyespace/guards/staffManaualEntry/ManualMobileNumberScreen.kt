@@ -138,57 +138,61 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
-//                if (useDummyValues) {
-//                    textview.text = "+919930620323"
-//                    ccd = "+91"
-//                    mobileNumber = "9930620323"
-//                }
+                if (useDummyValues) {
+                    textview.text = "+919930620323"
+                    ccd = "+91"
+                    mobileNumber = "9930620323"
+                }
 
                 if (textview.text.length == 13) {
 
-                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+                    if (intent.getStringExtra(MOBILENUMBER).equals(textview.text)) {
 
-                    if (!allowEntry) {
+                        val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
 
-                        val builder = AlertDialog.Builder(this@ManualMobileNumberScreen)
+                        if (!allowEntry) {
 
-                        builder.setMessage("This number is being used by a person already in")
-                        builder.setPositiveButton("Ok") { dialog, which ->
-                            dialog.cancel()
+                            val builder = AlertDialog.Builder(this@ManualMobileNumberScreen)
+
+                            builder.setMessage("This number is being used by a person already in")
+                            builder.setPositiveButton("Ok") { dialog, which ->
+                                dialog.cancel()
+                                finish()
+                            }
+                            builder.setCancelable(false)
+                            builder.show()
+                        } else {
+
+
+                            val d = Intent(this@ManualMobileNumberScreen, ManualNameEntryScreen::class.java)
+                            d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                            d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                            d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                            d.putExtra(MOBILENUMBER, mobileNumber)
+                            d.putExtra(COUNTRYCODE, ccd)
+                            d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                            d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                            d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                            d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                            d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                            d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                            d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                            d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                            d.putExtras(intent)
+                            startActivity(d)
                             finish()
+
+
                         }
-                        builder.setCancelable(false)
-                        builder.show()
+
                     } else {
-
-                        val d = Intent(this@ManualMobileNumberScreen, ManualNameEntryScreen::class.java)
-                        d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                        d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                        d.putExtra(UNITID, intent.getStringExtra(UNITID))
-                        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-                        d.putExtra(MOBILENUMBER, mobileNumber)
-                        d.putExtra(COUNTRYCODE, ccd)
-                        d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
-                        d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
-                        d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-                        d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
-                        d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
-                        d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-                        d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-                        d.putExtras(intent)
-                        startActivity(d)
-                        finish()
-
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
+                        Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
 
                     }
-
-                } else {
-                    buttonNext.isEnabled = true
-                    buttonNext.isClickable = true
-                    Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
-
                 }
             }
 
@@ -851,7 +855,7 @@ class ManualMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         workType.add("Maid")
         workType.add("HouseKeeping")
         workType.add("Cook")
-        workType.add("Security Officer")
+        //workType.add("Security Officer")
         workType.add("Gardener")
 
     }

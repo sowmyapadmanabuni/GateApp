@@ -5,7 +5,7 @@ import android.os.CountDownTimer
 class TimerUtil(
     millisInFuture: Long,
     var onFinishCallback: () -> Unit = {},
-    var onTickcallback: () -> Unit = {}
+    var onTickcallback: (ms: Long) -> Unit = {}
 ) : CountDownTimer(millisInFuture, 1000) {
 
     override fun onFinish() {
@@ -13,7 +13,7 @@ class TimerUtil(
     }
 
     override fun onTick(millisUntilFinished: Long) {
-        onTickcallback()
+        onTickcallback(millisUntilFinished)
     }
 
 }

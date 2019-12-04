@@ -61,6 +61,7 @@ public class RealmDB {
                 realm.commitTransaction();
             }
         }
+        realm.close();
 
     }
 

@@ -36,7 +36,6 @@ import kotlinx.android.synthetic.main.activity_final_registration.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
 
 class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
@@ -50,8 +49,8 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_device_name: TextView
 
     var count = 0
-    val visitorsList: ArrayList<VisitorLog> = arrayListOf<VisitorLog>()
-    val unitNameIdMap = HashMap<String, String>()
+
+    lateinit var curTime: String
 
     override fun onClick(v: View?) {
 
@@ -61,12 +60,14 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                 button_done.isEnabled = false
                 button_done.isClickable = false
 
-                if (!Utils.isNetworkAvailable(applicationContext)) {
+                if (!Utils.isConnectedToInternet()) {
                     button_done.isEnabled = true
                     button_done.isClickable = true
                     Utils.showToast(applicationContext, getString(R.string.no_internet))
                     return
                 }
+
+                curTime = getCurrentTimeLocal()
 
                 if (intent.getStringExtra(VISITOR_TYPE).contains(STAFF, true)) {
 
@@ -92,7 +93,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         unitname_dataList = intent.getStringExtra(UNITNAME).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                         unitid_dataList = intent.getStringExtra(UNITID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                         unitAccountId_dataList = intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-                        unitNameIdMap.clear()
+
                         if (unitname_dataList.size > 0) {
 
                             count = unitname_dataList.size
@@ -311,12 +312,10 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
     }
 
-
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
         val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
-        Log.e("taaag", "uploading image: $imgName")
 
-        unitNameIdMap[UNUniName] = UNUnitID
+        Log.i("taaag", "cutTIme: $curTime")
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
@@ -324,7 +323,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
             intToString(minteger), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), getCurrentTimeLocal(), SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20
         )
 
@@ -340,7 +339,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         if (globalApiObject.success) {
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
-                            Log.v("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
+                            Log.e("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
 
 
                             count--
@@ -361,11 +360,11 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
-                                        val visitors = VisitorLogRepo.get_IN_VisitorsForName(intent.getStringExtra(PERSONNAME))
+
+                                        val visitors = VisitorLogRepo.get_IN_VisitorsForTimeTime(curTime)
                                         if (debug) {
-                                        //    Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(this@StaffEntryRegistration, "no: ${visitors?.size}", Toast.LENGTH_SHORT).show()
                                         }
-                                        Log.e("taaag", "map map: $unitNameIdMap")
                                         if (visitors != null) {
 
                                             for (visitor in visitors) {
@@ -375,15 +374,17 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                                                 d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
                                                 d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
                                                 d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                                                d.putExtra("nr_id", intToString(globalApiObject.data.visitorLog.vlVisLgID))
+                                                d.putExtra("nr_id", intToString(visitor.vlVisLgID))
                                                 d.putExtra("unitname", visitor.unUniName)
                                                 d.putExtra("memType", "Owner")
-                                                d.putExtra(UNITID, unitNameIdMap[visitor.unUniName])
+                                                d.putExtra(UNITID, visitor.unUnitID)
                                                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                                                 d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
                                                 d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                                                 sendBroadcast(d)
+
+                                                Log.v("DELIVERY",visitor.vlVisLgID.toString())
                                             }
                                         }
                                         dismissProgress()

@@ -44,7 +44,7 @@ open class VisitorLog:RealmObject(){
     var unUniName: String = ""
     var vLVerStat: String = ""
     var vLGtName: String = ""
-    var uNUnitID: Int = 0
+    var unUnitID: String = ""
     var asAssnID: Int = 0
     var vlEntryT: String = ""
     var vlExitT: String = ""

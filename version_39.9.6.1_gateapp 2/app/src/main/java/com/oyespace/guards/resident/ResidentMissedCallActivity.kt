@@ -117,48 +117,61 @@ class ResidentMissedCallActivity : BaseKotlinActivity() {
 
     fun onClick(v: View) {
 
-        if (ConstantUtils.useDummyValues) {
-            mobileNumberString = "+919930620323"
-        }
+        when (v.getId()) {
 
-        if (mobileNumberString == null) {
-            return
-        }
-
-        val ascId = LocalDb.getAssociation().asAssnID
-
-        ResidentChecker().isResident(
-            mobileNumberString!!,
-            ascId,
-            object : ResidentChecker.ResponseListener {
-
-                override fun onResult(isResident: Boolean) {
-
-                    if (isResident) {
-                        Utils.getAlertDialog(this@ResidentMissedCallActivity, getString(R.string.valid), -1) {
-                            finish()
-                        }.show()
-                    } else {
-                        Utils.getAlertDialog(this@ResidentMissedCallActivity, getString(R.string.invalid), R.drawable.invalid_invi) {
-                            finish()
-                        }.show()
-                    }
-                    Log.d("check response", "resident: " + isResident)
-
+            R.id.buttonNext -> {
+                if (ConstantUtils.useDummyValues) {
+                    mobileNumberString = "+919930620323"
                 }
 
-                override fun onError(error: String) {
-
-                    Utils.getAlertDialog(
-                        this@ResidentMissedCallActivity,
-                        getString(R.string.invalid), R.drawable.invalid_invi
-                    ) {
-                        finish()
-                    }.show()
-
+                if (mobileNumberString == null) {
+                    return
                 }
 
-            })
+                val ascId = LocalDb.getAssociation().asAssnID
+
+                ResidentChecker().isResident(
+                    mobileNumberString!!,
+                    ascId,
+                    object : ResidentChecker.ResponseListener {
+
+                        override fun onResult(isResident: Boolean) {
+
+                            if (isResident) {
+                                Utils.getAlertDialog(this@ResidentMissedCallActivity, getString(R.string.valid), -1) {
+                                    finish()
+                                }.show()
+                            } else {
+                                Utils.getAlertDialog(this@ResidentMissedCallActivity, getString(R.string.invalid), R.drawable.invalid_invi) {
+                                    finish()
+                                }.show()
+                            }
+                            Log.d("check response", "resident: " + isResident)
+
+                        }
+
+                        override fun onError(error: String) {
+
+                            Utils.getAlertDialog(
+                                this@ResidentMissedCallActivity,
+                                getString(R.string.invalid), R.drawable.invalid_invi
+                            ) {
+                                finish()
+                            }.show()
+
+                        }
+
+                    })
+            }
+            R.id.btn_nobalance ->{
+                startActivity(Intent(this, ResidentMobileNumberScreenwithOTP::class.java))
+                finish()
+
+           }
+
+        }
+
+
     }
 
 }

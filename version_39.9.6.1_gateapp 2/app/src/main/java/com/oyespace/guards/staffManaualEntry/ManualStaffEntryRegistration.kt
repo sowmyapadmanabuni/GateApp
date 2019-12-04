@@ -34,7 +34,6 @@ import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
-import com.oyespace.guards.utils.NumberUtils.toInteger
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
@@ -187,12 +186,12 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
         // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
         tv_name.text = intent.getStringExtra(PERSONNAME)
-        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
+         tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": "+intent.getStringExtra(MOBILENUMBER))
 
         val input = intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
+        //tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
 
 
         tv_for.text = resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
@@ -337,7 +336,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                             vlog!!.asAssnID = Prefs.getInt(ASSOCIATION_ID, 0)
                             vlog.mEMemID = memID
                             vlog.reRgVisID = globalApiObject.data.visitorLog.vlVisLgID
-                            vlog.uNUnitID = toInteger(intent.getStringExtra(UNITID))
+                            vlog.unUnitID = intent.getStringExtra(UNITID)
                             vlog.vlfName = intent.getStringExtra(PERSONNAME)
                             vlog.vlMobile = intent.getStringExtra(MOBILENUMBER)
                             vlog.vlComName = intent.getStringExtra(COMPANY_NAME)
@@ -821,13 +820,13 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
 
                         if(getdata.data.visitorLog.vlMobile.equals(intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER))) {
-                            Toast.makeText(this@ManualStaffEntryRegistration,getdata.data.visitorLog.vlMobile+".."+intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),Toast.LENGTH_LONG).show()
+                           // Toast.makeText(this@ManualStaffEntryRegistration,getdata.data.visitorLog.vlMobile+".."+intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),Toast.LENGTH_LONG).show()
 
-//                            Utils.showToast(
-//                                this@ManualStaffEntryRegistration,
-//                                "Duplicate Entry not allowed"
-//                            )
-                            //  showToast(this@Dashboard,workerID.toString())
+                            Utils.showToast(
+                                this@ManualStaffEntryRegistration,
+                                "Duplicate Entry not allowed"
+                            )
+                             // showToast(this@Dashboard,workerID.toString())
                         }
                         else{
                             visitorLog(intent.getStringExtra(UNITNAME), intent.getStringExtra(UNITID), intent.getStringExtra(UNIT_ACCOUNT_ID))
