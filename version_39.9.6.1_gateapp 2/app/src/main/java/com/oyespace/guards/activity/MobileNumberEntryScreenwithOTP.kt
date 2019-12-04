@@ -699,7 +699,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                     }
 
                     override fun noNetowork() {
-                        Utils.showToast(this@MobileNumberEntryScreenwithOTP, "No Internet")
+                        Utils.showToast(this@MobileNumberEntryScreenwithOTP, resources.getString(R.string.no_internet))
                     }
 
                     override fun onShowProgress() {

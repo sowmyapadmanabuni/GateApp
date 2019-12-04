@@ -20,7 +20,10 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.SendStaffImageReq
+import com.oyespace.guards.pojo.SendStaffImageRes
+import com.oyespace.guards.pojo.StaffEditRequest
+import com.oyespace.guards.pojo.StaffEditResponse
 import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -308,7 +311,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                 }
 
 
-
             }
         }
 
@@ -332,9 +334,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
             }
         }
     }
-
-
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -364,8 +363,17 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         WKWorkID: Int
     ) {
 
+        var mobile = WKMobile
+        if (!WKMobile.startsWith("+91")) {
+            if (WKMobile.startsWith("9191")) {
+                mobile = WKMobile.replaceFirst("9191", "+91")
+            } else if (WKMobile.startsWith("91")) {
+                mobile = WKMobile.replaceFirst("91", "+91")
+            }
+        }
+
         val req = StaffEditRequest(
-            WKFName, WKMobile, WKImgName, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID
+            WKFName, mobile, WKImgName, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID
 
         )
 
@@ -592,8 +600,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         val action = "android.intent.action.PHONE_STATE"
         registerReceiver(receiver, IntentFilter(action))
     }
-
-
 
 
 }

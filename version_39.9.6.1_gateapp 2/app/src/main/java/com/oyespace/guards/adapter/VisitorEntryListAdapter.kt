@@ -20,16 +20,19 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.google.firebase.database.*
 import com.oyespace.guards.R
+import com.oyespace.guards.cloudfunctios.CloudFunctionRetrofitClinet
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
+import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.pojo.CloudFunctionNotificationReq
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.*
+import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.TimerUtil
-import com.squareup.picasso.Picasso
 import java.util.*
 
 
@@ -108,6 +111,17 @@ class VisitorEntryListAdapter(
             val unitName = visitor.unUniName
             val unitID = visitor.unUnitID
             val phone = visitor.vlMobile
+
+
+            val asAssnID =  visitor.asAssnID
+            val asAsnName = LocalDb.getAssociation()!!.asAsnName
+            val ntDesc = visitor.vlfName + " from " + visitor.vlComName + " has left your premises"
+            val ntTitle = visitor.vlfName + " left"
+            val ntType = "gate_app";
+            val sbSubID = visitor.unUnitID
+            val userID = visitor.reRgVisID
+
+            Log.e("VISITOR_DAT",""+visitor);
             Log.v("taaag", "refreshed IN list element at $position for vlID: $vlLogId unit: $unitName ($unitID)")
             holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId) ($phone)" else unitName
             holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
@@ -175,6 +189,7 @@ class VisitorEntryListAdapter(
                 }
             }
 
+            Log.i("taaag", "loading image $imgPath")
             Glide.with(mcontext)
                 .load(imgPath)
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
@@ -190,52 +205,13 @@ class VisitorEntryListAdapter(
                 var dialog_imageview: ImageView? = null
                 dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
-
-                //  if (orderData.vlVisType.equals("STAFF", true)) {
-
-                // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
-
-
-                if (visitor.vlVisType.contains(STAFF, true)) {
-
-                    var img = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
-
-                    if (visitor.vlEntryImg.isEmpty()) {
-
-                        img = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
-
-                    }
-
-                    Picasso.with(mcontext)
-                        .load(img)
-                        .placeholder(R.drawable.user_icon_black)
-                        .error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
-
-                } else {
-
-                    try {
-                        number = visitor.vlMobile.substring(3)
-                    } catch (e: StringIndexOutOfBoundsException) {
-                    }
-
-                    if (visitor.vlEntryImg.equals("")) {
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
-                    } else {
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
-
-                    }
-
-
-                }
+                Log.i("taaag", "loading image $imgPath")
+                Glide.with(mcontext)
+                    .load(imgPath)
+                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(false)
+                    .into(dialog_imageview)
 
                 alertadd.setView(view)
                 alertadd.show()
@@ -335,8 +311,6 @@ class VisitorEntryListAdapter(
         } catch (e: Exception) {
 
         }
-
-
     }
 
     private fun deleteEntryFromList(lgid: Int, position: Int, removeFromSearchList: Boolean = true) {

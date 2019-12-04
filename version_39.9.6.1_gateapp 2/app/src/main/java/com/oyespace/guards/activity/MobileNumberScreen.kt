@@ -139,10 +139,12 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                 if (textview.text.length == 13) {
 
+                    mobileNumber = textview.text.toString()
+
                     val flow = intent.getStringExtra(FLOW_TYPE)
                     val allowEntry = when (flow) {
                         STAFF_REGISTRATION -> !StaffRepo.checkExistingStaffForPhone(mobileNumber!!)
-                        else -> VisitorLogRepo.allowEntry(ccd, mobileNumber)
+                        else -> VisitorLogRepo.allowEntry("", mobileNumber)
                     }
 
                     if (!allowEntry) {

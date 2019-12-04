@@ -38,10 +38,15 @@ public class StaffRealm {
     public static void updateStaffsList(RealmList<Worker> arrayList) {
 
         try (Realm realmInstance = Realm.getDefaultInstance()) {
-            realmInstance.executeTransaction((realm) -> {
-                realm.delete(Worker.class);
-                realm.copyToRealmOrUpdate(arrayList);
-            });
+            if(realmInstance.isInTransaction()){
+                realmInstance.delete(Worker.class);
+                realmInstance.copyToRealmOrUpdate(arrayList);
+            }else {
+                realmInstance.executeTransaction((realm) -> {
+                    realm.delete(Worker.class);
+                    realm.copyToRealmOrUpdate(arrayList);
+                });
+            }
         }
     }
 

@@ -18,8 +18,7 @@ import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.activity.PatrollingAlert
 import com.oyespace.guards.adapter.PatrolShiftsAdapter
-import com.oyespace.guards.models.PatrolShift
-import com.oyespace.guards.models.ShiftsListResponse
+import com.oyespace.guards.models.*
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.services.APictureCapturingService
@@ -31,6 +30,13 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
+import io.realm.RealmQuery
+import io.realm.RealmResults
+import io.realm.exceptions.RealmPrimaryKeyConstraintException
+import io.realm.kotlin.createObject
+import io.realm.kotlin.delete
+import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_pschedule_list.*
 import kotlinx.android.synthetic.main.header_with_back.*
 import java.io.ByteArrayOutputStream
@@ -59,7 +65,11 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
         ot_back.setOnClickListener{
             finish()
         }
+        initRealm()
+
+        loadFromRealm()
         getPatrollingSchedules()
+
 
 
 
@@ -74,6 +84,8 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
 
     override fun onDestroy() {
        // Prefs.putBoolean(ConstantUtils.ACTIVE_ALERT, false)
+
+        realm.close()
         super.onDestroy()
     }
 
@@ -309,42 +321,123 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
                     dismissProgressrefresh()
                     if (PatrolList.success == true) {
                         var mTempShifts = PatrolList.data.patrollingShifts;
-                        var updatedArrayList = ArrayList<PatrolShift>()
-                        val sdf: SimpleDateFormat = SimpleDateFormat("EEEE")
-                        val d: Date = Date()
-                        val day = sdf.format(d)
-                        for(shift:PatrolShift in mTempShifts){
-                            if(shift.psRepDays.contains(day,ignoreCase = true)){
-                                updatedArrayList.add(shift)
+                        try {
+                            if(!realm.isInTransaction) {
+                                realm.beginTransaction()
+                                realm.delete<CheckPointsOfSchedule>()
                             }
+                            for (shift: PatrolShift in mTempShifts) {
+                                var schedule:PatrolShiftRealm;
+                                try {
+                                    schedule = realm.createObject<PatrolShiftRealm>(shift.psPtrlSID)
+                                }catch (e:RealmPrimaryKeyConstraintException){
+                                    schedule = realm.where<PatrolShiftRealm>().equalTo("psPtrlSID",shift.psPtrlSID).findFirstAsync()
+                                }
+                                schedule.asAssnID = shift.asAssnID
+                                schedule.deName = shift.deName;
+                                schedule.psIsActive = shift.psIsActive
+                                schedule.psRepDays = shift.psRepDays
+                                schedule.psSltName = shift.psSltName
+                                schedule.psSnooze = shift.psSnooze
+                                schedule.psdCreated = shift.psdCreated
+                                schedule.psdUpdated = shift.psdUpdated
+                                schedule.pseTime = shift.pseTime
+                                schedule.pssTime = shift.pssTime
+                                realm.insertOrUpdate(schedule)
+
+                                var maxId:Number? = realm.where<CheckPointsOfSchedule>().max("id")
+                                if(maxId != null){
+                                    maxId = maxId.toInt()+1
+                                }else{
+                                    maxId = 1
+                                }
+                                for(checkpointInfo: ScheduleCheckPointsData in shift.point){
+                                    Log.e("MAXID",""+maxId)
+                                    val checkPoint = realm.createObject<CheckPointsOfSchedule>(maxId)
+                                    checkPoint.psPtrlSID = shift.psPtrlSID
+                                    checkPoint.asAssnID = checkpointInfo.asAssnID
+                                    checkPoint.cpCkPName = checkpointInfo.checks.get(0).cpCkPName
+                                    checkPoint.cpcPntAt = checkpointInfo.checks.get(0).cpcPntAt
+                                    checkPoint.cpOrder = checkpointInfo.cpOrder
+                                    checkPoint.cpgpsPnts = checkpointInfo.cpgpsPnts
+                                    checkPoint.pcIsActive = checkpointInfo.pcIsActive
+                                    checkPoint.pcid = checkpointInfo.pcid
+                                    checkPoint.psChkPID = checkpointInfo.psChkPID
+                                    realm.insertOrUpdate(checkPoint)
+                                    maxId +=1
+                                }
+                            }
+                            if(realm.isInTransaction()){
+                                realm.commitTransaction()
+                            }
+                            realm.close()
+                        }catch (e:Exception){
+                            e.printStackTrace()
                         }
 
-                        mPatrolShiftArray = updatedArrayList
-                        setSchedulesAdapter()
+                        loadFromRealm()
 
-                        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
-                        var scheduleExist:Boolean = false
-                        if(ongoingSchedule != -1) {
-                            scheduleExist = isScheduleExist(ongoingSchedule)
-                            if(scheduleExist){
-                                Log.e("Starting_","Calling Timer")
-                                startMinutesTimer()
-                            }
-                        }
                     }
                 }
 
                 override fun onErrorResponse(e: Throwable) {
                     dismissProgressrefresh()
                     Toast.makeText(this@PScheduleListActivity, "Error ", Toast.LENGTH_LONG).show()
+                  //  loadFromRealm()
 
                 }
 
                 override fun noNetowork() {
                     dismissProgressrefresh()
                     Toast.makeText(this@PScheduleListActivity, "No network call ", Toast.LENGTH_LONG).show()
+                    //loadFromRealm()
                 }
             })
+    }
+
+    fun loadFromRealm(){
+        initRealm()
+        val schedulesFromRealm:RealmResults<PatrolShiftRealm>  = realm.where<PatrolShiftRealm>()
+            .findAllAsync()
+        var updatedArrayList = ArrayList<PatrolShift>()
+        val sdf: SimpleDateFormat = SimpleDateFormat("EEEE")
+        val d: Date = Date()
+        val day = sdf.format(d)
+        for(shift:PatrolShiftRealm in schedulesFromRealm){
+            if(shift.psRepDays.contains(day,ignoreCase = true)){
+                val shifter:PatrolShift = PatrolShift(
+                    psPtrlSID = shift.psPtrlSID,
+                    psSnooze = shift.psSnooze,
+                    pssTime = shift.pssTime,
+                    pseTime = shift.pseTime,
+                    psRepDays = shift.psRepDays,
+                    deName = shift.deName,
+                    psSltName = shift.psSltName,
+                    asAssnID = shift.asAssnID,
+                    psdCreated = shift.psdCreated,
+                    psdUpdated = shift.psdUpdated,
+                    psIsActive = shift.psIsActive,
+                    point = ArrayList()
+
+                )
+                updatedArrayList.add(shifter)
+            }
+        }
+//
+        mPatrolShiftArray = updatedArrayList
+        setSchedulesAdapter()
+
+        realm.close()
+
+        val ongoingSchedule = Prefs.getInt(ACTIVE_PATROLLING_SCHEDULE, -1)
+        var scheduleExist:Boolean = false
+        if(ongoingSchedule != -1) {
+            scheduleExist = isScheduleExist(ongoingSchedule)
+            if(scheduleExist){
+                Log.e("Starting_","Calling Timer")
+                startMinutesTimer()
+            }
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

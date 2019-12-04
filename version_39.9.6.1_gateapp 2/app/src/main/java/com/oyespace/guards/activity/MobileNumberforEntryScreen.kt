@@ -812,7 +812,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     }
 
                     override fun noNetowork() {
-                        Utils.showToast(this@MobileNumberforEntryScreen, "No Internet")
+                        Utils.showToast(this@MobileNumberforEntryScreen, resources.getString(R.string.no_internet))
                     }
 
                     override fun onShowProgress() {

@@ -161,7 +161,7 @@ class AppUtils {
             }
 
             try {
-                progressDialog.show()
+//                progressDialog.show()
                 mediaPlayer?.prepareAsync()
 //                progressDialog.dismiss()
             } catch (e: Exception) {
