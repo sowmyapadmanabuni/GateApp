@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.CallLog
@@ -34,6 +35,7 @@ import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
+import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
@@ -163,6 +165,18 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_mobile_number)
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            requestPermission(arrayOf(
+                Manifest.permission.ANSWER_PHONE_CALLS
+            ), 1, PermissionCallback { isGranted ->
+                if (isGranted) {
+
+                } else {
+
+                }
+            })
+        }
         receiver =  object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
 
@@ -187,6 +201,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
 
 
                             }
+                            LocalDb.disconnectCall(context)
                         }
                     }
 

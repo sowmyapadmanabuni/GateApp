@@ -93,9 +93,7 @@ import java.io.IOException
 import java.util.*
 import kotlin.concurrent.fixedRateTimer
 
-class Dashboard : BaseKotlinActivity(), View.OnClickListener,
-    ResponseHandler,
-    SGFingerPresentEvent {
+class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, SGFingerPresentEvent {
 
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
@@ -210,14 +208,16 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             if (mAutoOnEnabled) {
 
                 Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
-                if (usbConnected) {
+
+
                     CaptureFingerPrint()
-                }
+
                 Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 mAutoOnEnabled = false
                 val myRunnable = Runnable {
                     // your code here
                     mAutoOnEnabled = true
+                    mLed=true
                 }
 
                 val myHandler = Handler()
@@ -436,10 +436,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
-            registerReceiver(mUsbReceiver, filter)
-        }
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -469,7 +466,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             val info = manager.getPackageInfo(baseContext.packageName, 0)
             appVersion = info.versionName
             Log.d("tag", "app " + appVersion + " " + info.versionName)
-            txt_device_name?.text = "V: $appVersion"
+            txt_device_name?.text = "V: $appVersion${if (debug) "D" else ""}"
 
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -619,7 +616,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
 
     override fun onResume() {
 
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
+            registerReceiver(mUsbReceiver, filter)
+        }
 
         if(pTimerChecker == null) {
             runTimerCheck()
@@ -1125,70 +1125,91 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
     override fun SGFingerPresentCallback() {
 
         autoooooo++
-
-        if(usbConnected) {
-
+        if (usbConnected) {
+            Log.v("BIOMETRIC","ERROR")
             fingerDetectedHandler.sendMessage(Message())
         }
+
     }
 
     fun CaptureFingerPrint() {
 
         if (bSecuGenDeviceOpened == true) {
 
-            try {
 
-                val fp: ByteArray = getFingerprintFromScanner() ?: return
-                Log.d("taaag", "fp: ${fp.size}")
-                val id = matchFingerprint(fp)
+
+//                val fp: ByteArray = getFingerprintFromScanner() ?: return
+
+                if (mVerifyImage != null)
+                    mVerifyImage = null
+                mVerifyImage = ByteArray(mImageWidth * mImageHeight)
+
+                try {
+                    var result = sgfplib!!.GetImage(mVerifyImage)
+                    Log.d("match  1", result.toString() + " " + mVerifyImage!!.size)
+
+                    result = sgfplib!!.SetTemplateFormat(SecuGen.FDxSDKPro.SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400)
+                    Log.d("match  2", result.toString() + " " + mVerifyImage!!.size)
+
+                    var fpInfo: SGFingerInfo? = SGFingerInfo()
+                    for (i in mVerifyTemplate!!.indices)
+                        mVerifyTemplate!![i] = 0
+
+                    result = sgfplib!!.CreateTemplate(fpInfo, mVerifyImage, mVerifyTemplate)
+                    Log.d("match  3", result.toString() + " " + mVerifyTemplate!!.size)
+
+                    var matched: BooleanArray? = BooleanArray(1)
+              //  Log.d("taaag", "fp: ${fp.size}")
+                val id = matchFingerprint(mVerifyTemplate!!)
                 Log.d("taaag", "check result: $id")
 
 
-                    if (id > 0&& id >43) {
+                    if (id > 0) {
                         showToast(applicationContext,id.toString())
-                    val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
+                        val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
-                    // if yes, then make exit call
-                    if (staff != null) {
-                        t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
-                        loadEntryVisitorLog()
-                    } else {
-
-                        // get staff for id
-                        val worker: Worker? = StaffRepo.getStaffForId(id)
-                        Log.d("taaag", "worker found: $worker")
-                        if (worker == null) {
-                            showToast(this, "No staff found")
+                        // if yes, then make exit call
+                        if (staff != null) {
+                            t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
+                            VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
+                            loadEntryVisitorLog()
                         } else {
-                            getVisitorByWorkerId(
-                                Prefs.getInt(ASSOCIATION_ID, 0),
-                                worker.wkWorkID,
-                                worker.unUnitID,
-                                "${worker.wkfName} ${worker.wklName}",
-                                worker.wkMobile,
-                                worker.wkDesgn,
-                                worker.wkWrkType,
-                                worker.wkWorkID,
-                                worker.unUniName,
-                                worker.wkEntryImg
-                            )
+
+                            // get staff for id
+                            val worker: Worker? = StaffRepo.getStaffForId(id)
+                            Log.d("taaag", "worker found: $worker")
+                            if (worker == null) {
+                                showToast(this, "No staff found")
+                            } else {
+                                getVisitorByWorkerId(
+                                    Prefs.getInt(ASSOCIATION_ID, 0),
+                                    worker.wkWorkID,
+                                    worker.unUnitID,
+                                    "${worker.wkfName} ${worker.wklName}",
+                                    worker.wkMobile,
+                                    worker.wkDesgn,
+                                    worker.wkWrkType,
+                                    worker.wkWorkID,
+                                    worker.unUniName,
+                                    worker.wkEntryImg
+                                )
+                            }
+
+
                         }
 
 
+
                     }
-
-
-
-                }
-                    else if (id==43){
+                    else {
 
 
                         t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
 
                     }
 
-                mVerifyImage = null
+
+                    mVerifyImage = null
                 this.sgfplib!!.SetBrightness(100)
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
@@ -1218,23 +1239,24 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         } catch (e: NullPointerException) {
 
         }
-//        when (code) {
-//            SGFDX_ERROR_NONE -> {
-//                showToast(this, "fingerprint captured")
-//            }
-//            SGFDX_ERROR_EXTRACT_FAIL -> {
-//                showToast(this, "error capturing fingerprint")
-//                return null
-//            }
-//        }
-        Log.d("taaag", "capture code: $code")
-        return fpTemp
+
+            when (code) {
+                SGFDX_ERROR_NONE -> {
+                    showToast(this, "fingerprint captured")
+                }
+                SGFDX_ERROR_EXTRACT_FAIL -> {
+                    showToast(this, "error capturing fingerprint")
+                    return null
+                }
+            }
+            Log.d("taaag", "capture code: $code")
+            return fpTemp
 
     }
 
     fun matchFingerprint(fingerPrint: ByteArray): Int {
 
-        var number=0
+
 
         val asscId = Prefs.getInt(ASSOCIATION_ID, 0)
 
@@ -1243,7 +1265,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         val result = BooleanArray(1)
         for (fp in fps) {
 
-            number++
+
             Log.d("taaag", "matching with ${fp.userName}'s fingerprint")
 
             sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_NORMAL, result)
@@ -1257,15 +1279,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
             if (result[0]) return fp.userName.toInt()
 
         }
-        if (number > 0) {
-            return number
-        }
-        else{
-            number=0
-        }
 
 
-        return number
+        return -1
 
     }
 
@@ -1336,6 +1352,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener,
         when (v.id) {
 
             R.id.re_delivery -> {
+
+                Prefs.putString(ConstantUtils.TYPE, "Create")
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
 

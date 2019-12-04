@@ -1,5 +1,7 @@
 package com.oyespace.guards.realm;
 
+import android.util.Log;
+
 import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.utils.ConstantUtils;
 
@@ -130,13 +132,11 @@ public class VisitorEntryLogRealm {
     }
 
     public static void updateVisitorLogs(RealmList<VisitorLog> visitorsList) {
-        Realm realm = Realm.getDefaultInstance();
-        if (!realm.isInTransaction()) {
-            realm.beginTransaction();
-        }
-        realm.delete(VisitorLog.class);
-        realm.insertOrUpdate(visitorsList);
-        realm.commitTransaction();
+        Realm.getDefaultInstance().executeTransaction(realm -> {
+            realm.delete(VisitorLog.class);
+            realm.insertOrUpdate(visitorsList);
+            Log.d("taaaag", "refreshed realm visitorLog");
+        });
     }
 
     public static ArrayList<VisitorLog> searchVisitorLog(String searchQuery) {
@@ -207,6 +207,26 @@ public class VisitorEntryLogRealm {
                 .and()
                 .contains("vlEntryT", time)
                 .findAll());
+    }
+
+    public static void updateVisitorStatus(@NotNull VisitorLog visitor, @NotNull String status) {
+
+        Realm.getDefaultInstance().executeTransaction(realm -> {
+
+            visitor.setVlApprStat(status);
+
+        });
+
+    }
+
+    public static void updateVisitorLog(@NotNull VisitorLog visitorLog) {
+
+        Realm.getDefaultInstance().executeTransaction(realm -> {
+
+            realm.insertOrUpdate(visitorLog);
+
+        });
+
     }
 
     public interface VisitorEntryListener {

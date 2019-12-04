@@ -556,7 +556,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                                 intent.getStringExtra(MOBILENUMBER),
                                 intent.getStringExtra("DESIGNATION"),
                                 intent.getStringExtra("WORKTYPE"),
-                                intent.getIntExtra("WORKERID", 0),
+                                intent.getIntExtra(WORKER_ID, 0),
                                 intent.getStringExtra(UNITNAME)
                             )
 
@@ -784,7 +784,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                         intent.getStringExtra(MOBILENUMBER),
                         intent.getStringExtra("DESIGNATION"),
                         intent.getStringExtra("WORKTYPE"),
-                        intent.getIntExtra("WORKERID", 0),
+                        intent.getIntExtra(WORKER_ID, 0),
                         intent.getStringExtra(UNITNAME)
                     )
 

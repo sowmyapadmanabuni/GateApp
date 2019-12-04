@@ -1,9 +1,11 @@
 package com.oyespace.guards.resident
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.telephony.PhoneStateListener
@@ -17,6 +19,7 @@ import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.com.oyespace.guards.resident.ResidentChecker
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.databinding.ActivityMobileNumberBinding
+import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -56,6 +59,18 @@ class ResidentMissedCallActivity : BaseKotlinActivity() {
         }
         timer.start()
 
+        if (Build.VERSION.SDK_INT >= 28) {
+            requestPermission(arrayOf(
+                Manifest.permission.ANSWER_PHONE_CALLS
+            ), 1, PermissionCallback { isGranted ->
+                if (isGranted) {
+
+                } else {
+
+                }
+            })
+        }
+
         receiver = object : BroadcastReceiver() {
 
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -78,6 +93,7 @@ class ResidentMissedCallActivity : BaseKotlinActivity() {
 //                                residentMobileNumber = number.substring(3, 13)
 
                             }
+                            LocalDb.disconnectCall(context)
                         }
                     }
 
@@ -117,11 +133,11 @@ class ResidentMissedCallActivity : BaseKotlinActivity() {
 
     fun onClick(v: View) {
 
-        when (v.getId()) {
+        when (v.id) {
 
             R.id.buttonNext -> {
                 if (ConstantUtils.useDummyValues) {
-                    mobileNumberString = "+919930620323"
+                    mobileNumberString = "+91${ConstantUtils.dummyPhone}"
                 }
 
                 if (mobileNumberString == null) {

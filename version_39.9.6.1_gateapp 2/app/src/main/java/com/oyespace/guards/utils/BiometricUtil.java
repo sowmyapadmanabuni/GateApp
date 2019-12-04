@@ -34,6 +34,10 @@ public class BiometricUtil {
                 }
             }
 
+            if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                Log.e("taaag", "usb attached");
+            }
+
         }
     };
     private Context context;
@@ -59,11 +63,13 @@ public class BiometricUtil {
 
     }
 
-    private void init() {
+    public void init() {
 
         jlib.Init(SGFDxDeviceName.SG_DEV_AUTO);
         long error = jlib.OpenDevice(0);
         if (error == SGFDxErrorCode.SGFDX_ERROR_NONE) {
+
+            Log.i("taaag", "no error detecing biometric");
 
             jlib.SetTemplateFormat(SGFDxTemplateFormat.TEMPLATE_FORMAT_SG400);
             jlib.GetMaxTemplateSize(mMaxTemplateSize);

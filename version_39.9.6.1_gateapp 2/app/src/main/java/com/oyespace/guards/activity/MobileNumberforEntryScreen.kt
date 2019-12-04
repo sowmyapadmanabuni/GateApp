@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.provider.CallLog
@@ -16,7 +17,6 @@ import android.speech.RecognizerIntent
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
 import android.util.Log
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -34,6 +34,7 @@ import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RetrofitClinet
@@ -96,7 +97,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                 d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                 d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
-                d.putExtra("WORKERID", intent.getIntExtra("WORKERID", 0))
+                d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
                 d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                 d.putExtra("Image", intent.getStringExtra("Image"))
                 startActivity(d)
@@ -108,9 +109,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             R.id.buttonNext -> {
 
                 if (useDummyValues) {
-                    textview.text = "+919930620323"
+                    textview.text = "+91${dummyPhone}"
                     ccd = "+91"
-                    mobileNumber = "9930620323"
+                    mobileNumber = dummyPhone
                 }
 
                 if (textview.text.isNotEmpty()) {
@@ -119,7 +120,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                     val phoneNumber: String = textview.text.toString()
                     if (phoneNumber.contains(intent.getStringExtra(MOBILENUMBER))) {
 
-                        val allowEntry = VisitorLogRepo.allowEntry(countryCode, phoneNumber)
+                        val allowEntry = VisitorLogRepo.allowEntry("", phoneNumber)
 
                         if (!allowEntry) {
                             Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
@@ -194,6 +195,18 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             startActivity(d)
             finish()
 
+        }
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            requestPermission(arrayOf(
+                Manifest.permission.ANSWER_PHONE_CALLS
+            ), 1, PermissionCallback { isGranted ->
+                if (isGranted) {
+
+                } else {
+
+                }
+            })
         }
 
         receiver = object : BroadcastReceiver() {

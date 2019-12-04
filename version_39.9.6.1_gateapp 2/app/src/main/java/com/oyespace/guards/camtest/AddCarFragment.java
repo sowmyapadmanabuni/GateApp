@@ -406,18 +406,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
 //                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
 
-                if (photo == null) {
-                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
-                    submit_button.setEnabled(true);
-                    submit_button.setClickable(true);
-                }
-//                else if ( getIntent().getStringExtra(FLOW_TYPE).equals(DELIVERY) && list.size() ==0){
-//
-//
-//
-//                    Toast.makeText(getApplicationContext(),"Capture Product Photo ", Toast.LENGTH_SHORT).show();
-//                }
-                else {
+                if (imageView1.getDrawable().getConstantState()!=getResources().getDrawable(R.drawable.user_icon_black).getConstantState()) {
 
                     if (getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)) {
                         submit_button.setEnabled(false);
@@ -463,6 +452,14 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
 
                     }
+                }
+                else {
+
+                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
+                    submit_button.setEnabled(true);
+                    submit_button.setClickable(true);
+
+
 
                 }
 
