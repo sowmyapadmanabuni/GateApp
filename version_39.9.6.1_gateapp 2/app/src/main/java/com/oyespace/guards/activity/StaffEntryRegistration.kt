@@ -47,7 +47,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-
+var purpose:String?=null
     var count = 0
 
     lateinit var curTime: String
@@ -191,6 +191,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 //                getApplication().getApplicationContext().startService(
 //                        front_translucent);
 
+        purpose=intent.getStringExtra(VISITOR_PURPOSE)
 
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION, true)) {
 
@@ -321,7 +322,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
-            intToString(minteger), "", "", "",
+            purpose.toString(), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20

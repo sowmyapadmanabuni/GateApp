@@ -98,6 +98,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UNITID;
 import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
 import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_PURPOSE;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
 import static com.oyespace.guards.utils.Utils.showToast;
@@ -446,6 +447,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                         d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
                         d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                         d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
+                        d.putExtra(VISITOR_PURPOSE,getIntent().getStringExtra(VISITOR_PURPOSE));
                         d.putExtras(getIntent());
                         startActivity(d);
                         finish();

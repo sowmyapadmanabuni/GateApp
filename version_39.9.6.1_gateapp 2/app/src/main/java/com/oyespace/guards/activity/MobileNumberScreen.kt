@@ -104,6 +104,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(COUNTRYCODE, "")
                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                 startActivity(d)
                 finish()
 
@@ -119,6 +120,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                 startActivity(d)
                 finish()
 
@@ -633,6 +635,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                                 d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                                d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                                 startActivity(d)
                                 finish()
                             }

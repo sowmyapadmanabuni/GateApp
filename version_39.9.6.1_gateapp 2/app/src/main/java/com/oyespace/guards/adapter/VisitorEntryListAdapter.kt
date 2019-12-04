@@ -161,6 +161,14 @@ class VisitorEntryListAdapter(
             val entryImg = visitor.vlEntryImg
             var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
 
+            if(visitor.vlComName.contains("Others", true)) {
+                holder.tv_purposeofvisit.text=visitor.vlpOfVis
+                holder.tv_purposeofvisit.visibility=View.VISIBLE
+            }
+            else{
+                holder.tv_purposeofvisit.visibility=View.GONE
+            }
+
             if (visitor.vlVisType.contains(STAFF, true)) {
                 if (entryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
@@ -367,7 +375,7 @@ class VisitorEntryListAdapter(
         val iv_call: ImageButton
         val iv_user: ImageView
         val entrydate: TextView
-        //        val exitdate: TextView
+        val tv_purposeofvisit: TextView
         val ll_card: LinearLayout
         val expanded_view: ConstraintLayout
         val lyt_text: LinearLayout
@@ -395,7 +403,8 @@ class VisitorEntryListAdapter(
             iv_user = view.findViewById(R.id.iv_user)
 
             entrydate = view.findViewById(R.id.tv_entrydate)
-//            exitdate = view.findViewById(R.id.tv_exitdate)
+            tv_purposeofvisit = view.findViewById(R.id.tv_purposeofvisit)
+            tv_purposeofvisit.setSelected(true);
             ll_card = view.findViewById(R.id.ll_card)
             expanded_view = view.findViewById(R.id.expanded_view)
             lyt_text = view.findViewById(R.id.lyt_text)

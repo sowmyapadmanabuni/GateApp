@@ -647,7 +647,6 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             progressBar?.visibility = View.GONE
                             if (clazz == 123) {
 
-                                Toast.makeText(this@MobileNumberScreenwithOTP,"65765",Toast.LENGTH_LONG).show()
 
                                 val ccd = countryCode.toString()
                                 val mobileNumber = phone
@@ -667,7 +666,6 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                                     builder.show()
                                 } else {
 
-                                    Toast.makeText(this@MobileNumberScreenwithOTP,"tytdyfdy",Toast.LENGTH_LONG).show()
                                     val d = Intent(this@MobileNumberScreenwithOTP, ManualNameEntryScreen::class.java)
                                     d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
@@ -692,7 +690,6 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                                 }
                             }else {
 
-                                Toast.makeText(this@MobileNumberScreenwithOTP,"HI",Toast.LENGTH_LONG).show()
 
                                 val d = Intent(this@MobileNumberScreenwithOTP, AddCarFragment::class.java)
                                 d.putExtra(UNITID, intent.getStringExtra(UNITID))

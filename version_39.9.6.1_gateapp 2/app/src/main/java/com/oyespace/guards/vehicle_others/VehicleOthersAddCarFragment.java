@@ -73,6 +73,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_OTHERS;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_PURPOSE;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 
@@ -322,6 +323,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
                    d.putExtra(VEHICLE_NUMBER,getIntent().getStringExtra(VEHICLE_NUMBER));
                    d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
                    d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
+                   d.putExtra(VISITOR_PURPOSE,getIntent().getStringExtra(VISITOR_PURPOSE));
                    startActivity(d);
                    finish();
 

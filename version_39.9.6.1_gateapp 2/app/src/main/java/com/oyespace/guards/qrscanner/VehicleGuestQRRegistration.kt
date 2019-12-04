@@ -164,7 +164,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             0,
             "",  intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER), intToString(minteger), "",
             "", "", minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName,Prefs.getString(ConstantUtils.GATE_NO, ""),
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","",Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())

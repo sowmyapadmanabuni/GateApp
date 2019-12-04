@@ -88,6 +88,20 @@
                         android:paddingTop="2dp"
                         />
 
+                <TextView
+                        android:id="@+id/tv_purposeofvisit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:textSize="14sp"
+                        android:maxLength="15"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:text="Purpose"
+                        android:paddingTop="2dp"
+                        android:scrollHorizontally="true"
+                        />
+
                 <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"

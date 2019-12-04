@@ -32,6 +32,7 @@ import java.util.*
 
 class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
+    var purpose:String?=null
     var imgName: String? = null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: VehicleOthersImageAdapter
@@ -177,7 +178,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
         // tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
         tv_from.text = intent.getStringExtra(COMPANY_NAME) + " " + intent.getStringExtra(FLOW_TYPE)
 
-
+        purpose=intent.getStringExtra(VISITOR_PURPOSE)
         menuAdd.setOnClickListener {
             minteger++
             menuCount.text = "" + minteger
@@ -278,7 +279,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, UNUniName,
             UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
-            intToString(minteger),intent.getStringExtra(VEHICLE_NUMBER),"","",
+            purpose.toString(),intent.getStringExtra(VEHICLE_NUMBER),"","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15

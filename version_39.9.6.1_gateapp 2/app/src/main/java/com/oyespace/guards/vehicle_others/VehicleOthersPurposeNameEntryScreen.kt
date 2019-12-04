@@ -62,6 +62,7 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
                    // d.putExtra(COUNTRYCODE, countryCode)
                     d.putExtra(VEHICLE_NUMBER,intent.getStringExtra(VEHICLE_NUMBER))
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
                     startActivity(d)
                     finish()
                 } else {

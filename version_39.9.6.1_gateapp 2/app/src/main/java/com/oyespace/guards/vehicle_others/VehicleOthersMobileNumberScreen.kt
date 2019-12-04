@@ -86,6 +86,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                 d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                 startActivity(d)
                 finish()
 
@@ -143,6 +144,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                   //  d.putExtra(COUNTRYCODE, countryCode)
                     d.putExtra(VEHICLE_NUMBER,intent.getStringExtra(VEHICLE_NUMBER))
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
 
                     startActivity(d)
                     finish()
@@ -500,6 +502,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                             d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName+" "+globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                            d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                             startActivity(d)
                             finish()
 
