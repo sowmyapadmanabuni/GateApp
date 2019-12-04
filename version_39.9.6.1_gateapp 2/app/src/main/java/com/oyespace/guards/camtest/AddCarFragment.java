@@ -436,7 +436,9 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
     @Override
     public void onFailure(Exception e, int urlId) {
 
-        // showToast(this, "Staff Registration Failed");
+        showToast(this, "Staff Registration Failed");
+        Log.e("taaag", "e: " + e.getMessage());
+        e.printStackTrace();
     }
 
     private void staffRegistration() {
@@ -461,7 +463,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
         loginReq.WKLName = "";
 
-        loginReq.WKMobile = getIntent().getStringExtra(COUNTRYCODE) + getIntent().getStringExtra(MOBILENUMBER);
+        loginReq.WKMobile = getIntent().getStringExtra(MOBILENUMBER);
         loginReq.WKWrkType = getIntent().getStringExtra(VISITOR_TYPE);
         //loginReq.UNUnitID=toInteger( getIntent().getStringExtra(UNITID));
         loginReq.UNUnitID = getIntent().getStringExtra(UNITID);
