@@ -2392,7 +2392,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                         ddc.putExtra("unitname", unitName)
                         ddc.putExtra("memType", "Owner")
                         ddc.putExtra(UNITID, unitId.toString())
-                        ddc.putExtra(COMPANY_NAME, "Staff")
+                        ddc.putExtra(COMPANY_NAME, desgn)
                         ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
                         ddc.putExtra("VLVisLgID", vlVisLgID)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),

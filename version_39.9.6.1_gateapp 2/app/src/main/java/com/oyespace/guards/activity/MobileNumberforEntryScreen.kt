@@ -745,7 +745,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                             "VLVisLgID",
                                             globalApiObject.data.visitorLog.vlVisLgID
                                         )
-                                        ddc.putExtra(VISITOR_TYPE, "Staff")
+                                        ddc.putExtra(VISITOR_TYPE, desgn)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")

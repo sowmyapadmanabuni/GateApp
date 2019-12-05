@@ -258,7 +258,7 @@ var purpose:String?=null
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
-                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER))
+                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER).substring(3))
 
             }
         }
@@ -320,7 +320,7 @@ var purpose:String?=null
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg"
+        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
 
         Log.i("taaag", "cutTIme: $curTime")
 
@@ -578,7 +578,7 @@ var purpose:String?=null
                             ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
                             ddc.putExtra("unitname", unitName)
                             ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            ddc.putExtra(COMPANY_NAME, desgn)
                             this@StaffEntryRegistration.sendBroadcast(ddc)
 
                             Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())

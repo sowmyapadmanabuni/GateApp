@@ -591,7 +591,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         progressBar?.visibility = View.VISIBLE
 
 
-        val req = GetAccountDetailsByMobReq(isdCode, MobNumber)
+        val req = GetAccountDetailsByMobReq(isdCode, MobNumber.substring(3))
         Log.d("getAccountDetails", req.toString())
         compositeDisposable.add(
             RetrofitClinet.instance.GetAccountDetailsByMobCall(CHAMPTOKEN, req)
@@ -622,6 +622,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                                     PERSONNAME,
                                     globalApiObject.data.accountByMobile[0].acfName + " " + globalApiObject.data.accountByMobile[0].aclName
                                 )
+                                d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                                 startActivity(d)
                                 finish()
                             } else {
@@ -676,6 +677,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+        d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
         startActivity(d)
         finish()
     }

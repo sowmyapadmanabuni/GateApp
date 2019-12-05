@@ -121,15 +121,15 @@ class ResidentMobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickList
         }
 
             // buttonSkip.setVisibility(View.VISIBLE)
-            if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
-                if (workType.contains(intent.getStringExtra(COMPANY_NAME))) {
-                    buttonSkip.visibility = View.INVISIBLE
-                } else {
-                    buttonSkip.visibility = View.VISIBLE
-                }
-            } else {
-                buttonSkip.visibility = View.INVISIBLE
-            }
+//            if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 2.1") {
+//                if (workType.contains(intent.getStringExtra(COMPANY_NAME))) {
+//                    buttonSkip.visibility = View.INVISIBLE
+//                } else {
+//                    buttonSkip.visibility = View.VISIBLE
+//                }
+//            } else {
+//                buttonSkip.visibility = View.INVISIBLE
+//            }
             img_logo.visibility = View.VISIBLE
             Ed_phoneNum.visibility = View.VISIBLE
             textview.visibility = View.GONE

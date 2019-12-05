@@ -637,9 +637,12 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
         d.putExtra(UNITID, intent.getStringExtra(UNITID))
         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-        d.putExtra(MOBILENUMBER, textview.text.toString())
+        d.putExtra(MOBILENUMBER, phone.toString())
         d.putExtra(COUNTRYCODE, countryCode)
+        d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
         d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+        d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
+        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
         startActivity(d)
         finish()
     }

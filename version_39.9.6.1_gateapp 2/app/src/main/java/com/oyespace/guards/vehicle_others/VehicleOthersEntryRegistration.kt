@@ -318,7 +318,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
                         d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
                         d.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
-                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(VISITOR_TYPE, intent.getStringExtra(COMPANY_NAME) )
                         sendBroadcast(d)
                         uploadImage(imgName.toString(), mBitmap)
                         Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())

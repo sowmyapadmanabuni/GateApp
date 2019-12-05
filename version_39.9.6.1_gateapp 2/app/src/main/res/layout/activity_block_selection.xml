@@ -9,6 +9,53 @@
         tools:context=".activity.BlockSelectionActivity">
 
     <include layout="@layout/header_with_next" />
+    <LinearLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="3"
+            android:id="@+id/lyt"
+            android:layout_below="@+id/view1"
+            android:orientation="horizontal">
+
+        <TextView android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_device_name"
+                android:textColor="@color/black"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textSize="10sp"
+                android:padding="2dp"
+                android:text="Deeee"/>
+
+        <TextView android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_assn_name"
+                android:textColor="@color/black"
+                android:layout_weight="1"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:padding="3dp"
+                android:text="Association Name"/>
+
+        <TextView android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/txt_gate_name"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:layout_weight="1"
+
+                android:textSize="12sp"
+                android:padding="2dp"
+                android:text="Gate Name"/>
+    </LinearLayout>
+    <RelativeLayout
+            android:id="@+id/view2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_below="@+id/lyt"
+            android:background="@color/orange">
+
+    </RelativeLayout>
+
     <include android:id="@+id/title_unit" layout="@layout/title_bar" />
     <LinearLayout
             android:layout_width="match_parent"

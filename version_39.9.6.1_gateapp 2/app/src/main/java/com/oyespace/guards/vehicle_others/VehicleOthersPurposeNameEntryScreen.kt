@@ -134,8 +134,7 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
 
         val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        //intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "hi-IN")
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
 
         try {
@@ -143,6 +142,7 @@ class VehicleOthersPurposeNameEntryScreen : BaseKotlinActivity(), View.OnClickLi
         } catch (e: Exception) {
             Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
+
 
     }
 

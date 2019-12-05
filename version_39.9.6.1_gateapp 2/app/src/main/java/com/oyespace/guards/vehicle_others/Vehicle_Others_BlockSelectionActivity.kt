@@ -8,6 +8,7 @@ import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,12 +18,14 @@ import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.BlockSelectionAdapter
 import com.oyespace.guards.adapter.SelectedUnitsAdapter
 import com.oyespace.guards.adapter.UnitSearchResultAdapter
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.AppUtils
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -48,10 +51,35 @@ class Vehicle_Others_BlockSelectionActivity : BaseKotlinActivity(), View.OnClick
     internal var unitNames = ""
     internal var unitId = ""
     internal var acAccntID=""
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
+    lateinit var txt_device_name: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_selection)
+
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
+        }
+        txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
+        txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
+        try {
+            var appVersion = ""
+            val manager = baseContext.packageManager
+            val info = manager.getPackageInfo(baseContext.packageName, 0)
+            appVersion = info.versionName
+            Log.d("tag", "app " + appVersion + " " + info.versionName)
+            txt_device_name.text = "V: $appVersion"
+
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            txt_device_name.text = " "
+
+        }
         //setDarkStatusBar()
         try{
             var json:String = (intent.getStringExtra(SELECTED_UNITS))

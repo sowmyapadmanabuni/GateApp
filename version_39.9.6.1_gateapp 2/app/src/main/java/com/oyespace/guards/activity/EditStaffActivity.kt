@@ -1,10 +1,12 @@
 package com.oyespace.guards.activity
 
+import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.*
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -16,6 +18,7 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
@@ -180,6 +183,19 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
         tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            requestPermission(arrayOf(
+                Manifest.permission.ANSWER_PHONE_CALLS
+            ), 1, PermissionCallback { isGranted ->
+                if (isGranted) {
+
+                } else {
+
+                }
+            })
+        }
+
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, i: Intent?) {
 
@@ -220,7 +236,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                                     builder.show()
 
                                 }
-
+                                LocalDb.disconnectCall(context)
 //                                GetWorkersListByMobileNumberAndAssocID(
 //                                    tv_mobilenumber!!.text.toString(),
 //                                    Prefs.getInt(ASSOCIATION_ID, 0)

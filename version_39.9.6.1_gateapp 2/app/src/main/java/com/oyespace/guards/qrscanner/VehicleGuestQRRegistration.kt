@@ -5,6 +5,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.ImageBigView
 import com.oyespace.guards.R
@@ -39,6 +40,9 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
     var SPPrdImg8=""
     var SPPrdImg9=""
     var SPPrdImg10=""
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
+    lateinit var txt_device_name: TextView
 
     override fun onClick(v: View?) {
 
@@ -78,12 +82,31 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         minteger = intent.getStringExtra(NUMBEROFPERSONS).toInt()
         getUnitLog(intent.getStringExtra(UNITID).toInt())
 
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
+        txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
+        txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")
+        try {
+            var appVersion = ""
+            val manager = baseContext.packageManager
+            val info = manager.getPackageInfo(baseContext.packageName, 0)
+            appVersion = info.versionName
+            Log.d("tag", "app " + appVersion + " " + info.versionName)
+            txt_device_name.text = "V: $appVersion"
+
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            txt_device_name.text = " "
+
+        }
+
         itemLyt.visibility = View.VISIBLE
         lyt_count.visibility = View.VISIBLE
 
-        if (intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHQRCODE, true)) {
-            profile_image.visibility = View.GONE
-        }
+//        if (intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHQRCODE, true)) {
+//            profile_image.visibility = View.GONE
+//        }
         Log.d(
             "intentdata StaffEntry", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
                     + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE) + " "
@@ -93,7 +116,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         )
         txt_header.text=resources.getString(R.string.textidcard)+" "+ LocalDb.getAssociation()!!.asAsnName
 
-        tv_name.text = resources.getString(R.string.textname) + ": " + intent.getStringExtra(PERSONNAME)
+        tv_name.text =  intent.getStringExtra(PERSONNAME)
         val input =intent.getStringExtra(MOBILENUMBER)
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         tv_mobilenumber.text = "+" + 91 + " " + number

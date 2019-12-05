@@ -545,7 +545,9 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(VEHICLE_NUMBER,intent.getStringExtra(VEHICLE_NUMBER))
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                    startActivity(d)
+        d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+
+        startActivity(d)
         finish()
     }
 
