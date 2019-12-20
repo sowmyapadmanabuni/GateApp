@@ -1348,8 +1348,8 @@ data class CloudFunctionNotificationReq(
     val ntType: String,
     val sbSubID: String,
     val userID: Int,
-    val unitID: String
-
+    val unitID: String,
+    val topicName:String
 )
 
 
@@ -1886,8 +1886,21 @@ data class CheckPointScanRequest(
 
 data class CheckPointScanResponse(
     val apiVersion: String,
-    val `data`: String,
+    val `data`: TrackingObj,
     val success: Boolean
+)
+data class CheckPointMultipleScanResponse(
+    val apiVersion: String,
+    val `data`: MultipleTrackingObj,
+    val success: Boolean
+)
+
+data class TrackingObj(
+    val tracking:Int
+)
+
+data class MultipleTrackingObj(
+    val tracking:String
 )
 
 

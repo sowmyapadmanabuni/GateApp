@@ -102,6 +102,10 @@ interface WebApi {
     fun scanCheckPoint(@Header(OYE247KEY) token: String, @Body cpScanReq: CheckPointScanRequest)
             : Single<CheckPointScanResponse>
 
+    @POST("oye247/api/v1/MultiTracking/Create")
+    fun scanMultipleCheckPoint(@Header(OYE247KEY) token: String, @Body cpScanReq: CheckPointMultipleScanRequest)
+            : Single<CheckPointMultipleScanResponse>
+
     @POST("oye247/api/v1/Patrolling/PatrollingEndDateUpdate")
     fun stopPatrollingCall(@Header(OYE247KEY) token: String, @Body stopPatrollingReq: StopPatrollingReq)
             : Single<StopPatrollingResp>
