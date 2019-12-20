@@ -81,9 +81,9 @@ public class ConstantUtils {
 //    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
     public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
 //        public static final String BASE_URL = "https://api.oyespace.com/";
-//public static final String BASE_URL  =  "https://staging.oyespace.com/";
+public static final String BASE_URL  =  "https://staging.oyespace.com/";
 //    public static final String BASE_URL = "https://apidev.oyespace.com/";
-    public static final String BASE_URL = "https://apiuat.oyespace.com/";
+//public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
     public static final String PATROLLING_END_POINT = "Patrolling End Point";
@@ -124,7 +124,7 @@ public class ConstantUtils {
 
     public static final boolean debug = false;
     public static final boolean useDummyValues = false;
-    public static final String dummyPhone = "8660692521";
+    public static final String dummyPhone = "8884652653";
 
     public static final String SNOOZE_SCHEDULE_TIME = "SNOOZE_SCHEDULE_TIME";
     public static final String SNOOZE_IS_ACTIVE = "IS_SNOOZED_";

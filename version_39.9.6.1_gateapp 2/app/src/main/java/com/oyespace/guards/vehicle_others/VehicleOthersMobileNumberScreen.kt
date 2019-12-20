@@ -38,11 +38,11 @@ import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils.entryExists
 import com.oyespace.guards.utils.Utils
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -86,15 +86,21 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                 d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
                 d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                 startActivity(d)
                 finish()
 
             }
 
-            R.id.buttonNext ->{
+            R.id.buttonNext -> {
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
-                if(textview.text.length==13) {
+                if (useDummyValues) {
+                    textview.text = "+91${dummyPhone}"
+                    ccd = "+91"
+                    mobileNumber = dummyPhone
+                }
+                if (textview.text.length == 13) {
 //                    val d = Intent(this@VehicleOthersMobileNumberScreen, VehicleOthersNameEntryScreen::class.java)
 ////                    Log.d("intentdata MobileNumber","buttonNext "+intent.getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
 //                           // +" "+textview.text+" "+countryCode)
@@ -110,15 +116,16 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
 //                    startActivity(d);
 //                    finish();
                    // deliveryFlow_launchNameEntryScreen()
+                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
 
-                    if(entryExists(ccd,mobileNumber)) {
+                    if (!allowEntry) {
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
                         val builder = AlertDialog.Builder(this@VehicleOthersMobileNumberScreen)
                         //  builder.setTitle("Vendor Entry already done")
                         builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
 
-//                            val d = Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
+                            //                            val d = Intent(this@VehicleOthersMobileNumberScreen, Dashboard::class.java)
 //                            startActivity(d)
                             finish()
                             dialog.dismiss()
@@ -143,6 +150,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                   //  d.putExtra(COUNTRYCODE, countryCode)
                     d.putExtra(VEHICLE_NUMBER,intent.getStringExtra(VEHICLE_NUMBER))
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
 
                     startActivity(d)
                     finish()
@@ -500,6 +508,7 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
                             d.putExtra(PERSONNAME, globalApiObject.data.accountByMobile[0].acfName+" "+globalApiObject.data.accountByMobile[0].aclName)
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                            d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                             startActivity(d)
                             finish()
 
@@ -536,7 +545,9 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
         d.putExtra(COUNTRYCODE, ccd)
         d.putExtra(VEHICLE_NUMBER,intent.getStringExtra(VEHICLE_NUMBER))
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
-                    startActivity(d)
+        d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+
+        startActivity(d)
         finish()
     }
 

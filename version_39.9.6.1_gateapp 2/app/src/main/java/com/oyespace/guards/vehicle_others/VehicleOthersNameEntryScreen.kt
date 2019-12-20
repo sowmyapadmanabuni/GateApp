@@ -48,6 +48,7 @@ class VehicleOthersNameEntryScreen : BaseKotlinActivity() , View.OnClickListener
                     d.putExtra(PERSONNAME, Ed_Name.text.toString())
                     d.putExtra(VEHICLE_NUMBER, intent.getStringExtra(VEHICLE_NUMBER))
                     d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                    d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                     startActivity(d)
                     finish()
                 }else{

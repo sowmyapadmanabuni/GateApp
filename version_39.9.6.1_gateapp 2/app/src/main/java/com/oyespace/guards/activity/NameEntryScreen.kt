@@ -70,6 +70,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra("DOB",s_dob.toString())
                         d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                         d.putExtras(intent)
                         startActivity(d)
                         finish()
@@ -92,6 +93,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                     d.putExtra("DOB",s_dob.toString())
                     d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                     d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                    d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                     d.putExtras(intent)
                     startActivity(d)
                     finish()
@@ -112,7 +114,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         lyt_dob=findViewById(R.id.lyt_dob)
 
         if (intent.getStringExtra(PERSONNAME) != null) {
-            Ed_Name.setText(intent.getStringExtra(PERSONNAME))
+            Ed_Name.setText(intent.getStringExtra("FIRSTNAME"))
         }
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
             lyt_dob!!.visibility=View.VISIBLE

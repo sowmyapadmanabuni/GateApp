@@ -149,7 +149,7 @@ public class VisitorEntryLogRealm {
                 .or()
                 .contains("vlMobile", searchQuery)
                 .or()
-                .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
+                .contains("vlpOfVis", searchQuery, Case.INSENSITIVE)
                 .findAll());
 
 

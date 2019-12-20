@@ -33,7 +33,6 @@ import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.utils.TimerUtil
-import com.squareup.picasso.Picasso
 import java.util.*
 
 
@@ -176,12 +175,21 @@ class VisitorEntryListAdapter(
             val entryImg = visitor.vlEntryImg
             var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
 
+            if(visitor.vlComName.contains("Others", true)) {
+                holder.tv_purposeofvisit.text=visitor.vlpOfVis
+                holder.tv_purposeofvisit.visibility=View.VISIBLE
+            }
+            else{
+                holder.tv_purposeofvisit.visibility=View.GONE
+            }
+
             if (visitor.vlVisType.contains(STAFF, true)) {
                 if (entryImg.isEmpty()) {
                     imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
                 }
             }
 
+            Log.i("taaag", "loading image $imgPath")
             Glide.with(mcontext)
                 .load(imgPath)
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
@@ -197,52 +205,13 @@ class VisitorEntryListAdapter(
                 var dialog_imageview: ImageView? = null
                 dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
-
-                //  if (orderData.vlVisType.equals("STAFF", true)) {
-
-                // alertadd.setNeutralButton("Here!", DialogInterface.OnClickListener { dlg, sumthin -> })
-
-
-                if (visitor.vlVisType.contains(STAFF, true)) {
-
-                    var img = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
-
-                    if (visitor.vlEntryImg.isEmpty()) {
-
-                        img = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
-
-                    }
-
-                    Picasso.with(mcontext)
-                        .load(img)
-                        .placeholder(R.drawable.user_icon_black)
-                        .error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
-
-                } else {
-
-                    try {
-                        number = visitor.vlMobile.substring(3)
-                    } catch (e: StringIndexOutOfBoundsException) {
-                    }
-
-                    if (visitor.vlEntryImg.equals("")) {
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + number + ".jpg")
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
-                    } else {
-                        Picasso.with(mcontext)
-                            .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
-                            .placeholder(R.drawable.user_icon_black)
-                            .error(R.drawable.user_icon_black)
-                            .into(dialog_imageview)
-
-                    }
-
-
-                }
+                Log.i("taaag", "loading image $imgPath")
+                Glide.with(mcontext)
+                    .load(imgPath)
+                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .skipMemoryCache(false)
+                    .into(dialog_imageview)
 
                 alertadd.setView(view)
                 alertadd.show()
@@ -380,7 +349,7 @@ class VisitorEntryListAdapter(
         val iv_call: ImageButton
         val iv_user: ImageView
         val entrydate: TextView
-        //        val exitdate: TextView
+        val tv_purposeofvisit: TextView
         val ll_card: LinearLayout
         val expanded_view: ConstraintLayout
         val lyt_text: LinearLayout
@@ -408,7 +377,8 @@ class VisitorEntryListAdapter(
             iv_user = view.findViewById(R.id.iv_user)
 
             entrydate = view.findViewById(R.id.tv_entrydate)
-//            exitdate = view.findViewById(R.id.tv_exitdate)
+            tv_purposeofvisit = view.findViewById(R.id.tv_purposeofvisit)
+            tv_purposeofvisit.setSelected(true);
             ll_card = view.findViewById(R.id.ll_card)
             expanded_view = view.findViewById(R.id.expanded_view)
             lyt_text = view.findViewById(R.id.lyt_text)

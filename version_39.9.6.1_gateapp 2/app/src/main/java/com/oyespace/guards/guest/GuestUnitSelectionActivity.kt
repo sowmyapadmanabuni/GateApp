@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,6 +20,7 @@ import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.PaginationAdapter
+import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.PaginationData
@@ -26,6 +28,8 @@ import com.oyespace.guards.pojo.UnitPojo
 import com.oyespace.guards.pojo.UnitsList
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
+import com.oyespace.guards.utils.LocalDb
+import com.oyespace.guards.utils.Prefs
 import com.oyespace.guards.vehicle_guest.Vehicle_guest_UnitSelectionActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -54,7 +58,9 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
     private val LIMIT = 10
     var PAGE_NUMBER = 0
-
+    lateinit var txt_assn_name: TextView
+    lateinit var txt_gate_name: TextView
+    lateinit var txt_device_name: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,10 +69,34 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
         header_title.text = this.resources.getString(R.string.units_list_title)
         header_subtitle.text = "A Block"
 
+        txt_assn_name = findViewById(R.id.txt_assn_name)
+        txt_gate_name = findViewById(R.id.txt_gate_name)
+        txt_device_name = findViewById(R.id.txt_device_name)
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
+            txt_assn_name.textSize = 5 * resources.displayMetrics.density
+        }
+        txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
+        txt_gate_name.text = "Gate No: " + Prefs.getString(GATE_NO, "")
+        try {
+            var appVersion = ""
+            val manager = baseContext.packageManager
+            val info = manager.getPackageInfo(baseContext.packageName, 0)
+            appVersion = info.versionName
+            Log.d("tag", "app " + appVersion + " " + info.versionName)
+            txt_device_name.text = "V: $appVersion"
+
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            txt_device_name.text = " "
+
+        }
+
         /**
          * Setting status bar color (Only for Lollipop & above)
          */
         //setDarkStatusBar()
+
+
 
         try{
             blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK, -1)

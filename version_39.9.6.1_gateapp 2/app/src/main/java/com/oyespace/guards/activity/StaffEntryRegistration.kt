@@ -29,6 +29,7 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
+import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -47,7 +48,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
-
+var purpose:String?=null
     var count = 0
 
     lateinit var curTime: String
@@ -191,6 +192,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 //                getApplication().getApplicationContext().startService(
 //                        front_translucent);
 
+        purpose=intent.getStringExtra(VISITOR_PURPOSE)
 
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION, true)) {
 
@@ -231,7 +233,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         val input = intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
-        tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
+        tv_mobilenumber.text = number
 
 
         tv_for.text = resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
@@ -256,7 +258,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
-                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER))
+                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER).substring(3))
 
             }
         }
@@ -267,6 +269,11 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
 
+        } else {
+            val image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg"
+            Picasso.with(this)
+                .load(image)
+                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
         }
 
         list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
@@ -313,15 +320,15 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
 
         Log.i("taaag", "cutTIme: $curTime")
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),
-            LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(COUNTRYCODE) + intent.getStringExtra(MOBILENUMBER),
-            intToString(minteger), "", "", "",
+            LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(MOBILENUMBER),
+            purpose.toString(), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20
@@ -339,7 +346,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                         if (globalApiObject.success) {
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
-                            Log.e("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
+                            Log.d("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
 
 
                             count--
@@ -571,7 +578,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                             ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
                             ddc.putExtra("unitname", unitName)
                             ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                            ddc.putExtra(COMPANY_NAME, desgn)
                             this@StaffEntryRegistration.sendBroadcast(ddc)
 
                             Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
@@ -594,7 +601,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
                     override fun noNetowork() {
                         button_done.isEnabled = true
                         button_done.isClickable = true
-                        Utils.showToast(this@StaffEntryRegistration, "No Internet")
+                        Utils.showToast(this@StaffEntryRegistration, resources.getString(R.string.no_internet))
                     }
 
                     override fun onShowProgress() {

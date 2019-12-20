@@ -186,7 +186,14 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
         // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
         tv_name.text = intent.getStringExtra(PERSONNAME)
-         tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": "+intent.getStringExtra(MOBILENUMBER))
+        if(intent.getStringExtra(MOBILENUMBER)!=""){
+            tv_mobilenumber.visibility=View.VISIBLE
+            tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": "+intent.getStringExtra(MOBILENUMBER))
+        }else{
+            tv_mobilenumber.visibility=View.GONE
+        }
+
+
 
         val input = intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
@@ -407,7 +414,9 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                                         d.putExtra("VLVisLgID", visitorLogID)
                                         d.putExtra(
                                             VISITOR_TYPE,
-                                            intent.getStringExtra(VISITOR_TYPE)
+                                            intent.getStringExtra(
+                                                COMPANY_NAME
+                                            )
                                         )
                                         sendBroadcast(d)
 
@@ -436,7 +445,9 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                                 d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                                 // d.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                                 d.putExtra("VLVisLgID", visitorLogID)
-                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(
+                                    COMPANY_NAME
+                                ))
                                 sendBroadcast(d)
                             }
 

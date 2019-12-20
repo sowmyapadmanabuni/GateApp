@@ -16,6 +16,7 @@ import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeFBNotificationSyncEntry
+import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -219,12 +220,19 @@ class VisitorLogRepo {
 //                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
 //                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
 //                                context.sendBroadcast(intentAction1)
+                                val assName = LocalDb.getAssociation()!!.asAsnName
+                                val gateName = Prefs.getString(GATE_NO, null)
+                                var message = "${visitor.vlfName} from ${visitor.vlComName} has exited ${assName} from $gateName"
+                                if (visitor.vlVisType.contains(STAFF)) {
+                                    message = "${visitor.vlComName} ${visitor.vlfName} from  has exited ${assName} from $gateName"
+                                }
+
                                 if (status == ConstantUtils.EXITED) {
                                     try {
                                         if (visitor.isValid) {
                                             val d = Intent(context, BackgroundSyncReceiver::class.java)
                                             d.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                                            d.putExtra("msg", "exited staff: $vLogId")
+                                            d.putExtra("msg", message)
                                             d.putExtra("mobNum", visitor.vlMobile)
                                             d.putExtra("name", visitor.vlfName)
                                             d.putExtra("nr_id", visitor.vlVisLgID.toString())
@@ -234,7 +242,7 @@ class VisitorLogRepo {
                                             d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
                                             d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                             d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlComName)
                                             d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
                                             context.sendBroadcast(d)
                                         }
@@ -364,7 +372,7 @@ class VisitorLogRepo {
                         for (v in visitorLog) {
 
                             val apprStat = v.vlApprStat
-                            Log.i("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
+                            Log.d("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
                             if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
                                 if (apprStat.equals(APPROVED, true)) {
                                     return false

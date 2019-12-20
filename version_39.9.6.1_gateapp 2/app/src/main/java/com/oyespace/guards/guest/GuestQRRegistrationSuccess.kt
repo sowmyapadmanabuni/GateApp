@@ -3,6 +3,7 @@ package com.oyespace.guards.guest
 import android.content.ContentValues
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -44,7 +45,7 @@ import java.io.*
 import java.util.*
 
 class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
-
+    var imageName:String?=null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
     lateinit var mBitmap: Bitmap
@@ -155,6 +156,20 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             }
         }
 
+
+        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+        if(wrrw!=null) {
+            imageName="PERSON"+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER)  + ".jpg"
+//            var mBitmap: Bitmap;
+            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+            profile_image.setImageBitmap(mBitmap)
+
+        }else{
+            //  profile_image.visibility=View.GONE
+            imageName=""
+        }
+
+
     }
 
     private fun visitorLog() {
@@ -170,7 +185,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME), LocalDb.getAssociation()!!.asAsnName, 0, "",
             intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","",Prefs.getString(ConstantUtils.GATE_NO, ""),
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imageName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())

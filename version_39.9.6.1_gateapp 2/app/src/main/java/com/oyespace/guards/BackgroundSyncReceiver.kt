@@ -704,36 +704,6 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
     }
 
-//    fun sendFCM_toSyncNonreg_byID(NoNregID: Int) {
-//        val apiService = FCMApiClient.getClient().create(FCMApiInterface::class.java)
-//
-//        val payloadData = EntryPermissionPayload(
-//            NONREGULAR_BYID,
-//            NONREGULAR, NoNregID,
-//            entry_type[3], GlobalVariables.getGlobal_mobilenumber(), prefManager.getAssociationId()
-//        )
-//        val sendOTPRequest =
-//            SendEntryPermissionRequest(payloadData, "/topics/AllGuards" + prefManager.getAssociationId())
-//        val call = apiService.sendEntryPermission(sendOTPRequest)
-//
-//        call.enqueue(object : Callback<SendFCMResponse> {
-//            override fun onResponse(call: Call<SendFCMResponse>, response: Response<SendFCMResponse>) {
-//                Log.d("Dgddfdf", "fcm: " + response.body()!!.getMessage_id())
-//                if (response.body()!!.getMessage_id() != null) {
-//                    Toast.makeText(context1, Notified, Toast.LENGTH_SHORT).show()
-//                } else {
-//                    Toast.makeText(context1, Failed_to_Notify, Toast.LENGTH_SHORT).show()
-//                }
-//            }
-//
-//            override fun onFailure(call: Call<SendFCMResponse>, t: Throwable) {
-//                // Log error here since request failed
-//                Log.d("TAG", t.toString())
-//            }
-//        })
-//
-//    }
-
     fun sendFCM_toSyncNonreg() {
 
         Log.d("SYCNCHECK", "in 452")

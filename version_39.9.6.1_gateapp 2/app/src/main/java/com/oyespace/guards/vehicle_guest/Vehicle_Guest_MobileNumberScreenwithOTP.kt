@@ -33,6 +33,7 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
@@ -121,27 +122,49 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
 //                   finish();
 //                     deliveryFlow_launchNameEntryScreen()
 
-                   if (entryExists(countryCode.toString(),phone)) {
-//                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
-                        val builder = AlertDialog.Builder(this@Vehicle_Guest_MobileNumberScreenwithOTP)
-                       // builder.setTitle("Vendor Entry already done")
-                        builder.setMessage("Number is already registered")
+//                   if (entryExists(countryCode.toString(),phone)) {
+////                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
+//                        val builder = AlertDialog.Builder(this@Vehicle_Guest_MobileNumberScreenwithOTP)
+//                       // builder.setTitle("Vendor Entry already done")
+//                        builder.setMessage("Number is already registered")
+//                        builder.setPositiveButton("Ok") { dialog, which ->
+//
+//
+//                            dialog.cancel()
+//                            val d = Intent(this@Vehicle_Guest_MobileNumberScreenwithOTP, Dashboard::class.java)
+//                            startActivity(d)
+//                            finish()
+//                        }
+//                       builder.setCancelable(false)
+//                       builder.show()
+//                    } else {
+//                       getAccountDetails(countryCode.toString(), phone.toString())
+//
+//                   }
+
+
+                    val ccd = countryCode.toString()
+                    val mobileNumber = phone
+
+                    val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                    if (!allowEntry) {
+
+                        val builder = AlertDialog.Builder(this)
+
+                        builder.setMessage("This number is being used by a person already in")
                         builder.setPositiveButton("Ok") { dialog, which ->
-
-
                             dialog.cancel()
-                            val d = Intent(this@Vehicle_Guest_MobileNumberScreenwithOTP, Dashboard::class.java)
-                            startActivity(d)
                             finish()
                         }
-                       builder.setCancelable(false)
-                       builder.show()
-                    } else {
-                       getAccountDetails(countryCode.toString(), phone.toString())
+                        builder.setCancelable(false)
+                        builder.show()
 
-                   }
+                } else {
+                        getAccountDetails(countryCode.toString(), phone.toString())
 
-                }
+                    }
+
 //                else if(Ed_phoneNum.text.length > 0) {
 //                    val d = Intent(this@MobileNumberScreen, NameEntryScreen::class.java)
 //                    Log.d(
@@ -161,7 +184,7 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
 //                    finish();
 ////                    getAccountDetails("+"+countryCode.toString(),textview.getText().toString());
 //                }
-                else {
+              //  else {
                     buttonNext.isEnabled = true
                     buttonNext.isClickable = true
                     Toast.makeText(this, "Invalid number captured", Toast.LENGTH_SHORT).show()
@@ -344,21 +367,40 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
 
             } else {
 
-                if (entryExists(countryCode.toString(),phone)) {
-//                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
-                    val builder = AlertDialog.Builder(this@Vehicle_Guest_MobileNumberScreenwithOTP)
-                    // builder.setTitle("Vendor Entry already done")
-                    builder.setMessage("Number is already registered")
+//                if (entryExists(countryCode.toString(),phone)) {
+////                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
+//                    val builder = AlertDialog.Builder(this@Vehicle_Guest_MobileNumberScreenwithOTP)
+//                    // builder.setTitle("Vendor Entry already done")
+//                    builder.setMessage("Number is already registered")
+//                    builder.setPositiveButton("Ok") { dialog, which ->
+//
+//
+//                        dialog.cancel()
+//                        val d = Intent(this@Vehicle_Guest_MobileNumberScreenwithOTP, Dashboard::class.java)
+//                        startActivity(d)
+//                        finish()
+//                    }
+//                    builder.setCancelable(false)
+//                    builder.show()
+
+
+                val ccd = countryCode.toString()
+                val mobileNumber = phone
+
+                val allowEntry = VisitorLogRepo.allowEntry(ccd, mobileNumber)
+
+                if (!allowEntry) {
+
+                    val builder = AlertDialog.Builder(this)
+
+                    builder.setMessage("This number is being used by a person already in")
                     builder.setPositiveButton("Ok") { dialog, which ->
-
-
                         dialog.cancel()
-                        val d = Intent(this@Vehicle_Guest_MobileNumberScreenwithOTP, Dashboard::class.java)
-                        startActivity(d)
                         finish()
                     }
                     builder.setCancelable(false)
                     builder.show()
+
                 } else {
                    // getAccountDetails(countryCode.toString(), textview.getText().toString());
                     sendotp()

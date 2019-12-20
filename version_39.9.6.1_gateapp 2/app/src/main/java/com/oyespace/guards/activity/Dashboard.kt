@@ -1,10 +1,7 @@
 package com.oyespace.guards
 
 
-
 import SecuGen.FDxSDKPro.*
-import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_EXTRACT_FAIL
-import SecuGen.FDxSDKPro.SGFDxErrorCode.SGFDX_ERROR_NONE
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.*
@@ -210,7 +207,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 Log.d("Dgddfdfhhjhj : ", "bf bf entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
 
 
-                    CaptureFingerPrint()
+                CaptureFingerPrint()
 
                 Log.d("Dgddfdfhhjhj : ", "ff af entrybywalk $autoooooo $nnnn  $mAutoOnEnabled $usbConnected")
                 mAutoOnEnabled = false
@@ -436,7 +433,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
+            registerReceiver(mUsbReceiver, filter)
+        }
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -479,7 +479,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
 
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
-        Log.i("taaag", "listening to $fbdbAssocName firebase object reference")
+        Log.d("taaag", "listening to $fbdbAssocName firebase object reference")
         walkieAudioFBRef = FirebaseDatabase.getInstance().getReference("wt_audio").child(fbdbAssocName)
 
         removeWalkieTalkieAudioFirebase()
@@ -616,12 +616,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
     override fun onResume() {
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
-            registerReceiver(mUsbReceiver, filter)
-        }
-
-        if(pTimerChecker == null) {
+        if (pTimerChecker == null) {
             runTimerCheck()
         }
 
@@ -752,8 +748,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                         if (!usbPermissionRequested) {
                             //Log.d(TAG, "Call GetUsbManager().requestPermission()");
                             usbPermissionRequested = true
-                            sgfplib!!.GetUsbManager()
-                                .requestPermission(usbDevice, mPermissionIntent)
+                            sgfplib!!.GetUsbManager().requestPermission(usbDevice, mPermissionIntent)
                         } else {
                             //wait up to 20 seconds for the system to grant USB permission
                             hasPermission = sgfplib!!.GetUsbManager().hasPermission(usbDevice)
@@ -796,8 +791,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 }
             }
         } catch (ex: Exception) {
-            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(applicationContext, "Connect Secugen Correctly", Toast.LENGTH_SHORT).show()
         }
 
 
@@ -1125,17 +1119,16 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
     override fun SGFingerPresentCallback() {
 
         autoooooo++
-        if (usbConnected) {
-            Log.v("BIOMETRIC","ERROR")
+
+        if(usbConnected) {
+
             fingerDetectedHandler.sendMessage(Message())
         }
-
     }
 
     fun CaptureFingerPrint() {
 
         if (bSecuGenDeviceOpened == true) {
-
 
 
 //                val fp: ByteArray = getFingerprintFromScanner() ?: return
@@ -1164,23 +1157,26 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 Log.d("taaag", "check result: $id")
 
 
-                    if (id > 0) {
-                        showToast(applicationContext,id.toString())
-                        val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
+                if (id > 0) {
+                    val staff: VisitorLog? = VisitorLogRepo.get_IN_VisitorForId(id)
 
-                        // if yes, then make exit call
-                        if (staff != null) {
-                            t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
-                            VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
-                            loadEntryVisitorLog()
+                    // if yes, then make exit call
+                    if (staff != null) {
+                        t1?.speak("Thank You " + staff.vlfName, TextToSpeech.QUEUE_FLUSH, null)
+                        VisitorLogRepo.updateVisitorStatus(this, staff, EXITED)
+                    } else {
+
+                        // get staff for id
+                        val worker: Worker? = StaffRepo.getStaffForId(id)
+
+                        Log.d("taaag", "worker found: $worker")
+                        if (worker == null) {
+                            showToast(this, "No staff found")
                         } else {
 
-                            // get staff for id
-                            val worker: Worker? = StaffRepo.getStaffForId(id)
-                            Log.d("taaag", "worker found: $worker")
-                            if (worker == null) {
-                                showToast(this, "No staff found")
-                            } else {
+                            val phone = worker.wkMobile
+
+                            if (phone == null || phone.isEmpty()) {
                                 getVisitorByWorkerId(
                                     Prefs.getInt(ASSOCIATION_ID, 0),
                                     worker.wkWorkID,
@@ -1193,23 +1189,42 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                     worker.unUniName,
                                     worker.wkEntryImg
                                 )
+                            } else {
+
+                                val allowEntry = VisitorLogRepo.allowEntry("", phone)
+
+                                if (allowEntry) {
+                                    getVisitorByWorkerId(
+                                        Prefs.getInt(ASSOCIATION_ID, 0),
+                                        worker.wkWorkID,
+                                        worker.unUnitID,
+                                        "${worker.wkfName} ${worker.wklName}",
+                                        worker.wkMobile,
+                                        worker.wkDesgn,
+                                        worker.wkWrkType,
+                                        worker.wkWorkID,
+                                        worker.unUniName,
+                                        worker.wkEntryImg
+                                    )
+                                } else {
+                                    showToast(this, "Duplicate entries not allowed")
+                                }
                             }
 
 
                         }
 
 
-
-                    }
-                    else {
-
-
-                        t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
-
                     }
 
 
-                    mVerifyImage = null
+                } else {
+
+                    t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
+
+                }
+
+                mVerifyImage = null
                 this.sgfplib!!.SetBrightness(100)
             } catch (ex: Exception) {
                 sendExceptions("SGDBA_CptFingPt", ex.toString())
@@ -1224,62 +1239,28 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
     }
 
-    fun getFingerprintFromScanner(): ByteArray? {
-
-
-        val templateSize = IntArray(1)
-        sgfplib!!.GetMaxTemplateSize(templateSize)
-        val fpTemp = ByteArray(templateSize[0])
-        val fpImg = ByteArray(mImageWidth * mImageHeight)
-        var code = 0L
-        try {
-
-            sgfplib!!.GetImageEx(fpImg, 10000, 50)
-            code = sgfplib!!.CreateTemplate(SGFingerInfo(), fpImg, fpTemp)
-        } catch (e: NullPointerException) {
-
-        }
-
-            when (code) {
-                SGFDX_ERROR_NONE -> {
-                    showToast(this, "fingerprint captured")
-                }
-                SGFDX_ERROR_EXTRACT_FAIL -> {
-                    showToast(this, "error capturing fingerprint")
-                    return null
-                }
-            }
-            Log.d("taaag", "capture code: $code")
-            return fpTemp
-
-    }
-
     fun matchFingerprint(fingerPrint: ByteArray): Int {
-
-
 
         val asscId = Prefs.getInt(ASSOCIATION_ID, 0)
 
         val fps = RealmDB.getRegularVisitorsFingerPrint(asscId)
-        Log.d("taaag", "got ${fps.size} fingerprints from realm")
+        Log.v("taaag", "got ${fps.size} fingerprints from realm")
         val result = BooleanArray(1)
         for (fp in fps) {
 
+            Log.v("taaag", "matching with ${fp.userName}'s fingerprint")
 
-            Log.d("taaag", "matching with ${fp.userName}'s fingerprint")
-
-            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_NORMAL, result)
+            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg1, SGFDxSecurityLevel.SL_HIGH, result)
             if (result[0]) return fp.userName.toInt()
 
 
-            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg2, SGFDxSecurityLevel.SL_NORMAL, result)
+            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg2, SGFDxSecurityLevel.SL_HIGH, result)
             if (result[0]) return fp.userName.toInt()
 
-            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg3, SGFDxSecurityLevel.SL_NORMAL, result)
+            sgfplib!!.MatchTemplate(fingerPrint, fp.FPImg3, SGFDxSecurityLevel.SL_HIGH, result)
             if (result[0]) return fp.userName.toInt()
 
         }
-
 
         return -1
 
@@ -2411,7 +2392,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                         ddc.putExtra("unitname", unitName)
                         ddc.putExtra("memType", "Owner")
                         ddc.putExtra(UNITID, unitId.toString())
-                        ddc.putExtra(COMPANY_NAME, "Staff")
+                        ddc.putExtra(COMPANY_NAME, desgn)
                         ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
                         ddc.putExtra("VLVisLgID", vlVisLgID)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),

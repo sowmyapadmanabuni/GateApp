@@ -671,16 +671,114 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                             val id = globalApiObject.data.visitorLog.vlVisLgID
                             updateFirebaseColor(id, "#f0f0f0")
 
-                            val ddc  =  Intent(this@MobileNumberEntryScreenwithOTP, BackgroundSyncReceiver::class.java)
-                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                            ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
-                            ddc.putExtra("mobNum", mobileNumb)
-                            ddc.putExtra("name", personName)
-                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            ddc.putExtra("unitname", unitName)
-                            ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-                            this@MobileNumberEntryScreenwithOTP.sendBroadcast(ddc)
+                            if (unitId.contains(",")) {
+
+                                var unitname_dataList: Array<String>
+                                var unitid_dataList: Array<String>
+
+                                unitname_dataList =
+                                    unitName.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
+                                unitid_dataList =
+                                    unitId.split(",".toRegex()).dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
+                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                if (unitid_dataList.size > 0) {
+                                    for (i in 0 until unitid_dataList.size) {
+
+                                        val ddc =
+                                            Intent(
+                                                this@MobileNumberEntryScreenwithOTP,
+                                                BackgroundSyncReceiver::class.java
+                                            )
+                                        ddc.putExtra(
+                                            ConstantUtils.BSR_Action,
+                                            ConstantUtils.VisitorEntryFCM
+                                        )
+                                        ddc.putExtra(
+                                            "msg",
+                                            personName + " " + desgn + " is coming to your home" + "(" + "(" + unitname_dataList.get(
+                                                i
+                                            ).replace(" ", "") + ")" + ")"
+                                        )
+                                        ddc.putExtra("mobNum", mobileNumb)
+                                        ddc.putExtra("name", personName)
+                                        ddc.putExtra(
+                                            "nr_id",
+                                            globalApiObject.data.visitorLog.vlVisLgID.toString()
+                                        )
+                                        ddc.putExtra(
+                                            "unitname",
+                                            unitname_dataList.get(i).replace(" ", "")
+                                        )
+                                        ddc.putExtra("memType", "Owner")
+                                        ddc.putExtra(
+                                            UNITID,
+                                            unitid_dataList.get(i).replace(" ", "")
+                                        )
+                                        ddc.putExtra(
+                                            COMPANY_NAME,
+                                            intent.getStringExtra(COMPANY_NAME)
+                                        )
+                                        //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                                        ddc.putExtra(
+                                            "VLVisLgID",
+                                            globalApiObject.data.visitorLog.vlVisLgID
+                                        )
+                                        ddc.putExtra(VISITOR_TYPE, "Staff")
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                        this@MobileNumberEntryScreenwithOTP.sendBroadcast(ddc)
+
+                                    }
+                                }
+                            } else {
+                                val ddc =
+                                    Intent(
+                                        this@MobileNumberEntryScreenwithOTP,
+                                        BackgroundSyncReceiver::class.java
+                                    )
+                                ddc.putExtra(
+                                    ConstantUtils.BSR_Action,
+                                    ConstantUtils.VisitorEntryFCM
+                                )
+                                ddc.putExtra(
+                                    "msg",
+                                    personName + " " + desgn + " is coming to your home" + "(" + unitName + ")"
+                                )
+                                ddc.putExtra("mobNum", mobileNumb)
+                                ddc.putExtra("name", personName)
+                                ddc.putExtra(
+                                    "nr_id",
+                                    globalApiObject.data.visitorLog.vlVisLgID.toString()
+                                )
+                                ddc.putExtra("unitname", unitName)
+                                ddc.putExtra("memType", "Owner")
+                                ddc.putExtra(UNITID, unitId.toString())
+                                ddc.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
+                                ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
+                                ddc.putExtra(VISITOR_TYPE, desgn)
+//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
+//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
+//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                                this@MobileNumberEntryScreenwithOTP.sendBroadcast(ddc)
+
+                            }
+
+
+
+//                            val ddc  =  Intent(this@MobileNumberEntryScreenwithOTP, BackgroundSyncReceiver::class.java)
+//                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
+//                            ddc.putExtra("msg", personName+" "+desgn +" is coming to your home")
+//                            ddc.putExtra("mobNum", mobileNumb)
+//                            ddc.putExtra("name", personName)
+//                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
+//                            ddc.putExtra("unitname", unitName)
+//                            ddc.putExtra("memType", "Owner")
+//                            ddc.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+//                            this@MobileNumberEntryScreenwithOTP.sendBroadcast(ddc)
 
                             Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                         } else {
@@ -699,7 +797,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                     }
 
                     override fun noNetowork() {
-                        Utils.showToast(this@MobileNumberEntryScreenwithOTP, "No Internet")
+                        Utils.showToast(this@MobileNumberEntryScreenwithOTP, resources.getString(R.string.no_internet))
                     }
 
                     override fun onShowProgress() {

@@ -1,10 +1,12 @@
 package com.oyespace.guards.activity
 
+import android.Manifest
 import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.*
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -16,11 +18,15 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.listeners.PermissionCallback
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.*
+import com.oyespace.guards.pojo.SendStaffImageReq
+import com.oyespace.guards.pojo.SendStaffImageRes
+import com.oyespace.guards.pojo.StaffEditRequest
+import com.oyespace.guards.pojo.StaffEditResponse
 import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -177,6 +183,19 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
         tv_guardnumber.text = resources.getString(R.string.textgivemissedcall) + " +" + number
 
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            requestPermission(arrayOf(
+                Manifest.permission.ANSWER_PHONE_CALLS
+            ), 1, PermissionCallback { isGranted ->
+                if (isGranted) {
+
+                } else {
+
+                }
+            })
+        }
+
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, i: Intent?) {
 
@@ -217,7 +236,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                                     builder.show()
 
                                 }
-
+                                LocalDb.disconnectCall(context)
 //                                GetWorkersListByMobileNumberAndAssocID(
 //                                    tv_mobilenumber!!.text.toString(),
 //                                    Prefs.getInt(ASSOCIATION_ID, 0)
@@ -308,7 +327,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                 }
 
 
-
             }
         }
 
@@ -332,9 +350,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
             }
         }
     }
-
-
-
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -364,8 +379,17 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         WKWorkID: Int
     ) {
 
+        var mobile = WKMobile
+        if (!WKMobile.startsWith("+91")) {
+            if (WKMobile.startsWith("9191")) {
+                mobile = WKMobile.replaceFirst("9191", "+91")
+            } else if (WKMobile.startsWith("91")) {
+                mobile = WKMobile.replaceFirst("91", "+91")
+            }
+        }
+
         val req = StaffEditRequest(
-            WKFName, WKMobile, WKImgName, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID
+            WKFName, mobile, WKImgName, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID
 
         )
 
@@ -592,8 +616,6 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         val action = "android.intent.action.PHONE_STATE"
         registerReceiver(receiver, IntentFilter(action))
     }
-
-
 
 
 }
