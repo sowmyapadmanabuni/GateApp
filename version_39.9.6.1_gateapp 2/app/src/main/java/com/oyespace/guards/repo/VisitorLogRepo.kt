@@ -242,7 +242,7 @@ class VisitorLogRepo {
                                             d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
                                             d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                             d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlComName)
+                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
                                             d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
                                             context.sendBroadcast(d)
                                         }
