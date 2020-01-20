@@ -16,6 +16,14 @@
             android:background="@color/white"
             android:padding="2dp">
 
+        <Button
+                android:id="@+id/iv_torch"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/torch_on"
+                android:gravity="center"
+                />
+
         <ImageView android:layout_width="150dp"
                 android:id="@+id/img_logo"
                 android:layout_height="40dp"

@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -51,6 +53,8 @@ import java.util.*
 
 class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListener, CountryCodePicker.OnCountryChangeListener{
 
+    var iv_torch:Button?=null
+    var clickable1 = 0
     private var ccp: CountryCodePicker? = null
     private var countryCode: String? = null
     private var countryName: String? = null
@@ -176,6 +180,36 @@ class VehicleOthersMobileNumberScreen : BaseKotlinActivity() , View.OnClickListe
 
 
         setContentView(R.layout.activity_mobile_number)
+
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         if (Build.VERSION.SDK_INT >= 28) {
             requestPermission(arrayOf(

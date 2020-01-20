@@ -6,9 +6,12 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.location.Location
 import android.net.Uri
 import android.os.AsyncTask
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -38,6 +41,7 @@ import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
 import io.realm.kotlin.where
 import kotlinx.android.synthetic.main.activity_sos_screen_gate.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.text.SimpleDateFormat
@@ -63,6 +67,8 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
     }
 
+    var iv_torch: Button?=null
+    var clickable1 = 0
 
     lateinit var edittext: EditText
     lateinit var edittext1: EditText
@@ -140,7 +146,11 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
             if (currentSOS != null && currentSOS.isValid) {
                 var lng: Double = currentSOS.longitude.toDouble()
                 var lat: Double = currentSOS.latitude.toDouble()
-                sosLocation = LatLng(lat, lng)
+
+                Log.v("LOcation is",lng.toString() +".."+lat)
+               sosLocation = LatLng(lat, lng)
+
+
                 getDirections()
             } else {
                 getSOS()
@@ -155,6 +165,38 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sos_screen_gate)
+
+        buttonNext.visibility=View.GONE
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         var notificationManager: NotificationManager =
             getSystemService(
@@ -897,13 +939,18 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
 
                 val path = ArrayList<LatLng>()
 
-                for (i in 0..(respObj.routes[0].legs[0].steps.size - 1)) {
+                try {
+
+                    for (i in 0..(respObj.routes[0].legs[0].steps.size - 1)) {
 //                    val startLatLng = LatLng(respObj.routes[0].legs[0].steps[i].start_location.lat.toDouble()
 //                            ,respObj.routes[0].legs[0].steps[i].start_location.lng.toDouble())
 //                    path.add(startLatLng)
 //                    val endLatLng = LatLng(respObj.routes[0].legs[0].steps[i].end_location.lat.toDouble()
 //                            ,respObj.routes[0].legs[0].steps[i].end_location.lng.toDouble())
-                    path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
+                        path.addAll(decodePolyline(respObj.routes[0].legs[0].steps[i].polyline.points))
+                    }
+                }catch (e:IndexOutOfBoundsException){
+
                 }
                 result.add(path)
             } catch (e: Exception) {

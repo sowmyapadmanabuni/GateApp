@@ -601,7 +601,8 @@ val SPPrdImg16:String,
 val SPPrdImg17 : String,
 val SPPrdImg18 : String,
 val SPPrdImg19 : String,
-val SPPrdImg20 : String
+val SPPrdImg20 : String,
+val VLKidName : String
 
 
 
@@ -613,6 +614,52 @@ val SPPrdImg20 : String
 )
 
 //visitor log resp
+//data class CreateVisitorLogResp<T>(
+//    val apiVersion: String,
+//    val `data`: VLRData,
+//    val success: Boolean
+//)
+//
+//data class VLRData(
+//    val visitorLog: VisitorLogResp
+//)
+//
+//data class VisitorLogResp(
+//    val asAssnID: Int,
+//    val endDate: String,
+//    val fmid: Int,
+//    val meMemID: Int,
+//    val reRgVisID: Int,
+//    val startDate: String,
+//    val unUniName: String,
+//    val unUnitID: String,
+//    val vlCmntImg: Any,
+//    val vlCmnts: Any,
+//    val vlComName: Any,
+//    val vlEntryT: String,
+//    val vlEntyWID: Int,
+//    val vlExitT: String,
+//    val vlExitWID: Int,
+//    val vlGtName: Any,
+//    val vlIsActive: Boolean,
+//    val vlItmCnt: Int,
+//    val vlMobile: Any,
+//    val vlPrmBy: Any,
+//    val vlPrmStat: Any,
+//    val vlVehNum: Any,
+//    val vlVehType: Any,
+//    val vlVerStat: Any,
+//    val vlVisCnt: Int,
+//    val vlVisImgN: Any,
+//    val vlVisLgID: Int,
+//    val vlVisType: Any,
+//    val vldCreated: String,
+//    val vldUpdated: String,
+//    val vlfName: Any,
+//    val vllName: Any,
+//    val vlpOfVis: Any
+//)
+
 data class CreateVisitorLogResp<T>(
     val apiVersion: String,
     val `data`: VLRData,
@@ -624,19 +671,46 @@ data class VLRData(
 )
 
 data class VisitorLogResp(
+    val acAccntID: Any,
     val asAssnID: Int,
     val endDate: String,
     val fmid: Int,
     val meMemID: Int,
     val reRgVisID: Int,
+    val spPrdImg1: Any,
+    val spPrdImg10: Any,
+    val spPrdImg11: Any,
+    val spPrdImg12: Any,
+    val spPrdImg13: Any,
+    val spPrdImg14: Any,
+    val spPrdImg15: Any,
+    val spPrdImg16: Any,
+    val spPrdImg17: Any,
+    val spPrdImg18: Any,
+    val spPrdImg19: Any,
+    val spPrdImg2: Any,
+    val spPrdImg20: Any,
+    val spPrdImg3: Any,
+    val spPrdImg4: Any,
+    val spPrdImg5: Any,
+    val spPrdImg6: Any,
+    val spPrdImg7: Any,
+    val spPrdImg8: Any,
+    val spPrdImg9: Any,
     val startDate: String,
-    val unUniName: String,
-    val unUnitID: String,
+    val unUniName: Any,
+    val unUnitID: Any,
+    val vlApprStat: Any,
+    val vlApprdBy: Any,
     val vlCmntImg: Any,
     val vlCmnts: Any,
     val vlComName: Any,
+    val vlEntryGPS: Any,
+    val vlEntryImg: Any,
     val vlEntryT: String,
     val vlEntyWID: Int,
+    val vlExitGPS: Any,
+    val vlExitImg: Any,
     val vlExitT: String,
     val vlExitWID: Int,
     val vlGtName: Any,
@@ -645,20 +719,25 @@ data class VisitorLogResp(
     val vlMobile: Any,
     val vlPrmBy: Any,
     val vlPrmStat: Any,
+    val vlSelfImg: Any,
     val vlVehNum: Any,
     val vlVehType: Any,
+    val vlVenImg: Any,
+    val vlVenName: Any,
     val vlVerStat: Any,
     val vlVisCnt: Int,
-    val vlVisImgN: Any,
     val vlVisLgID: Int,
     val vlVisType: Any,
+    val vlVoiceNote: Any,
     val vldCreated: String,
     val vldUpdated: String,
+    val vlengName: Any,
+    val vlexgName: Any,
     val vlfName: Any,
     val vllName: Any,
-    val vlpOfVis: Any
+    val vlpOfVis: Any,
+    val vlsActTm: String
 )
-
 
 /// Get device info
 
@@ -1737,7 +1816,7 @@ data class CheckPointData(
     val cpcPntAt: String
 )
 
-data class GetFamilyMemberResponse(
+data class GetFamilyMemberResponse<T>(
 
     val apiVersion: String,
     val `data`: FamilyMembersData,
@@ -1890,8 +1969,19 @@ data class CheckPointScanResponse(
     val success: Boolean
 )
 
+data class GetCallResponse(
+    val callid: String,
+    val status: Int,
+    val status_str: String
+)
 
 
+data class UpdateApprovalStatus(
+    val VLApprStat: String,
+    val VLVisLgID: Int,
+    val VLApprdBy: String,
+    val VLExAprdBy: String
+)
 
 
 

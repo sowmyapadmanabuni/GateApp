@@ -17,7 +17,7 @@ open class ExitVisitorLog : RealmObject() {
     var vlMobile: String = ""
     var vlVisType: String = ""
     var vlComName: String = ""
-    var vLPOfVis: String = ""
+    var vlpOfVis: String = ""
     var vlVisCnt: Int = 0
     var vLVehNum: String = ""
     var vLVehType: String = ""

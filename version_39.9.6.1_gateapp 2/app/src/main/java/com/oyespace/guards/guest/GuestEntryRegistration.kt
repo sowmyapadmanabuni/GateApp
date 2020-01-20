@@ -8,6 +8,7 @@ import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -32,6 +33,7 @@ import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -45,6 +47,8 @@ import java.util.*
 
 class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var imageName: String? = null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
@@ -69,8 +73,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
             R.id.button_done ->{
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+GUEST_REGISTRATION+" "+FLOW_TYPE.equals( GUEST_REGISTRATION,true))
-                button_done.isEnabled = false
-                button_done.isClickable = false
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
                 if(intent.getStringExtra(UNITID).contains(",")){
                     var unitname_dataList: Array<String>
@@ -146,6 +150,9 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
+
+        buttonNext.text=resources.getString(R.string.textdone)
+
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)
@@ -253,7 +260,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             "",
             imageName.toString(),
             Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 

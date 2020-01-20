@@ -46,6 +46,7 @@ class VisitorLogRepo {
                             Log.e("get_IN_VisitorLog", "" + response)
                             if (response.success) {
                                 val visitorsList = response.data.visitorLog
+                                LocalDb.saveEnteredVisitorLog(visitorsList);
                                 if (visitorsList == null) {
                                     VisitorEntryLogRealm.deleteAllVisitorLogs()
                                     listener?.onFetch(null, "no entries found")
@@ -164,12 +165,12 @@ class VisitorLogRepo {
                 val actTime = vl.vlsActTm
                 val status = vl.vlApprStat
 
-                if (status.equals(APPROVED, true)) {
+                if (status.equals(ENTRYAPPROVED, true)) {
 
                     val msLeft = DateTimeUtils.msLeft(actTime, MAX_DELIVERY_ALLOWED_SEC)
                     Log.v("taaag", "vlID: ${vl.vlVisLgID} actTIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
                     if (msLeft <= 0) {
-                        if (status.equals(APPROVED, true)) {
+                        if (status.equals(ENTRYAPPROVED, true)) {
                             overStaying.add(vl)
                             Log.v("taaag", "overstaying: ${vl.vlVisLgID} actIme: ${actTime} entryTime: ${vl.vlEntryT} msLeft: $msLeft")
                         }
@@ -224,7 +225,7 @@ class VisitorLogRepo {
                                 val gateName = Prefs.getString(GATE_NO, null)
                                 var message = "${visitor.vlfName} from ${visitor.vlComName} has exited ${assName} from $gateName"
                                 if (visitor.vlVisType.contains(STAFF)) {
-                                    message = "${visitor.vlComName} ${visitor.vlfName} from  has exited ${assName} from $gateName"
+                                    message = "${visitor.vlfName} has exited ${assName} from $gateName"
                                 }
 
                                 if (status == ConstantUtils.EXITED) {
@@ -242,7 +243,7 @@ class VisitorLogRepo {
                                             d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
                                             d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                             d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlComName)
+                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
                                             d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
                                             context.sendBroadcast(d)
                                         }
@@ -371,12 +372,15 @@ class VisitorLogRepo {
                     if (visitorLog != null) {
                         for (v in visitorLog) {
 
+
                             val apprStat = v.vlApprStat
                             Log.d("taaag", "approval status: $apprStat for $mobileNumber, ${v.vlVisType}, ${v.unUniName}, ${v.vlVisType}")
                             if (v.vlVisType.contains(DELIVERY, true) || ignoreType) {
-                                if (apprStat.equals(APPROVED, true)) {
-                                    return false
-                                }
+//                                if (apprStat.equals(APPROVED, true)) {
+//                                    return false
+//                                }
+
+                                return false
                             } else {
                                 return false
                             }

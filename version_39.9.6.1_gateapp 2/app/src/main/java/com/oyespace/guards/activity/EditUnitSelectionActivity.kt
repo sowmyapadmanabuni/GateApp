@@ -5,15 +5,15 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.AppCompatCheckBox
 import com.google.gson.Gson
 import com.oyespace.guards.R
@@ -53,10 +53,42 @@ class EditUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     private val LIMIT = 10
     var PAGE_NUMBER = 0
 
+    var iv_torch: Button?=null
+    var clickable1 = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unit_selection)
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         header_title.text = this.resources.getString(R.string.units_list_title)
         header_subtitle.text = "A Block"

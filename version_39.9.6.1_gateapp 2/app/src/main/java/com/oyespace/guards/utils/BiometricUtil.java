@@ -51,7 +51,7 @@ public class BiometricUtil {
 
     public BiometricUtil(Context context) {
         this.context = context;
-        jlib = new JSGFPLib(context, (UsbManager) context.getSystemService(Context.USB_SERVICE));
+      //  jlib = new JSGFPLib(context, (UsbManager) context.getSystemService(Context.USB_SERVICE));
         autoOn = new SGAutoOnEventNotifier(jlib, () -> {
 
             Log.i("taaag", "detected");

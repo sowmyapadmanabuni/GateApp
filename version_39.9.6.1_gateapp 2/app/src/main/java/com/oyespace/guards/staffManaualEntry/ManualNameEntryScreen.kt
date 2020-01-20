@@ -2,15 +2,16 @@ package com.oyespace.guards.staffManaualEntry
 
 import android.app.Activity
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.View
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
@@ -19,11 +20,14 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import kotlinx.android.synthetic.main.activity_name_entry.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var s_dob: String? = null
     var date: String? = null
     private var cal: Calendar? = null
@@ -142,6 +146,35 @@ class ManualNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
             lyt_dob!!.visibility = View.GONE
         }
 
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         val sDOB = intent.getStringExtra("BIRTHDAY")
         sDOB.substring(0, 10)

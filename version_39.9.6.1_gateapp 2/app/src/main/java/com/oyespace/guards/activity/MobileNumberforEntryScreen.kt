@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -59,7 +61,8 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
     override fun onFailure(e: java.lang.Exception?, urlId: Int) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
-
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var receiver: BroadcastReceiver? = null
     val workType: ArrayList<String> = ArrayList()
     private var ccp: CountryCodePicker? = null
@@ -157,6 +160,8 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         lytt=findViewById(R.id.lytt)
         timer = findViewById(R.id.timer)
 
+        buttonNext.visibility=View.GONE
+
         if(intent.getStringExtra(MOBILENUMBER).isEmpty()){
             lytt?.visibility=View.INVISIBLE
             btn_nobalance.visibility=View.INVISIBLE
@@ -173,6 +178,36 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             tv_guardnumber.visibility=View.VISIBLE
             timertext.visibility=View.VISIBLE
             timer.visibility= View.VISIBLE
+        }
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
         }
 
         btn_manualentry!!.setOnClickListener {
@@ -675,7 +710,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
             SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",intent.getStringExtra("Image"),Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","",""
-            , ""
+            , "",""
         )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
@@ -717,7 +752,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                         )
                                         ddc.putExtra(
                                             "msg",
-                                            personName + " " + desgn + " is coming to your home" + "(" + "(" + unitname_dataList.get(
+                                            personName + " is coming to your home" + "(" + "(" + unitname_dataList.get(
                                                 i
                                             ).replace(" ", "") + ")" + ")"
                                         )
@@ -765,7 +800,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                 )
                                 ddc.putExtra(
                                     "msg",
-                                    personName + " " + desgn + " is coming to your home" + "(" + unitName + ")"
+                                    personName+ " is coming to your home" + "(" + unitName + ")"
                                 )
                                 ddc.putExtra("mobNum", mobileNumb)
                                 ddc.putExtra("name", personName)

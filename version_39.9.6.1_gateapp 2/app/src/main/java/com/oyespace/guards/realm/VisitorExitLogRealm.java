@@ -78,7 +78,7 @@ public class VisitorExitLogRealm {
                     .or()
                     .contains("vlMobile", searchQuery)
                     .or()
-                    .contains("vLPOfVis", searchQuery, Case.INSENSITIVE)
+                    .contains("vlpOfVis", searchQuery, Case.INSENSITIVE)
                     .findAll());
             return results;
         }

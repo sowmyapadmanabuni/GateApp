@@ -15,6 +15,7 @@ import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import java.util.*
 
 class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
@@ -25,9 +26,9 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
 
             when (v?.id) {
 
-                R.id.button_done ->{
-                    button_done.isEnabled = false
-                    button_done.isClickable = false
+                R.id.buttonNext ->{
+                    buttonNext.isEnabled = false
+                    buttonNext.isClickable = false
                     Log.d("button_done ","StaffEntry "+ ConstantUtils.FLOW_TYPE +" "+ ConstantUtils.STAFF_REGISTRATION +" "+ ConstantUtils.FLOW_TYPE.equals(ConstantUtils.STAFF_REGISTRATION,true))
                     //finish();
 //                    val i_staff = Intent(this@StaffDetails, StaffListActivity::class.java)
@@ -53,6 +54,8 @@ class StaffDetails : BaseKotlinActivity() , View.OnClickListener  {
             super.onCreate(savedInstanceState)
             setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
             setContentView(R.layout.activity_final_registration)
+
+            buttonNext.text=resources.getString(R.string.textdone)
 
             txt_assn_name.text = "Society: " + LocalDb.getAssociation()!!.asAsnName
             txt_gate_name.text = "Gate No: " + Prefs.getString(ConstantUtils.GATE_NO, "")

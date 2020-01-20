@@ -10,7 +10,10 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -30,6 +33,10 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.signature.StringSignature;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -49,6 +56,7 @@ import com.oyespace.guards.responce.StaffImageRes;
 import com.oyespace.guards.responce.StaffRegistrationRespJv;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
+import com.oyespace.guards.utils.UploadImageApi;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import retrofit2.Call;
@@ -75,6 +83,8 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
     // File destination;
     File file;
 
+    Button iv_torch;
+    int clickable1 = 0;
     ChampApiInterface champApiInterface;
 
     private final int REQUEST_CODE_SPEECH_INPUT = 100;
@@ -86,6 +96,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
     ImageView iv_delete, imageView1, iv_edit;
     final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     Bitmap photo = null;
+    Bitmap images = null;
     TextView tv_name;
     TextView txt_assn_name, txt_device_name, txt_gate_name;
     private View view;
@@ -149,6 +160,19 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                 .check();
     }
 
+
+//    private SimpleTarget target = new SimpleTarget<Bitmap>() {
+//        @Override
+//        public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
+//            // do something with the bitmap
+//            // for demonstration purposes, let's just set it to an ImageView
+//            photo = bitmap;
+//           imageView1.setImageBitmap(photo);
+//        }
+//    };
+
+
+
     private Target target = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -174,6 +198,43 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
     private void initViews() {
 
+        iv_torch=findViewById(R.id.iv_torch);
+
+        iv_torch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                    String cameraId = null;
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+
+                        if (clickable1 == 0) {
+                            try {
+
+                                iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_off));
+                                camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                                //  iv_torch!!.text = "OFF"
+                                clickable1 = 1;
+                            } catch (CameraAccessException e){
+                                e.printStackTrace();
+                            }
+                        } else if (clickable1 == 1) {
+                            camManager.setTorchMode(cameraId, false);
+                            // iv_torch!!.text = "ON"
+                            iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_on));
+                            clickable1 = 0;
+
+                        }
+
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         // makeArrayList = new ArrayList<>();
 
 //        viewPager_Image = (ViewPager) view.findViewById(R.id.add_car_view_pager);
@@ -281,20 +342,51 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         } else {
             if (getIntent().getIntExtra(ACCOUNT_ID, 0) != 0) {
 
-                if (getIntent().getStringExtra("Image") != null) {
+//                if (getIntent().getStringExtra("Image") != null) {
+//
+////                    Picasso.with(this)
+////                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
+////                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+//
+//
+//                    Glide.with(this)
+//                        .load(Uri.parse(IMAGE_BASE_URL+ "Images/" + getIntent().getStringExtra("Image")))
+//                        .placeholder(R.drawable.user_icon_black)
+//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                        .skipMemoryCache(false)
+//                        .into(imageView1);
+//
+//                    Glide.with(this).load(IMAGE_BASE_URL+ "Images/" + getIntent().getStringExtra("Image")).into(target);
+//
+////                    Picasso.with(this)
+////                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
+////                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(target);
+//
+//                } else {
 
-                    Picasso.with(this)
-                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
-                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-                    Picasso.with(this)
-                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
-                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(target);
+                String image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg";
+//
+              // Glide.with(this).load(image).asBitmap().into(target);
+              //  Picasso.with(this).load(image).into(target);
+                imageView1.setImageBitmap(photo);
 
-                } else {
+//                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
+                    Glide.with(this)
+                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
+                            .placeholder(R.drawable.user_icon_black)
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .skipMemoryCache(false)
+                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+                            .into(imageView1);
 
-                    String image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg";
 
-                    Picasso.with(this).load(image).into(target);
+
+//                    Glide.with(requireContext())
+//                            .load(myUrl)
+//                            .signature(ObjectKey(System.currentTimeMillis()))
+//                            .into(myImageView)
+
+
 
 //                    imageView1.setImageBitmap(photo);
 
@@ -306,13 +398,19 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 //                        .into(imageView1);
 
                     //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
-
-                    Picasso.with(this)
-                            .load(image)
-                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-                }
+//
+//                    Picasso.with(this)
+//                            .load(image)
+//                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
+              //  }
 
             }
+//            else{
+//                imageView1.setImageBitmap(photo);
+//             //   imageView1.setImageBitmap(photo);
+//                Toast.makeText(getApplicationContext(), "111 ", Toast.LENGTH_SHORT).show();
+//
+//            }
 
         }
 
@@ -379,7 +477,18 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                         submit_button.setClickable(false);
                         staffRegistration();
                     } else {
+                        imgName = "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).substring(3) + ".jpg";
+                        try{
 
+                            images=((BitmapDrawable) imageView1.getDrawable().getCurrent()).getBitmap();
+
+                        UploadImageApi.Companion.uploadImage(imgName, images);
+                    }catch (ClassCastException e){
+
+                        }
+//
+//                        imageView1.buildDrawingCache();
+//                        Bitmap image= imageView1.getDrawingCache();
 
                         byte[] byteArray = null;
                         try {
@@ -396,6 +505,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                         }
 
 
+
                         Intent d = new Intent(AddCarFragment.this, StaffEntryRegistration.class);
 //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -407,7 +517,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                         d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
-                        d.putExtra(PERSON_PHOTO, byteArray);
+                        d.putExtra(PERSON_PHOTO,   imgName);
                         d.putExtra(ITEMS_PHOTO_LIST, list);
                         d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
                         d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
@@ -575,7 +685,8 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
     @Override
     public void onDestroy() {  // could be in onPause or onStop
-        Picasso.with(this).cancelRequest(target);
+      Picasso.with(this).cancelRequest(target);
+       // Glide.clear(target);
         super.onDestroy();
     }
 
@@ -759,12 +870,9 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id., f);
-
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();*//*
-
         fragmentManager.beginTransaction().replace(R.id.frame_container, new MyStockFragment()).commit();
-
     }*/
 
     @Override
@@ -1006,4 +1114,3 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
 
 }
-

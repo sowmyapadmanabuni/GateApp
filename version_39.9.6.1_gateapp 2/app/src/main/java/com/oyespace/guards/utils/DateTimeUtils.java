@@ -3,6 +3,7 @@ package com.oyespace.guards.utils;
 import android.content.Context;
 import android.os.Build;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
@@ -111,6 +112,35 @@ public class DateTimeUtils {
 
     }
 
+
+    public static int msLeftMinute(String et, int maxSec) {
+
+        try {
+
+            Calendar c1 = Calendar.getInstance();
+            c1.setTime(DATE_FORMAT_YMDHMS.parse(et));
+            c1.add(Calendar.SECOND, maxSec);
+
+            Calendar c2 = Calendar.getInstance();
+            c2.setTime(DATE_FORMAT_YMDHMS.parse(getCurrentTimeLocal()));
+
+            //get Time in milli seconds
+            long ms1 = c1.getTimeInMillis();
+            long ms2 = c2.getTimeInMillis();
+
+            long diff_sec = ms2 - ms1;
+            int day_diff =(int) diff_sec / (60 * 1000);
+
+            return day_diff;
+
+        } catch (java.text.ParseException e) {
+            e.printStackTrace();
+            return 0;
+        }
+
+    }
+
+
     public static boolean dateExpired(String entryDate) {
 
         try {
@@ -166,6 +196,8 @@ public class DateTimeUtils {
             long diff_sec = ms2 - ms1;
             int day_diff = (int) diff_sec / (60 * 1000);
             int allottedTime = maxMins;
+
+            Log.v("Gateapp", String.valueOf(allottedTime));
 
             //int allottedTime=8+itemCount*7;
 
@@ -289,6 +321,56 @@ public class DateTimeUtils {
         return b;
     }
 
+
+    public static boolean OneMinuteTimeUp(String downloaded_date, String curr_date_YMD_hms, int maxMins) {
+
+        try {
+            java.util.Date dt_dwnld_date, dt_curr_date;
+            // DateFormat dateFormatGMT =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",  Locale.getDefault());
+            // DateFormat dateFormatHMS =new SimpleDateFormat("HH:mm:ss",  Locale.getDefault());
+            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+
+            //  dateFormatGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
+            dt_dwnld_date = DATE_FORMAT_YMDHMS.parse(downloaded_date);
+            Calendar c1 = Calendar.getInstance();
+            //Change to Calendar Date
+            c1.setTime(dt_dwnld_date);
+
+            dt_curr_date = DATE_FORMAT_YMDHMS.parse(curr_date_YMD_hms);
+
+            Calendar c2 = Calendar.getInstance();
+            //Change to Calendar Date
+            c2.setTime(DATE_FORMAT_YMDHMS.parse(DATE_FORMAT_YMDHMS.format(dt_curr_date)));
+            c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)));
+            //get Time in milli seconds
+            long ms1 = c1.getTimeInMillis();
+            long ms2 = c2.getTimeInMillis();
+
+            //get difference in milli seconds
+            long diff_sec = ms2 - ms1;
+            int day_diff = (int) diff_sec / (60 * 1000);
+            int allottedTime = maxMins;
+
+            Log.v("Gateapp", String.valueOf(allottedTime));
+
+            //int allottedTime=8+itemCount*7;
+
+//            if (day_diff >= 120) {
+////                return day_diff;
+//                return true;
+//            }
+            return day_diff == allottedTime;
+//            return day_diff;
+        } catch (java.text.ParseException e) {
+
+            e.printStackTrace();
+            return true;
+//            return 7;
+        }
+
+    }
+
+
 //    public void overlayAlert(Context context) {
 //
 //        final Dialog dialog = new Dialog(context); // Context, this, etc.
@@ -297,6 +379,8 @@ public class DateTimeUtils {
 //        dialog.show();
 //
 //    }
+
+
 
 
 

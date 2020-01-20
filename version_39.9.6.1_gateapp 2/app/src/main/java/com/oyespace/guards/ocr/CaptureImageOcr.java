@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -34,14 +36,15 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
-import com.oyespace.guards.Dashboard;
 import com.oyespace.guards.R;
 import com.oyespace.guards.camtest.ImageHelper;
+import com.oyespace.guards.constants.PrefKeys;
 import com.oyespace.guards.network.ChampApiInterface;
 import com.oyespace.guards.network.ResponseHandler;
 import com.oyespace.guards.network.RestClient;
 import com.oyespace.guards.network.URLData;
 import com.oyespace.guards.qrscanner.CustomViewFinderScannerActivity;
+import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 import com.oyespace.guards.vehicle_others.VehicleOthersServiceProviderListActivity;
 import com.yarolegovich.lovelydialog.LovelyStandardDialog;
@@ -59,6 +62,7 @@ import java.util.PriorityQueue;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
 import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
 import static com.oyespace.guards.utils.Utils.showToast;
 
@@ -103,6 +107,9 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
     private ImageView image_Gallery, insurance_file_name, rc_book_file_name;
     private EditText vehicalnumber ;
     private ProgressDialog mProgressDialog;
+     TextView txt_assn_name;
+    TextView txt_gate_name;
+     TextView txt_device_name;
     /**
      * An instance of the driver class to run model inference with Firebase.
      */
@@ -118,6 +125,30 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
         setLocale(Prefs.getString(LANGUAGE,null));
         setContentView(R.layout.ocr_layout);
         initViews();
+
+
+        txt_assn_name = findViewById(R.id.txt_assn_name);
+        txt_gate_name = findViewById(R.id.txt_gate_name);
+        txt_device_name = findViewById(R.id.txt_device_name);
+        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
+            txt_assn_name.setTextSize(5 * getResources().getDisplayMetrics().density);
+        }
+        txt_assn_name.setText("Society: " + LocalDb.getAssociation().getAsAsnName());
+        txt_gate_name.setText("Gate No: " + Prefs.getString(GATE_NO, null));
+        try {
+            String appVersion = "";
+            PackageManager manager = getBaseContext().getPackageManager();
+            PackageInfo info = manager.getPackageInfo(getBaseContext().getPackageName(), 0);
+            appVersion = info.versionName;
+            Log.d("tag", "app " + appVersion + " " + info.versionName);
+            txt_device_name.setText("V: " + appVersion);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            txt_device_name.setText(" ");
+
+        }
+
 
         mProgressDialog =new ProgressDialog(this);
         mProgressDialog.setIndeterminate(false);
@@ -501,8 +532,8 @@ final ImageView imageView = (ImageView) LayoutInflater.from(context).inflate(R.l
     public void onBackPressed() {
         super.onBackPressed();
 
-        Intent i=new Intent(CaptureImageOcr.this,Dashboard.class);
-        startActivity(i);
+//        Intent i=new Intent(CaptureImageOcr.this,Dashboard.class);
+//        startActivity(i);
         finish();
     }
 

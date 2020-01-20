@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 import android.telecom.TelecomManager;
+import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
 import com.oyespace.guards.constants.PrefKeys;
+import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.models.Worker;
 import com.oyespace.guards.pojo.Association;
 import com.oyespace.guards.pojo.CheckPointByAssocID;
@@ -17,6 +19,8 @@ import com.oyespace.guards.responce.VisitorLogExitResp;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import io.realm.RealmList;
 
 /**
  * Created by Kalyan on 4/29/2017.
@@ -79,21 +83,34 @@ public class LocalDb {
         }
     }
 
-    public static ArrayList<VisitorEntryLog> getVisitorEnteredLog() {
+    public static void saveEnteredVisitorLog(RealmList<VisitorLog> menuItems) {
+        String tojson;
+        //Log.d("SYCNCHECK","in 79"+menuItems.size());
+
+        if (menuItems == null || menuItems.size() == 0) {
+            // saveHotelId("");
+            tojson = "";
+        } else {
+            tojson = ParseUtils.tojson(menuItems, "LocalDb");
+        }
+        Prefs.putString(PrefKeys.VisitorEnteredLogLocalDB, tojson);
+    }
+
+    public static RealmList<VisitorLog> getVisitorEnteredLog() {
         String cartData = Prefs.getString(PrefKeys.VisitorEnteredLogLocalDB, null);
         if (cartData == null) {
             return null;
         } else {
-            Type type = new TypeToken<ArrayList<VisitorEntryLog>>() {
+            Type type = new TypeToken<RealmList<VisitorLog>>() {
             }.getType();
-            ArrayList<VisitorEntryLog> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
-            // Log.d("SYCNCHECK","in 99"+menuList.size());
+            RealmList<VisitorLog> menuList = ParseUtils.fromJson(cartData, type, "LocalDb");
+            //x Log.d("SYCNCHECK","in 99"+menuList.size());
 
             return menuList;
         }
     }
 
-    public static void saveEnteredVisitorLog_old(ArrayList<VisitorLogExitResp.Data.VisitorLog> menuItems) {
+    public static void saveEnteredVisitorLog_old(ArrayList<VisitorLog> menuItems) {
         String tojson;
         if (menuItems == null || menuItems.size() == 0) {
             // saveHotelId("");

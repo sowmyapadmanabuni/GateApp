@@ -11,6 +11,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -79,6 +81,9 @@ import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 
 public class VehicleOthersAddCarFragment extends Activity implements View.OnClickListener {
 
+
+    Button iv_torch;
+    int clickable1 = 0;
     public static Button image_Gallery, submit_button, buttonCapture;
     TextView tv_name;
     private FragmentManager fragmentManager ;
@@ -169,6 +174,44 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
     };
 
     private void initViews() {
+        iv_torch=findViewById(R.id.iv_torch);
+
+        iv_torch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                    String cameraId = null;
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+
+                        if (clickable1 == 0) {
+                            try {
+
+                                iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_off));
+                                camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                                //  iv_torch!!.text = "OFF"
+                                clickable1 = 1;
+                            } catch (CameraAccessException e){
+                                e.printStackTrace();
+                            }
+                        } else if (clickable1 == 1) {
+                            camManager.setTorchMode(cameraId, false);
+                            // iv_torch!!.text = "ON"
+                            iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_on));
+                            clickable1 = 0;
+
+                        }
+
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
         txt_device_name=findViewById(R.id.txt_device_name);
         tv_name=findViewById(R.id.tv_name);
         iv_edit=findViewById(R.id.iv_edit);

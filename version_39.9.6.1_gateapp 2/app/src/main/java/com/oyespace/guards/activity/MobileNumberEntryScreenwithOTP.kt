@@ -7,7 +7,10 @@ import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
 import android.provider.Settings
@@ -62,6 +65,8 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
     var otpnumber: String? = null
     var phone:String?=null
     var dialogs:Dialog?=null
+    var iv_torch: Button?=null
+    var clickable1 = 0
 
     // private var Ed_phoneNum:String?=null
 
@@ -94,6 +99,36 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
         setContentView(R.layout.layout_mobilenumber_otp)
 
         addEntries()
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
+        buttonNext.visibility=View.GONE
         progressBar = this.progressBar1
        // timer=findViewById(R.id.timer)
         txt_assn_name=findViewById(R.id.txt_assn_name)
@@ -656,7 +691,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
             intent.getStringExtra("Image"),
             Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),
-            "" ,"","","","","","","","",""
+            "" ,"","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 

@@ -29,6 +29,7 @@
                         android:layout_width="@dimen/_80sdp"
                         android:layout_height="@dimen/_120sdp"
                         android:src="@drawable/user_icon_black"
+                        android:adjustViewBounds="true"
                         android:layout_gravity="center_horizontal"
                         android:padding="2dp"
                         />
@@ -65,6 +66,20 @@
                         android:textStyle="bold"
                         android:paddingTop="5dp"
                         />
+
+                <TextView
+                        android:id="@+id/tv_purposeofvisit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:textSize="14sp"
+                        android:maxLength="15"
+                        android:textColor="@color/black"
+                        android:textStyle="bold"
+                        android:text="Purpose"
+                        android:paddingTop="2dp"
+                        android:scrollHorizontally="true"
+                        />
                 <TextView
                         android:id="@+id/tv_serviceprovider"
                         android:layout_width="wrap_content"
@@ -88,19 +103,7 @@
                         android:paddingTop="2dp"
                         />
 
-                <TextView
-                        android:id="@+id/tv_purposeofvisit"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="10dp"
-                        android:textSize="14sp"
-                        android:maxLength="15"
-                        android:textColor="@color/black"
-                        android:textStyle="bold"
-                        android:text="Purpose"
-                        android:paddingTop="2dp"
-                        android:scrollHorizontally="true"
-                        />
+
 
                 <View
                         android:layout_width="match_parent"
@@ -151,16 +154,17 @@
                             android:paddingLeft="10dp"
                             android:text="Entry Date"
                             />
-                    <!--                    <TextView-->
-                    <!--                            android:id="@+id/tv_exitdate"-->
-                    <!--                            android:layout_width="0dp"-->
-                    <!--                            android:layout_height="wrap_content"-->
-                    <!--                            android:layout_weight="1"-->
-                    <!--                            android:textSize="10sp"-->
-                    <!--                            android:textColor="@color/black"-->
-                    <!--                            android:paddingLeft="10dp"-->
-                    <!--                            android:text="Exit Date"-->
-                    <!--                            />-->
+                                        <TextView
+                                                android:id="@+id/tv_exitdate"
+                                                android:layout_width="0dp"
+                                                android:layout_height="wrap_content"
+                                                android:layout_weight="1"
+                                                android:textSize="10sp"
+                                                android:visibility="invisible"
+                                                android:textColor="@color/black"
+                                                android:paddingLeft="10dp"
+                                                android:text="Exit Date"
+                                                />
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout android:layout_width="0dp"
@@ -205,7 +209,19 @@
                         android:background="@drawable/square"
                         android:visibility="invisible"
                         android:text="@string/textexit"/>
+
+                <TextView
+                        android:id="@+id/tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:paddingLeft="10dp"
+                        android:textColor="@color/black"
+                        android:textSize="10sp" />
+
+
             </LinearLayout>
+
         </LinearLayout>
         <RelativeLayout android:layout_width="match_parent"
                 android:layout_height="wrap_content"

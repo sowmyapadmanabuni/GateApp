@@ -13,6 +13,8 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -112,6 +114,8 @@ import static com.oyespace.guards.utils.Utils.showToast;
 
 public class ManualAddCarFragment extends Activity implements ResponseHandler, View.OnClickListener {
 
+    Button iv_torch;
+    int clickable1 = 0;
     public final static int REQUEST_CODE = 65635;
     //    private FloatingActionButton floatButton;
     public static final int REQUEST_CAMERA = 0, SELECT_FILE = 1, PICK_INSURANCE_REQUEST_CODE = 2, PICK_RCBOOK_REQUEST_CODE = 3;
@@ -249,6 +253,44 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
 
 //        viewPager_Image = (ViewPager) view.findViewById(R.id.add_car_view_pager);
         //GridView gridview
+
+        iv_torch=findViewById(R.id.iv_torch);
+
+        iv_torch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                    String cameraId = null;
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+
+                        if (clickable1 == 0) {
+                            try {
+
+                                iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_off));
+                                camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                                //  iv_torch!!.text = "OFF"
+                                clickable1 = 1;
+                            } catch (CameraAccessException e){
+                                e.printStackTrace();
+                            }
+                        } else if (clickable1 == 1) {
+                            camManager.setTorchMode(cameraId, false);
+                            // iv_torch!!.text = "ON"
+                            iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_on));
+                            clickable1 = 0;
+
+                        }
+
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
 
         tv_name = findViewById(R.id.tv_name);

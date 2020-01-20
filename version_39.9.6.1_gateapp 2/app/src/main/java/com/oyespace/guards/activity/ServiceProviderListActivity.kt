@@ -1,5 +1,8 @@
 package com.oyespace.guards.activity
 
+import android.content.Context
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -19,14 +22,16 @@ import androidx.core.app.ComponentActivity
 import androidx.core.app.ComponentActivity.ExtraData
 import androidx.core.content.ContextCompat.getSystemService
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
-
-
-
+import android.os.Build
+import android.view.View
+import android.widget.Button
+import kotlinx.android.synthetic.main.header_with_next.*
 
 
 class ServiceProviderListActivity : BaseKotlinActivity() {
 
-
+    var iv_torch: Button?=null
+    var clickable1 = 0
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
@@ -93,6 +98,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
         setContentView(R.layout.activity_service_provider_list)
 
+        buttonNext.visibility=View.GONE
+
        // vendor_names = Arrays.asList(resources.getStringArray(R.array.vendor_list))
 
         vendor_names= listOf(resources.getString(R.string.textzomato),
@@ -137,7 +144,35 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
         }
 
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         //  getServiceProviderList()
         val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)

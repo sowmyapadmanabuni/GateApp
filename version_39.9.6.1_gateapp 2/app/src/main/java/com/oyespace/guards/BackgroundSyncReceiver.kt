@@ -81,7 +81,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 intent.getStringExtra("name"),
                                 "",
                                 intent.getStringExtra(VISITOR_TYPE),
-                                "Staff",
+                                intent.getStringExtra(VISITOR_TYPE),
                                 0,
                                 unitname_dataList.get(i).replace(" ", ""),
                                 intent.getIntExtra("VLVisLgID", 0),
@@ -109,7 +109,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             } else {
 
                 try {
-                    getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), "Staff", 0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0), intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification)
+                    getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), intent.getStringExtra(VISITOR_TYPE), 0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0), intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification)
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -1127,9 +1127,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
         RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId, assnID.toString(), accountId.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(object : CommonDisposable<GetFamilyMemberResponse>() {
+            .subscribe(object : CommonDisposable<GetFamilyMemberResponse<ArrayList<FamilyMember>>>() {
 
-                override fun onSuccessResponse(getdata: GetFamilyMemberResponse) {
+                override fun onSuccessResponse(getdata: GetFamilyMemberResponse<ArrayList<FamilyMember>>) {
 
                     if (getdata.success) {
 

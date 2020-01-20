@@ -1,10 +1,15 @@
 package com.oyespace.guards.qrscanner
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.ImageBigView
@@ -21,9 +26,12 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import java.util.*
 
 class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var minteger = 0
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
@@ -48,9 +56,9 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
 
         when (v?.id) {
 
-            R.id.button_done -> {
-                button_done.isEnabled = false
-                button_done.isClickable = false
+            R.id.buttonNext -> {
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
                 invitationupdate("True", intent.getIntExtra(INVITATIONID, 0))
                 visitorLog()
@@ -81,6 +89,38 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
         setContentView(R.layout.activity_final_registration)
         minteger = intent.getStringExtra(NUMBEROFPERSONS).toInt()
         getUnitLog(intent.getStringExtra(UNITID).toInt())
+
+        buttonNext.text=resources.getString(R.string.textdone)
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         txt_assn_name = findViewById(R.id.txt_assn_name)
         txt_gate_name = findViewById(R.id.txt_gate_name)
@@ -188,7 +228,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
             "",  intent.getStringExtra(COUNTRYCODE) + "" + intent.getStringExtra(MOBILENUMBER), intToString(minteger), "",
             "", "", minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"","",Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)

@@ -7,7 +7,10 @@ import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.CallLog
 import android.provider.Settings
@@ -26,7 +29,6 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.DexterError
 import com.karumi.dexter.listener.PermissionRequestErrorListener
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
@@ -63,6 +65,8 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
     var mobilenumber:String?=null
     var otpnumber: String? = null
     var phone:String?=null
+    var iv_torch: Button?=null
+    var clickable1 = 0
 
     // private var Ed_phoneNum:String?=null
 
@@ -207,6 +211,36 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
 
         setContentView(R.layout.layout_mobilenumber_otp)
 
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
 //        receiver =  object : BroadcastReceiver() {
 //            override fun onReceive(context: Context?, intent: Intent?) {
@@ -679,6 +713,7 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
         d.putExtra(MOBILENUMBER, textview.text.toString())
         d.putExtra(COUNTRYCODE, countryCode)
         d.putExtra(UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
 
         startActivity(d)
         finish()

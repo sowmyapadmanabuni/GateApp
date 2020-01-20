@@ -10,23 +10,25 @@
             android:orientation="vertical">
 
         <!-- HEADER START -->
-        <RelativeLayout
-                android:id="@+id/rl_header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="0dp"
-                android:layout_weight="1.2"
-                android:background="@color/white"
-                android:padding="2dp">
 
-            <ImageView
-                    android:id="@+id/rl_header1"
-                    android:layout_width="150dp"
-                    android:layout_height="40dp"
-                    android:layout_centerHorizontal="true"
-                    android:layout_margin="@dimen/_2sdp"
-                    android:src="@drawable/oyespace_toolbar" />
-        </RelativeLayout>
+        <include layout="@layout/header_with_next" />
+<!--        <RelativeLayout-->
+<!--                android:id="@+id/rl_header"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="0dp"-->
+<!--                android:layout_weight="1.2"-->
+<!--                android:background="@color/white"-->
+<!--                android:padding="2dp">-->
+
+<!--            <ImageView-->
+<!--                    android:id="@+id/rl_header1"-->
+<!--                    android:layout_width="150dp"-->
+<!--                    android:layout_height="40dp"-->
+<!--                    android:layout_centerHorizontal="true"-->
+<!--                    android:layout_margin="@dimen/_2sdp"-->
+<!--                    android:src="@drawable/oyespace_toolbar" />-->
+<!--        </RelativeLayout>-->
 
         <RelativeLayout
                 android:id="@+id/r1"

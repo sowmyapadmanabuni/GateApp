@@ -2,15 +2,20 @@ package com.oyespace.guards.staffManaualEntry
 
 import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -38,6 +43,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -50,7 +56,8 @@ import java.io.FileOutputStream
 import java.util.*
 
 class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
-
+    var iv_torch: Button?=null
+    var clickable1 = 0
     internal var TAKE_PHOTO_REQUEST = 1034
     var destination: File? = null
     var imgName: String? = null
@@ -65,9 +72,9 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
 
         when (v?.id) {
 
-            R.id.button_done -> {
-                button_done.isEnabled = false
-                button_done.isClickable = false
+            R.id.buttonNext -> {
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
                 getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra(UNITID), intent.getStringExtra(PERSONNAME),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(COMPANY_NAME),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra(UNITNAME))
 
@@ -127,6 +134,37 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
         //launchCamera()
 //        val service =  Intent(getBaseContext(), CapPhoto::class.java)
 //        startService(service);
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
+        buttonNext.text=resources.getString(R.string.textdone)
 
         token = Math.random()
 
@@ -302,7 +340,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,imgName.toString(),
             imgName!!,Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","")
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","","")
 
         Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())
 
@@ -385,9 +423,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                                         d.putExtra(BSR_Action, VisitorEntryFCM)
                                         d.putExtra(
                                             "msg",
-                                            intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(
-                                                COMPANY_NAME
-                                            ) + " is coming to your home" + "(" + unitname_dataList.get(
+                                            intent.getStringExtra(PERSONNAME) + " from " + " is coming to your home" + "(" + unitname_dataList.get(
                                                 i
                                             ).replace(" ", "") + ")"
                                         )
@@ -430,9 +466,7 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                                 d.putExtra(BSR_Action, VisitorEntryFCM)
                                 d.putExtra(
                                     "msg",
-                                    intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(
-                                        COMPANY_NAME
-                                    ) + " is coming to your home" + "(" + intent.getStringExtra(
+                                    intent.getStringExtra(PERSONNAME) + " from " + " is coming to your home" + "(" + intent.getStringExtra(
                                         UNITNAME
                                     ) + ")"
                                 )
@@ -471,8 +505,8 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                         )
                         Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
 
-                        button_done.isEnabled = true
-                        button_done.isClickable = true
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
 
                         dismissProgress()
                     }

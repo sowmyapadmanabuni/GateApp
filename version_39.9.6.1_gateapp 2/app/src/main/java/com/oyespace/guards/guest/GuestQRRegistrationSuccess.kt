@@ -1,14 +1,19 @@
 package com.oyespace.guards.guest
 
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.oyespace.guards.BackgroundSyncReceiver
@@ -31,10 +36,9 @@ import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
-import kotlinx.android.synthetic.main.activity_final_registration.txt_assn_name
-import kotlinx.android.synthetic.main.activity_final_registration.txt_device_name
-import kotlinx.android.synthetic.main.activity_final_registration.txt_gate_name
+
 import kotlinx.android.synthetic.main.activity_name_entry.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -45,6 +49,8 @@ import java.io.*
 import java.util.*
 
 class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var imageName:String?=null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
@@ -85,6 +91,36 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
+        buttonNext.text=resources.getString(R.string.textdone)
         txtassnname=findViewById(R.id.txt_assn_name)
         txtgatename=findViewById(R.id.txt_gate_name)
         txtdevicename=findViewById(R.id.txt_device_name)
@@ -186,7 +222,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER), intToString(minteger), "", "", "",
             minteger, ConstantUtils.GUEST,SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imageName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","",""
+            DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","",""
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)

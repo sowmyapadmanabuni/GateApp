@@ -16,7 +16,8 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.Sort;
 
-import static com.oyespace.guards.utils.ConstantUtils.PENDING;
+import static com.oyespace.guards.utils.ConstantUtils.ENTRYPENDING;
+
 
 public class VisitorEntryLogRealm {
     Realm realm = Realm.getDefaultInstance();
@@ -185,7 +186,7 @@ public class VisitorEntryLogRealm {
         return new ArrayList<>(realm.where(VisitorLog.class)
                 .equalTo("vlfName", name)
                 .and()
-                .equalTo("vlApprStat", PENDING, Case.INSENSITIVE)
+                .equalTo("vlApprStat", ENTRYPENDING, Case.INSENSITIVE)
                 .findAll());
     }
 

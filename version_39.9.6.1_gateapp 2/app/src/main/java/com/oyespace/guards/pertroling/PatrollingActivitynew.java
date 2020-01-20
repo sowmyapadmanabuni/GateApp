@@ -73,6 +73,8 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
     private TextView dataTextView;
     public   String[] patrolingdataList;
 
+    Button buttonNext;
+
 
     public ArrayList<String[]> pat = new ArrayList<>();
     LocationManager mLocationManager;
@@ -121,6 +123,8 @@ public class PatrollingActivitynew extends BaseScannerActivity implements Respon
 
         setContentView(R.layout.activity_check_scanner_point);
 
+        buttonNext=findViewById(R.id.buttonNext);
+        buttonNext.setVisibility(View.GONE);
         gpsTracker=new GPSTracker(getApplicationContext());
         currentLocation = gpsTracker.getLocation();
         noQrcodeButton = findViewById(R.id.button2);

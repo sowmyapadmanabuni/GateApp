@@ -15,8 +15,11 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraManager;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -79,6 +82,8 @@ import static com.oyespace.guards.utils.Utils.showToast;
 
 public class RegisterFingerPrint extends AppCompatActivity implements ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
 
+    Button iv_torch;
+    int clickable1 = 0;
     private static final String TAG = "SecuGen USB";
     String finger_type = "", MemberType = "Regular";
     String key_left_thumb = "left_thumb";
@@ -209,6 +214,46 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
 
         setContentView(R.layout.activity_register_finger_print);
         Log.d("btn_biometric", "af setContentView");
+
+        iv_torch=findViewById(R.id.iv_torch);
+
+        iv_torch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    CameraManager camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                    String cameraId = null;
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+
+                        if (clickable1 == 0) {
+                            try {
+
+                                iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_off));
+                                camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                                //  iv_torch!!.text = "OFF"
+                                clickable1 = 1;
+                            } catch (CameraAccessException e){
+                                e.printStackTrace();
+                            }
+                        } else if (clickable1 == 1) {
+                            camManager.setTorchMode(cameraId, false);
+                            // iv_torch!!.text = "ON"
+                            iv_torch.setBackground(getResources().getDrawable(R.drawable.torch_on));
+                            clickable1 = 0;
+
+                        }
+
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+
         txt_assn_name = findViewById(R.id.txt_assn_name);
         txt_device_name = findViewById(R.id.txt_device_name);
         txt_device_name = findViewById(R.id.txt_device_name);
@@ -264,7 +309,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
         save.setVisibility(View.INVISIBLE);
         next = findViewById(R.id.buttonNext);
         previous = findViewById(R.id.buttonPrevious);
-        buttonDone = findViewById(R.id.buttonDone);
+        buttonDone = findViewById(R.id.buttonNext);
 
 
         t1 = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
@@ -989,7 +1034,7 @@ public class RegisterFingerPrint extends AppCompatActivity implements ResponseHa
             }
         }
 
-        if (v.getId() == R.id.buttonDone) {
+        if (v.getId() == R.id.buttonNext) {
             Intent d = new Intent(RegisterFingerPrint.this, StaffDetails.class);
             d.putExtra(WORKER_ID, getIntent().getIntExtra(WORKER_ID, 0));
             d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));

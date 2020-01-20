@@ -1,7 +1,13 @@
 package com.oyespace.guards.activity
 
+import android.content.Context
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import com.oyespace.guards.R
 import com.oyespace.guards.adapter.WorkersTypeListAdapter
@@ -11,6 +17,7 @@ import com.oyespace.guards.utils.ConstantUtils.GATE_NO
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
 import kotlinx.android.synthetic.main.activity_worker.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import java.util.*
 
 
@@ -19,10 +26,43 @@ class WorkersTypeList: BaseKotlinActivity() {
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView
+    var iv_torch: Button?=null
+    var clickable1 = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_worker)
+
+        buttonNext.visibility=View.VISIBLE
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
         txt_assn_name=findViewById(R.id.txt_assn_name)
         txt_gate_name=findViewById(R.id.txt_gate_name)
         txt_device_name=findViewById(R.id.txt_device_name)

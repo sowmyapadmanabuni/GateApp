@@ -9,8 +9,10 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.widget.Toast;
 
-import com.oyespace.guards.pojo.VisitorEntryLog;
+
+import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
 
@@ -22,6 +24,8 @@ import static com.oyespace.guards.utils.DateTimeUtils.deliveryTimeUp;
 import static com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal;
 
 public class BGService extends Service  {
+
+
     String language;
     public BGService() {
     }
@@ -72,15 +76,18 @@ public class BGService extends Service  {
     public void saveLatLongPoints(){
         final Runnable r = new Runnable() {
             public void run() {
+
                 saveLatLongPoints();
                 Prefs.putBoolean(BG_NOTIFICATION_ON,true);
             }
         };
         overStayingNames="";
         if (LocalDb.getVisitorEnteredLog() != null) {
-            for (VisitorEntryLog s : LocalDb.getVisitorEnteredLog()) {
+            for (VisitorLog s : LocalDb.getVisitorEnteredLog()) {
+                Toast.makeText(this,"111",Toast.LENGTH_LONG).show();
+
                 //if the existing elements contains the search input
-                if (s.getVlVisType().equalsIgnoreCase(DELIVERY)&&deliveryTimeUp(s.getVlEntryT(),getCurrentTimeLocal(),1)) {
+                if (s.getVlVisType().equalsIgnoreCase(DELIVERY)&& (s.getVlApprStat().equalsIgnoreCase("EntryApproved"))&&deliveryTimeUp(s.getVlsActTm(),getCurrentTimeLocal(),1)) {
                     //adding the element to filtered list
                     overStayingNames+=s.getVlfName();
                 }
@@ -89,14 +96,14 @@ public class BGService extends Service  {
 
         if(overStayingNames.length()>2){
             if(t1 != null) {
-             //   t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
+                   t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
 
                 try {
                     Thread.sleep((long) 3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-               // t1.speak("Overstaying " + overStayingNames, TextToSpeech.QUEUE_FLUSH, null);
+                 t1.speak("Overstaying " + overStayingNames, TextToSpeech.QUEUE_FLUSH, null);
 
             }
             else {

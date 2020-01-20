@@ -8,89 +8,91 @@
         android:background="@color/white"
         android:layout_height="match_parent"
         >
-    <RelativeLayout android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="2dp"
-            android:id="@+id/rl_header"
-            android:background="@color/white"
-            >
+    <include layout="@layout/header_with_next" />
+
+<!--    <RelativeLayout android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="2dp"-->
+<!--            android:id="@+id/rl_header"-->
+<!--            android:background="@color/white"-->
+<!--            >-->
 
 
-        <ImageView android:layout_width="150dp"
-                android:layout_height="40dp"
-                android:id="@+id/rl_header1"
-                android:layout_centerHorizontal="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/oyespace_toolbar"/>
+<!--        <ImageView android:layout_width="150dp"-->
+<!--                android:layout_height="40dp"-->
+<!--                android:id="@+id/rl_header1"-->
+<!--                android:layout_centerHorizontal="true"-->
+<!--                android:layout_centerVertical="true"-->
+<!--                android:src="@drawable/oyespace_toolbar"/>-->
 
-        <Button android:id="@+id/button_done"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onClick"
-                android:text="@string/textdone"
-                android:padding="@dimen/_5sdp"
-                android:textSize="@dimen/_10sdp"
-                android:layout_margin="5dp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:background="@drawable/square"
-                android:layout_alignParentRight="true"/>
+<!--        <Button android:id="@+id/button_done"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:onClick="onClick"-->
+<!--                android:text="@string/textdone"-->
+<!--                android:padding="@dimen/_5sdp"-->
+<!--                android:textSize="@dimen/_10sdp"-->
+<!--                android:layout_margin="5dp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:background="@drawable/square"-->
+<!--                android:layout_alignParentRight="true"/>-->
 
-    </RelativeLayout>
-    <RelativeLayout android:layout_width="match_parent"
-            android:layout_below="@+id/rl_header"
-            android:layout_height="2dp"
-            android:background="@color/orange">
+<!--    </RelativeLayout>-->
+<!--    <RelativeLayout android:layout_width="match_parent"-->
+<!--            android:layout_below="@+id/rl_header"-->
+<!--            android:layout_height="2dp"-->
+<!--            android:background="@color/orange">-->
 
-    </RelativeLayout>
+<!--    </RelativeLayout>-->
 
-    <LinearLayout
-            android:id="@+id/lyt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="3"
-            android:layout_below="@+id/rl_header"
-            android:orientation="horizontal">
+<!--    <LinearLayout-->
+<!--            android:id="@+id/lyt"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:weightSum="3"-->
+<!--            android:layout_below="@+id/rl_header"-->
+<!--            android:orientation="horizontal">-->
 
-        <TextView android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/txt_device_name"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:textSize="10sp"
-                android:padding="2dp"
-                android:text=""/>
+<!--        <TextView android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/txt_device_name"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="10sp"-->
+<!--                android:padding="2dp"-->
+<!--                android:text=""/>-->
 
-        <TextView android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/txt_assn_name"
-                android:textColor="@color/black"
-                android:layout_weight="1"
-                android:textStyle="bold"
-                android:textSize="12sp"
-                android:padding="2dp"
-                android:text="Association Name"/>
+<!--        <TextView android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/txt_assn_name"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:layout_weight="1"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textSize="12sp"-->
+<!--                android:padding="2dp"-->
+<!--                android:text="Association Name"/>-->
 
-        <TextView android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/txt_gate_name"
-                android:textColor="@color/black"
-                android:textStyle="bold"
-                android:layout_weight="1"
+<!--        <TextView android:layout_width="0dp"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:id="@+id/txt_gate_name"-->
+<!--                android:textColor="@color/black"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_weight="1"-->
 
-                android:textSize="12sp"
-                android:padding="2dp"
-                android:text="Gate Name"/>
-    </LinearLayout>
+<!--                android:textSize="12sp"-->
+<!--                android:padding="2dp"-->
+<!--                android:text="Gate Name"/>-->
+<!--    </LinearLayout>-->
 
 
-    <RelativeLayout android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/orange"
-            android:layout_below="@+id/lyt">
+<!--    <RelativeLayout android:layout_width="match_parent"-->
+<!--            android:layout_height="1dp"-->
+<!--            android:background="@color/orange"-->
+<!--            android:layout_below="@+id/lyt">-->
 
-    </RelativeLayout>
+<!--    </RelativeLayout>-->
     <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"

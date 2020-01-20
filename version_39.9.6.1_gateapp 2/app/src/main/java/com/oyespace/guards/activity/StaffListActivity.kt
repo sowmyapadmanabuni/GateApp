@@ -3,12 +3,16 @@ package com.oyespace.guards.activity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -35,6 +39,7 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
     lateinit var tv_nodata: TextView
     private lateinit var tv: EditText
     private val REQUEST_CODE_SPEECH_INPUT = 100
+
     override fun onClick(v: View?) {
 
         when (v?.id) {

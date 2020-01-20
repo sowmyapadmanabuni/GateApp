@@ -219,5 +219,5 @@
     </string-array>
 
     <string name="gate_channel">GATE_NOTIF_CHANNEL</string>
-
+    <string name="textkidexit">Kid Exit</string>
 </resources>

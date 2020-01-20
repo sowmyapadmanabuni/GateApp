@@ -9,6 +9,8 @@ import android.content.*
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
 import android.media.AudioAttributes
@@ -54,6 +56,7 @@ import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
+import com.oyespace.guards.kidexit.KidExitBlockSelectionActivity
 import com.oyespace.guards.models.*
 import com.oyespace.guards.models.FingerPrint
 import com.oyespace.guards.models.Worker
@@ -78,6 +81,7 @@ import com.oyespace.guards.utils.FirebaseDBUtils.Companion.addWalkieTalkieAudioF
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.removeWalkieTalkieAudioFirebase
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.Utils.showToast
+import com.oyespace.guards.zeotelapi.ZeotelRetrofitClinet
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
@@ -92,6 +96,7 @@ import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, SGFingerPresentEvent {
 
+var iv_torch:Button?=null
 
     private val REQUEST_CODE_SPEECH_INPUT = 100
     var unAccountID: String? = null
@@ -128,6 +133,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
     // LinearLayout lyt_settings;
     var clickable = 0
     var clickable1 = 0
+    var re_kidexit:RelativeLayout?=null
     var re_resident: RelativeLayout? = null
     var re_vehicle: RelativeLayout? = null
     var re_staff: RelativeLayout? = null
@@ -216,7 +222,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                     mAutoOnEnabled = true
                     mLed=true
                 }
-
                 val myHandler = Handler()
                 //final int TIME_TO_WAIT = 2000;
 
@@ -271,7 +276,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 nCaptureModeN = 0
                 usbConnected = true
             } else if (UsbManager.ACTION_USB_DEVICE_DETACHED == action) {
+
                 usbConnected = false
+               // sgfplib!!.Close()
             }
         }
     }
@@ -328,10 +335,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         } else {
             Prefs.putString(LANGUAGE, "en")
         }
-        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
-            startService(Intent(this@Dashboard, BGService::class.java))
-
-        }
+//        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
+//            startService(Intent(this@Dashboard, BGService::class.java))
+//
+//        }
 //        getLatestSubscription()
         println("Shalini" + getCurrentTimeLocalYMD())
         Dexter.withActivity(this)
@@ -433,10 +440,10 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         filter!!.addAction(UsbManager.EXTRA_PERMISSION_GRANTED)
         filter!!.addAction(ACTION_USB_PERMISSION)
 
-        if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
+       // if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
             registerReceiver(mUsbReceiver, filter)
-        }
+      //  }
 
 
         sgfplib = JSGFPLib(getSystemService(Context.USB_SERVICE) as UsbManager)
@@ -614,8 +621,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
     }
 
 
-    override fun onResume() {
 
+    override fun onResume() {
 
         if (pTimerChecker == null) {
             runTimerCheck()
@@ -1061,7 +1068,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             sgfplib!!.CloseDevice()
             bSecuGenDeviceOpened = false
         }
-        //        sgfplib.CloseDevice();
+       // sgfplib!!.Close()
 
 
         mVerifyImage = null
@@ -1129,7 +1136,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
     fun CaptureFingerPrint() {
 
         if (bSecuGenDeviceOpened == true) {
-
 
 //                val fp: ByteArray = getFingerprintFromScanner() ?: return
 
@@ -1275,9 +1281,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
         getDeviceList(LocalDb.getAssociation()!!.asAssnID)
 
-
-
-
         super.onStart()
 
 
@@ -1338,6 +1341,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
                 startActivity(i_delivery)
 
+
             }
 
             R.id.re_staff -> {
@@ -1364,6 +1368,40 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             R.id.re_resident -> {
                 val i_staff = Intent(this@Dashboard, ResidentIdActivity::class.java)
                 startActivity(i_staff)
+            }
+            R.id.re_kidexit->{
+
+                val i_kidexit = Intent(this@Dashboard, KidExitBlockSelectionActivity::class.java)
+                startActivity(i_kidexit)
+            }
+            R.id.iv_torch-> {
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                    var cameraId: String? = null
+                    cameraId = camManager.getCameraIdList()[0];
+                    if(clickable1==0){
+                        try {
+                            iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                            camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                          //  iv_torch!!.text = "OFF"
+                            clickable1=1
+                        } catch (e: CameraAccessException) {
+                            e.printStackTrace();
+                        }
+                    }
+                    else if(clickable1==1){
+                        camManager.setTorchMode(cameraId, false);
+                       // iv_torch!!.text = "ON"
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                        clickable1=0
+
+                    }
+                }
+
             }
             R.id.tv_languagesettings ->
 
@@ -1393,7 +1431,8 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         mHandlerr = Handler()
         //startRepeatingTask()
         //database =  DBHelper(this);
-
+        iv_torch=findViewById<Button>(R.id.iv_torch)
+        iv_torch?.setOnClickListener ( this )
         tv = findViewById<EditText>(R.id.edt_search_text1)
         btn_mic = findViewById(R.id.btn_mic)
         btn_in = findViewById(R.id.btn_in)
@@ -1493,6 +1532,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         re_staff?.setOnClickListener(this)
         re_delivery = findViewById(R.id.re_delivery)
         re_delivery?.setOnClickListener(this)
+        re_kidexit=findViewById(R.id.re_kidexit)
+        re_kidexit?.setOnClickListener ( this )
+
         rv_dashboard = findViewById(R.id.rv_dashboard)
         rv_dashboard?.layoutManager = LinearLayoutManager(
             this,
@@ -1523,9 +1565,29 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         })
 
         iv_help!!.setOnClickListener {
-            val intent = Intent(Intent.ACTION_CALL)
-            intent.data = Uri.parse("tel:" + "9343121121")
-            startActivity(intent)
+//            val intent = Intent(Intent.ACTION_CALL)
+//            intent.data = Uri.parse("tel:" + "9343121121")
+//            startActivity(intent)
+
+            ZeotelRetrofitClinet.instance.getCall("KI_3t1wBwDQ2odmnvIclEdg-1391508276", "4000299","8431901841","AGENTNUMBER=8333833448","60","json")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(object : CommonDisposable<GetCallResponse>() {
+
+                    override fun onSuccessResponse(getdata: GetCallResponse) {
+
+                    }
+
+                    override fun onErrorResponse(e: Throwable) {
+
+                    }
+
+                    override fun noNetowork() {
+                        Toast.makeText(this@Dashboard, "No network call ", Toast.LENGTH_LONG).show()
+                    }
+                })
+
+
         }
 
         btn_in.setOnClickListener {
@@ -1583,9 +1645,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
 
 
-        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
-            startService(Intent(this@Dashboard, BGService::class.java))
-        }
+//        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
+//            startService(Intent(this@Dashboard, BGService::class.java))
+//        }
 
 
         if (Prefs.getInt(PATROLLING_ID, 0) != 0) {
@@ -2181,6 +2243,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 override fun onSuccessResponse(getdata: getVisitorDataByWorker) {
 
                     if (getdata.success == true) {
+
+                        t1?.speak("No Match Found", TextToSpeech.QUEUE_FLUSH, null)
+
                     }
                 }
 
@@ -2220,7 +2285,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             LocalDb.getAssociation()!!.asAsnName, 0, "", mobileNumb, "1", "", "", "",
             1, "Staff Biometric Entry", "", "", "", "", ""
             , "", "", "", "", "", "", wkEntryImg, Prefs.getString(GATE_NO, ""), getCurrentTimeLocal(),
-            "", "", "", "", "", "", "", "", "", ""
+            "", "", "", "", "", "", "", "", "", "",""
         )
 
         Log.d("CreateVisitorLogResp", "StaffEntry destination " + req.toString())
@@ -2286,7 +2351,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                         ddc.putExtra(COMPANY_NAME, "Staff")
                                         ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
                                         ddc.putExtra("VLVisLgID", visitorLogID)
-                                        ddc.putExtra(VISITOR_TYPE, "Staff")
+                                        ddc.putExtra(VISITOR_TYPE, desgn)
                                         sendBroadcast(ddc)
                                     }
                                 }
@@ -2298,7 +2363,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                 )
                                 ddc.putExtra(
                                     "msg",
-                                    "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
+                                    "$personName" + " is coming to your home" + "(" + unitName + ")"
                                 )
                                 ddc.putExtra("mobNum", mobileNumb)
                                 ddc.putExtra("name", personName)
@@ -2309,7 +2374,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                 ddc.putExtra(COMPANY_NAME, "Staff")
                                 ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
                                 ddc.putExtra("VLVisLgID", visitorLogID)
-                                ddc.putExtra(VISITOR_TYPE, "Staff")
+                                ddc.putExtra(VISITOR_TYPE, desgn)
                                 sendBroadcast(ddc)
                             }
 
@@ -2360,7 +2425,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
                         if (UnitList.data.unit.unOcStat.equals("Sold Owner Occupied Unit")) {
                             unAccountID = UnitList.data.unit.owner[0].acAccntID.toString()
-                        } else if (UnitList.data.unit.unOcStat.equals("Sold Tenant Occupied Unit ")) {
+                        } else if (UnitList.data.unit.unOcStat.equals("Sold Tenant Occupied Unit")) {
 
                             unAccountID = UnitList.data.unit.tenant[0].acAccntID.toString()
 
@@ -2384,7 +2449,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                         ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
                         ddc.putExtra(
                             "msg",
-                            "$personName $desgn " + " is coming to your home" + "(" + unitName + ")"
+                            "$personName" + " is coming to your home" + "(" + unitName + ")"
                         )
                         ddc.putExtra("mobNum", mobileNumb)
                         ddc.putExtra("name", personName)
@@ -2480,7 +2545,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
         override fun run() {
 
-            Toast.makeText(context, "Hii", Toast.LENGTH_LONG).show()
             var i: Intent = context!!.packageManager
                 .getLaunchIntentForPackage(context.packageName)
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

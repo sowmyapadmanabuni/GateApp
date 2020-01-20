@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -60,6 +61,7 @@ class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Arra
 //
 //        }
 //        if(arrayList[position].image_url>0) {
+
         Picasso.with(mcontext)
             .load("http://mediaupload.oyespace.com/" + arrayList[position])
             .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)

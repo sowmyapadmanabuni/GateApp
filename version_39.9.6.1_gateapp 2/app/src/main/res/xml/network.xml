@@ -9,5 +9,8 @@
 
     </domain-config>
 
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">ex4.zeotel.com</domain>
 
+    </domain-config>
 </network-security-config>

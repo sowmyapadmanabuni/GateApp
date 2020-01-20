@@ -107,4 +107,21 @@
             android:gravity="right"
             android:padding="5dp"
     />
+
+<!--    <TextView-->
+<!--            android:id="@+id/tv_familymember"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:visibility="visible"-->
+<!--            android:textSize="16sp"-->
+<!--            android:layout_below="@+id/tv_number5"-->
+<!--            android:layout_margin="10dp"-->
+<!--            android:text="Family Members"/>-->
+
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_family"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_number5"/>
 </RelativeLayout>

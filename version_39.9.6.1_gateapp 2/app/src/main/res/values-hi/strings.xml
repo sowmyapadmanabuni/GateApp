@@ -87,7 +87,7 @@
     <string name="texteditvn">वाहन संख्या संपादित करें</string>
     <string name="textother">अन्य</string>
     <string name="textguest">अतिथि</string>
-    <string name="textlookingforqr">गेस्ट क्यूआर कोड की तलाश में</string>
+    <string name="textlookingforqr">गेस्ट qrcode की तलाश में</string>
     <string name="textnoqrcode">बिना qrcode केै</string>
     <string name="textpatrollingscreen">पैट्रोलिंग स्क्रीन</string>
     <string name="textstart">शुरु</string>
@@ -96,7 +96,7 @@
     <string name="textstaffdesignationselection">स्टाफ पदनाम चयन</string>
     <string name="textstringentry">प्रवेश करें</string>
     <string name="textbiometric">बायोमेट्रिक</string>
-    <string name="texttakepersonphoto">पर्सन फोटो लें</string>
+    <string name="texttakepersonphoto">व्यक्ति  फोटो लें</string>
     <string name="textretakepersonphoto"> व्यक्ति का फोटो फिर से लें </string>
 
     <string name="texttakeproductphoto">उत्पाद तस्वीरें ले लो</string>
@@ -221,5 +221,6 @@
     </string-array>
 
     <string name="gate_channel">GATE_NOTIF_CHANNEL</string>
+    <string name="textkidexit">शिशु निकास</string>
 
 </resources>

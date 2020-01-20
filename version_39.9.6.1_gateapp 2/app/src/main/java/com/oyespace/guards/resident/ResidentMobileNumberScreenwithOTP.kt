@@ -130,7 +130,7 @@ class ResidentMobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickList
 //            } else {
 //                buttonSkip.visibility = View.INVISIBLE
 //            }
-            img_logo.visibility = View.VISIBLE
+       //     img_logo.visibility = View.VISIBLE
             Ed_phoneNum.visibility = View.VISIBLE
             textview.visibility = View.GONE
 

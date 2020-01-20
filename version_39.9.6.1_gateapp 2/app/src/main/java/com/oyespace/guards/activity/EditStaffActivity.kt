@@ -16,6 +16,7 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import com.bumptech.glide.load.engine.Resource
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.listeners.PermissionCallback
@@ -85,13 +86,16 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
     var ed_dob: TextView? = null
     var btn_update: Button? = null
     var tv_mobilenumber: TextView? = null
+    var iv_torch: Button?=null
+    var clickable1 = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_staff)
 
 
-        btn_update = findViewById(R.id.btn_update)
+        btn_update = findViewById(R.id.buttonNext)
+        btn_update!!.text=resources.getString(R.string.textupdate)
 
         ed_dob = findViewById(R.id.ed_dob)
         // ed_dob.text=intent.getStringExtra("DOB")

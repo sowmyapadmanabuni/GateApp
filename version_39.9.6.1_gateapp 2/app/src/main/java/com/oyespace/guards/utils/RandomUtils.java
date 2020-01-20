@@ -75,11 +75,11 @@ public class RandomUtils {
 
 
 
-    public static ArrayList<VisitorLogExitResp.Data.VisitorLog> getSortedVisitorLog_old(ArrayList<VisitorLogExitResp.Data.VisitorLog> arrayList ){
-        ArrayList<VisitorLogExitResp.Data.VisitorLog> nonExitedSort =new ArrayList<>();
-        ArrayList<VisitorLogExitResp.Data.VisitorLog> exitedSort =new ArrayList<>();
+    public static ArrayList<VisitorLog> getSortedVisitorLog_old(ArrayList<VisitorLog> arrayList ){
+        ArrayList<VisitorLog> nonExitedSort =new ArrayList<>();
+        ArrayList<VisitorLog> exitedSort =new ArrayList<>();
 
-        for (VisitorLogExitResp.Data.VisitorLog s : arrayList) {
+        for (VisitorLog s : arrayList) {
             //if the existing elements contains the search input
             Log.d("button_done ", "visitorlogbydate " + s.getVlExitT() + " " + s.getVlExitT().equals("0001-01-01T00:00:00"));
 
@@ -96,24 +96,24 @@ public class RandomUtils {
 
         LocalDb.saveEnteredVisitorLog_old(nonExitedSort);
 
-        Collections.sort(exitedSort, new Comparator<VisitorLogExitResp.Data.VisitorLog>() {
+        Collections.sort(exitedSort, new Comparator<VisitorLog>() {
             @Override
-            public int compare(VisitorLogExitResp.Data.VisitorLog lhs, VisitorLogExitResp.Data.VisitorLog rhs) {
+            public int compare(VisitorLog lhs, VisitorLog rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
                 return rhs.getVlExitT().compareTo(lhs.getVlExitT());
 
             }
         });
-        Collections.sort(nonExitedSort, new Comparator<VisitorLogExitResp.Data.VisitorLog>() {
+        Collections.sort(nonExitedSort, new Comparator<VisitorLog>() {
             @Override
-            public int compare(VisitorLogExitResp.Data.VisitorLog lhs, VisitorLogExitResp.Data.VisitorLog rhs) {
+            public int compare(VisitorLog lhs, VisitorLog rhs) {
                 // -1 - less than, 1 - greater than, 0 - equal, all inversed for descending
                 return lhs.getVlVisType().compareTo(rhs.getVlVisType());
 
             }
         });
 
-        ArrayList<VisitorLogExitResp.Data.VisitorLog> newAl =new ArrayList<>();
+        ArrayList<VisitorLog> newAl =new ArrayList<>();
 
         newAl.addAll(nonExitedSort);
         newAl.addAll(exitedSort);

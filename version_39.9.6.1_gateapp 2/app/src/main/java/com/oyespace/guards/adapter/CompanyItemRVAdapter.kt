@@ -39,7 +39,11 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
             intent.putExtra(VISITOR_TYPE, DELIVERY)
             if(arrayList[position].vendor_names.equals("Others")){
                 intent.putExtra(COMPANY_NAME, OTHERS)
-            }else{
+            }
+            else if(arrayList[position].vendor_names.equals("अन्य")){
+                intent.putExtra(COMPANY_NAME, OTHERS)
+            }
+            else{
                val data= arrayList[position].vendor_names
                 intent.putExtra(COMPANY_NAME, data)
 

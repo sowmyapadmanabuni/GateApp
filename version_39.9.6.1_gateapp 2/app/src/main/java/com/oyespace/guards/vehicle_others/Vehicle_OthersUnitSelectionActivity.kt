@@ -5,16 +5,16 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.RelativeLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -42,6 +42,8 @@ import kotlinx.android.synthetic.main.title_bar.*
 
 class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  {
 
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var orderListAdapter:UnitListAdapter?=null
     var pageNumberAdapter: PaginationAdapter? = null
     var arrayList = ArrayList<UnitPojo>()
@@ -68,6 +70,36 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_unit_selection)
+
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
 
         header_title.text = this.resources.getString(R.string.units_list_title)
         header_subtitle.text = "A Block"
@@ -607,7 +639,13 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                                 if (orderData.owner[0].uoMobile.equals("")) {
                                     iv_unit1.visibility = View.GONE
                                     tv_number1.visibility = View.GONE
-                                } else {
+                                }
+
+                                else if (orderData.owner[0].uoMobile.equals("null")) {
+                                    iv_unit1.visibility = View.GONE
+                                    tv_number1.visibility = View.GONE
+                                }
+                                else {
 
                                     iv_unit1.visibility = View.VISIBLE
                                     tv_number1.visibility = View.VISIBLE
@@ -617,7 +655,12 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                                 if (orderData.owner[0].uoMobile1.equals("")) {
                                     iv_unit2.visibility = View.GONE
                                     tv_number2.visibility = View.GONE
-                                } else {
+                                }
+                                else if (orderData.owner[0].uoMobile1.equals("null")) {
+                                    iv_unit2.visibility = View.GONE
+                                    tv_number2.visibility = View.GONE
+                                }
+                                else {
                                     iv_unit2.visibility = View.VISIBLE
                                     tv_number2.visibility = View.VISIBLE
                                     tv_number2.setText(orderData.owner[0].uoMobile1)
@@ -626,7 +669,13 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                                 if (orderData.owner[0].uoMobile2.equals("")) {
                                     iv_unit3.visibility = View.GONE
                                     tv_number3.visibility = View.GONE
-                                } else {
+                                }
+
+                                else if (orderData.owner[0].uoMobile2.equals("null")) {
+                                    iv_unit3.visibility = View.GONE
+                                    tv_number3.visibility = View.GONE
+                                }
+                                else {
                                     iv_unit3.visibility = View.VISIBLE
                                     tv_number3.visibility = View.VISIBLE
                                     tv_number3.setText(orderData.owner[0].uoMobile2)
@@ -635,7 +684,12 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                                 if (orderData.owner[0].uoMobile3.equals("")) {
                                     iv_unit4.visibility = View.GONE
                                     tv_number4.visibility = View.GONE
-                                } else {
+                                }
+                                else if (orderData.owner[0].uoMobile3.equals("null")) {
+                                    iv_unit4.visibility = View.GONE
+                                    tv_number4.visibility = View.GONE
+                                }
+                                else {
                                     iv_unit4.visibility = View.VISIBLE
                                     tv_number4.visibility = View.VISIBLE
                                     tv_number4.setText(orderData.owner[0].uoMobile3)
@@ -643,7 +697,12 @@ class Vehicle_OthersUnitSelectionActivity : BaseKotlinActivity() , View.OnClickL
                                 if (orderData.owner[0].uoMobile4.equals("")) {
                                     iv_unit5!!.visibility = View.GONE
                                     tv_number5.visibility = View.GONE
-                                } else {
+                                }
+                                else if (orderData.owner[0].uoMobile4.equals("null")) {
+                                    iv_unit5!!.visibility = View.GONE
+                                    tv_number5.visibility = View.GONE
+                                }
+                                else {
                                     iv_unit5!!.visibility = View.VISIBLE
                                     tv_number5.visibility = View.VISIBLE
                                     tv_number5.setText(orderData.owner[0].uoMobile4)

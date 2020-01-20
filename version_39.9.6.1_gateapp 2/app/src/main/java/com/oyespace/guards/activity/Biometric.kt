@@ -8,12 +8,11 @@ import android.app.AlertDialog
 import android.app.PendingIntent
 import android.content.*
 import android.graphics.*
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.hardware.usb.UsbDevice
 import android.hardware.usb.UsbManager
-import android.os.Bundle
-import android.os.Environment
-import android.os.Handler
-import android.os.Message
+import android.os.*
 import android.speech.tts.TextToSpeech
 import android.util.Base64
 import android.util.Log
@@ -44,6 +43,8 @@ import java.util.*
 
 class Biometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, Runnable, SGFingerPresentEvent {
 
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var result: Long? = null
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
@@ -232,6 +233,38 @@ class Biometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, R
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
 
         setContentView(R.layout.activity_register_finger_print)
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
+
+
+
 
         val dir =
             File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
@@ -297,7 +330,7 @@ class Biometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, R
         save!!.visibility = View.INVISIBLE
         next = findViewById(R.id.buttonNext)
         previous = findViewById(R.id.buttonPrevious)
-        buttonDone = findViewById(R.id.buttonDone)
+        buttonDone = findViewById(R.id.buttonNext)
 
 
         t1 = TextToSpeech(applicationContext, TextToSpeech.OnInitListener { status ->
@@ -1114,7 +1147,7 @@ class Biometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, R
             }
         }
 
-        if (v.id == R.id.buttonDone) {
+        if (v.id == R.id.buttonNext) {
 
 
             val d = Intent(this@Biometric, StaffDetails::class.java)

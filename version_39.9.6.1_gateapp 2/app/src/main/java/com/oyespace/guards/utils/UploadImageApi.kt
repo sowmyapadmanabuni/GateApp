@@ -3,6 +3,7 @@ package com.oyespace.guards.utils
 import android.graphics.Bitmap
 import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import okhttp3.MediaType
@@ -69,6 +70,8 @@ class UploadImageApi {
                 override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
                     try {
                         Log.d("uploadImage", "response:" + response.body()!!)
+
+
                         // file.delete()
 
                     } catch (ex: Exception) {

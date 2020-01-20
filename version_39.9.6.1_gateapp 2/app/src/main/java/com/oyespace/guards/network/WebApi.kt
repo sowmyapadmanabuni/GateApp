@@ -178,7 +178,7 @@ interface WebApi {
     fun updateInvitation(@Header(OYE247KEY) token: String, @Body invitationUpdateReq: InvitationUpdateReq): Single<InviteCreateRes>
 
     @GET("oyesafe/api/v1/GetFamilyMemberListByAssocAndUnitID/{uid}/{aid}/{accid}")
-    fun getFamilyMemberList(@Header("X-OYE247-APIKey") token: String, @Path("uid") unUnitID: String, @Path("aid")asAssnID: String,@Path("accid") accountID:String):Single<GetFamilyMemberResponse>
+    fun getFamilyMemberList(@Header("X-OYE247-APIKey") token: String, @Path("uid") unUnitID: String, @Path("aid")asAssnID: String,@Path("accid") accountID:String):Single<GetFamilyMemberResponse<ArrayList<FamilyMember>>>
 
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     fun residentValidation(@Header("X-OYE247-APIKey") token: String, @Body residentValidationRequest: ResidentValidationRequest)
@@ -197,4 +197,8 @@ interface WebApi {
 
     @GET("oyesafe/api/v1/Subscription/GetLatestSubscriptionByAssocID/{id}")
     fun getSubscriptionData(@Header("X-OYE247-APIKey") token: String,@Path("id") assid: String):Single<SubscriptionResp>
+
+
+    @POST("oyesafe/api/v1/UpdateApprovalStatus")
+    fun updateApprovalStatus(@Header(OYE247KEY) token: String, @Body updateApprovalStatus: UpdateApprovalStatus): Single<Any>
 }

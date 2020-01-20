@@ -1,13 +1,18 @@
 package com.oyespace.guards.vehicle_others
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -27,11 +32,15 @@ import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import java.io.File
 import java.util.*
 
 class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
 
+    var imageName: String? = null
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var purpose:String?=null
     var imgName: String? = null
     internal var list = ArrayList<String>()
@@ -65,10 +74,10 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
 
         when (v?.id) {
 
-            R.id.button_done -> {
+            R.id.buttonNext -> {
 
-                button_done.isEnabled = false
-                button_done.isClickable = false
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
                 if (intent.getStringExtra(UNITID).contains(",")) {
                     var unitname_dataList: Array<String>
@@ -142,6 +151,37 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
 
+        iv_torch=findViewById(R.id.iv_torch)
+        iv_torch!!.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
+        buttonNext.text=resources.getString(R.string.textdone)
+
         txt_assn_name = findViewById(R.id.txt_assn_name)
         txt_gate_name = findViewById(R.id.txt_gate_name)
         txt_device_name = findViewById(R.id.txt_device_name)
@@ -207,10 +247,13 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
         if (wrrw != null) {
 //            var mBitmap: Bitmap;
+            imageName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
 
         } else {
+
+            imageName = ""
             Picasso.with(this)
                 .load(
                     IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
@@ -268,7 +311,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
         //      imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" +intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
-        imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+      //  imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
 
 //        var memID:Int=64
 //        if(!BASE_URL.contains("dev",true)){
@@ -281,9 +324,9 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
             purpose.toString(),intent.getStringExtra(VEHICLE_NUMBER),"","",
             minteger,intent.getStringExtra(VISITOR_TYPE),SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imgName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10,"",imageName.toString(),Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
-            , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20)
+            , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20,"")
         Log.d("CreateVisitorLogResp","StaffEntry "+req.toString())
 
         compositeDisposable.add(

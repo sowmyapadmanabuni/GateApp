@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -14,6 +15,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.signature.StringSignature
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
@@ -29,11 +33,11 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
-import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
+import kotlinx.android.synthetic.main.header_with_next.*
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -44,7 +48,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     var imgName: String? = null
     internal var list = ArrayList<String>()
     lateinit var imageAdapter: ImageAdapter
-    lateinit var mBitmap: Bitmap
+     var mBitmap: Bitmap?=null
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
@@ -57,13 +61,13 @@ var purpose:String?=null
 
         when (v?.id) {
 
-            R.id.button_done -> {
-                button_done.isEnabled = false
-                button_done.isClickable = false
+            R.id.buttonNext -> {
+                buttonNext.isEnabled = false
+                buttonNext.isClickable = false
 
                 if (!Utils.isConnectedToInternet()) {
-                    button_done.isEnabled = true
-                    button_done.isClickable = true
+                    buttonNext.isEnabled = true
+                    buttonNext.isClickable = true
                     Utils.showToast(applicationContext, getString(R.string.no_internet))
                     return
                 }
@@ -126,23 +130,37 @@ var purpose:String?=null
 
             R.id.profile_image -> {
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
-                val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-                if (wrrw != null) {
+              //  val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+               // if (wrrw != null) {
 
                     val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
                     val factory = LayoutInflater.from(this@StaffEntryRegistration)
                     val view = factory.inflate(R.layout.dialog_big_image, null)
                     var dialog_imageview: ImageView? = null
                     dialog_imageview = view.findViewById(R.id.dialog_imageview)
-                    mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                    dialog_imageview.setImageBitmap(mBitmap)
+//                    mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+//                    dialog_imageview.setImageBitmap(mBitmap)
+                    dialog_imageview.background = profile_image.getDrawable()
 
                     alertadd.setView(view)
                     alertadd.show()
-
-                } else {
-
-                }
+              //  }
+//                else {
+//                    val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
+//                    val factory = LayoutInflater.from(this@StaffEntryRegistration)
+//                    val view = factory.inflate(R.layout.dialog_big_image, null)
+//                    var dialog_imageview: ImageView? = null
+//                    dialog_imageview = view.findViewById(R.id.dialog_imageview)
+//                    Glide.with(this)
+//                        .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
+//                        .placeholder(R.drawable.user_icon_black)
+//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                        .skipMemoryCache(false)
+//                        .signature(StringSignature(System.currentTimeMillis().toString()))
+//                        .into(dialog_imageview)
+//                    alertadd.setView(view)
+//                    alertadd.show()
+//                }
             }
 
         }
@@ -193,6 +211,7 @@ var purpose:String?=null
 //                        front_translucent);
 
         purpose=intent.getStringExtra(VISITOR_PURPOSE)
+        buttonNext.text=resources.getString(R.string.textdone)
 
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION, true)) {
 
@@ -263,18 +282,32 @@ var purpose:String?=null
             }
         }
 
-        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-        if (wrrw != null) {
+        val url=intent.getStringExtra(PERSON_PHOTO)
 
-            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-            profile_image.setImageBitmap(mBitmap)
 
-        } else {
-            val image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg"
-            Picasso.with(this)
-                .load(image)
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
-        }
+//        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+//        if (wrrw != null) {
+//            //   imageView1.setImageBitmap(photo);
+//
+//            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+//            profile_image.setImageBitmap(mBitmap)
+//
+//        } else {
+//               //imageView1.setImageBitmap(photo);
+//            Toast.makeText(applicationContext, "222 ", Toast.LENGTH_SHORT).show()
+//
+//            val image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg"
+////            Picasso.with(this)
+////                .load(image)
+////                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
+            Glide.with(this)
+                .load(Uri.parse(IMAGE_BASE_URL + "Images/" + url))
+                .placeholder(R.drawable.user_icon_black)
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(false)
+                .signature(StringSignature(System.currentTimeMillis().toString()))
+                .into(profile_image)
+//        }
 
         list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
 
@@ -331,7 +364,7 @@ var purpose:String?=null
             purpose.toString(), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
-            , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20
+            , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20,""
         )
 
         Log.d("taaag", "log request: $req")
@@ -344,6 +377,8 @@ var purpose:String?=null
                     override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
 
                         if (globalApiObject.success) {
+
+                            Toast.makeText(this@StaffEntryRegistration, "111", Toast.LENGTH_SHORT).show()
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
                             Log.d("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
@@ -363,7 +398,7 @@ var purpose:String?=null
                                 val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
                                 deleteDir(dir.absolutePath)
 
-                                uploadImage(imgName, mBitmap)
+                              //  uploadImage(imgName, mBitmap)
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
@@ -391,7 +426,7 @@ var purpose:String?=null
                                                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                                                 sendBroadcast(d)
 
-                                                Log.v("DELIVERY",visitor.vlVisLgID.toString())
+                                                Log.v("DELIVERY",visitor.vlVisLgID.toString()+intent.getStringExtra(VISITOR_TYPE))
                                             }
                                         }
                                         dismissProgress()
@@ -411,17 +446,18 @@ var purpose:String?=null
                     }
 
                     override fun onErrorResponse(e: Throwable) {
+                        Toast.makeText(this@StaffEntryRegistration, "222", Toast.LENGTH_SHORT).show()
                         dismissProgress()
-                        button_done.isEnabled = true
-                        button_done.isClickable = true
+                       // buttonNext.isEnabled = true
+                       // buttonNext.isClickable = true
                         Utils.showToast(applicationContext, getString(R.string.some_wrng) + e.toString())
                         Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
                     }
 
                     override fun noNetowork() {
                         dismissProgress()
-                        button_done.isEnabled = true
-                        button_done.isClickable = true
+                       // buttonNext.isEnabled = true
+                       // buttonNext.isClickable = true
                         Utils.showToast(applicationContext, getString(R.string.no_internet))
                     }
 
@@ -453,7 +489,7 @@ var purpose:String?=null
                     override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                         if (globalApiObject.success == true) {
                             // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                            uploadImage(imgName.toString(), mBitmap)
+                           // uploadImage(imgName.toString(), mBitmap)
                             Log.d(
                                 "CreateVisitorLogResp",
                                 "StaffEntry " + globalApiObject.data.toString()
@@ -555,7 +591,7 @@ var purpose:String?=null
             intent.getStringExtra("Image"),
             Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),
-            "", "", "", "", "", "", "", "", "", ""
+            "", "", "", "", "", "", "", "", "", "",""
         )
         Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
 
@@ -592,15 +628,15 @@ var purpose:String?=null
 
                     override fun onErrorResponse(e: Throwable) {
                         Log.d("onErrorResponse", "StaffEntry " + e.toString())
-                        button_done.isEnabled = true
-                        button_done.isClickable = true
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
                         Utils.showToast(this@StaffEntryRegistration, "Something went wrong")
 //                    dismissProgress()
                     }
 
                     override fun noNetowork() {
-                        button_done.isEnabled = true
-                        button_done.isClickable = true
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
                         Utils.showToast(this@StaffEntryRegistration, resources.getString(R.string.no_internet))
                     }
 

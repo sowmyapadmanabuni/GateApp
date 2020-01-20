@@ -5,35 +5,38 @@
               android:orientation="vertical"
               android:background="@android:color/white"
 >
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="2dp"
-                    android:background="@color/white"
-    >
 
-        <ImageView android:layout_width="150dp"
-                   android:layout_height="40dp"
-                   android:layout_centerHorizontal="true"
-android:layout_margin="@dimen/_2sdp"
-                   android:src="@drawable/oyespace_toolbar"/>
-        <Button
-                android:id="@+id/buttonNext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_2sdp"
-                android:layout_alignParentRight="true"
-                android:padding="@dimen/_2sdp"
-                android:onClick="onClick"
-                android:text="@string/textnext"
-                android:textColor="@android:color/white"
-                android:background="@drawable/square"
-                android:textSize="@dimen/_10sdp"/>
-    </RelativeLayout>
-    <RelativeLayout android:layout_width="match_parent"
-                    android:layout_height="2dp"
-                    android:background="@color/orange">
+    <include layout="@layout/header_with_next" />
 
-    </RelativeLayout>
+<!--    <RelativeLayout android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:padding="2dp"-->
+<!--                    android:background="@color/white"-->
+<!--    >-->
+
+<!--        <ImageView android:layout_width="150dp"-->
+<!--                   android:layout_height="40dp"-->
+<!--                   android:layout_centerHorizontal="true"-->
+<!--android:layout_margin="@dimen/_2sdp"-->
+<!--                   android:src="@drawable/oyespace_toolbar"/>-->
+<!--        <Button-->
+<!--                android:id="@+id/buttonNext"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_margin="@dimen/_2sdp"-->
+<!--                android:layout_alignParentRight="true"-->
+<!--                android:padding="@dimen/_2sdp"-->
+<!--                android:onClick="onClick"-->
+<!--                android:text="@string/textnext"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                android:background="@drawable/square"-->
+<!--                android:textSize="@dimen/_10sdp"/>-->
+<!--    </RelativeLayout>-->
+<!--    <RelativeLayout android:layout_width="match_parent"-->
+<!--                    android:layout_height="2dp"-->
+<!--                    android:background="@color/orange">-->
+
+<!--    </RelativeLayout>-->
 
     <TextView android:layout_width="match_parent"
               android:layout_height="wrap_content"

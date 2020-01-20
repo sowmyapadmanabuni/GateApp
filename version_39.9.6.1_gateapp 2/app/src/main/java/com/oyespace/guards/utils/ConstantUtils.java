@@ -16,6 +16,7 @@ public class ConstantUtils {
     public static final String FLOW_TYPE = "flow_type";
     public static final String VISITOR_TYPE = "visitor_type";
     public static final String PERSONNAME = "person_name";
+    public static final String KIDNAME = "kid_name";
     public static final String ACCOUNT_ID = "account_id";
     public static final String BLOCK_ID = "block_id";
     public static final String UNIT_ACCOUNT_ID = "unit_account_id";
@@ -29,6 +30,8 @@ public class ConstantUtils {
 
     public static final String DELIVERY = "Delivery";
     public static final String STAFF = "Staff";
+    public static final String KIDEXIT = "Kid Exit";
+    public static final String KID_EXIT = "KID_EXIT";
     public static final String STAFF_REGISTRATION = "STAFF_REGISTRATION";
     public static final String FULL_MANUAL_STAFF_ENTRY = "FULL_MANUAL_STAFF_ENTRY";
     public static final String WORKER_ID = "worker_id";
@@ -77,13 +80,13 @@ public class ConstantUtils {
 
 
     //http://mediaupload.oyespace.com/Images/
-//    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
-//    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
-    public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
-//        public static final String BASE_URL = "https://api.oyespace.com/";
-public static final String BASE_URL  =  "https://staging.oyespace.com/";
-//    public static final String BASE_URL = "https://apidev.oyespace.com/";
-//public static final String BASE_URL = "https://apiuat.oyespace.com/";
+  //public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+   // public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+  public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+    //  public static final String BASE_URL = "https://api.oyespace.com/";
+//public static final String BASE_URL  =  "https://staging.oyespace.com/";
+  // public static final String BASE_URL = "https://apidev.oyespace.com/";
+public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
     public static final String PATROLLING_END_POINT = "Patrolling End Point";
@@ -132,16 +135,21 @@ public static final String BASE_URL  =  "https://staging.oyespace.com/";
     public static final String ACTIVE_ALERT = "ACTIVE_ALERT";
     public static final String PATROLLING_RESUMED_TIME = "PATROLLING_RESUMED_TIME";
 
+    public static final int ONE_MINUTE_REMAINDER = debug ? 30 * 60 : 1 * 60;// 1 min
     public static final int MAX_DELIVERY_ALLOWED_SEC = debug ? 3 * 60 : 7 * 60;// 7 mins
     public static final int MAX_ENTRY_EXPIRY_SEC = debug ? 30 * 60 : 30 * 60;// 30 mins
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";
 
-    public static final String EXPIRED = "Expired";
-    public static final String REJECTED = "Rejected";
-    public static final String APPROVED = "Approved";
+    public static final String ENTRYEXPIRED = "EntryExpired";
+    public static final String EXITEXPIRED = "ExitExpired";
+    public static final String ENTRYREJECTED = "EntryRejected";
+    public static final String EXITREJECTED = "ExitRejected";
+    public static final String ENTRYAPPROVED = "EntryApproved";
+    public static final String EXITAPPROVED = "ExitApproved";
     public static final String EXITED = "Exited";
-    public static final String PENDING = "Pending";
+    public static final String ENTRYPENDING = "EntryPending";
+    public static final String EXITPENDING = "ExitPending";
 
     public static final String SEND_NOTIFICATION = "send_notification";
 }
