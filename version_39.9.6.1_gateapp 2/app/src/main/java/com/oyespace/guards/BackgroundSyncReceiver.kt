@@ -75,9 +75,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     for (i in 0 until unitid_dataList.size) {
 
                         try {
-
+                            val unitid = unitid_dataList.get(i).replace(" ", "").toInt();
                             getUnitLog(
-                                unitid_dataList.get(i).replace(" ", "").toInt(),
+                                unitid,
                                 intent.getStringExtra("name"),
                                 "",
                                 intent.getStringExtra(VISITOR_TYPE),
@@ -87,7 +87,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 intent.getIntExtra("VLVisLgID", 0),
                                 intent.getStringExtra("msg"),
                                 intent.getStringExtra("nr_id"),
-                                sendNotification
+                                sendNotification,""+Prefs.getInt(ASSOCIATION_ID, 0).toString()+ NOTIF_STAFF_ENTRY+unitid
                             )
                         } catch (e: Exception) {
 
@@ -110,6 +110,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                 try {
                     getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), intent.getStringExtra(VISITOR_TYPE), 0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0), intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification)
+                    val unitid = intent.getStringExtra(UNITID).toInt()
+                    getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), "Staff",
+                        0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0),
+                        intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification,
+                        ""+Prefs.getInt(ASSOCIATION_ID, 0).toString()+NOTIF_STAFF_ENTRY+unitid)
 
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -207,10 +212,14 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                 val userID: Int = intent.getIntExtra("userID", 0)
                 val unitID: String = intent.getStringExtra("unitID")//40841
                 Log.e("BEFORE_",""+associationID+"-"+associationName+"-"+ntDesc+"-"+ntTitle+"-"+ntType+"-"+sbSubID+"-"+userID+"-"+unitID);
-                sendCloudFunctionNotification(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID)
+                val topic = ""+associationID+ NOTIF_STAFF_EXIT+unitID;
+                sendCloudFunctionNotification(associationID,associationName,ntDesc,ntTitle,ntType,sbSubID,userID,unitID,topic)
             }catch (e:Exception){
                 e.printStackTrace()
             }
+        }else if (intent.getStringExtra(BSR_Action).equals(BGS_OFFLINE_SYNC)) {
+            Log.e("BGS_OFFLINE_SYNC","BGS_OFFLINE_SYNC")
+            Toast.makeText(mcontext,"Syncing offline ...",Toast.LENGTH_LONG).show()
         }
 
     }
@@ -854,9 +863,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int, unitID: String) {
+    private fun sendCloudFunctionNotification(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int, unitID: String, topicName:String) {
 
-        val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
+        val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID, topicName)
 
         CloudFunctionRetrofitClinet.instance
             .sendCloud_VisitorEntry(dataReq)
@@ -880,9 +889,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             })
     }
 
-    private fun sendCloudFunctionNotificationAdmin(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int, unitID: String) {
+    private fun sendCloudFunctionNotificationAdmin(associationID: Int, associationName: String, ntDesc: String, ntTitle: String, ntType: String, sbSubID: String, userID: Int, unitID: String, topicName:String) {
 
-        val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID)
+        val dataReq = CloudFunctionNotificationReq(associationID, associationName, ntDesc, ntTitle, ntType, sbSubID, userID, unitID, topicName)
 
 
         CloudFunctionRetrofitClinet.instance
@@ -938,7 +947,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
     private fun getUnitLog(unitId: Int, personName: String, mobileNumb: String, desgn: String,
-                           workerType: String, staffID: Int, unitName: String, vlVisLgID: Int, msg: String, nrId: String, sendNotification: Boolean) {
+                           workerType: String, staffID: Int, unitName: String, vlVisLgID: Int, msg: String, nrId: String, sendNotification: Boolean,topicName: String) {
 
         Log.e("getUnitLog_SAV",""+unitId+" - "+personName);
         RetrofitClinet.instance
@@ -960,7 +969,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification
+                                            sendNotification,topicName
                                         )
                                     }
                                 } catch (e: IndexOutOfBoundsException) {
@@ -980,7 +989,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification
+                                            sendNotification,topicName
                                         )
 
                                     }
@@ -1003,7 +1012,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification
+                                            sendNotification,topicName
                                         )
 
                                     }
@@ -1031,7 +1040,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification
+                                            sendNotification, topicName
                                         )
                                     }
                                 } catch (e: IndexOutOfBoundsException) {
@@ -1081,7 +1090,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 "gate_app",
                                 vlVisLgID.toString() + "admin",
                                 unAccountID!!.toInt(),
-                                unAccountID.toString()
+                                unAccountID.toString(),topicName
                             )
                         } catch (e: KotlinNullPointerException) {
 
@@ -1123,7 +1132,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-    fun getFamilyMemberData(unitId: String, assnID: Int, accountId: Int, desgn: String, msg: String, vlVisLgID: Int, sendNotification: Boolean) {
+    fun getFamilyMemberData(unitId: String, assnID: Int, accountId: Int, desgn: String, msg: String, vlVisLgID: Int, sendNotification: Boolean, topicName:String) {
         RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId, assnID.toString(), accountId.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -1166,7 +1175,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     "gate_app",
                                     vlVisLgID.toString() + "admin",
                                     getdata.data.familyMembers[i].acAccntID,
-                                    getdata.data.familyMembers[i].acAccntID.toString()
+                                    getdata.data.familyMembers[i].acAccntID.toString(),topicName
                                 )
 
                             }

@@ -87,6 +87,13 @@ public class ConstantUtils {
 //public static final String BASE_URL  =  "https://staging.oyespace.com/";
   // public static final String BASE_URL = "https://apidev.oyespace.com/";
 public static final String BASE_URL = "https://apiuat.oyespace.com/";
+//    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+//    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+    public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+//        public static final String BASE_URL = "https://api.oyespace.com/";
+//public static final String BASE_URL  =  "https://staging.oyespace.com/";
+//    public static final String BASE_URL = "https://apidev.oyespace.com/";
+public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
     public static final String PATROLLING_END_POINT = "Patrolling End Point";
@@ -119,6 +126,7 @@ public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final long PATROLLING_PAUSE_REMINDER_TIMER = 8;
     public static final String BGS_PATROLLING_ALARM = "BGS_PATROLLING_ALARM";
     public static final String VISITOR_EXIT_NOTIFY = "VISITOR_EXIT_NOTIFY";
+    public static final String BGS_OFFLINE_SYNC = "BGS_PATROLLING_ALARM";
 
     public static final String SOS_STATUS_COMPLETED = "COMPLETED";
     public static final String SOS_STATUS_PASSED = "PASS";
@@ -152,4 +160,10 @@ public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String EXITPENDING = "ExitPending";
 
     public static final String SEND_NOTIFICATION = "send_notification";
+
+
+    public static final String NOTIF_STAFF_ENTRY = "_STAFFENTRY_";
+    public static final String NOTIF_STAFF_EXIT = "_STAFFEXIT_";
+    public static final String NOTIF_VENDOR_ENTRY = "_VENDORENTRY_";
+    public static final String NOTIF_VENDOR_EXIT = "_VENDOREXIT_";
 }

@@ -1,5 +1,6 @@
 package com.oyespace.guards.models
 
+import com.oyespace.guards.pojo.CheckPointScanRequest
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -19,6 +20,32 @@ open class PatrolShiftRealm:RealmObject() {
     var psdUpdated: String=""
     var psIsActive: Boolean=false
     //var point: RealmList<ScheduleCheckPointsDataRealm> = RealmList()
+}
+
+
+data class CheckPointMultipleScanRequest(
+    val ASAssnID: Int,
+    val WKWorkID: String,
+    val wkfName: String,
+    val PSPtrlSID : Int,
+    val TRImage:String,
+    val deId:Int,
+    val tracking:List<CheckPointScanRequest>
+)
+
+open class CheckPointScanRealm:RealmObject() {
+    @PrimaryKey
+    var id:Int=0
+    var ASAssnID: Int=0
+    var WKWorkID: String=""
+    var wkfName: String=""
+    var PSPtrlSID: Int=0
+    var TRTDateT: String=""
+    var TRGPSPnt: String=""
+    var CPCkPName: String=""
+    var TRImage: String=""
+    var deId: Int=0
+    var CPCPntAt: String=""
 }
 
 open class CheckPointsOfSchedule:RealmObject(){

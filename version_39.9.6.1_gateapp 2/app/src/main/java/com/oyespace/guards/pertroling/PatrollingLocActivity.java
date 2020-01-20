@@ -49,6 +49,7 @@ import com.oyespace.guards.R;
 import com.oyespace.guards.SGPatrollingService;
 import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.broadcastreceiver.GeofenceBroadcastReceiver;
+import com.oyespace.guards.models.CheckPointScanRealm;
 import com.oyespace.guards.models.CheckPointsOfSchedule;
 import com.oyespace.guards.models.CheckPointsOfSheduleListResponse;
 import com.oyespace.guards.models.PatrolShift;
@@ -740,10 +741,10 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                 //setSatellitesAccuracy();
                 boolean hasInternet = mInternetAvailabilityChecker.getCurrentInternetAvailabilityStatus();
                 //if(hasInternet) {
-                    if (currentSatelliteCount > 4) {
-                        //if(currentLocationAccuracy < 8){
-                        //if (currentLocationAge < 15) {
-                        isValidCheckPoint(qrCheckpoint);
+                if (currentSatelliteCount > 4) {
+                    //if(currentLocationAccuracy < 8){
+                    //if (currentLocationAge < 15) {
+                    isValidCheckPoint(qrCheckpoint);
 //                        }else{
 //                            showAnimatedDialog("Same GPS location from last 15 seconds", R.raw.error, true, "OK");
 //                            gpsTracker.getLocation();
@@ -752,7 +753,7 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 //                        showAnimatedDialog("Signal accuracy is very low", R.raw.error, true, "OK");
 //                        gpsTracker.getLocation();
 //                    }
-                    } else {
+                } else {
 //                    String msg = "No Satellites found. Unable to calculate location";
 //                    if(currentSatelliteCount > 0){
 //                        msg = "Only "+currentSatelliteCount+" Satellites found. Unable to calculate location";
@@ -760,14 +761,14 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
 //                    showAnimatedDialog(msg, R.raw.error, true, "OK");
 //                    gpsTracker.getLocation();
 
-                        if (currentLocationAccuracy < 15) {
-                            isValidCheckPoint(qrCheckpoint);
-                        } else {
-                            String msg = "Low location accuracy. Please try again";
-                            showAnimatedDialog(msg, R.raw.error, true, "OK");
-                            gpsTracker.getLocation();
-                        }
+                    if (currentLocationAccuracy < 15) {
+                        isValidCheckPoint(qrCheckpoint);
+                    } else {
+                        String msg = "Low location accuracy. Please try again";
+                        showAnimatedDialog(msg, R.raw.error, true, "OK");
+                        gpsTracker.getLocation();
                     }
+                }
 //                }else{
 //                    showAnimatedDialog("Poor connectivity", R.raw.error_alert, true, "OK");
 //                }
@@ -1124,6 +1125,8 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                     public void onErrorResponse(@NotNull Throwable e) {
                         Log.e("SCNANNED_ERR",""+e);
                        // showAnimatedDialog("No Internet Connectivity", R.raw.error, true, "OK");
+                        saveScannedCheckPoint(scanRequest);
+
                     }
 
                     @Override
@@ -1131,6 +1134,38 @@ public class PatrollingLocActivity extends BaseKotlinActivity implements ZXingSc
                         Log.e("SCNANNED_NETWR",""+checkPointScanResponse);
                     }
                 });
+    }
+
+    public void saveScannedCheckPoint(CheckPointScanRequest scanReq){
+
+        try {
+
+            Number maxId = realm.where(CheckPointScanRealm.class).max("id");
+            int max_id = 1;
+            if (maxId != null) {
+                max_id = maxId.intValue() + 1;
+            }
+            if (!realm.isInTransaction()) {
+                realm.beginTransaction();
+            }
+            CheckPointScanRealm scanRealm = realm.createObject(CheckPointScanRealm.class, max_id);
+            scanRealm.setASAssnID(scanReq.getASAssnID());
+            scanRealm.setCPCkPName(scanReq.getCPCkPName());
+            scanRealm.setCPCPntAt(scanReq.getCPCPntAt());
+            scanRealm.setDeId(scanReq.getDeId());
+            scanRealm.setPSPtrlSID(scanReq.getPSPtrlSID());
+            scanRealm.setTRGPSPnt(scanReq.getTRGPSPnt());
+            scanRealm.setTRImage(scanReq.getTRImage());
+            scanRealm.setTRTDateT(scanReq.getTRTDateT());
+            scanRealm.setWkfName(scanReq.getWkfName());
+            scanRealm.setWKWorkID(scanReq.getWKWorkID());
+
+            if (realm.isInTransaction()) {
+                realm.commitTransaction();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
