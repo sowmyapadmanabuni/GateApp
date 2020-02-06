@@ -66,7 +66,7 @@ import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
 import static com.oyespace.guards.utils.Utils.showToast;
 
-public class  CaptureImageOcr extends Activity implements View.OnClickListener, ResponseHandler {
+public class  CaptureImageOcr extends Activity implements View.OnClickListener,ResponseHandler  {
 
     String imgNamee;
     public static final int REQUEST_CAMERA = 0, SELECT_FILE = 1, PICK_INSURANCE_REQUEST_CODE = 2, PICK_RCBOOK_REQUEST_CODE = 3;
@@ -222,7 +222,7 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
 
                     Log.d("data in text ", text.getText());
 
-                    vehicalnumber.setText(text.getText());
+                    vehicalnumber.setText(text.getText().replaceAll("[-+^]*", " "));
                     vehicalNumberData = vehicalnumber.getText().toString().trim();
 
                 }
@@ -347,9 +347,9 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener, 
                             })
 
                             .show();
-                    other.setVisibility(View.VISIBLE);
-                    guest.setVisibility(View.VISIBLE);
-                    resident.setVisibility(View.GONE);
+//                    other.setVisibility(View.VISIBLE);
+//                    guest.setVisibility(View.VISIBLE);
+//                    resident.setVisibility(View.GONE);
                 }
 
             } else {

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        package="com.oyespace.guards"
-        >
-
+        package="com.oyespace.guards">
     <!-- NETWORK & WIFI -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -26,10 +24,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <permission android:name="android.permission.CLEAR_APP_CACHE" /> <!-- CAMERA & RECORDING -->
-    <uses-permission android:name="android.permission.CAMERA"/>
-    <uses-permission android:name="android.permission.FLASHLIGHT"/>
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
@@ -46,55 +45,46 @@
             android:usesCleartextTraffic="true"
             tools:ignore="GoogleAppIndexingWarning"
             tools:replace="android:allowBackup">
-        <activity android:name=".activity.PatrollingAlert"></activity>
+        <activity android:name=".residentidcard.ResidentOptionActivity"></activity>
+        <activity android:name=".activity.PatrollingAlert" />
         <activity
                 android:name=".pertroling.PScheduleListActivity"
-                android:theme="@style/noActionBar" />
-<!--        <activity-->
-<!--                android:name=".residentidcard.ResidentIdActivity"-->
-<!--                android:theme="@style/noActionBar"></activity>-->
-
+                android:theme="@style/noActionBar" /> <!-- <activity -->
+        <!-- android:name=".residentidcard.ResidentIdActivity" -->
+        <!-- android:theme="@style/noActionBar"></activity> -->
         <activity
                 android:name=".residentidcard.ResidentIdActivity_OLD"
-                android:theme="@style/noActionBar"></activity>
-
-
-        <activity android:name=".staffManaualEntry.ManualStaffEntryRegistration"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualStaffEntryRegistration"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualAddCarFragment"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualNameEntryScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManualMobileNumberScreen"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".staffManaualEntry.ManulBlockSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualAddCarFragment"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".staffManaualEntry.ManualUnitSelectionActivity"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualNameEntryScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManualMobileNumberScreen"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                />
-
-        <activity android:name=".staffManaualEntry.ManulBlockSelectionActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-                android:windowSoftInputMode="adjustPan"/>
-
-        <activity android:name=".staffManaualEntry.ManualUnitSelectionActivity"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
-              />
-
-        <activity android:name=".residentidcard.ResidentMobileNumberScreenwithOTP"
-                android:screenOrientation="portrait"
-                android:theme="@style/noActionBar"
+                android:theme="@style/noActionBar" />
+        <activity
+                android:name=".residentidcard.ResidentMobileNumberScreenwithOTP"
                 android:launchMode="singleInstance"
-                />
-
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar" />
         <activity android:name=".activity.NewBiometric" />
         <activity
                 android:name=".activity.EditStaffActivity"
@@ -109,8 +99,6 @@
                 android:name=".CapPhoto"
                 android:enabled="true"
                 android:exported="true" />
-
-
         <service
                 android:name=".pertroling.LocationService"
                 android:enabled="true"
@@ -130,6 +118,7 @@
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
                 android:value="@string/google_maps_key" />
+
         <activity
                 android:name=".activity.MobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"
@@ -160,8 +149,8 @@
         <activity android:name=".testgridsectionedrecyclerview.RecyclerViewActivity" />
         <activity
                 android:name=".activity.SplashActivity"
-                android:screenOrientation="portrait"
                 android:noHistory="true"
+                android:screenOrientation="portrait"
                 android:theme="@style/splashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -238,16 +227,16 @@
         <activity
                 android:name=".activity.ImgView"
                 android:screenOrientation="portrait"
-                android:theme="@style/noActionBar" />
-<!--        <activity-->
-<!--                android:name=".activity.TicketingDetailsActivity"-->
-<!--                android:screenOrientation="portrait"-->
-<!--                android:theme="@style/noActionBar" />-->
+                android:theme="@style/noActionBar" /> <!-- <activity -->
+        <!-- android:name=".activity.TicketingDetailsActivity" -->
+        <!-- android:screenOrientation="portrait" -->
+        <!-- android:theme="@style/noActionBar" /> -->
         <activity
                 android:name=".Dashboard"
+                android:launchMode="singleInstance"
                 android:screenOrientation="portrait"
-                android:windowSoftInputMode="adjustPan"
-                android:theme="@style/noActionBar" />
+                android:theme="@style/noActionBar"
+                android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".activity.SosGateAppActivity"
                 android:screenOrientation="portrait"
@@ -488,12 +477,10 @@
                 android:name=".vehicle_others.Vehicle_OthersUnitSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-
         <activity
                 android:name=".resident.ResidentIdActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-
         <activity
                 android:name=".resident.ResidentMissedCallActivity"
                 android:screenOrientation="portrait"
@@ -501,36 +488,40 @@
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
-                android:value="@string/gate_channel"/>
+                android:value="@string/gate_channel" />
+
         <activity
                 android:name=".resident.ResidentMobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-        <activity android:name=".kidexit.KidExitBlockSelectionActivity"
+        <activity
+                android:name=".kidexit.KidExitBlockSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-        <activity android:name=".kidexit.KidExitUnitSelectionActivity"
+        <activity
+                android:name=".kidexit.KidExitUnitSelectionActivity"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-        <activity android:name=".kidexit.KidExitMobileNumberScreen"
+        <activity
+                android:name=".kidexit.KidExitMobileNumberScreen"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-
-        <activity android:name=".kidexit.KidExitNameEntryScreen"
+        <activity
+                android:name=".kidexit.KidExitNameEntryScreen"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-
-        <activity android:name=".kidexit.KidExitStaffEntryRegistration"
+        <activity
+                android:name=".kidexit.KidExitStaffEntryRegistration"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-        <activity android:name=".kidexit.KidExitAddCarFragment"
+        <activity
+                android:name=".kidexit.KidExitAddCarFragment"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-
-        <activity android:name=".kidexit.KidExit_MobileNumberScreenwithOTP"
+        <activity
+                android:name=".kidexit.KidExit_MobileNumberScreenwithOTP"
                 android:screenOrientation="portrait"
                 android:theme="@style/noActionBar" />
-
     </application>
 
 </manifest>

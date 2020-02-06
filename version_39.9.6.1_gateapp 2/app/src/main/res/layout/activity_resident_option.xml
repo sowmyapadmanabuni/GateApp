@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".residentidcard.ResidentOptionActivity">
+
+    <include layout="@layout/header_with_next" />
+
+    <RelativeLayout
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:layout_height="wrap_content">
+
+        <Button android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/bt_vehicleScanner"
+                android:text="Vehicle Scanner"
+                android:visibility="visible"
+                android:textColor="@android:color/white"
+                android:padding="@dimen/_10sdp"
+                android:textSize="18sp"
+                android:background="@drawable/square"
+
+                />
+
+
+        <Button android:layout_width="match_parent"
+                android:id="@+id/bt_qrcodescanner"
+                android:layout_height="wrap_content"
+                android:text="QR Code scanner"
+                android:padding="@dimen/_10sdp"
+                android:textSize="18sp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_below="@+id/bt_vehicleScanner"
+                android:textColor="@android:color/white"
+                android:background="@drawable/square"
+
+                />
+
+        <Button android:layout_width="match_parent"
+                android:id="@+id/bt_missedcall"
+                android:layout_height="wrap_content"
+                android:text="Missed Call"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:padding="@dimen/_10sdp"
+                android:textSize="18sp"
+                android:layout_below="@+id/bt_qrcodescanner"
+                android:textColor="@android:color/white"
+                android:background="@drawable/square"
+
+                />
+
+    </RelativeLayout>
+
+
+
+
+</RelativeLayout>

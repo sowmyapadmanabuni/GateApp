@@ -1,19 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout>
 
-
-    <LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
+    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:layout_width="match_parent"
-            android:weightSum="10"
-            android:orientation="vertical"
             android:layout_height="match_parent">
-    <FrameLayout
-            android:layout_weight="9"
-            android:layout_height="0dp"
-            android:layout_width="match_parent"
-            >
 
         <FrameLayout
                 android:id="@+id/content_frame"
@@ -50,25 +41,14 @@
 
         </LinearLayout>
 
-
-    </FrameLayout>
-    <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="bottom"
-            android:background="#33000000"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
         <Button
                 android:id="@+id/missedCallBtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:visibility="gone"
                 android:layout_margin="10dp"
                 android:onClick="onMissedCallPress"
                 android:text="Missed Call" />
-
-    </LinearLayout>
-    </LinearLayout>
+    </FrameLayout>
 </layout>

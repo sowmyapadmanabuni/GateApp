@@ -71,6 +71,7 @@ import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.resident.ResidentIdActivity
 import com.oyespace.guards.residentidcard.ResidentIdActivity_OLD
+import com.oyespace.guards.residentidcard.ResidentOptionActivity
 import com.oyespace.guards.responce.VisitorLogCreateResp
 import com.oyespace.guards.responce.VisitorLogExitResp
 import com.oyespace.guards.services.SOSSirenService
@@ -1391,7 +1392,7 @@ var iv_torch:Button?=null
             }
 
             R.id.re_resident -> {
-                val i_staff = Intent(this@Dashboard, ResidentIdActivity_OLD::class.java)
+                val i_staff = Intent(this@Dashboard, ResidentOptionActivity::class.java)
                 startActivity(i_staff)
             }
             R.id.re_kidexit->{

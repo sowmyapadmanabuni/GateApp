@@ -495,9 +495,6 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
             holder.rb_unit.setChecked(lastSelectedPosition == position);
 
 
-
-
-
             holder.rb_unit.setOnClickListener(View.OnClickListener {
 
 
@@ -509,8 +506,9 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 //
                     if( !holder.rb_unit.isChecked) {
 //                    if(!pos.equals(0)){
-                       listVistor!!.get(pos).isSelected=false
-                    }                   else{
+                       listVistor!!.get(pos).isSelected=true
+                    }
+                    else{
                         listVistor!!.get(pos).isSelected=false
                     }
 
