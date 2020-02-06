@@ -2,6 +2,7 @@ package com.oyespace.guards.kidexit
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -22,17 +23,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.adapter.FamilMembersAdapter
 import com.oyespace.guards.adapter.PaginationAdapter
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.PaginationData
-import com.oyespace.guards.pojo.UnitPojo
-import com.oyespace.guards.pojo.UnitsList
+import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.TaptoCallApi
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_unit_list.*
@@ -469,7 +470,9 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 
         private val mInflater: LayoutInflater
 
-
+        var family_recyclerview:RecyclerView?=null
+        var familMembersAdapter: FamilMembersAdapter?=null
+        var arrayFamilyList = ArrayList<FamilyMember>()
         init {
             mInflater = LayoutInflater.from(mcontext)
 
@@ -513,6 +516,7 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 //if(orderData.owner[0].uoMobile!=null) {
 
 
+
                     val dialogBuilder = AlertDialog.Builder(mcontext)
 
                     // set message of alert dialog
@@ -543,6 +547,8 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 //                    mcontext.startActivity(intent)
 
 
+
+
                     if (orderData.tenant.size != 0) {
 
                         val alertadd = AlertDialog.Builder(mcontext)
@@ -560,6 +566,114 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
                         var iv_unit2: ImageView? = null
                         iv_unit2 = view.findViewById(R.id.iv_unit2)
 
+                        family_recyclerview=view.findViewById(R.id.rv_family)
+                        family_recyclerview?.layoutManager = LinearLayoutManager(
+                            mcontext,
+                            LinearLayoutManager.VERTICAL,
+                            false
+                        )
+
+
+                        if(orderData.unOcStat.contains("Sold Owner Occupied Unit")){
+
+                            RetrofitClinet.instance.getFamilyMemberList(ConstantUtils.OYE247TOKEN, orderData.unUnitID, orderData.asAssnID.toString(), orderData.owner[0].acAccntID.toString())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(object : CommonDisposable<GetFamilyMemberResponse<ArrayList<FamilyMember>>>() {
+
+                                    override fun onSuccessResponse(getdata: GetFamilyMemberResponse<ArrayList<FamilyMember>>) {
+
+                                        if (getdata.success) {
+
+
+                                            // var familydataList=ArrayList<FamilyMember>()
+                                            arrayFamilyList=getdata.data.familyMembers
+                                            familMembersAdapter= FamilMembersAdapter(arrayFamilyList,mcontext)
+                                            family_recyclerview!!.adapter=familMembersAdapter
+                                        }
+
+                                    }
+
+                                    override fun onErrorResponse(e: Throwable) {
+
+                                    }
+
+                                    override fun noNetowork() {
+                                    }
+                                })
+
+
+                        }else if(orderData.unOcStat.contains("Sold Tenant Occupied Unit")){
+
+//                            Toast.makeText(mcontext,"222",Toast.LENGTH_LONG).show()
+//                            getFamilyMemberData(orderData.unUnitID,orderData.asAssnID,orderData.tenant[0].acAccntID)
+
+                            RetrofitClinet.instance.getFamilyMemberList(ConstantUtils.OYE247TOKEN, orderData.unUnitID, orderData.asAssnID.toString(), orderData.tenant[0].acAccntID.toString())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(object : CommonDisposable<GetFamilyMemberResponse<ArrayList<FamilyMember>>>() {
+
+                                    override fun onSuccessResponse(getdata: GetFamilyMemberResponse<ArrayList<FamilyMember>>) {
+
+                                        if (getdata.success) {
+
+
+                                            // var familydataList=ArrayList<FamilyMember>()
+                                            arrayFamilyList=getdata.data.familyMembers
+                                            familMembersAdapter= FamilMembersAdapter(arrayFamilyList,mcontext)
+                                            family_recyclerview!!.adapter=familMembersAdapter
+                                        }
+
+                                    }
+
+                                    override fun onErrorResponse(e: Throwable) {
+
+                                    }
+
+                                    override fun noNetowork() {
+                                    }
+                                })
+
+
+                        }else if(orderData.unOcStat.contains("UnSold Tenant Occupied Unit")){
+
+                            RetrofitClinet.instance.getFamilyMemberList(ConstantUtils.OYE247TOKEN, orderData.unUnitID, orderData.asAssnID.toString(), orderData.tenant[0].acAccntID.toString())
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(object : CommonDisposable<GetFamilyMemberResponse<ArrayList<FamilyMember>>>() {
+
+                                    override fun onSuccessResponse(getdata: GetFamilyMemberResponse<ArrayList<FamilyMember>>) {
+
+                                        if (getdata.success) {
+
+
+                                            // var familydataList=ArrayList<FamilyMember>()
+                                            arrayFamilyList=getdata.data.familyMembers
+                                            //   Toast.makeText(mcontext,arrayFamilyList.size.toString(),Toast.LENGTH_LONG).show()
+                                            familMembersAdapter= FamilMembersAdapter(arrayFamilyList,mcontext)
+                                            family_recyclerview!!.adapter=familMembersAdapter
+                                        }
+
+                                    }
+
+                                    override fun onErrorResponse(e: Throwable) {
+
+                                    }
+
+                                    override fun noNetowork() {
+                                    }
+                                })
+
+
+                        }else if(orderData.unOcStat.contains("UnSold Vacant Unit")){
+
+                        }else if(orderData.unOcStat.contains("Sold Vacant Unit")){
+
+                        }
+                        else{
+
+                        }
+
                         try {
 
                             if (orderData.tenant[0].utMobile.equals("")) {
@@ -569,7 +683,7 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 
                                 iv_unit1.visibility = View.VISIBLE
                                 tv_number1.visibility = View.VISIBLE
-                                tv_number1.setText(orderData.tenant[0].utMobile)
+                                tv_number1.setText("Tenant's mobile number")
                             }
 
                             if (orderData.tenant[0].utMobile1.equals("")) {
@@ -579,7 +693,7 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 
                                 iv_unit2.visibility = View.VISIBLE
                                 tv_number2.visibility = View.VISIBLE
-                                tv_number2.setText(orderData.tenant[0].utMobile1)
+                                tv_number2.setText("Tenant's alternative mobile number")
                             }
 
 
@@ -589,19 +703,18 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 
                         iv_unit1.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL)
-                            intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile)
-                            mcontext.startActivity(intent)
-
+                            var agentNumber="AGENTNUMBER="+orderData.tenant[0].utMobile.replace("+91", "")
+                            var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
                         }
 
 
                         iv_unit2.setOnClickListener {
 
-                            val intent = Intent(Intent.ACTION_CALL)
-                            intent.data = Uri.parse("tel:" + orderData.tenant[0].utMobile1)
-                            mcontext.startActivity(intent)
 
+                            var agentNumber="AGENTNUMBER="+orderData.tenant[0].utMobile1.replace("+91", "")
+                            var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
                         }
 
 
@@ -657,7 +770,7 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 
                                     iv_unit1.visibility = View.VISIBLE
                                     tv_number1.visibility = View.VISIBLE
-                                    tv_number1.setText(orderData.owner[0].uoMobile)
+                                    tv_number1.setText("Owner's mobile number")
                                 }
 
                                 if (orderData.owner[0].uoMobile1.equals("")) {
@@ -671,7 +784,7 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
                                 else {
                                     iv_unit2.visibility = View.VISIBLE
                                     tv_number2.visibility = View.VISIBLE
-                                    tv_number2.setText(orderData.owner[0].uoMobile1)
+                                    tv_number2.setText("Owner's alternative mobile number1")
                                 }
 
                                 if (orderData.owner[0].uoMobile2.equals("")) {
@@ -679,41 +792,41 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
                                     tv_number3.visibility = View.GONE
                                 }
 
-                                 else if (orderData.owner[0].uoMobile2.equals("null")) {
+                                else if (orderData.owner[0].uoMobile2.equals("null")) {
                                     iv_unit3.visibility = View.GONE
                                     tv_number3.visibility = View.GONE
                                 }
                                 else {
                                     iv_unit3.visibility = View.VISIBLE
                                     tv_number3.visibility = View.VISIBLE
-                                    tv_number3.setText(orderData.owner[0].uoMobile2)
+                                    tv_number3.setText("Owner's alternative mobile number2")
                                 }
 
                                 if (orderData.owner[0].uoMobile3.equals("")) {
                                     iv_unit4.visibility = View.GONE
                                     tv_number4.visibility = View.GONE
                                 }
-                               else if (orderData.owner[0].uoMobile3.equals("null")) {
+                                else if (orderData.owner[0].uoMobile3.equals("null")) {
                                     iv_unit4.visibility = View.GONE
                                     tv_number4.visibility = View.GONE
                                 }
                                 else {
                                     iv_unit4.visibility = View.VISIBLE
                                     tv_number4.visibility = View.VISIBLE
-                                    tv_number4.setText(orderData.owner[0].uoMobile3)
+                                    tv_number4.setText("Owner's alternative mobile number3")
                                 }
                                 if (orderData.owner[0].uoMobile4.equals("")) {
                                     iv_unit5!!.visibility = View.GONE
                                     tv_number5.visibility = View.GONE
                                 }
-                               else if (orderData.owner[0].uoMobile4.equals("null")) {
+                                else if (orderData.owner[0].uoMobile4.equals("null")) {
                                     iv_unit5!!.visibility = View.GONE
                                     tv_number5.visibility = View.GONE
                                 }
                                 else {
                                     iv_unit5!!.visibility = View.VISIBLE
                                     tv_number5.visibility = View.VISIBLE
-                                    tv_number5.setText(orderData.owner[0].uoMobile4)
+                                    tv_number5.setText("Owner's alternative mobile number4")
                                 }
                             } catch (e: IndexOutOfBoundsException) {
 
@@ -721,39 +834,42 @@ class KidExitUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener 
 
                             iv_unit1.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL)
-                                intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile)
-                                mcontext.startActivity(intent)
 
+
+                                var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile.replace("+91", "")
+                                var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
                             }
 
                             iv_unit2.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL)
-                                intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile1)
-                                mcontext.startActivity(intent)
+
+                                var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile1.replace("+91", "")
+                                var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
                             }
 
                             iv_unit3.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL)
-                                intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile2)
-                                mcontext.startActivity(intent)
+                                var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile2.replace("+91", "")
+                                var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
                             }
                             iv_unit4.setOnClickListener {
+                                var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile3.replace("+91", "")
+                                var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
-                                val intent = Intent(Intent.ACTION_CALL)
-                                intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile3)
-                                mcontext.startActivity(intent)
 
                             }
                             iv_unit5.setOnClickListener {
 
-                                val intent = Intent(Intent.ACTION_CALL)
-                                intent.data = Uri.parse("tel:" + orderData.owner[0].uoMobile4)
-                                mcontext.startActivity(intent)
+                                var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile4.replace("+91", "")
+                                var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
+
 
                             }
 

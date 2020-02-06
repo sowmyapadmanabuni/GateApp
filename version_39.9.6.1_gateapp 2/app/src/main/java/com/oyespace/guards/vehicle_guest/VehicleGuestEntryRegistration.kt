@@ -246,7 +246,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity(), View.OnClickListener
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
         if (wrrw != null) {
 //            var mBitmap: Bitmap;
-            imageName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+            imageName = "PERSON" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
 

@@ -71,7 +71,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         when (v?.id) {
 
-            R.id.button_done ->{
+            R.id.buttonNext ->{
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+GUEST_REGISTRATION+" "+FLOW_TYPE.equals( GUEST_REGISTRATION,true))
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
@@ -218,7 +218,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
         if(wrrw!=null) {
-            imageName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+            imageName = "PERSON"+ intent.getStringExtra(MOBILENUMBER) + ".jpg"
 //            var mBitmap: Bitmap;
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)

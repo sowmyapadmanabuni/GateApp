@@ -335,7 +335,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
             } else {
                // buttonSkip.visibility = View.INVISIBLE
             }
-            img_logo.visibility = View.VISIBLE
+          //  img_logo.visibility = View.VISIBLE
             Ed_phoneNum.visibility = View.VISIBLE
             textview.visibility = View.GONE
 //            Ed_phoneNum.setVisibility(View.GONE)
@@ -694,6 +694,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             d.putExtra(ACCOUNT_ID, globalApiObject.data.accountByMobile[0].acAccntID)
                             d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                             d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+                            d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
                             d.putExtras(intent)
                             startActivity(d)
                             finish()
@@ -782,6 +783,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
         d.putExtra(COUNTRYCODE, "+91")
         d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+        d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
 
         d.putExtras(intent)
         startActivity(d)

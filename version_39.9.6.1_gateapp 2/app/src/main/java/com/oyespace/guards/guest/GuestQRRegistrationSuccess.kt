@@ -73,7 +73,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
 
         when (v?.id) {
 
-            R.id.button_done -> {
+            R.id.buttonNext -> {
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))

@@ -1,5 +1,6 @@
 package com.oyespace.guards.adapter
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -42,8 +43,6 @@ class VistorOutListAdapter(
     init {
         this.searchList = listVistor
         mInflater = LayoutInflater.from(mcontext)
-
-
     }
     //  var mTTS: TextToSpeech?=null
 
@@ -84,11 +83,11 @@ class VistorOutListAdapter(
 
             var agentNumber="AGENTNUMBER="+visitor.vlMobile.replace("+91", "")
             var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
         }
 
-        if(visitor.vlComName.contains("Others", true)) {
+        if(visitor.vlComName.contains("Others", true)&&(visitor.vlVisType.contains(DELIVERY, true))) {
             holder.tv_purposeofvisit.visibility=View.VISIBLE
             holder.tv_purposeofvisit.text=visitor.vlpOfVis
 

@@ -109,6 +109,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+                d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
                 startActivity(d)
                 finish()
 
@@ -125,6 +126,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                 d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+                d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
                 startActivity(d)
                 finish()
 
@@ -209,7 +211,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_mobile_number)
 
-iv_torch=findViewById(R.id.iv_torch)
+        iv_torch=findViewById(R.id.iv_torch)
         iv_torch!!.setOnClickListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -319,8 +321,16 @@ iv_torch=findViewById(R.id.iv_torch)
         val timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
+
+
+                var clock:String?=null
                 val remainedSecs: Long = millisUntilFinished / 1000
-                timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
+                if((millisUntilFinished / 1000) % 60 < 10)
+                    clock = " 0" + ((millisUntilFinished / 1000)/60)%60 + ":0" + ((millisUntilFinished / 1000)%60);
+                else
+                    clock = " 0" + ((millisUntilFinished / 1000)/60)%60 + ":" + ((millisUntilFinished / 1000)%60);
+                // timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
+                timer.text=clock
             }
 
             override fun onFinish() {
@@ -671,6 +681,7 @@ iv_torch=findViewById(R.id.iv_torch)
                                 d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
                                 d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                                 d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+                                d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
                                 startActivity(d)
                                 finish()
                             }

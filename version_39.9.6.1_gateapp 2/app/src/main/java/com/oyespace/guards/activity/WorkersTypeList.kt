@@ -27,13 +27,14 @@ class WorkersTypeList: BaseKotlinActivity() {
     lateinit var txt_gate_name:TextView
     lateinit var txt_device_name: TextView
     var iv_torch: Button?=null
+
     var clickable1 = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_worker)
 
-        buttonNext.visibility=View.VISIBLE
+        buttonNext.visibility=View.GONE
         iv_torch=findViewById(R.id.iv_torch)
         iv_torch!!.setOnClickListener {
 

@@ -1,6 +1,7 @@
 package com.oyespace.guards.adapter
 
 import android.annotation.SuppressLint
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -29,8 +30,6 @@ import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.pojo.InvitationUpdateReq
-import com.oyespace.guards.pojo.InviteCreateRes
 import com.oyespace.guards.pojo.UpdateApprovalStatus
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
@@ -39,22 +38,17 @@ import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColorforExit
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import java.text.DateFormat
-import java.text.ParseException
-import java.text.SimpleDateFormat
 import java.util.*
 
 
-class VisitorEntryListAdapter(
-    private var visitorList: ArrayList<VisitorLog>,
-    private val mcontext: Context
-) : RecyclerView.Adapter<VisitorEntryListAdapter.MenuHolder>() {
+class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, private val mcontext: Context) : RecyclerView.Adapter<VisitorEntryListAdapter.MenuHolder>() {
 
     val ACCEPTED_COLOR = "#75be6f"
     val REJECTED_COLOR = "#ff0000"
     val PENDING_COLOR = "#ffb81a"
     val TIMEUP_COLOR = "#ff0000"
     var status_: String? =null
+    var progress:ProgressDialog?=null
     lateinit var fbEventListener:FBValueEventListener
 
     private var searchList: ArrayList<VisitorLog>? = null
@@ -66,6 +60,7 @@ class VisitorEntryListAdapter(
     var fbdbAssocName: String
 
     init {
+        progress =  ProgressDialog(mcontext);
         this.searchList = visitorList
         timerHashMap = hashMapOf()
         fbdbAssocName = "A_${Prefs.getInt(ASSOCIATION_ID, 0)}"
@@ -244,7 +239,7 @@ class VisitorEntryListAdapter(
             val entryImg = visitor.vlEntryImg
             var imgPath = IMAGE_BASE_URL + "Images/" + entryImg
 
-            if(visitor.vlComName.contains("Others", true)) {
+            if(visitor.vlComName.contains("Others", true)&&(visitor.vlVisType.contains(DELIVERY, true))) {
                 holder.tv_purposeofvisit.text=visitor.vlpOfVis
                 holder.tv_purposeofvisit.visibility=View.VISIBLE
             }
@@ -313,9 +308,11 @@ class VisitorEntryListAdapter(
             holder.iv_call.visibility = if (visitor.vlMobile.length > 5) View.VISIBLE else View.INVISIBLE
             holder.iv_call.setOnClickListener {
 
+
+
                 var agentNumber="AGENTNUMBER="+visitor.vlMobile.replace("+91", "")
                 var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber, mcontext)
 
             }
 
@@ -482,7 +479,9 @@ class VisitorEntryListAdapter(
         var isAnimating: Boolean = false
          var timer: CountDownTimer? = null
 
+
         init {
+
             entryTime = view.findViewById(R.id.tv_entrytime)
             exitTime = view.findViewById(R.id.tv_exittime)
             visitorName = view.findViewById(R.id.tv_name)
@@ -610,9 +609,22 @@ class VisitorEntryListAdapter(
                                         holder.ll_card.startAnimation(animBlink)
                                         holder.btn_makeexit.visibility = View.VISIBLE
 
-                                    //    if (!Prefs.getBoolean(PrefKeys.BG_NOTIFICATION_ON, false)) {
-                                            var serviceIntent =  Intent(mcontext, BGService::class.java);
-                                        mcontext.startService(serviceIntent);
+                                       // val overstayValue=Prefs.getBoolean(PrefKeys.BG_NOTIFICATION_ON, false)
+
+                                      // if (overstayValue==true) {
+                                           // Let it continue running until it is stopped.
+
+
+                                        Handler().postDelayed({
+                                            var serviceIntent = Intent(mcontext, BGService::class.java);
+                                            mcontext.startService(serviceIntent);
+                                        }, 1000*1*60)
+
+
+
+                                      // }
+
+
 
 
                                     } else {
@@ -706,7 +718,6 @@ class VisitorEntryListAdapter(
 
                         val fbColor = firebaseObject.buttonColor.toLowerCase()
                         status_=firebaseObject.status
-                        Toast.makeText(mcontext, status_, Toast.LENGTH_SHORT).show()
 
                         actionTime = if (dataSnapshot.hasChild("updatedTime")) {
                             firebaseObject.updatedTime

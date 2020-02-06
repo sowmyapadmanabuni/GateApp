@@ -89,6 +89,11 @@
                 android:theme="@style/noActionBar"
               />
 
+        <activity android:name=".residentidcard.ResidentMobileNumberScreenwithOTP"
+                android:screenOrientation="portrait"
+                android:theme="@style/noActionBar"
+                android:launchMode="singleInstance"
+                />
 
         <activity android:name=".activity.NewBiometric" />
         <activity

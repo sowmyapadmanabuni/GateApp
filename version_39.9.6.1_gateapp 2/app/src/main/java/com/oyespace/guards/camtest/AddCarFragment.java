@@ -161,15 +161,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
     }
 
 
-//    private SimpleTarget target = new SimpleTarget<Bitmap>() {
-//        @Override
-//        public void onResourceReady(Bitmap bitmap, GlideAnimation glideAnimation) {
-//            // do something with the bitmap
-//            // for demonstration purposes, let's just set it to an ImageView
-//            photo = bitmap;
-//           imageView1.setImageBitmap(photo);
-//        }
-//    };
 
 
 
@@ -277,12 +268,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                 dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
                 dialog_imageview.setBackground(imageView1.getDrawable());
 
-                // Picasso.with(AddCarFragment.this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(dialog_imageview);
-
-
-//                Picasso.with(AddCarFragment.this)
-//                        .load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg")
-//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(dialog_imageview);
 
                 builder.setView(dialogView);
 
@@ -342,75 +327,27 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         } else {
             if (getIntent().getIntExtra(ACCOUNT_ID, 0) != 0) {
 
-//                if (getIntent().getStringExtra("Image") != null) {
-//
-////                    Picasso.with(this)
-////                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
-////                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-//
-//
-//                    Glide.with(this)
-//                        .load(Uri.parse(IMAGE_BASE_URL+ "Images/" + getIntent().getStringExtra("Image")))
-//                        .placeholder(R.drawable.user_icon_black)
-//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                        .skipMemoryCache(false)
-//                        .into(imageView1);
-//
-//                    Glide.with(this).load(IMAGE_BASE_URL+ "Images/" + getIntent().getStringExtra("Image")).into(target);
-//
-////                    Picasso.with(this)
-////                            .load(IMAGE_BASE_URL + "Images/" + getIntent().getStringExtra("Image"))
-////                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(target);
-//
-//                } else {
 
-                String image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg";
-//
-              // Glide.with(this).load(image).asBitmap().into(target);
-              //  Picasso.with(this).load(image).into(target);
+                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSON"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
+
                 imageView1.setImageBitmap(photo);
 
+
 //                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
-                    Glide.with(this)
-                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
-                            .placeholder(R.drawable.user_icon_black)
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-                            .skipMemoryCache(false)
-                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-                            .into(imageView1);
+//                    Glide.with(this)
+//                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
+//                            .placeholder(R.drawable.user_icon_black)
+//                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                            .skipMemoryCache(false)
+//                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+//                            .into(imageView1);
 
-
-
-//                    Glide.with(requireContext())
-//                            .load(myUrl)
-//                            .signature(ObjectKey(System.currentTimeMillis()))
-//                            .into(myImageView)
-
-
-
-//                    imageView1.setImageBitmap(photo);
-
-//                Glide.with(this)
-//                        .load(Uri.parse(IMAGE_BASE_URL+"Images/"+"PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg"))
-//                        .placeholder(R.drawable.user_icon_black)
-//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                        .skipMemoryCache(false)
-//                        .into(imageView1);
-
-                    //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
-//
-//                    Picasso.with(this)
-//                            .load(image)
-//                            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-              //  }
+                Picasso.with(this)
+                        .load(IMAGE_BASE_URL +"Images/PERSON"+getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") +".jpg")
+                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }
-//            else{
-//                imageView1.setImageBitmap(photo);
-//             //   imageView1.setImageBitmap(photo);
-//                Toast.makeText(getApplicationContext(), "111 ", Toast.LENGTH_SHORT).show();
-//
-//            }
+
 
         }
 
@@ -466,33 +403,21 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
 
-//                val imgName = "Association"+ "0" + ".jpg"
 
-//                if(personPhoto==null && getIntent().getStringExtra(MOBILENUMBER).toString().length()==0) {
 
                 if (imageView1.getDrawable().getConstantState()!=getResources().getDrawable(R.drawable.user_icon_black).getConstantState()) {
 
-                    if (getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)) {
+
+                    if(getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)){
                         submit_button.setEnabled(false);
                         submit_button.setClickable(false);
                         staffRegistration();
-                    } else {
-                        imgName = "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).substring(3) + ".jpg";
-                        try{
+                    }else{
 
-                            images=((BitmapDrawable) imageView1.getDrawable().getCurrent()).getBitmap();
 
-                        UploadImageApi.Companion.uploadImage(imgName, images);
-                    }catch (ClassCastException e){
-
-                        }
-//
-//                        imageView1.buildDrawingCache();
-//                        Bitmap image= imageView1.getDrawingCache();
-
-                        byte[] byteArray = null;
+                        byte[] byteArray=null;
                         try {
-                            Log.d("Dgddfdf picas", "5 2");
+                            Log.d("Dgddfdf picas","5 2");
                             ByteArrayOutputStream bos = new ByteArrayOutputStream();
                             photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
                             byteArray = bos.toByteArray();
@@ -500,10 +425,9 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                             System.out.println("AFTER COMPRESSION-===>" + len);
                             bos.flush();
                             bos.close();
-                        } catch (Exception ex) {
-                            Log.d("Dgddfdf picas", "7");
+                        }catch (Exception ex){
+                            Log.d("Dgddfdf picas","7");
                         }
-
 
 
                         Intent d = new Intent(AddCarFragment.this, StaffEntryRegistration.class);
@@ -517,26 +441,26 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                         d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                         d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
-                        d.putExtra(PERSON_PHOTO,   imgName);
+                        d.putExtra(PERSON_PHOTO, byteArray);
                         d.putExtra(ITEMS_PHOTO_LIST, list);
-                        d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
-                        d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
-                        d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
+                        d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
+                        d.putExtra(UNIT_ACCOUNT_ID,getIntent().getStringExtra(UNIT_ACCOUNT_ID));
+                        d.putExtra(BLOCK_ID,getIntent().getStringExtra(BLOCK_ID));
+                        d.putExtra(UNITOCCUPANCYSTATUS,getIntent().getStringExtra(UNITOCCUPANCYSTATUS));
                         d.putExtra(VISITOR_PURPOSE,getIntent().getStringExtra(VISITOR_PURPOSE));
-                        d.putExtras(getIntent());
                         startActivity(d);
                         finish();
 
 
                     }
+
+
                 }
                 else {
 
-                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Capture Photo ", Toast.LENGTH_SHORT).show();
                     submit_button.setEnabled(true);
                     submit_button.setClickable(true);
-
-
 
                 }
 
@@ -785,42 +709,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
             imageAdapter = new ImageAdapter(list, AddCarFragment.this, "On");
             rv_image.setAdapter(imageAdapter);
-            // iamgeLyt.addView(imageView);
-            // iv_delete = findViewById(R.id.iv_delete);
-            /*  sumeeth code tried for deleting the photo  it worked */
 
-//            iv_delete.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//
-//                    final AlertDialog.Builder builder = new AlertDialog.Builder(AddCarFragment.this);
-//                    builder.setTitle("Delete image");
-//                    builder.setCancelable(false);
-//                    builder.setMessage("Do you want to delete this image");
-//                    builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            list.remove(selectedImagePath);
-//                            //iamgeLyt.removeView(imageView);
-//                            imageAdapter.notifyDataSetChanged();
-////                            if (list.size() == 18) {
-////                                image_Gallery.setVisibility(View.VISIBLE);
-////                            } else {
-////                                image_Gallery.setVisibility(View.GONE);
-////                            }
-//                        }
-//                    });
-//
-//                    builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            builder.setCancelable(true);
-//                        }
-//                    });
-//                    AlertDialog dialog = builder.create();
-//                    dialog.show();
-//              }
-//            });
 
 
         } catch (Exception e) {
@@ -864,16 +753,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         image_Gallery.setVisibility(View.VISIBLE);
     }
 
-    /*code to move from one fragment to another */
-    /* void changePostion(){
-     *//* Fragment f = new MyStockFragment();
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id., f);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();*//*
-        fragmentManager.beginTransaction().replace(R.id.frame_container, new MyStockFragment()).commit();
-    }*/
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -909,24 +789,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
 
         }
-//        if (requestCode == AddCarFragment.REQUEST_CAMERA && resultCode == Activity.RESULT_OK) {
-//            Log.e("Activity", "Result OK");
-//
-//                onCaptureImageResult(data, this);
-//                showViewPager();
-//
-//        } else  if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
-//            Bitmap photo = (Bitmap) data.getExtras().get("data");
-//            imageView1.setImageBitmap(photo);
-//            personPhoto=photo;
-//            Log.d("Activity", "CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE ");
-//        }
-//        else if(requestCode==REQUEST_CODE_SPEECH_INPUT&& requestCode==Activity.RESULT_OK&&data != null) {
-//         //   if (data != null) {
-//                ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-//                Ed_Name.setText(result.get(0));
-//           // }
-//        }
 
 
         Log.d("Activity", "Result Fail");

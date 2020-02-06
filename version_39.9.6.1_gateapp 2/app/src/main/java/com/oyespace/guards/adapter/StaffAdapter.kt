@@ -26,6 +26,7 @@ import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
+import com.oyespace.guards.utils.TaptoCallApi
 import com.squareup.picasso.Picasso
 import java.util.*
 
@@ -115,32 +116,33 @@ if(staffdata.isValid){
         }
 
         holder.iv_edit.setOnClickListener {
+            if(staffdata.isValid) {
 
+                val intent = Intent(mcontext, EditStaffActivity::class.java)
 
-            val intent = Intent(mcontext, EditStaffActivity::class.java)
+                intent.putExtra(UNITID, staffdata.unUnitID)
+                intent.putExtra("FIRSTNAME", staffdata.wkfName)
+                intent.putExtra("LASTNAME", staffdata.wklName)
+                intent.putExtra(MOBILENUMBER, staffdata.wkMobile)
+                intent.putExtra("DESIGNATION", staffdata.wkDesgn)
+                intent.putExtra("WORKTYPE", staffdata.wkWrkType)
+                intent.putExtra(WORKER_ID, staffdata.wkWorkID)
+                intent.putExtra(UNITNAME, staffdata.unUniName)
+                intent.putExtra("IMAGE", staffdata.wkEntryImg)
+                intent.putExtra("DOB", staffdata.wkdob)
 
-            intent.putExtra(UNITID, staffdata.unUnitID)
-            intent.putExtra("FIRSTNAME", staffdata.wkfName)
-            intent.putExtra("LASTNAME", staffdata.wklName)
-            intent.putExtra(MOBILENUMBER, staffdata.wkMobile)
-            intent.putExtra("DESIGNATION", staffdata.wkDesgn)
-            intent.putExtra("WORKTYPE", staffdata.wkWrkType)
-            intent.putExtra(WORKER_ID, staffdata.wkWorkID)
-            intent.putExtra(UNITNAME, staffdata.unUniName)
-            intent.putExtra("IMAGE", staffdata.wkEntryImg)
-            intent.putExtra("DOB", staffdata.wkdob)
-
-            // (mcontext as Activity).startActivityForResult(intent, 2)
-            mcontext.startActivity(intent)
-            (mcontext as Activity).finish()
-
+                // (mcontext as Activity).startActivityForResult(intent, 2)
+                mcontext.startActivity(intent)
+                (mcontext as Activity).finish()
+            }
         }
 
         holder.iv_call.setOnClickListener {
 
-            val intent = Intent(Intent.ACTION_CALL)
-            intent.data = Uri.parse("tel:" + staffdata.wkMobile)
-            mcontext.startActivity(intent)
+            var agentNumber="AGENTNUMBER="+staffdata.wkMobile.replace("+91", "")
+            var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
+
         }
 
         val noofFingers = StaffRepo.getFingersForStaff(staffdata.wkWorkID)

@@ -223,10 +223,11 @@ class VisitorLogRepo {
 //                                context.sendBroadcast(intentAction1)
                                 val assName = LocalDb.getAssociation()!!.asAsnName
                                 val gateName = Prefs.getString(GATE_NO, null)
-                                var message = "${visitor.vlfName} from ${visitor.vlComName} has exited ${assName} from $gateName"
-                                if (visitor.vlVisType.contains(STAFF)) {
-                                    message = "${visitor.vlfName} has exited ${assName} from $gateName"
-                                }
+                                try {
+                                    var message = "${visitor.vlfName} from ${visitor.vlComName} has exited ${assName} from $gateName"
+                                    if (visitor.vlVisType.contains(STAFF)) {
+                                        message = "${visitor.vlfName} has exited ${assName} from $gateName"
+                                    }
 
                                 if (status == ConstantUtils.EXITED) {
                                     try {
@@ -250,6 +251,9 @@ class VisitorLogRepo {
                                     } catch (e: Exception) {
                                         e.printStackTrace()
                                     }
+                                }
+                                }catch (e:IllegalStateException){
+
                                 }
 
 

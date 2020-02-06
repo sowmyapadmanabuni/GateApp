@@ -223,6 +223,7 @@
 
         </RelativeLayout>
 
+
         <Button android:id="@+id/Btn_SendOtp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
@@ -230,10 +231,10 @@
                 android:textAllCaps="true"
                 android:visibility="visible"
                 android:onClick="onClick"
+                android:textColor="@color/white"
                 android:textSize="18sp"
+                android:background="@drawable/square"
                 android:padding="10dp"
-                android:background="@color/white"
-                android:textColor="@color/colorPrimaryDark"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp"
                 tools:ignore="OnClick"/>

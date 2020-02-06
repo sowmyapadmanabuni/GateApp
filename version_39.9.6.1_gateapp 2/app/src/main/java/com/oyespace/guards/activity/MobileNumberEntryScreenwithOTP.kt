@@ -583,24 +583,35 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                         if (globalApiObject.success) {
                             dialogs!!.dismiss()
 
-                           // getAccountDetails(countryCode.toString(), phone.toString());
+                            // getAccountDetails(countryCode.toString(), phone.toString());
 
-                            visitorLog(
-                                intent.getStringExtra(UNITID),
-                                intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
-                                intent.getStringExtra(MOBILENUMBER),
-                                intent.getStringExtra("DESIGNATION"),
-                                intent.getStringExtra("WORKTYPE"),
-                                intent.getIntExtra(WORKER_ID, 0),
-                                intent.getStringExtra(UNITNAME)
-                            )
-
-                            buttonNext.isEnabled = false
-                            buttonNext.isClickable = false
+                            if (LocalDb.getVisitorEnteredLog() != null) {
+                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
+                                    Utils.showToast(
+                                        this@MobileNumberEntryScreenwithOTP,
+                                        "Duplicate Entry not allowed"
+                                    )
+                                }
+                            }else {
 
 
+                                    visitorLog(
+                                        intent.getStringExtra(UNITID),
+                                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+                                        intent.getStringExtra(MOBILENUMBER),
+                                        intent.getStringExtra("DESIGNATION"),
+                                        intent.getStringExtra("WORKTYPE"),
+                                        intent.getIntExtra(WORKER_ID, 0),
+                                        intent.getStringExtra(UNITNAME)
+                                    )
 
-                        } else {
+                                    buttonNext.isEnabled = false
+                                    buttonNext.isClickable = false
+
+                                }
+
+
+                        }else {
 
 
                             //Utils.showToast(applicationContext, globalApiObject.apiVersion)

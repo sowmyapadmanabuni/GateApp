@@ -89,9 +89,12 @@ import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
 import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
 import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
 import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
+import static com.oyespace.guards.utils.ConstantUtils.GUARDIANNAME;
 import static com.oyespace.guards.utils.ConstantUtils.IMAGE_BASE_URL;
 import static com.oyespace.guards.utils.ConstantUtils.ITEMS_PHOTO_LIST;
+import static com.oyespace.guards.utils.ConstantUtils.KIDEXIT;
 import static com.oyespace.guards.utils.ConstantUtils.KIDNAME;
+import static com.oyespace.guards.utils.ConstantUtils.KID_EXIT;
 import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247KEY;
 import static com.oyespace.guards.utils.ConstantUtils.OYE247TOKEN;
@@ -262,7 +265,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
 
         tv_name = findViewById(R.id.tv_name);
         iv_edit = findViewById(R.id.iv_edit);
-        tv_name.setText(getIntent().getStringExtra(PERSONNAME));
+        tv_name.setText(getIntent().getStringExtra(GUARDIANNAME));
         txt_assn_name = findViewById(R.id.txt_assn_name);
         txt_device_name = findViewById(R.id.txt_device_name);
         txt_gate_name = findViewById(R.id.txt_gate_name);
@@ -354,7 +357,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
 
-        if (getIntent().getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
+        if (getIntent().getStringExtra(FLOW_TYPE).equals(KIDEXIT)) {
             image_Gallery.setVisibility(View.INVISIBLE);
             rv_image.setVisibility(View.INVISIBLE);
             ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
@@ -486,7 +489,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
                         d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
                         d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                        d.putExtra(GUARDIANNAME, getIntent().getStringExtra(GUARDIANNAME));
                         d.putExtra(PERSON_PHOTO, byteArray);
                         d.putExtra(ITEMS_PHOTO_LIST, list);
                         d.putExtra(KIDNAME,getIntent().getStringExtra(KIDNAME));
@@ -538,7 +541,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
 
         loginReq.VNVendorID = 0;
         loginReq.WKDesgn = getIntent().getStringExtra(COMPANY_NAME);
-        loginReq.WKFName = getIntent().getStringExtra(PERSONNAME);
+        loginReq.WKFName = getIntent().getStringExtra(GUARDIANNAME);
         loginReq.WKIDCrdNo = "";
         loginReq.WKDOB = getIntent().getStringExtra("DOB");
         loginReq.WKISDCode = "";
@@ -591,7 +594,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
 
                         Intent d = new Intent(KidExitAddCarFragment.this, Biometric.class);
                         d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
-                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                        d.putExtra(GUARDIANNAME, getIntent().getStringExtra(GUARDIANNAME));
                         d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                         d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                         d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
@@ -603,7 +606,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
                     } else if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
                         Intent intent = new Intent(KidExitAddCarFragment.this, StaffDetails.class);
                         intent.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
-                        intent.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                        intent.putExtra(GUARDIANNAME, getIntent().getStringExtra(GUARDIANNAME));
                         intent.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                         intent.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                         intent.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
@@ -616,7 +619,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
                     } else {
                         Intent d = new Intent(KidExitAddCarFragment.this, Biometric.class);
                         d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
-                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                        d.putExtra(GUARDIANNAME, getIntent().getStringExtra(GUARDIANNAME));
                         d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                         d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
                         d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));

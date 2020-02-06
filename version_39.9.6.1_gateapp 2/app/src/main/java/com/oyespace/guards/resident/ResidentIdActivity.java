@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,6 +75,8 @@ public class ResidentIdActivity extends BaseScannerActivity implements ZXingScan
     @SuppressLint("CheckResult")
     @Override
     public void handleResult(Result result) {
+
+        Log.v("Resident data...",result.toString());
 
         String[] qrData = result.getText().split(";");
         if (qrData.length < 2) {

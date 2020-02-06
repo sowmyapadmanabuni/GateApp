@@ -37,6 +37,7 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
     var lyt_kid:LinearLayout?=null
     var datepickerdialog:DatePickerDialog?=null
     var ed_dob:EditText?=null
+    var Ed_Name:EditText?=null
     var ed_KidName:EditText?=null
     private var calendar: Calendar? = null
     private var year: Int = 0
@@ -48,9 +49,11 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNext ->{
+
+
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
-                if(Ed_Name.text.length<2  ) {
+                if(Ed_Name!!.text.length<2  ) {
                     buttonNext.isEnabled = true
                     buttonNext.isClickable = true
                     Toast.makeText(this,"Enter Valid Name", Toast.LENGTH_SHORT).show()
@@ -79,7 +82,7 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                         d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                         d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                         d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                        d.putExtra(PERSONNAME, Ed_Name.text.toString())
+                        d.putExtra(GUARDIANNAME, Ed_Name!!.text.toString())
                         d.putExtra(KIDNAME, ed_KidName!!.text.toString())
                         d.putExtra("DOB",s_dob.toString())
                         d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
@@ -102,7 +105,7 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                     d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
                     d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                    d.putExtra(PERSONNAME, Ed_Name.text.toString())
+                    d.putExtra(GUARDIANNAME, Ed_Name!!.text.toString())
                     d.putExtra(KIDNAME, ed_KidName!!.text.toString())
                    // d.putExtra("DOB",ed_dob!!.getText().toString())
                     d.putExtra("DOB",s_dob.toString())
@@ -127,6 +130,7 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         setContentView(R.layout.activity_name_entry)
         ed_dob=findViewById(R.id.ed_dob)
         ed_KidName=findViewById(R.id.ed_KidName)
+        Ed_Name=findViewById(R.id.Ed_Name)
         lyt_dob=findViewById(R.id.lyt_dob)
         lyt_kid=findViewById(R.id.lyt_kid)
 
@@ -163,7 +167,7 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         }
 
         if (intent.getStringExtra(PERSONNAME) != null) {
-            Ed_Name.setText(intent.getStringExtra(PERSONNAME))
+            Ed_Name!!.setText(intent.getStringExtra(PERSONNAME))
         }
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
             lyt_dob!!.visibility=View.VISIBLE
@@ -307,7 +311,7 @@ class KidExitNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                 if (resultCode == Activity.RESULT_OK  && null!= data){
                     val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
                     if(clickable1==1){
-                        Ed_Name.setText(result[0].replace(" ", "").trim())
+                        Ed_Name!!.setText(result[0].replace(" ", "").trim())
                     }
                     else if(clickable1==2){
                         ed_KidName!!.setText(result[0].replace(" ", "").trim())

@@ -73,6 +73,7 @@
                         android:layout_height="wrap_content"
                         android:paddingLeft="10dp"
                         android:textSize="14sp"
+                        android:visibility="gone"
                         android:maxLength="15"
                         android:textColor="@color/black"
                         android:textStyle="bold"
@@ -196,15 +197,18 @@
                         android:src="@drawable/attachment"
                         android:visibility="gone" />
 
+
+
+
                 <Button
                         android:id="@+id/btn_makeexit"
-                        android:layout_marginTop="@dimen/_20sdp"
+                        android:layout_marginTop="@dimen/_30sdp"
                         android:layout_marginBottom="@dimen/_20sdp"
                         android:layout_width="wrap_content"
                         android:textColor="@color/black"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:textSize="14sp"
+                        android:textSize="12sp"
                         android:layout_marginRight="4dp"
                         android:background="@drawable/square"
                         android:visibility="invisible"
@@ -214,10 +218,11 @@
                         android:id="@+id/tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+android:visibility="visible"
 
                         android:paddingLeft="10dp"
                         android:textColor="@color/black"
-                        android:textSize="10sp" />
+                        android:textSize="8sp" />
 
 
             </LinearLayout>

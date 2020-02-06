@@ -54,6 +54,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
     internal var unitNumber4 = ""
     internal var unitNumber5 = ""
     internal var unitNames = ""
+    internal var unitOccupancyStatus=""
     internal var blockID = ""
     internal var unitId = ""
     internal var acAccntID = ""
@@ -248,16 +249,34 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                     unitNames += ", "
                     unitId += ", "
                     acAccntID += ", "
-                    acAccntID += ", "
+                  //  acAccntID += ", "
                     unitNumber1 += ", "
                     unitNumber2 += ", "
                     unitNumber3 += ", "
                     unitNumber4 += ", "
                     unitNumber5 += ", "
+                    unitOccupancyStatus+=","
                 }
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
-                acAccntID += selected.get(j).acAccntID
+                unitOccupancyStatus+=selected.get(j).unOcStat
+
+//               if(selected.get(j).unOcStat.contains("Sold Owner Occupied Unit")){
+//                   acAccntID += selected.get(j).owner[0].acAccntID
+//
+//               }
+//                else if(selected.get(j).unOcStat.contains("Sold Tenant Occupied Unit")){
+//                   acAccntID += selected.get(j).tenant[0].acAccntID
+//               }
+//                else if(selected.get(j).unOcStat.contains("UnSold Tenant Occupied Unit")){
+//                   acAccntID += selected.get(j).tenant[0].acAccntID
+//               }
+//                else if(selected.get(j).unOcStat.contains("UnSold Vacant Unit")){
+//                   acAccntID += 0
+//               }
+//                else if(selected.get(j).unOcStat.contains("Sold Vacant Unit")){
+//                   acAccntID += 0
+//               }
 
             }
 
@@ -277,7 +296,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                         "RESIDENT_NUMBER",
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
                     )
-
+                    d.putExtra(UNITOCCUPANCYSTATUS,unitOccupancyStatus)
                     startActivity(d)
                     finish()
                 } else {
@@ -302,6 +321,7 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                         unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
                     )
 
+                    d.putExtra(UNITOCCUPANCYSTATUS,unitOccupancyStatus)
 
                     startActivity(d)
                     finish()

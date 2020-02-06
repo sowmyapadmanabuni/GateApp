@@ -83,7 +83,7 @@ public class ResidentIdActivity_OLD extends BaseScannerActivity implements ZXing
         super.onPause();
         mScannerView.stopCamera();
     }
-
+//
     @Override
     public void handleResult(Result result) {
 
@@ -117,7 +117,7 @@ public class ResidentIdActivity_OLD extends BaseScannerActivity implements ZXing
                         @Override
                         public void onClick(View v) {
                             alertDialog.dismiss();
-//
+
                             finish();
 
                         }

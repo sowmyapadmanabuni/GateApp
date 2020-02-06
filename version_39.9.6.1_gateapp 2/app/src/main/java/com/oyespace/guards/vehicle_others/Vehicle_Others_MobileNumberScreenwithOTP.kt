@@ -310,7 +310,7 @@ class Vehicle_Others_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCl
 //            Ed_phoneNum.setVisibility(View.GONE)
 //            textview.visibility = View.VISIBLE
         } else {
-            buttonSkip.visibility = View.INVISIBLE
+//            buttonSkip.visibility = View.INVISIBLE
         }
 
         val mobilePHONEDATA:String = Prefs.getString(PrefKeys.MOBILE_NUMBER,"")

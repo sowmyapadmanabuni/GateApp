@@ -70,6 +70,7 @@ import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.request.VisitorEntryReqJv
 import com.oyespace.guards.resident.ResidentIdActivity
+import com.oyespace.guards.residentidcard.ResidentIdActivity_OLD
 import com.oyespace.guards.responce.VisitorLogCreateResp
 import com.oyespace.guards.responce.VisitorLogExitResp
 import com.oyespace.guards.services.SOSSirenService
@@ -225,7 +226,7 @@ var iv_torch:Button?=null
                 val myHandler = Handler()
                 //final int TIME_TO_WAIT = 2000;
 
-                myHandler.postDelayed(myRunnable, 3000)
+                myHandler.postDelayed(myRunnable, 4000)
 
             }
         }
@@ -305,6 +306,7 @@ var iv_torch:Button?=null
         showingOutLog = false
         textWatcher = object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
+
             }
 
             override fun onTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
@@ -1180,6 +1182,29 @@ var iv_torch:Button?=null
                             showToast(this, "No staff found")
                         } else {
 
+
+//                            if (LocalDb.getVisitorEnteredLog() != null) {
+//                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
+//                                    Utils.showToast(
+//                                        this@Dashboard,
+//                                        "Duplicate Entry not allowed"
+//                                    )
+//                                    t1?.speak("Duplicate Entry", TextToSpeech.QUEUE_FLUSH, null)
+//                                }
+//                            }else {
+//
+//                                visitorLogBiometric(
+//                                    worker.unUnitID,
+//                                    "${worker.wkfName} ${worker.wklName}",
+//                                    worker.wkMobile,
+//                                    worker.wkDesgn,
+//                                    worker.wkWrkType,
+//                                    worker.wkWorkID,
+//                                    worker.unUniName,
+//                                    worker.wkEntryImg
+//                                )
+//                            }
+
                             val phone = worker.wkMobile
 
                             if (phone == null || phone.isEmpty()) {
@@ -1366,7 +1391,7 @@ var iv_torch:Button?=null
             }
 
             R.id.re_resident -> {
-                val i_staff = Intent(this@Dashboard, ResidentIdActivity::class.java)
+                val i_staff = Intent(this@Dashboard, ResidentIdActivity_OLD::class.java)
                 startActivity(i_staff)
             }
             R.id.re_kidexit->{

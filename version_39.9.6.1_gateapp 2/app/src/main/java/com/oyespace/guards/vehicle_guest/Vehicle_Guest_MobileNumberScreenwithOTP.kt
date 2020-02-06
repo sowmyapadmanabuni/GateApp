@@ -333,7 +333,7 @@ class Vehicle_Guest_MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnCli
 //            Ed_phoneNum.setVisibility(View.GONE)
 //            textview.visibility = View.VISIBLE
         } else {
-            buttonSkip.visibility = View.INVISIBLE
+         //   buttonSkip.visibility = View.INVISIBLE
         }
 
         val mobilePHONEDATA:String = Prefs.getString(PrefKeys.MOBILE_NUMBER,"")

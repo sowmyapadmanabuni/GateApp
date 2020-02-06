@@ -271,7 +271,7 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
        // iamgeLyt.removeAllViews();
         list.clear();
        Picasso.with(this)
-               .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+               .load(IMAGE_BASE_URL + "Images/PERSON"+ getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
 //        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
@@ -285,13 +285,13 @@ public class VehicleOthersAddCarFragment extends Activity implements View.OnClic
         }else{
 
             if(getIntent().getIntExtra(ACCOUNT_ID,0)!=0){
-                Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON"  + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
+                Picasso.with(this).load(IMAGE_BASE_URL + "Images/" + "PERSON"+ getIntent().getStringExtra(MOBILENUMBER) + ".jpg").into(target);
 
                 Log.v("CALLER IMAGEVIEW", IMAGE_BASE_URL + "Images/" + "PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg");
 
                 imageView1.setImageBitmap(photo);
               Picasso.with(this)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
+                        .load(IMAGE_BASE_URL + "Images/PERSON"+ getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
                       .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
 
             }

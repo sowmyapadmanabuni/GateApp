@@ -84,7 +84,7 @@ var purpose:String?=null
 
                     staffVisitorLog(
                         intent.getStringExtra(UNITID),
-                        intent.getStringExtra(PERSONNAME),
+                        intent.getStringExtra(GUARDIANNAME),
                         intent.getStringExtra(MOBILENUMBER),
                         intent.getStringExtra("DESIGNATION"),
                         intent.getStringExtra("WORKTYPE"),
@@ -269,7 +269,7 @@ var purpose:String?=null
         }
 
         // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
-        tv_name.text = intent.getStringExtra(PERSONNAME)
+        tv_name.text = intent.getStringExtra(GUARDIANNAME)
         // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
 
         val input = intent.getStringExtra(MOBILENUMBER)
@@ -300,7 +300,7 @@ var purpose:String?=null
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
                 // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
-                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER).substring(3))
+                singUp(intent.getStringExtra(GUARDIANNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER).substring(3))
 
             }
         }
@@ -362,13 +362,13 @@ var purpose:String?=null
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
+        val imgName = "PERSON" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
 
         Log.i("taaag", "cutTIme: $curTime")
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
-            UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),
+            UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(GUARDIANNAME),
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(MOBILENUMBER),
             purpose.toString(), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
@@ -420,9 +420,9 @@ var purpose:String?=null
                                                 updateKidExitFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
                                                 val d = Intent(this@KidExitStaffEntryRegistration, BackgroundSyncReceiver::class.java)
                                                 d.putExtra(BSR_Action, VisitorEntryFCM)
-                                                d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " is Requesting "+intent.getStringExtra(KIDNAME)+"to be taken out from " +Prefs.getString(ConstantUtils.GATE_NO, "")+ " of " + UNUniName + ")")
+                                                d.putExtra("msg", intent.getStringExtra(GUARDIANNAME) + " is Requesting "+intent.getStringExtra(KIDNAME)+" to be taken out from " +Prefs.getString(ConstantUtils.GATE_NO, "")+ " of " + UNUniName)
                                                 d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-                                                d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                                                d.putExtra("name", intent.getStringExtra(GUARDIANNAME))
                                                 d.putExtra("nr_id", vlid.toString())
                                                 d.putExtra("unitname", UNUniName)
                                                 d.putExtra("memType", "Owner")

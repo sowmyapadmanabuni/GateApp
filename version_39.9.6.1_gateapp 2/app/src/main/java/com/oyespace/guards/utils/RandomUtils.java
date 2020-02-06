@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Random;
 
+import io.realm.RealmList;
+
 /**
  * Created by Kalyan on 5/28/2017.
  */
@@ -124,5 +126,15 @@ public class RandomUtils {
 
     public static boolean entryExists(String isdCode ,String mobNum ) {
         return VisitorLogRepo.Companion.check_IN_VisitorByPhone(isdCode + mobNum);
+    }
+
+    public static boolean contain(RealmList<VisitorLog> list, int id) {
+
+        for (VisitorLog item : list) {
+            if (item.getReRgVisID()==id) {
+                return true;
+            }
+        }
+        return false;
     }
 }

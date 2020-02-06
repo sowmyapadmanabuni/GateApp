@@ -1,14 +1,18 @@
 package com.oyespace.guards.pertroling
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.hardware.camera2.CameraAccessException
+import android.hardware.camera2.CameraManager
 import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.app.ActivityCompat
@@ -50,8 +54,8 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
 
 
     var pictureService: APictureCapturingService?=null;
-
-
+    var iv_torch: Button?=null
+    var clickable1 = 0
     var mPatrolShiftArray = ArrayList<PatrolShift>()
     var mPatrolShiftsAdapter: PatrolShiftsAdapter? = null
     var mCameraConfig:CameraConfig? = null;
@@ -62,6 +66,37 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_pschedule_list)
         title_block.findViewById<AppCompatTextView>(R.id.header_title).text = "Patrolling Schedules"
+
+        iv_torch=findViewById<Button>(R.id.iv_torch)
+        iv_torch?.setOnClickListener {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                val camManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager;
+                var cameraId: String? = null
+                cameraId = camManager.getCameraIdList()[0];
+                if(clickable1==0){
+                    try {
+                        iv_torch!!.background=resources.getDrawable(R.drawable.torch_off)
+                        camManager.setTorchMode(cameraId, true);   //Turn ON
+
+                        //  iv_torch!!.text = "OFF"
+                        clickable1=1
+                    } catch (e: CameraAccessException) {
+                        e.printStackTrace();
+                    }
+                }
+                else if(clickable1==1){
+                    camManager.setTorchMode(cameraId, false);
+                    // iv_torch!!.text = "ON"
+                    iv_torch!!.background=resources.getDrawable(R.drawable.torch_on)
+                    clickable1=0
+
+                }
+            }
+
+        }
+
         ot_back.setOnClickListener{
             finish()
         }

@@ -1,5 +1,6 @@
 package com.oyespace.guards.adapter
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import android.view.LayoutInflater
@@ -26,7 +27,6 @@ class FamilMembersAdapter ( val listVistor: ArrayList<FamilyMember>,  val mconte
 
     private val mInflater: LayoutInflater
 
-
     init {
         mInflater = LayoutInflater.from(mcontext)
     }
@@ -40,20 +40,32 @@ class FamilMembersAdapter ( val listVistor: ArrayList<FamilyMember>,  val mconte
     override fun onBindViewHolder(holder: MenuHolder, position: Int) {
         val orderData = listVistor.get(position)
 
-       // if(orderData.fmMinor==false) {
+        if(orderData.fmMinor== false) {
 
-
-
+            holder.tv_relation.visibility=View.VISIBLE
             holder.tv_relation.text = orderData?.fmRltn
+            holder.iv_unit.visibility = View.VISIBLE
 
-            holder.iv_unit.setOnClickListener {
+        }
+        else{
+            holder.tv_relation.visibility=View.GONE
+            holder.iv_unit.visibility = View.GONE
+        }
 
-                var agentNumber = "AGENTNUMBER=" + orderData.fmMobile.replace("+91", "")
-                var gateMobileNumber = Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+        for (i in 0 until listVistor.size) {
 
-                TaptoCallApi.taptocallApi(gateMobileNumber, agentNumber)
+            if(orderData.fmMinor == true && orderData.fmRltn == "Child"){
+                holder.iv_unit.visibility = View.GONE
+            }else{
+                holder.iv_unit.setOnClickListener {
 
-          //  }
+                    var agentNumber = "AGENTNUMBER=" + orderData.fmMobile.replace("+91", "")
+
+                    var gateMobileNumber = Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
+
+                    TaptoCallApi.taptocallApi(gateMobileNumber, agentNumber,mcontext)
+                }
+            }
         }
 
     }

@@ -87,7 +87,7 @@ public class Myapp extends MultiDexApplication implements InternetConnectivityLi
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
        // Fabric.with(this, new Crashlytics());
-        Fabric.with(this, new Crashlytics());
+       // Fabric.with(this, new Crashlytics());
         Timber.plant(new Timber.DebugTree());
         mApplicationContext = getApplicationContext();
         Prefs.initPrefs(getApplicationContext());

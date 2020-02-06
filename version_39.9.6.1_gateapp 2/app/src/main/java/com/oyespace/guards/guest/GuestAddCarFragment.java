@@ -220,7 +220,7 @@ public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnCl
 
         image_Gallery = findViewById(R.id.btnCaptureItemPhoto);
         buttonSkip=findViewById(R.id.buttonSkip);
-        buttonSkip.setVisibility(View.GONE);
+       // buttonSkip.setVisibility(View.GONE);
         //iamgeLyt = (LinearLayout) findViewById(R.id.imageLyt);
         rv_image = findViewById(R.id.rv_image);
         iv_delete = findViewById(R.id.iv_delete);
@@ -294,7 +294,7 @@ public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnCl
 //                        .load(IMAGE_BASE_URL + "Images/"+"PERSONAssociation"+Prefs.getInt(ASSOCIATION_ID,0)+"NONREGULAR" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg")
 //                        .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(imageView1);
 
-                //  Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+"NONREGULAR"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
+               //   Picasso.with(this).load(IMAGE_BASE_URL +"Images/PERSON"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").placeholder(R.drawable.user_icon_black).memoryPolicy(MemoryPolicy.NO_CACHE).into(imageView1);
 
 
             }

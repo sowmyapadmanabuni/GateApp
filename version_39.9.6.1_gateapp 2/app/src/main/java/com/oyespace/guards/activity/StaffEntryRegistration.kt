@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -15,15 +14,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.signature.StringSignature
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.camtest.ImageAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
+import com.oyespace.guards.network.ImageApiClient
+import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.repo.VisitorLogRepo
@@ -32,13 +30,21 @@ import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
-import com.oyespace.guards.utils.UploadImageApi.Companion.uploadImage
+import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_final_registration.*
 import kotlinx.android.synthetic.main.header_with_next.*
+import okhttp3.MediaType
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Call
+import retrofit2.Callback
+import timber.log.Timber
+import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -130,21 +136,21 @@ var purpose:String?=null
 
             R.id.profile_image -> {
                 Log.d("button_done ", "StaffEntry " + FLOW_TYPE + " " + STAFF_REGISTRATION + " " + FLOW_TYPE.equals(STAFF_REGISTRATION, true))
-              //  val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-               // if (wrrw != null) {
+                val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+                if (wrrw != null) {
 
                     val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
                     val factory = LayoutInflater.from(this@StaffEntryRegistration)
                     val view = factory.inflate(R.layout.dialog_big_image, null)
                     var dialog_imageview: ImageView? = null
                     dialog_imageview = view.findViewById(R.id.dialog_imageview)
-//                    mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-//                    dialog_imageview.setImageBitmap(mBitmap)
-                    dialog_imageview.background = profile_image.getDrawable()
+                    mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+                    dialog_imageview.setImageBitmap(mBitmap)
+                  //  dialog_imageview.background = profile_image.getDrawable()
 
                     alertadd.setView(view)
                     alertadd.show()
-              //  }
+                }
 //                else {
 //                    val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
 //                    val factory = LayoutInflater.from(this@StaffEntryRegistration)
@@ -282,17 +288,31 @@ var purpose:String?=null
             }
         }
 
-        val url=intent.getStringExtra(PERSON_PHOTO)
+       // val url=intent.getStringExtra(PERSON_PHOTO)
 
 
-//        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-//        if (wrrw != null) {
+       val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+       if (wrrw != null) {
 //            //   imageView1.setImageBitmap(photo);
 //
-//            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-//            profile_image.setImageBitmap(mBitmap)
+           mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+           profile_image.setImageBitmap(mBitmap)
 //
-//        } else {
+       }
+        else{
+           //                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
+//                    Glide.with(this)
+//                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
+//                            .placeholder(R.drawable.user_icon_black)
+//                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                            .skipMemoryCache(false)
+//                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+//                            .into(imageView1);
+           Picasso.with(this)
+               .load(IMAGE_BASE_URL + "Images/PERSON" + intent.getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg")
+               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
+       }
+       //else {
 //               //imageView1.setImageBitmap(photo);
 //            Toast.makeText(applicationContext, "222 ", Toast.LENGTH_SHORT).show()
 //
@@ -300,13 +320,13 @@ var purpose:String?=null
 ////            Picasso.with(this)
 ////                .load(image)
 ////                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
-            Glide.with(this)
-                .load(Uri.parse(IMAGE_BASE_URL + "Images/" + url))
-                .placeholder(R.drawable.user_icon_black)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(false)
-                .signature(StringSignature(System.currentTimeMillis().toString()))
-                .into(profile_image)
+//            Glide.with(this)
+//                .load(Uri.parse(IMAGE_BASE_URL + "Images/" + url))
+//                .placeholder(R.drawable.user_icon_black)
+//                .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                .skipMemoryCache(false)
+//                .signature(StringSignature(System.currentTimeMillis().toString()))
+//                .into(profile_image)
 //        }
 
         list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
@@ -353,7 +373,8 @@ var purpose:String?=null
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-        val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
+      //  val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
+        val imgName = "PERSON" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
 
         Log.i("taaag", "cutTIme: $curTime")
 
@@ -378,7 +399,6 @@ var purpose:String?=null
 
                         if (globalApiObject.success) {
 
-                            Toast.makeText(this@StaffEntryRegistration, "111", Toast.LENGTH_SHORT).show()
 
                             val vlid = globalApiObject.data.visitorLog.vlVisLgID
                             Log.d("taaag", "saving... $vlid for $UNUniName at entryTime: ${getCurrentTimeLocal()}")
@@ -398,6 +418,17 @@ var purpose:String?=null
                                 val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
                                 deleteDir(dir.absolutePath)
 
+
+                               //   uploadImage(imgName,personPhoto);
+                                val ddc = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
+                                Log.d("btn_biometric", "af $imgName")
+
+                                ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO)
+                                ddc.putExtra("imgName", imgName)
+                                ddc.putExtra(PERSON_PHOTO,  intent.getByteArrayExtra(PERSON_PHOTO))
+                                sendBroadcast(ddc)
+
+
                               //  uploadImage(imgName, mBitmap)
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
@@ -411,6 +442,7 @@ var purpose:String?=null
 
                                             for (visitor in visitors) {
                                                 updateFirebaseColor(visitor.vlVisLgID)
+
                                                 val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
                                                 d.putExtra(BSR_Action, VisitorEntryFCM)
                                                 d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
@@ -424,6 +456,7 @@ var purpose:String?=null
                                                 d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
                                                 d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                                d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
                                                 sendBroadcast(d)
 
                                                 Log.v("DELIVERY",visitor.vlVisLgID.toString()+intent.getStringExtra(VISITOR_TYPE))
@@ -489,7 +522,7 @@ var purpose:String?=null
                     override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                         if (globalApiObject.success == true) {
                             // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                           // uploadImage(imgName.toString(), mBitmap)
+                            uploadAccountImage(imgName.toString(), mBitmap)
                             Log.d(
                                 "CreateVisitorLogResp",
                                 "StaffEntry " + globalApiObject.data.toString()
@@ -649,6 +682,153 @@ var purpose:String?=null
                     }
                 })
         )
+    }
+
+    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
+        Log.d("uploadImage",localImgName)
+        var byteArrayProfile: ByteArray?
+        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
+
+
+        val imageFile = File(mPath)
+
+
+        try {
+            val outputStream = FileOutputStream(imageFile)
+            val quality = 50
+            if (incidentPhoto != null) {
+                incidentPhoto.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
+            }
+            outputStream.flush()
+            outputStream.close()
+
+            val bosProfile = ByteArrayOutputStream()
+            if (incidentPhoto != null) {
+                incidentPhoto.compress(Bitmap.CompressFormat.PNG, 50, bosProfile)
+            }
+            byteArrayProfile = bosProfile.toByteArray()
+            val len = bosProfile.toByteArray().size
+            println("AFTER COMPRESSION-===>$len")
+            bosProfile.flush()
+            bosProfile.close()
+            if (incidentPhoto != null) {
+            }
+            Timber.e("uploadImage  bf", "sfas")
+        } catch (ex: Exception) {
+
+            Log.d("uploadImage ererer bf", ex.toString())
+        }
+
+
+        val file = File(imageFile.toString())
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
+        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
+        val call = apiService.updateImageProfile(body)
+
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
+                try {
+                    Log.d("uploadImage111", "response:" + response.body()!!)
+                    file.delete()
+                    // Toast.makeText(getApplicationContext(),"Uploaded Successfully",Toast.LENGTH_SHORT).show();
+
+                } catch (ex: Exception) {
+                    Log.d("uploadImage222", "errr:" + ex.toString())
+
+                }
+
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                // Log error here since request failed
+                Log.d("uploadImage", t.toString())
+
+            }
+        })
+
+
+    }
+
+    fun uploadAccountImage(localImgName: String, incidentPhoto: Bitmap?) {
+        Log.d("uploadImage",localImgName)
+        var byteArrayProfile: ByteArray?
+        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
+        val imageFile = File(mPath)
+
+        try {
+            val outputStream = FileOutputStream(imageFile)
+            val quality = 75
+            if (incidentPhoto != null) {
+                incidentPhoto.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
+            }
+            outputStream.flush()
+            outputStream.close()
+
+            val bosProfile = ByteArrayOutputStream()
+            if (incidentPhoto != null) {
+                incidentPhoto.compress(Bitmap.CompressFormat.PNG, 75, bosProfile)
+            }
+            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
+            byteArrayProfile = bosProfile.toByteArray()
+            val len = bosProfile.toByteArray().size
+            println("AFTER COMPRESSION-===>$len")
+            bosProfile.flush()
+            bosProfile.close()
+            if (incidentPhoto != null) {
+                //    incidentPhoto.recycle()
+            }
+            Timber.e("uploadImage  bf", "sfas")
+        } catch (ex: Exception) {
+            byteArrayProfile = null
+            Log.d("uploadImage ererer bf", ex.toString())
+        }
+
+//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
+//
+//        val imageFileOS: OutputStream?
+//        try {
+//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
+//            imageFileOS!!.write(byteArrayProfile!!)
+//            imageFileOS.flush()
+//            imageFileOS.close()
+//
+//            Log.d("uploadImage Path bf", uriTarget.toString())
+//        } catch (e: FileNotFoundException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        } catch (e: IOException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        }
+
+        val file = File(imageFile.toString())
+        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
+        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
+        val call = apiService.updateImageProfile(body)
+
+        call.enqueue(object : Callback<Any> {
+            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
+                try {
+                    Log.d("uploadImage", "response:" + response.body()!!)
+
+                } catch (ex: Exception) {
+                    Log.d("uploadImage", "errr:" + ex.toString())
+
+                }
+
+            }
+
+            override fun onFailure(call: Call<Any>, t: Throwable) {
+                // Log error here since request failed
+                Log.d("uploadImage", t.toString())
+
+            }
+        })
+
+
     }
 
 }

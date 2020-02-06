@@ -129,7 +129,29 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                             Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITNAME), intent.getStringExtra("Image"))
+                         //   getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITNAME), intent.getStringExtra("Image"))
+                            if (LocalDb.getVisitorEnteredLog() != null) {
+                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
+                                    Utils.showToast(
+                                        this@MobileNumberforEntryScreen,
+                                        "Duplicate Entry not allowed"
+                                    )
+                                }
+                            }else {
+
+                                    visitorLog(
+                                        intent.getStringExtra(UNITID),
+                                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+                                        intent.getStringExtra(MOBILENUMBER),
+                                        intent.getStringExtra("DESIGNATION"),
+                                        intent.getStringExtra("WORKTYPE"),
+                                        intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+                                        intent.getStringExtra(UNITNAME)
+                                    )
+                                }
+
+
+
                         }
 
 
@@ -160,7 +182,9 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         lytt=findViewById(R.id.lytt)
         timer = findViewById(R.id.timer)
 
-        buttonNext.visibility=View.GONE
+        buttonNext.visibility=View.VISIBLE
+
+        buttonNext.text=resources.getString(R.string.textdone)
 
         if(intent.getStringExtra(MOBILENUMBER).isEmpty()){
             lytt?.visibility=View.INVISIBLE
@@ -303,8 +327,14 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
         val timer = object : CountDownTimer(60000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
 
+                var clock:String?=null
                 val remainedSecs: Long = millisUntilFinished / 1000
-                timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
+                if((millisUntilFinished / 1000) % 60 < 10)
+                    clock = " 0" + ((millisUntilFinished / 1000)/60)%60 + ":0" + ((millisUntilFinished / 1000)%60);
+                else
+                    clock = " 0" + ((millisUntilFinished / 1000)/60)%60 + ":" + ((millisUntilFinished / 1000)%60);
+                // timer.text = ("0" + (remainedSecs / 60) + ":" + (remainedSecs % 60))// manage it accordign to you
+                timer.text=clock
             }
 
             override fun onFinish() {

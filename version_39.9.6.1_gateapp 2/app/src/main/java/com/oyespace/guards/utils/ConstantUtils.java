@@ -9,6 +9,7 @@ public class ConstantUtils {
     public static final int CHECKPOINT_ACCURACY = 10;
     public static final String DATA = "data";
     public static final String ADDITIONAL_DATA = "aditional_data";
+    public static final String UNITOCCUPANCYSTATUS = "unit_occupancy_status";
     public static final String UNITID = "unit_id";
     public static final String UNITNAME = "unit_name";
     public static final String COMPANY_NAME = "company_name";
@@ -16,6 +17,7 @@ public class ConstantUtils {
     public static final String FLOW_TYPE = "flow_type";
     public static final String VISITOR_TYPE = "visitor_type";
     public static final String PERSONNAME = "person_name";
+    public static final String GUARDIANNAME = "guardian_name";
     public static final String KIDNAME = "kid_name";
     public static final String ACCOUNT_ID = "account_id";
     public static final String BLOCK_ID = "block_id";
@@ -80,20 +82,15 @@ public class ConstantUtils {
 
 
     //http://mediaupload.oyespace.com/Images/
-  //public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
-   // public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
-  public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
+ // public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
+  //  public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
+ public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
     //  public static final String BASE_URL = "https://api.oyespace.com/";
 //public static final String BASE_URL  =  "https://staging.oyespace.com/";
   // public static final String BASE_URL = "https://apidev.oyespace.com/";
 public static final String BASE_URL = "https://apiuat.oyespace.com/";
 //    public static final String IMAGE_BASE_URL = "http://mediaupload.oyespace.com/";
 //    public static final String IMAGE_BASE_URL = "https://mediauploaddev.oyespace.com/";
-    public static final String IMAGE_BASE_URL = "https://mediauploaduat.oyespace.com/";
-//        public static final String BASE_URL = "https://api.oyespace.com/";
-//public static final String BASE_URL  =  "https://staging.oyespace.com/";
-//    public static final String BASE_URL = "https://apidev.oyespace.com/";
-public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String PATROLLING_START_POINT_AND_END_POINT = "Patrolling Start and End Point";
     public static final String PATROLLING_START_POINT = "Patrolling Start Point";
     public static final String PATROLLING_END_POINT = "Patrolling End Point";

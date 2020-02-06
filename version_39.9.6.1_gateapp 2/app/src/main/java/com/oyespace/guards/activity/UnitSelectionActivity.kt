@@ -2,6 +2,7 @@ package com.oyespace.guards.activity
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -680,7 +681,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                                 iv_unit1.visibility = View.VISIBLE
                                 tv_number1.visibility = View.VISIBLE
-                                tv_number1.setText("Mobile Number")
+                                tv_number1.setText("Tenant's mobile number")
                             }
 
                             if (orderData.tenant[0].utMobile1.equals("")) {
@@ -690,7 +691,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                                 iv_unit2.visibility = View.VISIBLE
                                 tv_number2.visibility = View.VISIBLE
-                                tv_number2.setText("Mobile Number")
+                                tv_number2.setText("Tenant's alternative mobile number")
                             }
 
 
@@ -702,7 +703,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                             var agentNumber="AGENTNUMBER="+orderData.tenant[0].utMobile.replace("+91", "")
                             var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
                         }
 
 
@@ -710,7 +711,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                             var agentNumber="AGENTNUMBER="+orderData.tenant[0].utMobile1.replace("+91", "")
                             var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                            TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
                         }
 
 
@@ -766,7 +767,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                                     iv_unit1.visibility = View.VISIBLE
                                     tv_number1.visibility = View.VISIBLE
-                                    tv_number1.setText(orderData.owner[0].uoMobile)
+                                    tv_number1.setText("Owner's mobile number")
                                 }
 
                                 if (orderData.owner[0].uoMobile1.equals("")) {
@@ -780,7 +781,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                                 else {
                                     iv_unit2.visibility = View.VISIBLE
                                     tv_number2.visibility = View.VISIBLE
-                                    tv_number2.setText(orderData.owner[0].uoMobile1)
+                                    tv_number2.setText("Owner's alternative mobile number1")
                                 }
 
                                 if (orderData.owner[0].uoMobile2.equals("")) {
@@ -795,7 +796,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                                 else {
                                     iv_unit3.visibility = View.VISIBLE
                                     tv_number3.visibility = View.VISIBLE
-                                    tv_number3.setText("Mobile Number")
+                                    tv_number3.setText("Owner's alternative mobile number2")
                                 }
 
                                 if (orderData.owner[0].uoMobile3.equals("")) {
@@ -809,7 +810,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                                 else {
                                     iv_unit4.visibility = View.VISIBLE
                                     tv_number4.visibility = View.VISIBLE
-                                    tv_number4.setText("Mobile Number")
+                                    tv_number4.setText("Owner's alternative mobile number3")
                                 }
                                 if (orderData.owner[0].uoMobile4.equals("")) {
                                     iv_unit5!!.visibility = View.GONE
@@ -822,7 +823,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                                 else {
                                     iv_unit5!!.visibility = View.VISIBLE
                                     tv_number5.visibility = View.VISIBLE
-                                    tv_number5.setText("Mobile Number")
+                                    tv_number5.setText("Owner's alternative mobile number4")
                                 }
                             } catch (e: IndexOutOfBoundsException) {
 
@@ -832,14 +833,15 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                                 var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile.replace("+91", "")
                                 var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
                             }
 
                             iv_unit2.setOnClickListener {
 
+
                                 var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile1.replace("+91", "")
                                 var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
                             }
 
@@ -847,22 +849,24 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                                 var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile2.replace("+91", "")
                                 var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
                             }
                             iv_unit4.setOnClickListener {
 
+
                                 var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile3.replace("+91", "")
                                 var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
 
                             }
                             iv_unit5.setOnClickListener {
 
+
                                 var agentNumber="AGENTNUMBER="+orderData.owner[0].uoMobile4.replace("+91", "")
                                 var gateMobileNumber= Prefs.getString(PrefKeys.MOBILE_NUMBER, "").replace("91", "")
-                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber)
+                                TaptoCallApi.taptocallApi(gateMobileNumber,agentNumber,mcontext)
 
 
                             }

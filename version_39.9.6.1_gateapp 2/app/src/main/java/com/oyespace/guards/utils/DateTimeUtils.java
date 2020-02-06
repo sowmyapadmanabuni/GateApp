@@ -176,6 +176,8 @@ public class DateTimeUtils {
             // DateFormat dateFormatHMS =new SimpleDateFormat("HH:mm:ss",  Locale.getDefault());
             DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
+            Log.i("taagtime", "1");
+
             //  dateFormatGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
             dt_dwnld_date = DATE_FORMAT_YMDHMS.parse(downloaded_date);
             Calendar c1 = Calendar.getInstance();
@@ -187,17 +189,17 @@ public class DateTimeUtils {
             Calendar c2 = Calendar.getInstance();
             //Change to Calendar Date
             c2.setTime(DATE_FORMAT_YMDHMS.parse(DATE_FORMAT_YMDHMS.format(dt_curr_date)));
-            c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)));
+          //  c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)));
             //get Time in milli seconds
             long ms1 = c1.getTimeInMillis();
             long ms2 = c2.getTimeInMillis();
-
+            Log.i("taagtime", "2");
             //get difference in milli seconds
             long diff_sec = ms2 - ms1;
             int day_diff = (int) diff_sec / (60 * 1000);
             int allottedTime = maxMins;
-
-            Log.v("Gateapp", String.valueOf(allottedTime));
+            Log.i("taagtime", "3");
+            Log.v("Gateapp", String.valueOf(allottedTime)+".."+String.valueOf(day_diff));
 
             //int allottedTime=8+itemCount*7;
 

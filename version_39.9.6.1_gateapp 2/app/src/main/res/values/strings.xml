@@ -111,7 +111,7 @@
     <string name="in">In</string>
     <string name="out">Out</string>
     <string name="textvisiting">Visiting</string>
-    <string name="textmissedcallby">Get Missed Call by:</string>
+    <string name="textmissedcallby">Get Missed Call by: </string>
     <string name="textnodata">No Data</string>
     <string name="textnobalance">No Balance</string>
     <string name="textcancel">Cancel</string>
@@ -129,7 +129,7 @@
     </string>
     <string name="capture">Capture</string>
     <string name="init">Initialize</string>
-    <string name="units_list_title">Units List</string>
+    <string name="units_list_title">Unit List</string>
     <string name="units_selection_title">Select Units</string>
     <string name="blocks_selection_title">Select Blocks</string>
     <string name="tvdynamicsearch">Dynamic Search</string>

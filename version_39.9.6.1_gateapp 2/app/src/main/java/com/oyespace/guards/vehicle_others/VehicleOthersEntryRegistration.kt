@@ -247,7 +247,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
         val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
         if (wrrw != null) {
 //            var mBitmap: Bitmap;
-            imageName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+            imageName = "PERSON" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
             mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
             profile_image.setImageBitmap(mBitmap)
 
@@ -256,7 +256,7 @@ class VehicleOthersEntryRegistration : BaseKotlinActivity(), View.OnClickListene
             imageName = ""
             Picasso.with(this)
                 .load(
-                    IMAGE_BASE_URL + "Images/PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
+                    IMAGE_BASE_URL + "Images/PERSON" + intent.getStringExtra(MOBILENUMBER) + ".jpg"
                 )
                 .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
                 .into(profile_image)
