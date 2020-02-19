@@ -417,7 +417,7 @@ var purpose:String?=null
                                         if (visitors != null) {
 
                                             for (visitor in visitors) {
-                                                updateKidExitFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID)
+                                                updateKidExitFirebaseColor(globalApiObject.data.visitorLog.vlVisLgID,""+UNUnitID.toString(),"")
                                                 val d = Intent(this@KidExitStaffEntryRegistration, BackgroundSyncReceiver::class.java)
                                                 d.putExtra(BSR_Action, VisitorEntryFCM)
                                                 d.putExtra("msg", intent.getStringExtra(GUARDIANNAME) + " is Requesting "+intent.getStringExtra(KIDNAME)+" to be taken out from " +Prefs.getString(ConstantUtils.GATE_NO, "")+ " of " + UNUniName)

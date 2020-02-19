@@ -141,6 +141,9 @@ interface WebApi {
     @GET("oyesafe/api/v1/Device/GetDeviceListByAssocID/{id}")
     fun getDeviceListResponse(@Header("X-OYE247-APIKey") token: String, @Path("id") assid: String):Single<getDeviceList>
 
+    @GET("oyesafe/api/v1/GetFamilyMemberListForIVR/{assnId}/{unitId}")
+    fun getFamilyMemberListForIVR(@Header("X-OYE247-APIKey") token: String, @Path("assnId") assid: String,  @Path("unitId") unitId: String):Single<GetFamilyDetailsResponse<ArrayList<FamilyMember>>>
+
 
     @GET("oyesafe/api/v1/VisitorLog/GetVisitorLogListByWorkerID/{workerid}/{id}")
     fun getVisitorByWorkerId(@Header("X-OYE247-APIKey")token: String,@Path("workerid")workerId:Int,@Path("id")assid:Int):Single<getVisitorDataByWorker>
@@ -205,4 +208,8 @@ interface WebApi {
 
     @POST("oyesafe/api/v1/UpdateApprovalStatus")
     fun updateApprovalStatus(@Header(OYE247KEY) token: String, @Body updateApprovalStatus: UpdateApprovalStatus): Single<Any>
+
+
+    @POST("oyesafe/api/v1/IVRCallID/Create")
+    fun updateIVRStatus(@Header(OYE247KEY) token: String, @Body IVRBody: IVRBody): Single<Any>
 }

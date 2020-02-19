@@ -8,6 +8,7 @@ import com.oyespace.guards.pojo.GetCallResponse
 import com.oyespace.guards.zeotelapi.ZeotelRetrofitClinet
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONObject
 
 
 class TaptoCallApi {
@@ -30,9 +31,9 @@ class TaptoCallApi {
             ZeotelRetrofitClinet.instance.getCall("KI_3t1wBwDQ2odmnvIclEdg-1391508276", "4000299", gateMobileNumber, agentMobileNumber, "120", "json")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<GetCallResponse>() {
+                .subscribeWith(object : CommonDisposable<String>() {
 
-                    override fun onSuccessResponse(getdata: GetCallResponse) {
+                    override fun onSuccessResponse(getdata: String) {
                         progressDialog.dismiss()
 
                     }

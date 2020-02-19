@@ -1823,6 +1823,20 @@ data class GetFamilyMemberResponse<T>(
     val success: Boolean
 )
 
+
+data class GetFamilyDetailsResponse<T>(
+
+    val apiVersion: String,
+    val `data`: FamilyMembersDetails,
+    val success: Boolean
+)
+
+data class FamilyMembersDetails(
+    val familyDetails: ArrayList<FamilyMember>,
+    val tenantDetails:Tenant,
+    val ownerDetails:Owner
+)
+
 data class FamilyMembersData(
     val familyMembers: ArrayList<FamilyMember>
 )
@@ -1994,6 +2008,14 @@ data class UpdateApprovalStatus(
     val VLVisLgID: Int,
     val VLApprdBy: String,
     val VLExAprdBy: String
+)
+
+
+data class IVRBody(
+    val CallID: String,
+    val VLVisLgID: String,
+    val ASAssnID:String,
+    val TypeOfVisit:String
 )
 
 

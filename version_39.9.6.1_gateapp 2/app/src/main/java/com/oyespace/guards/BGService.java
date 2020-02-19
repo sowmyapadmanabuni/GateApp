@@ -46,6 +46,7 @@ public class BGService extends Service  {
     public int onStartCommand(Intent intent2, int flags, int startId) {
         // Let it continue running until it is stopped.
         Log.i("taag", "1111");
+        Log.e("START_BGSERVICE","STARTED");
         handler = new Handler();
 
         // check if GPS enabled

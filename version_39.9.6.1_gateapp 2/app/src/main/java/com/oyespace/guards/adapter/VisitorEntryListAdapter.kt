@@ -38,6 +38,7 @@ import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColorforExit
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import org.json.JSONObject
 import java.util.*
 
 
@@ -182,29 +183,50 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
 
                             }
                             if (holder.btn_makeexit.text == "Request Exit") {
+                                try {
 
-                                updateFirebaseColorforExit(vlLogId.toInt(), "#ffb81a", "ExitPending")
+                                    val assName = LocalDb.getAssociation()!!.asAsnName
+                                    val gateName = Prefs.getString(GATE_NO, null)
+                                    var visitorJsonObj = JSONObject();
+                                    visitorJsonObj.put(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                    visitorJsonObj.put("msg", "${visitor.vlfName} from ${visitor.vlComName} has requested for exit from $gateName")
+                                    visitorJsonObj.put("mobNum", visitor.vlMobile)
+                                    visitorJsonObj.put("name", visitor.vlfName)
+                                    visitorJsonObj.put("nr_id", visitor.vlVisLgID.toString())
+                                    visitorJsonObj.put("unitname", visitor.unUniName)
+                                    visitorJsonObj.put("memType", "Owner")
+                                    visitorJsonObj.put(ConstantUtils.UNITID, visitor.unUnitID)
+                                    visitorJsonObj.put(ConstantUtils.COMPANY_NAME, visitor.vlComName)
+                                    visitorJsonObj.put(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
+                                    visitorJsonObj.put("VLVisLgID", visitor.vlVisLgID)
+                                    visitorJsonObj.put(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                    visitorJsonObj.put(ConstantUtils.SEND_NOTIFICATION, true)
 
-                                VisitorLogRepo.updateVisitorStatus(mcontext, visitor, EXITPENDING, true)
-                                updateApprovalStatus("ExitPending",visitor.vlVisLgID,visitor.vlApprdBy,"")
+                                    updateFirebaseColorforExit(vlLogId.toInt(), visitor, visitorJsonObj.toString(), "#ffb81a", "ExitPending")
 
-                                val assName = LocalDb.getAssociation()!!.asAsnName
-                                val gateName = Prefs.getString(GATE_NO, null)
-                                val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
-                                d.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
-                                d.putExtra("msg",  "${visitor.vlfName} from ${visitor.vlComName} has requested for exit from $gateName")
-                                d.putExtra("mobNum", visitor.vlMobile)
-                                d.putExtra("name", visitor.vlfName)
-                                d.putExtra("nr_id", visitor.vlVisLgID.toString())
-                                d.putExtra("unitname", visitor.unUniName)
-                                d.putExtra("memType", "Owner")
-                                d.putExtra(ConstantUtils.UNITID, visitor.unUnitID)
-                                d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
-                                d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
-                                d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                                d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
-                                d.putExtra(ConstantUtils.SEND_NOTIFICATION, true)
-                                mcontext.sendBroadcast(d)
+
+                                    VisitorLogRepo.updateVisitorStatus(mcontext, visitor, EXITPENDING, true)
+                                    updateApprovalStatus("ExitPending", visitor.vlVisLgID, visitor.vlApprdBy, "")
+
+
+                                    val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
+                                    d.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
+                                    d.putExtra("msg", "${visitor.vlfName} from ${visitor.vlComName} has requested for exit from $gateName")
+                                    d.putExtra("mobNum", visitor.vlMobile)
+                                    d.putExtra("name", visitor.vlfName)
+                                    d.putExtra("nr_id", visitor.vlVisLgID.toString())
+                                    d.putExtra("unitname", visitor.unUniName)
+                                    d.putExtra("memType", "Owner")
+                                    d.putExtra(ConstantUtils.UNITID, visitor.unUnitID)
+                                    d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
+                                    d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
+                                    d.putExtra("VLVisLgID", visitor.vlVisLgID)
+                                    d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                    d.putExtra(ConstantUtils.SEND_NOTIFICATION, true)
+                                    mcontext.sendBroadcast(d)
+                                }catch (e:java.lang.Exception){
+                                    e.printStackTrace()
+                                }
                             }
                             else if(holder.btn_makeexit.text == "Exit"){
                                 notificationSyncFBRef.child(vlLogId).removeEventListener(fbEventListener)

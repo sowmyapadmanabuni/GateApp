@@ -163,4 +163,7 @@ public static final String BASE_URL = "https://apiuat.oyespace.com/";
     public static final String NOTIF_STAFF_EXIT = "_STAFFEXIT_";
     public static final String NOTIF_VENDOR_ENTRY = "_VENDORENTRY_";
     public static final String NOTIF_VENDOR_EXIT = "_VENDOREXIT_";
+
+    public static final String ZEOTEL_API_KEY = "ynXIl8oE9bN7NLulZjea1Q-1579242022";
+    public static final String ZEOTEL_ACCOUNT_ID = "4000342";
 }

@@ -30,6 +30,7 @@ import com.oyespace.guards.utils.AppUtils.Companion.intToString
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
+import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateVisitorLog
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -39,6 +40,7 @@ import kotlinx.android.synthetic.main.header_with_next.*
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import timber.log.Timber
@@ -377,6 +379,7 @@ var purpose:String?=null
         val imgName = "PERSON" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
 
         Log.i("taaag", "cutTIme: $curTime")
+        Log.e("VISITOR_LOG","::"+Unit_ACCOUNT_ID+" - "+UNUniName)
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
@@ -441,25 +444,46 @@ var purpose:String?=null
                                         if (visitors != null) {
 
                                             for (visitor in visitors) {
-                                                updateFirebaseColor(visitor.vlVisLgID)
+                                                try{
 
-                                                val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
-                                                d.putExtra(BSR_Action, VisitorEntryFCM)
-                                                d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
-                                                d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
-                                                d.putExtra("name", intent.getStringExtra(PERSONNAME))
-                                                d.putExtra("nr_id", intToString(visitor.vlVisLgID))
-                                                d.putExtra("unitname", visitor.unUniName)
-                                                d.putExtra("memType", "Owner")
-                                                d.putExtra(UNITID, visitor.unUnitID)
-                                                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
-                                                d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
-                                                d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                                                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-                                                d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
-                                                sendBroadcast(d)
+                                                    var visitorObj = JSONObject();
+                                                    visitorObj.put(BSR_Action, VisitorEntryFCM)
+                                                    visitorObj.put("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
+                                                    visitorObj.put("mobNum", intent.getStringExtra(MOBILENUMBER))
+                                                    visitorObj.put("name", intent.getStringExtra(PERSONNAME))
+                                                    visitorObj.put("nr_id", intToString(visitor.vlVisLgID))
+                                                    visitorObj.put("unitname", visitor.unUniName)
+                                                    visitorObj.put("memType", "Owner")
+                                                    visitorObj.put(UNITID, visitor.unUnitID)
+                                                    visitorObj.put(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                                    visitorObj.put(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
+                                                    visitorObj.put("VLVisLgID", visitor.vlVisLgID)
+                                                    visitorObj.put(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                                    visitorObj.put(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
 
-                                                Log.v("DELIVERY",visitor.vlVisLgID.toString()+intent.getStringExtra(VISITOR_TYPE))
+                                                    updateVisitorLog(visitor.vlVisLgID,visitor,Unit_ACCOUNT_ID,visitorObj.toString())
+
+                                                    val d = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
+                                                    d.putExtra(BSR_Action, VisitorEntryFCM)
+                                                    d.putExtra("msg", intent.getStringExtra(PERSONNAME) + " from " + intent.getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + visitor.unUniName + ")")
+                                                    d.putExtra("mobNum", intent.getStringExtra(MOBILENUMBER))
+                                                    d.putExtra("name", intent.getStringExtra(PERSONNAME))
+                                                    d.putExtra("nr_id", intToString(visitor.vlVisLgID))
+                                                    d.putExtra("unitname", visitor.unUniName)
+                                                    d.putExtra("memType", "Owner")
+                                                    d.putExtra(UNITID, visitor.unUnitID)
+                                                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                                                    d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
+                                                    d.putExtra("VLVisLgID", visitor.vlVisLgID)
+                                                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                                    d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
+                                                    sendBroadcast(d)
+
+                                                    Log.v("DELIVERY",visitor.vlVisLgID.toString()+intent.getStringExtra(VISITOR_TYPE))
+                                                }catch (e:java.lang.Exception){
+
+                                                }
+
                                             }
                                         }
                                         dismissProgress()
