@@ -3,6 +3,7 @@ package com.oyespace.guards.utils
 import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
 import com.oyespace.guards.models.NotificationSyncModel
+import com.oyespace.guards.models.VisitorLog
 
 class FirebaseDBUtils {
 
@@ -12,8 +13,20 @@ class FirebaseDBUtils {
         fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a",status:String="EntryPending") {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
-            Log.d("taaag", "push to firebase: $visitorId")
-            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status)
+            Log.e("taaag_firebase", "push to firebase: $visitorId")
+            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status,"","","",false)
+            FirebaseDatabase.getInstance()
+                .getReference("NotificationSync")
+                .child(childName)
+                .child(visitorId.toString()).setValue(notificationSyncModel)
+
+        }
+
+        fun updateVisitorLog(visitorId: Int, visitorLog: VisitorLog, accountId:String,visitorJSON:String, buttonColor: String = "#ffb81a",status:String="EntryPending") {
+
+            val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
+            Log.e("taaag_firebase", "push to firebase: $visitorId")
+            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status,visitorLog.unUnitID,accountId,visitorJSON,false)
             FirebaseDatabase.getInstance()
                 .getReference("NotificationSync")
                 .child(childName)
@@ -51,11 +64,11 @@ class FirebaseDBUtils {
                 .child("f")
                 .removeValue()
         }
-        fun updateFirebaseColorforExit(visitorId: Int, buttonColor: String = "#ffb81a",status:String="ExitPending") {
+        fun updateFirebaseColorforExit(visitorId: Int,visitorLog: VisitorLog,visitorJSON:String, buttonColor: String = "#ffb81a",status:String="ExitPending") {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.d("taaag", "push to firebase: $visitorId")
-            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status)
+            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status,visitorLog.unUnitID,"",visitorJSON,false)
             FirebaseDatabase.getInstance()
                 .getReference("NotificationSync")
                 .child(childName)
@@ -63,11 +76,11 @@ class FirebaseDBUtils {
 
         }
 
-        fun updateKidExitFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a",status:String="ExitPending") {
+        fun updateKidExitFirebaseColor(visitorId: Int, unitId:String,visitorJSON: String, buttonColor: String = "#ffb81a",status:String="ExitPending") {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.d("taaag", "push to firebase: $visitorId")
-            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status)
+            val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status,"","","",true)
             FirebaseDatabase.getInstance()
                 .getReference("NotificationSync")
                 .child(childName)

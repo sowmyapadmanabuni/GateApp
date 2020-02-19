@@ -36,9 +36,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.FirebaseError
+import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.karumi.dexter.Dexter
@@ -88,11 +87,19 @@ import io.reactivex.schedulers.Schedulers
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import java.io.File
 import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.URL
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.concurrent.fixedRateTimer
 
 class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, SGFingerPresentEvent {
@@ -105,6 +112,7 @@ var iv_torch:Button?=null
     var value: String? = ""
     var handler: Handler? = null
     var runnable: Runnable? = null
+    var _counter:Int = 0;
     private var arrayList: ArrayList<VisitorLogExitResp.Data.VisitorLog>? = null
     lateinit var cd: ConnectionDetector
     var timer: Timer? = null
@@ -118,6 +126,7 @@ var iv_torch:Button?=null
 
     internal var newAl: ArrayList<VisitorLog>? = ArrayList()
     var mHandler: Handler? = null
+    var mScheduleHandler: Handler? = null
     lateinit var btn_in: Button
     lateinit var btn_out: Button
     lateinit var btn_mic: Button
@@ -289,6 +298,12 @@ var iv_torch:Button?=null
     internal var rg_language: RadioGroup? = null
     internal var dialogs: Dialog? = null
     lateinit var textWatcher: TextWatcher
+
+
+    private var mDatabase: DatabaseReference? = null
+    private var mReminderRef: DatabaseReference? = null
+    private var mVisitorRef: DatabaseReference? = null
+    private var mReminderPath:String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1454,6 +1469,9 @@ var iv_torch:Button?=null
     internal fun init() {
         showProgressrefresh()
         mHandlerr = Handler()
+        mScheduleHandler = Handler(Looper.getMainLooper())
+        initFRTDB()
+        initFirebaseTimer()
         //startRepeatingTask()
         //database =  DBHelper(this);
         iv_torch=findViewById<Button>(R.id.iv_torch)
@@ -1597,9 +1615,9 @@ var iv_torch:Button?=null
             ZeotelRetrofitClinet.instance.getCall("KI_3t1wBwDQ2odmnvIclEdg-1391508276", "4000299","8431901841","AGENTNUMBER=8333833448","60","json")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<GetCallResponse>() {
+                .subscribeWith(object : CommonDisposable<String>() {
 
-                    override fun onSuccessResponse(getdata: GetCallResponse) {
+                    override fun onSuccessResponse(getdata: String) {
 
                     }
 
@@ -1690,6 +1708,274 @@ var iv_torch:Button?=null
             ) { dialog, which -> dialog.cancel() }
             builder.show()
         }
+
+    }
+
+    private fun initFirebaseTimer(){
+        mScheduleHandler = Handler(Looper.getMainLooper())
+        mScheduleHandler!!.post(object : Runnable {
+            override fun run() {
+                loopFRTDB()//Check every 1 minute
+                mScheduleHandler!!.postDelayed(this, 10000)
+            }
+        })
+    }
+
+    private fun loopFRTDB(){
+
+        try{
+            _counter +=1;
+            Log.e("loopFRTDB","loopFRTDB "+_counter)
+            runReminderCheck()
+
+        }catch (e:java.lang.Exception){
+            Log.e("loopFRTDB_Err",""+e);
+        }
+    }
+
+    private fun initFRTDB() {
+        try {
+            mReminderPath = "NotificationSync/A_" + LocalDb.getAssociation()!!.asAssnID + "/"
+            Log.e(TAG, "" + mReminderPath)
+            mDatabase = FirebaseDatabase.getInstance().reference
+            mReminderRef = FirebaseDatabase.getInstance().getReference(mReminderPath)
+            mReminderRef!!.keepSynced(true)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun runReminderCheck(){
+        val reminderListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                Log.e("SNAP_FIREBASE",""+dataSnapshot)
+
+                val children = dataSnapshot!!.children
+                children.forEach {
+                    Log.e("SNAPLOOP",""+it)
+                    if (it.hasChild("status")) {
+                        val status = it.child("status").getValue(String::class.java)!!
+                        Log.e("hasChild",""+status)
+                        if(status.equals("EntryPending") || status.equals("ExitPending")){
+                            Log.e("status_match",""+status)
+                            //Check if entry if still pending
+                            if (it.hasChild("gate_mobile")) {
+                                Log.e("gate_mobile","Found!")
+                                //Check gate mobile
+                                val gate_processed = it.child("gate_mobile").getValue(String::class.java)!!
+                                Log.e("gate_mobile","Found!"+gate_processed)
+                                if(gate_processed.equals(Prefs.getString(PrefKeys.MOBILE_NUMBER, null))){
+                                    Log.e("gate_mobile","Found! Same...")
+                                    //Check processed gate mobile is equal to current gate mobile
+                                    val last_updated_val = it.child("updated_time").getValue(String::class.java)!!
+                                    Log.e("last_updated_val",""+last_updated_val)
+                                    val last_updated_time = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(last_updated_val)
+                                    Log.e("last_updated_time",""+last_updated_time)
+                                    val currentDate = Date()
+
+                                    val diffInMs = currentDate.getTime() - last_updated_time.getTime();
+                                    val diffInSec = TimeUnit.MILLISECONDS.toSeconds(diffInMs)
+                                    Log.e("DIFFERENCE",""+diffInMs+" - / "+diffInSec)
+                                    val unitId = it.child("unit_id").getValue(String::class.java)!!
+                                    val visitorJSON = it.child("visitorJSON").getValue(String::class.java)!!
+                                    if(diffInSec >= 60){
+
+                                        val counter = it.child("attempt_counter").getValue(Int::class.java)!!
+
+                                        if(counter>=0 && counter <=4) {
+                                            val updated_counter = counter + 1;
+                                            val visitorLgId = it.child("visitorlogId").getValue(Int::class.java)!!
+                                            val visitorPath = "NotificationSync/A_" + LocalDb.getAssociation()!!.asAssnID + "/" + visitorLgId
+                                            mVisitorRef = FirebaseDatabase.getInstance().getReference(visitorPath)
+                                            mVisitorRef!!.child("attempt_counter").setValue(updated_counter)
+                                            mVisitorRef!!.child("updated_time").setValue(DateTimeUtils.getCurrentTimeLocal())
+
+                                            //@Todo: Get all family members, send IVR/Notification
+                                            if(counter == 0 || counter == 2){
+                                                //Notification
+                                                sendNotification(visitorJSON,status)
+                                            }else{
+                                                //IVR
+                                                //sendIVRCall()
+                                                sendReminderToFamily(status,unitId,""+visitorLgId)
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(p0: DatabaseError) {
+
+            }
+        }
+
+        mReminderRef!!.addListenerForSingleValueEvent(reminderListener)
+    }
+
+
+    fun sendNotification(visitorJSON:String, status:String){
+        try{
+
+           // if(status.equals("EntryPending")) {
+                val parsedVisitor = JSONObject(visitorJSON)
+
+                var msg = parsedVisitor.getString("msg");
+                if(status.equals("ExitPending")){
+                    val gateName = Prefs.getString(GATE_NO, null)
+                    msg = parsedVisitor.getString("name")+" from "+parsedVisitor.getString(COMPANY_NAME)+" has requested for exit from "+gateName
+                }
+
+
+                val d = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+                d.putExtra(BSR_Action, VisitorEntryFCM)
+                d.putExtra("msg", msg)
+                d.putExtra("mobNum", parsedVisitor.getString("mobNum"))
+                d.putExtra("name", parsedVisitor.getString("name"))
+                d.putExtra("nr_id", parsedVisitor.getString("nr_id"))
+                d.putExtra("unitname", parsedVisitor.getString("unitname"))
+                d.putExtra("memType", "Owner")
+                d.putExtra(UNITID, parsedVisitor.getString(UNITID))
+                d.putExtra(COMPANY_NAME, parsedVisitor.getString(COMPANY_NAME))
+                d.putExtra(UNIT_ACCOUNT_ID, parsedVisitor.getString(UNIT_ACCOUNT_ID))
+                d.putExtra("VLVisLgID", parsedVisitor.getInt("VLVisLgID"))
+                d.putExtra(VISITOR_TYPE, parsedVisitor.getString(VISITOR_TYPE))
+                d.putExtra(UNITOCCUPANCYSTATUS, parsedVisitor.getString(UNITOCCUPANCYSTATUS))
+                sendBroadcast(d)
+           // }
+
+        }catch (e:java.lang.Exception){
+            Log.e("SendNotification",""+e)
+        }
+    }
+
+    fun sendReminderToFamily(type:String, unitId:String, visitorLogId: String){
+
+        val assnId = Prefs.getInt(ASSOCIATION_ID, 0)
+        RetrofitClinet.instance.getFamilyMemberListForIVR(OYE247TOKEN, ""+assnId,unitId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CommonDisposable<GetFamilyDetailsResponse<ArrayList<FamilyMember>>>() {
+
+                override fun onSuccessResponse(getdata: GetFamilyDetailsResponse<ArrayList<FamilyMember>>) {
+                    try {
+                        Log.e("FETCH_FAMILY", "" + getdata)
+                        if (getdata.success) {
+                            val familyMembers = getdata.data.familyDetails
+                            val owner = getdata.data.ownerDetails;
+                            val tenant = getdata.data.tenantDetails
+                            if(owner.uoid != 0 && owner.uoMobile != null){
+                                sendIVRCall(owner.uoMobile, visitorLogId, type);
+                            }
+
+                            if(tenant.utid != 0 && tenant.utMobile != null){
+                                sendIVRCall(tenant.utMobile, visitorLogId, type);
+                            }
+                            for (member in familyMembers) {
+                                var mob = member.fmMobile;
+                                if (mob.contains("+91")) {
+                                    mob = mob.replace("+91", "");
+                                }
+                                //if(mob.contains("700")) {
+                                sendIVRCall(mob, visitorLogId, type);//mob
+                                //}
+                            }
+
+
+
+                        }
+                    }catch (e:java.lang.Exception){
+                        e.printStackTrace()
+                    }
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+
+
+
+    }
+
+
+
+    fun sendIVRCall(phone:String, visitorLogId:String, type:String) {
+
+        Executors.newSingleThreadExecutor().execute({
+
+            Log.e("PHONE_ZEOTEL",""+phone);
+            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+phone+"&ri=60&rc=3&user_vars=&tl=&df=json")
+
+            with(url.openConnection() as HttpURLConnection) {
+                requestMethod = "GET"  // optional default is GET
+
+                println("\nSent 'GET' request to URL : $url; Response Code : $responseCode")
+
+                inputStream.bufferedReader().use {
+                    it.lines().forEach { line ->
+                        Log.e("REDING_ZEOTEL",""+line)
+                        //{status:0, status_str:'OK', callid:'7JZnfKAgVYHrpNpVjxZpHA'}
+                        val response = ""+line;
+                        val jsonStr = response.replace("'","\"")
+                        Log.e("UPDATED_ZEOTEL",""+jsonStr)
+                        try{
+                            val jsonObj = JSONObject(jsonStr)
+                            val callid = jsonObj.getString("callid")
+                            updateIVRCallStatus(visitorLogId,callid,type)
+                            Log.e("CALL_ID",""+callid);
+                        }catch (e:Exception){
+                                Log.e("Excep_Call",""+e);
+                        }
+
+                    }
+                }
+            }
+
+
+        })
+
+
+    }
+
+    fun updateIVRCallStatus(visitorLogId:String, callId:String, status:String){
+        val assnId = Prefs.getInt(ASSOCIATION_ID, 0)
+        var type = "Exit"
+        if(status.equals("EntryPending")){
+            type = "Entry"
+        }
+        val ivrBody = IVRBody(callId,visitorLogId,""+assnId,type)
+        Log.e("IVR_BODY",""+ivrBody)
+
+        RetrofitClinet.instance.updateIVRStatus(OYE247TOKEN,ivrBody)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(object : CommonDisposable<Any>() {
+
+                override fun onSuccessResponse(getdata: Any) {
+
+                    Log.e("updateIVRCallStatus",""+getdata)
+
+                }
+
+                override fun onErrorResponse(e: Throwable) {
+
+                }
+
+                override fun noNetowork() {
+
+                }
+            })
+
 
     }
 
