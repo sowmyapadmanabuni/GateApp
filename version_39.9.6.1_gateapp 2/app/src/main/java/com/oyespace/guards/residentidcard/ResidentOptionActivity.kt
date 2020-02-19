@@ -11,9 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.StaffListActivity
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.utils.ConstantUtils

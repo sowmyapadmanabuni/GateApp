@@ -47,8 +47,9 @@ import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.activity.MobileNumberScreen
 import com.oyespace.guards.activity.ServiceProviderListActivity
-import com.oyespace.guards.activity.StaffListActivity
+import com.oyespace.guards.staff.StaffListActivity
 import com.oyespace.guards.adapter.ChildEventListenerAdapter
 import com.oyespace.guards.adapter.VisitorEntryListAdapter
 import com.oyespace.guards.adapter.VistorOutListAdapter
@@ -69,8 +70,6 @@ import com.oyespace.guards.realm.RealmDB
 import com.oyespace.guards.repo.StaffRepo
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.request.VisitorEntryReqJv
-import com.oyespace.guards.resident.ResidentIdActivity
-import com.oyespace.guards.residentidcard.ResidentIdActivity_OLD
 import com.oyespace.guards.residentidcard.ResidentOptionActivity
 import com.oyespace.guards.responce.VisitorLogCreateResp
 import com.oyespace.guards.responce.VisitorLogExitResp
@@ -1364,7 +1363,7 @@ var iv_torch:Button?=null
             R.id.re_delivery -> {
 
                 Prefs.putString(ConstantUtils.TYPE, "Create")
-                val i_delivery = Intent(this@Dashboard, ServiceProviderListActivity::class.java)
+                val i_delivery = Intent(this@Dashboard, MobileNumberScreen::class.java)
                 startActivity(i_delivery)
 
 

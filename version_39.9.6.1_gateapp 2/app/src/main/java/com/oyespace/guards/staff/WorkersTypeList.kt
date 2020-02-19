@@ -1,4 +1,4 @@
-package com.oyespace.guards.activity
+package com.oyespace.guards.staff
 
 import android.content.Context
 import android.hardware.camera2.CameraAccessException
@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.WorkersTypeListAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE

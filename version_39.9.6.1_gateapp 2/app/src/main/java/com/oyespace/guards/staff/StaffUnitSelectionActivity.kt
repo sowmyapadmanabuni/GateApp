@@ -1,4 +1,4 @@
-package com.oyespace.guards.activity
+package com.oyespace.guards.staff
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.FamilMembersAdapter
 import com.oyespace.guards.adapter.PaginationAdapter
 import com.oyespace.guards.constants.PrefKeys
@@ -41,7 +42,7 @@ import kotlinx.android.synthetic.main.pager_view.*
 import kotlinx.android.synthetic.main.subtitle_bar.*
 import kotlinx.android.synthetic.main.title_bar.*
 
-class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
+class StaffUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     var iv_torch: Button?=null
     var clickable1 = 0
@@ -147,7 +148,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
         getUnitsFromBlock()
 
-        rv_unit.setLayoutManager(GridLayoutManager(this@UnitSelectionActivity, 2))
+        rv_unit.setLayoutManager(GridLayoutManager(this@StaffUnitSelectionActivity, 2))
     }
 
     override fun onClick(v: View?) {
@@ -165,17 +166,14 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                         }
                     }
                 }
-                val _intent = Intent(this@UnitSelectionActivity, BlockSelectionActivity::class.java)
+                val _intent = Intent(this@StaffUnitSelectionActivity, StaffBlockSelectionActivity::class.java)
                 var json = Gson().toJson(selectedUnits)
-                _intent.putExtra(ACCOUNT_ID,intent.getStringExtra(ACCOUNT_ID))
-                _intent.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-                _intent.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
-                _intent.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
-                _intent.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
-                _intent.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                _intent.putExtra(FLOW_TYPE, DELIVERY)
+                _intent.putExtra(VISITOR_TYPE, DELIVERY)
                 _intent.putExtra(SELECTED_UNITS, json)
-                _intent.putExtra(PERSONNAME,intent.getStringExtra(PERSONNAME) )
-                //_intent.putExtra(PERSON_PHOTO,intent.getStringExtra(PERSON_PHOTO))
+                _intent.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                _intent.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                _intent.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                 startActivity(_intent)
                 finish()
 
@@ -294,7 +292,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
             pageNumberAdapter =
                 PaginationAdapter(
-                    this@UnitSelectionActivity,
+                    this@StaffUnitSelectionActivity,
                     pageArrayList,
                     clickListener = { page, index ->
                         onPageClick(page, index)
@@ -303,7 +301,7 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
             rv_page.layoutManager =
                 LinearLayoutManager(
-                    this@UnitSelectionActivity,
+                    this@StaffUnitSelectionActivity,
                     LinearLayoutManager.HORIZONTAL,
                     false
                 )
@@ -363,9 +361,9 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
             }
             rv_unit.showProgress()
             orderListAdapter =
-                UnitSelectionActivity.UnitListAdapter(
+                StaffUnitSelectionActivity.UnitListAdapter(
                     arrayList,
-                    this@UnitSelectionActivity,
+                    this@StaffUnitSelectionActivity,
                     checkListener = { arr, ischecked ->
                         onCheckUnit(arr, ischecked)
                     })
@@ -376,9 +374,9 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         } else {
             rv_unit.showProgress()
             orderListAdapter =
-                UnitSelectionActivity.UnitListAdapter(
+                StaffUnitSelectionActivity.UnitListAdapter(
                     arrayFullList,
-                    this@UnitSelectionActivity,
+                    this@StaffUnitSelectionActivity,
                     checkListener = { arr, ischecked ->
                         onCheckUnit(arr, ischecked)
                     })
@@ -454,13 +452,13 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
                 override fun onErrorResponse(e: Throwable) {
                     dismissProgressrefresh()
-                    Toast.makeText(this@UnitSelectionActivity, "No Units Found ", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@StaffUnitSelectionActivity, "No Units Found ", Toast.LENGTH_LONG).show()
 
                 }
 
                 override fun noNetowork() {
                     dismissProgressrefresh()
-                    Toast.makeText(this@UnitSelectionActivity, "No network call ", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@StaffUnitSelectionActivity, "No network call ", Toast.LENGTH_LONG).show()
                 }
             })
 
@@ -915,16 +913,12 @@ class UnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
             holder.lv_itemrecyclerview.setOnClickListener({
                 val mcontextintent = (mcontext as Activity).intent
 
-                val intent = Intent(mcontext, MobileNumberScreen::class.java)
+                val intent = Intent(mcontext, StaffMobileNumberScreen::class.java)
                 intent.putExtra(FLOW_TYPE, mcontextintent.getStringExtra(FLOW_TYPE))
                 intent.putExtra(VISITOR_TYPE, mcontextintent.getStringExtra(VISITOR_TYPE))
+                intent.putExtra(COMPANY_NAME, mcontextintent.getStringExtra(COMPANY_NAME))
                 intent.putExtra(UNITID, orderData.unUnitID)
                 intent.putExtra(UNITNAME, orderData.unUniName)
-                intent.putExtra(ACCOUNT_ID,mcontextintent.getStringExtra(ACCOUNT_ID))
-                intent.putExtra(MOBILENUMBER, mcontextintent.getStringExtra(MOBILENUMBER))
-                intent.putExtra(COUNTRYCODE, mcontextintent.getStringExtra(COUNTRYCODE))
-                intent.putExtra(PERSONNAME,mcontextintent.getStringExtra(PERSONNAME) )
-                intent.putExtra(PERSON_PHOTO,intent.getStringExtra(PERSON_PHOTO))
 //                mcontext.startActivity(intent)
 //                (mcontext as Activity).finish()
 

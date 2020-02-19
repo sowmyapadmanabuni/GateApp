@@ -10,6 +10,8 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -18,6 +20,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,6 +40,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.gms.common.util.IOUtils;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.camtest.CarImages_Adapter;
@@ -53,6 +57,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.Random;
@@ -74,10 +79,12 @@ import static com.oyespace.guards.utils.ConstantUtils.UNITID;
 import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
 import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
+import static com.oyespace.guards.utils.RandomUtils.encodeToBase64;
 
 
 public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnClickListener {
 
+    String encodedImage;
     Button iv_torch;
     int clickable1 = 0;
     TextView txt_assn_name,txt_device_name,txt_gate_name ;
@@ -361,6 +368,7 @@ public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnCl
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
 
+
                 byte[] byteArray = null;
                 try {
                     Log.d("Dgddfdf picas", "5 2");
@@ -369,12 +377,26 @@ public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnCl
                     byteArray = bos.toByteArray();
                     int len = bos.toByteArray().length;
                     System.out.println("AFTER COMPRESSION-===>" + len);
+
+                    BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+                    Bitmap bitmap = drawable.getBitmap();
+                     encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
+
+//                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                    Bitmap bitmapp = BitmapFactory.decodeResource(getResources(), R.drawable.user_icon_black);
+//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                    byte[] imageBytes = baos.toByteArray();
+//                    String imageString = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+//
+//                    imageBytes = Base64.decode(imageString, Base64.DEFAULT);
+//                    Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+//                    imageView.setImageBitmap(decodedImage);
+
                     bos.flush();
                     bos.close();
                 } catch (Exception ex) {
                     Log.d("Dgddfdf picas", "7");
                 }
-
 
 //                if (personPhoto == null) {
 //                    Toast.makeText(getApplicationContext(), "Capture Photo ", Toast.LENGTH_SHORT).show();
@@ -382,23 +404,24 @@ public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnCl
 
 
                     Intent d = new Intent(GuestAddCarFragment.this, GuestEntryRegistration.class);
-//                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-//                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+////                    Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+////                            + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
                     d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
                     d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-                    d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
+                   d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
                     d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
                     d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
                     d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-                    d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                   d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
                     d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
                     d.putExtra(PERSON_PHOTO, byteArray);
                     d.putExtra(ITEMS_PHOTO_LIST, list);
                     d.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID, 0));
                 d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID));
                 d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
+                d.putExtra("Base64", encodedImage);
                     startActivity(d);
-                    finish();
+                   finish();
                 }
 
             //}

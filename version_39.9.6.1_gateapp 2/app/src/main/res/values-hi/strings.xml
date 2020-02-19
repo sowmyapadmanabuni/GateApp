@@ -222,5 +222,6 @@
 
     <string name="gate_channel">GATE_NOTIF_CHANNEL</string>
     <string name="textkidexit">शिशु निकास</string>
+    <string name="tv_change">बदलना</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.oyespace.guards.activity
+package com.oyespace.guards.staff
 
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -13,6 +13,8 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
+import com.oyespace.guards.camtest.AddCarFragment
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -22,7 +24,7 @@ import kotlinx.android.synthetic.main.activity_name_entry.*
 import kotlinx.android.synthetic.main.header_with_next.*
 import java.util.*
 
-class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
+class StaffNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
     var iv_torch: Button?=null
     var clickable1 = 0
     var s_dob:String?=null
@@ -50,9 +52,41 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                     buttonNext.isClickable = true
                     Toast.makeText(this,"Enter Valid Name", Toast.LENGTH_SHORT).show()
 
+
+                }
+                else if((intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION))) {
+
+
+                    if (ed_dob!!.length() == 0) {
+                        buttonNext.isEnabled = true
+                        buttonNext.isClickable = true
+                        Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        val d = Intent(this@StaffNameEntryScreen, StaffAddCarFragment::class.java)
+                        d.putExtra(UNITID,intent.getStringExtra(UNITID) )
+                        d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                        d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
+                        d.putExtra(VISITOR_TYPE,intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra(COMPANY_NAME,intent.getStringExtra(COMPANY_NAME))
+                        d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                        d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
+                        d.putExtra(PERSONNAME, Ed_Name.text.toString())
+                        d.putExtra("DOB",s_dob.toString())
+                        d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID))
+                        d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                        d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
+                        d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
+                        d.putExtras(intent)
+                        startActivity(d)
+                        finish()
+                    }
                 }
                 else{
-                    val d = Intent(this@NameEntryScreen, DeliveryPersonPhotoActivity::class.java)
+                    val d = Intent(this@StaffNameEntryScreen, StaffAddCarFragment::class.java)
+
+//                    Log.d("intentdata NameEntr","buttonNext "+getIntent().getStringExtra(UNITNAME)+" "+intent.getStringExtra(UNITID)
+//                            +" "+getIntent().getStringExtra(MOBILENUMBER)+" "+getIntent().getStringExtra(COUNTRYCODE)+" "+Ed_Name.text);
                     d.putExtra(UNITID,intent.getStringExtra(UNITID) )
                     d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                     d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))
@@ -67,7 +101,6 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                     d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                     d.putExtra(VISITOR_PURPOSE,intent.getStringExtra(VISITOR_PURPOSE))
                     d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
-                    d.putExtra(PERSON_PHOTO,intent.getStringExtra(PERSON_PHOTO))
                     d.putExtras(intent)
                     startActivity(d)
                     finish()
@@ -90,9 +123,12 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         if (intent.getStringExtra(PERSONNAME) != null) {
             Ed_Name.setText(intent.getStringExtra("FIRSTNAME"))
         }
-
+        if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
+            lyt_dob!!.visibility=View.VISIBLE
+        }
+            else{
             lyt_dob!!.visibility=View.GONE
-
+            }
 
         iv_torch=findViewById(R.id.iv_torch)
         iv_torch!!.setOnClickListener {
@@ -152,7 +188,7 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
             val d = cal.get(Calendar.DAY_OF_MONTH)
 
 
-             datepickerdialog = DatePickerDialog(this@NameEntryScreen, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
+             datepickerdialog = DatePickerDialog(this@StaffNameEntryScreen, DatePickerDialog.OnDateSetListener { view, year, monthOfYear, dayOfMonth ->
 
                 // Display Selected date in textbox
 
@@ -232,6 +268,16 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
             }
         }
 
+//        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+//        intent.putExtra(RecognizerIntent.EXTRA_PROMPT,"say something")
+//
+//        try {
+//            startActivityForResult(intent,REQUEST_CODE_SPEECH_INPUT)
+//        }catch (e: Exception){
+//            Toast.makeText(this,e.message, Toast.LENGTH_SHORT).show()
+//        }
 
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -262,12 +308,42 @@ class NameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
         res.updateConfiguration(conf, dm)
     }
 
+//    override fun onCreateDialog(id: Int): Dialog? {
+//        // TODO Auto-generated method stub
+//        return if (id == 999) {
+//            DatePickerDialog(
+//                this,
+//                myDateListener, year, month, day
+//            )
+//        } else null
+//    }
 
     override fun onBackPressed() {
         super.onBackPressed()
-
+//        val i_delivery = Intent(this@NameEntryScreen, Dashboard::class.java)
+//        startActivity(i_delivery)
         finish()
     }
-
+//    fun setDate() {
+//        showDialog(999)
+////        Toast.makeText(
+////            applicationContext, "ca",
+////            Toast.LENGTH_SHORT
+////        )
+////            .show()
+//    }
+//    private fun showDate(year: Int, month: Int, day: Int) {
+//        ed_dob!!.setText(
+//            StringBuilder().append(day).append("-")
+//                .append(month).append("-").append(year)
+//        )
+//    }
+//    private val myDateListener = DatePickerDialog.OnDateSetListener { arg0, arg1, arg2, arg3 ->
+//        // TODO Auto-generated method stub
+//        // arg1 = year
+//        // arg2 = month
+//        // arg3 = day
+//        showDate(arg1, arg2 + 1, arg3)
+//    }
 
 }

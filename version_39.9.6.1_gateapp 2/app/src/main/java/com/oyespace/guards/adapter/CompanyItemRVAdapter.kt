@@ -14,11 +14,13 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BlockSelectionActivity
+import com.oyespace.guards.activity.NameEntryScreen
+import com.oyespace.guards.activity.PurposeScreen
 import com.oyespace.guards.pojo.VendorPojo
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.squareup.picasso.Picasso
 
-class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>) :
+class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorPojo>, private val unitId:String, private val unitNames:String, private val flowType:String, private val visitorType:String, private val mobileNumber:String, private val countryCode:String,private val unitAccountId:String) :
     RecyclerView.Adapter<CompanyItemRVAdapter.ItemViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -34,22 +36,65 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
 
         holder.lv_itemrecyclerview.setOnClickListener {
 
-            val intent = Intent(mcontext, BlockSelectionActivity::class.java)
-            intent.putExtra(FLOW_TYPE, DELIVERY)
-            intent.putExtra(VISITOR_TYPE, DELIVERY)
-            if(arrayList[position].vendor_names.equals("Others")){
-                intent.putExtra(COMPANY_NAME, OTHERS)
-            }
-            else if(arrayList[position].vendor_names.equals("अन्य")){
-                intent.putExtra(COMPANY_NAME, OTHERS)
-            }
-            else{
-               val data= arrayList[position].vendor_names
-                intent.putExtra(COMPANY_NAME, data)
 
+            if(arrayList[position].vendor_names.equals("Others")){
+
+                val intent = Intent(mcontext, PurposeScreen::class.java)
+                intent.putExtra(UNITID, unitId)
+                intent.putExtra(UNITNAME, unitNames)
+                intent.putExtra(FLOW_TYPE, flowType)
+                intent.putExtra(VISITOR_TYPE, visitorType)
+                intent.putExtra(MOBILENUMBER, mobileNumber)
+                intent.putExtra(COUNTRYCODE, countryCode)
+                intent.putExtra(COMPANY_NAME, OTHERS)
+                intent.putExtra(UNIT_ACCOUNT_ID,unitAccountId)
+                mcontext.startActivity(intent)
+                (mcontext as Activity).finish()
+
+            }else if(arrayList[position].vendor_names.equals("अन्य")){
+
+                val intent = Intent(mcontext, PurposeScreen::class.java)
+                intent.putExtra(UNITID, unitId)
+                intent.putExtra(UNITNAME, unitNames)
+                intent.putExtra(FLOW_TYPE, flowType)
+                intent.putExtra(VISITOR_TYPE, visitorType)
+                intent.putExtra(MOBILENUMBER, mobileNumber)
+                intent.putExtra(COUNTRYCODE, countryCode)
+                intent.putExtra(COMPANY_NAME, OTHERS)
+                intent.putExtra(UNIT_ACCOUNT_ID,unitAccountId)
+                mcontext.startActivity(intent)
+                (mcontext as Activity).finish()
+
+            }else{
+                val intent = Intent(mcontext, NameEntryScreen::class.java)
+                intent.putExtra(UNITID, unitId)
+                intent.putExtra(UNITNAME, unitNames)
+                intent.putExtra(FLOW_TYPE, flowType)
+                intent.putExtra(VISITOR_TYPE, visitorType)
+                intent.putExtra(MOBILENUMBER, mobileNumber)
+                intent.putExtra(COUNTRYCODE, countryCode)
+                intent.putExtra(COMPANY_NAME, arrayList[position].vendor_names)
+                intent.putExtra(UNIT_ACCOUNT_ID,unitAccountId)
+                mcontext.startActivity(intent)
+                (mcontext as Activity).finish()
             }
-            mcontext.startActivity(intent)
-            (mcontext as Activity).finish()
+
+//            val intent = Intent(mcontext, BlockSelectionActivity::class.java)
+//            intent.putExtra(FLOW_TYPE, DELIVERY)
+//            intent.putExtra(VISITOR_TYPE, DELIVERY)
+//            if(arrayList[position].vendor_names.equals("Others")){
+//                intent.putExtra(COMPANY_NAME, OTHERS)
+//            }
+//            else if(arrayList[position].vendor_names.equals("अन्य")){
+//                intent.putExtra(COMPANY_NAME, OTHERS)
+//            }
+//            else{
+//               val data= arrayList[position].vendor_names
+//                intent.putExtra(COMPANY_NAME, data)
+//
+//            }
+//            mcontext.startActivity(intent)
+//            (mcontext as Activity).finish()
 
             Log.v("PROJECT", arrayList[position].vendor_names)
 

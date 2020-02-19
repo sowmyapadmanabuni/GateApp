@@ -268,7 +268,8 @@ data class VisitorExitReq(
     val VLExitWID: Int,
     val VLVisLgID: Int,
     val VLEXGName: String,
-    val VLApprStat: String
+    val VLApprStat: String,
+    val VLExitT:String
 )
 //Visitor exit response
 data class VisitorExitResp(
@@ -1995,6 +1996,83 @@ data class UpdateApprovalStatus(
     val VLApprdBy: String,
     val VLExAprdBy: String
 )
+
+//get latest record
+//data class GetLatestRecord(
+//    val apiVersion: String,
+//    val `data`: VisitorLatestRecord,
+//    val success: Boolean
+//)
+//
+//data class VisitorLatestRecord(
+//
+//    val acAccntID: String,
+//    val asAssnID: Int,
+//    val endDate: String,
+//    val fmid: Int,
+//    val meMemID: Int,
+//    val reRgVisID: Int,
+//    val spPrdImg1: String,
+//    val spPrdImg10: String,
+//    val spPrdImg11: String,
+//    val spPrdImg12: String,
+//    val spPrdImg13: String,
+//    val spPrdImg14: String,
+//    val spPrdImg15: String,
+//    val spPrdImg16: String,
+//    val spPrdImg17: String,
+//    val spPrdImg18: String,
+//    val spPrdImg19: String,
+//    val spPrdImg2: String,
+//    val spPrdImg20: String,
+//    val spPrdImg3: String,
+//    val spPrdImg4: String,
+//    val spPrdImg5: String,
+//    val spPrdImg6: String,
+//    val spPrdImg7: String,
+//    val spPrdImg8: String,
+//    val spPrdImg9: String,
+//    val startDate: String,
+//    val unUniName: String,
+//    val unUnitID: String,
+//    val vlApprStat: String,
+//    val vlApprdBy: String,
+//    val vlCmntImg: String,
+//    val vlCmnts: String,
+//    val vlComName: String,
+//    val vlEntryGPS: String,
+//    val vlEntryImg: String,
+//    val vlEntryT: String,
+//    val vlEntyWID: Int,
+//    val vlExitGPS: String,
+//    val vlExitImg: String,
+//    val vlExitT: String,
+//    val vlExitWID: Int,
+//    val vlGtName: String,
+//    val vlIsActive: Boolean,
+//    val vlItmCnt: Int,
+//    val vlMobile: String,
+//    val vlPrmBy: String,
+//    val vlPrmStat: String,
+//    val vlSelfImg: String,
+//    val vlVehNum: String,
+//    val vlVehType: String,
+//    val vlVenImg: String,
+//    val vlVenName: String,
+//    val vlVerStat: String,
+//    val vlVisCnt: Int,
+//    val vlVisLgID: Int,
+//    val vlVisType: String,
+//    val vlVoiceNote: String,
+//    val vldCreated: String,
+//    val vldUpdated: String,
+//    val vlengName: String,
+//    val vlexgName: String,
+//    val vlfName: String,
+//    val vllName: String,
+//    val vlpOfVis: String,
+//    val vlsActTm: String
+//)
 
 
 

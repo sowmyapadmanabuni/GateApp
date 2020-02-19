@@ -3,6 +3,7 @@ package com.oyespace.guards.adapter
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
@@ -211,22 +212,22 @@ class VistorOutListAdapter(
 
         var imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
 
-        if (visitor.vlVisType.contains("STAFF", true)) {
+//        if (visitor.vlVisType.contains("STAFF", true)) {
+//
+//            if (visitor.vlEntryImg.isEmpty()) {
+//                imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
+//            }
+//
+//        }
+//
+//        if (refreshImages) {
+//            Picasso.with(mcontext).invalidate(imgPath)
+//        }
 
-            if (visitor.vlEntryImg.isEmpty()) {
-                imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
-            }
 
-        }
-
-        if (refreshImages) {
-            Picasso.with(mcontext).invalidate(imgPath)
-        }
-
-        Picasso.with(mcontext)
-            .load(imgPath)
-            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-            .into(holder.iv_user)
+        val imageAsBytes = android.util.Base64.decode(visitor.vlEntryImg,android.util.Base64.DEFAULT);
+        val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+        holder.iv_user.setImageBitmap(decodedImage)
 
         holder.iv_user.setOnClickListener {
             try {
@@ -242,34 +243,35 @@ class VistorOutListAdapter(
             var dialog_imageview: ImageView? = null
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
+            dialog_imageview!!.setBackground(holder.iv_user!!.getDrawable())
 
-            if (visitor.vlVisType.contains("STAFF", true)) {
-
-                if (visitor.vlEntryImg.equals("")) {
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
-                } else {
-
-
-                    Picasso.with(mcontext)
-                        .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                        .into(dialog_imageview)
-                }
-
-
-            } else {
-
-
-                Picasso.with(mcontext)
-                    .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
-                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                    .into(dialog_imageview)
-
-
-            }
+//            if (visitor.vlVisType.contains("STAFF", true)) {
+//
+//                if (visitor.vlEntryImg.equals("")) {
+//                    Picasso.with(mcontext)
+//                        .load(IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg")
+//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+//                        .into(dialog_imageview)
+//                } else {
+//
+//
+//                    Picasso.with(mcontext)
+//                        .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
+//                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+//                        .into(dialog_imageview)
+//                }
+//
+//
+//            } else {
+//
+//
+//                Picasso.with(mcontext)
+//                    .load(IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg)
+//                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+//                    .into(dialog_imageview)
+//
+//
+//            }
 
             alertadd.setView(view)
             alertadd.show()

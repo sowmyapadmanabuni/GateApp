@@ -231,6 +231,24 @@ var purpose:String?=null
                 intent.getStringExtra(COMPANY_NAME)
         }
 
+        tv_changefrom.setOnClickListener {
+
+
+            val d = Intent(this@StaffEntryRegistration, ServiceProviderListActivity::class.java)
+            d.putExtra(UNITID, intent.getStringExtra(UNITID))
+            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+             d.putExtra(ACCOUNT_ID, intent.getStringArrayExtra(ACCOUNT_ID))
+            d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+            d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
+            d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+            d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+            d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+            d.putExtra("RESIDENT_NUMBER", intent.getStringExtra("RESIDENT_NUMBER"))
+            d.putExtra(UNITOCCUPANCYSTATUS, intent.getStringExtra(UNITOCCUPANCYSTATUS))
+            d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
+            startActivity(d)
+            finish()
+        }
 
         txt_assn_name = findViewById(R.id.txt_assn_name)
         txt_gate_name = findViewById(R.id.txt_gate_name)
@@ -255,7 +273,7 @@ var purpose:String?=null
         tv_name.text = intent.getStringExtra(PERSONNAME)
         // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
 
-        val input = intent.getStringExtra(MOBILENUMBER)
+        val input = intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER)
         //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         tv_mobilenumber.text = number
@@ -291,27 +309,34 @@ var purpose:String?=null
        // val url=intent.getStringExtra(PERSON_PHOTO)
 
 
-       val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-       if (wrrw != null) {
-//            //   imageView1.setImageBitmap(photo);
+        val imageAsBytes = android.util.Base64.decode(intent.getStringExtra("Base64"),android.util.Base64.DEFAULT);
+        val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+        profile_image.setImageBitmap(decodedImage)
+
+
+//       val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+//       if (wrrw != null) {
+////            //   imageView1.setImageBitmap(photo);
+////
+//           mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+//           profile_image.setImageBitmap(mBitmap)
 //
-           mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-           profile_image.setImageBitmap(mBitmap)
-//
-       }
-        else{
-           //                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
-//                    Glide.with(this)
-//                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
-//                            .placeholder(R.drawable.user_icon_black)
-//                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                            .skipMemoryCache(false)
-//                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-//                            .into(imageView1);
-           Picasso.with(this)
-               .load(IMAGE_BASE_URL + "Images/PERSON" + intent.getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg")
-               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
-       }
+//           intent.getStringExtra("Base64")
+////
+//       }intent.getStringExtra("Base64")
+//        else{
+//           //                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
+////                    Glide.with(this)
+////                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
+////                            .placeholder(R.drawable.user_icon_black)
+////                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+////                            .skipMemoryCache(false)
+////                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
+////                            .into(imageView1);
+//           Picasso.with(this)
+//               .load(IMAGE_BASE_URL + "Images/PERSON" + intent.getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg")
+//               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
+//       }
        //else {
 //               //imageView1.setImageBitmap(photo);
 //            Toast.makeText(applicationContext, "222 ", Toast.LENGTH_SHORT).show()
@@ -384,7 +409,7 @@ var purpose:String?=null
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(MOBILENUMBER),
             purpose.toString(), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), intent.getStringExtra("Base64"), Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20,""
         )
 
@@ -420,13 +445,13 @@ var purpose:String?=null
 
 
                                //   uploadImage(imgName,personPhoto);
-                                val ddc = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
-                                Log.d("btn_biometric", "af $imgName")
-
-                                ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO)
-                                ddc.putExtra("imgName", imgName)
-                                ddc.putExtra(PERSON_PHOTO,  intent.getByteArrayExtra(PERSON_PHOTO))
-                                sendBroadcast(ddc)
+//                                val ddc = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
+//                                Log.d("btn_biometric", "af $imgName")
+//
+//                                ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO)
+//                                ddc.putExtra("imgName", imgName)
+//                                ddc.putExtra(PERSON_PHOTO,  intent.getByteArrayExtra(PERSON_PHOTO))
+//                                sendBroadcast(ddc)
 
 
                               //  uploadImage(imgName, mBitmap)

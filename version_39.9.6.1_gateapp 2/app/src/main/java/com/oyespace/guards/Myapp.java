@@ -96,7 +96,7 @@ public class Myapp extends MultiDexApplication implements InternetConnectivityLi
         CrashlyticsCore crashlyticsCore = new CrashlyticsCore.Builder()
                 .disabled(BuildConfig.DEBUG)
                 .build();
-        Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
+       // Fabric.with(this, new Crashlytics.Builder().core(crashlyticsCore).build());
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder().name("oysepace.realm")
                 .schemaVersion(2)

@@ -25,6 +25,7 @@ import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Build
 import android.view.View
 import android.widget.Button
+import com.oyespace.guards.utils.ConstantUtils.*
 import kotlinx.android.synthetic.main.header_with_next.*
 
 
@@ -66,31 +67,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
 
     )
-//    val vendor_names = arrayOf(
-//        resources.getString(R.string.textzomato),
-//        resources.getString(R.string.textswiggy),
-//        resources.getString(R.string.textfoodpanda),
-//        resources.getString(R.string.textubereats),
-//        resources.getString(R.string.textdominos),
-//        resources.getString(R.string.textbluedart),
-//        resources.getString(R.string.textdtdc),
-//        resources.getString(R.string.textfedex),
-//        resources.getString(R.string.textjabong),
-//        resources.getString(R.string.textflipkart),
-//        resources.getString(R.string.textamazon),
-//        resources.getString(R.string.textbigbasket),
-//        resources.getString(R.string.textgrofers),
-//        resources.getString(R.string.textgodrej),
-//        resources.getString(R.string.textcarpenter),
-//        resources.getString(R.string.textplumber),
-//        resources.getString(R.string.textelectrician),
-//        resources.getString(R.string.textola),
-//        resources.getString(R.string.textuber),
-//        resources.getString(R.string.textmeru),
-//        resources.getString(R.string.textgascylinde),
-//        resources.getString(R.string.textothers)
-//
-//    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -181,7 +158,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         rv_serviceProvider.layoutManager = gridLayoutManager
 
         val data: ArrayList<VendorPojo> = prepareData()
-        val adapter = CompanyItemRVAdapter( this@ServiceProviderListActivity,data)
+        val adapter = CompanyItemRVAdapter( this@ServiceProviderListActivity,data,intent.getStringExtra(UNITID),intent.getStringExtra(UNITNAME),intent.getStringExtra(FLOW_TYPE),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(MOBILENUMBER),"+91",intent.getStringExtra(UNIT_ACCOUNT_ID))
         rv_serviceProvider.adapter = adapter
 
         //for loop for sections
@@ -192,12 +169,8 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
                 itemArrayList.add("Item $j")
             }
 
-            //add the section and items to array list
-            // sectionModelArrayList.add(SectionModel("Section $i", itemArrayList))
         }
 
-        // val adapter = ServiceProviderAdapter(this, sectionModelArrayList)
-        // rv_serviceProvider!!.adapter = adapter
 
     }
 

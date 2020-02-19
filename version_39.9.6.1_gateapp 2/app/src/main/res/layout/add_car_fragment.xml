@@ -132,11 +132,20 @@ android:orientation="vertical"
                   android:layout_weight="4.5">
         <ImageView android:id="@+id/imageView1"
                    android:layout_height="@dimen/_80sdp"
-                   android:layout_centerHorizontal="true"
+            android:layout_centerHorizontal="true"
                    android:src="@drawable/user_icon_black"
                    android:layout_width="@dimen/_150sdp">
 
         </ImageView>
+
+<!--        <ImageView android:id="@+id/imageView"-->
+<!--            android:layout_height="@dimen/_80sdp"-->
+<!--            android:layout_centerHorizontal="true"-->
+<!--            android:src="@drawable/user_icon_black"-->
+<!--            android:layout_width="@dimen/_150sdp">-->
+
+<!--        </ImageView>-->
+
 
         <TextView
                 android:id="@+id/tv_name"

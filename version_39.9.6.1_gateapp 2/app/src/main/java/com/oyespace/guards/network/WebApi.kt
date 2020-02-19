@@ -1,6 +1,7 @@
 package com.oyespace.guards.network
 
 
+import com.oyespace.guards.PojoClasses.GetLatestRecord
 import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.FingerPrintCreateReq
@@ -205,4 +206,7 @@ interface WebApi {
 
     @POST("oyesafe/api/v1/UpdateApprovalStatus")
     fun updateApprovalStatus(@Header(OYE247KEY) token: String, @Body updateApprovalStatus: UpdateApprovalStatus): Single<Any>
+
+    @GET("oyesafe/api/v1/GetLatestVisitorDetailsByMobileNum/{mobilenumber}/{id}")
+    fun getLatestRecord(@Header("X-OYE247-APIKey") token: String,@Path("mobilenumber") mobileNumber: String,@Path("id") assid: String):Single<GetLatestRecord>
 }

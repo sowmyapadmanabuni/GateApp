@@ -4,8 +4,11 @@ import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.CountDownTimer
 import android.os.Handler
 import android.util.Log
@@ -38,6 +41,7 @@ import com.oyespace.guards.utils.DateTimeUtils.*
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColorforExit
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 
@@ -258,14 +262,27 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                 }
             }
 
+//                val baos = ByteArrayOutputStream()
+//                val bitmapp = BitmapFactory.decodeResource(mcontext.resources, R.drawable.user_icon_black)
+//                bitmapp.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+//                var imageBytes = baos.toByteArray()
+//                val imageString = android.util.Base64.encodeToString(imageBytes, android.util.Base64.DEFAULT)
+//                imageBytes = android.util.Base64.decode(imageString, android.util.Base64.DEFAULT)
+//                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//                holder.iv_user.setImageBitmap(decodedImage)
+
+            val imageAsBytes = android.util.Base64.decode(visitor.vlEntryImg,android.util.Base64.DEFAULT);
+            val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+            holder.iv_user.setImageBitmap(decodedImage)
+
             Log.i("taaag", "loading image $imgPath")
-            Glide.with(mcontext)
-                .load(Uri.parse(imgPath))
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .skipMemoryCache(false)
-                .signature(StringSignature(System.currentTimeMillis().toString()))
-                .into(holder.iv_user)
+//            Glide.with(mcontext)
+//                .load(Uri.parse(imgPath))
+//                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+//                .diskCacheStrategy(DiskCacheStrategy.NONE)
+//                .skipMemoryCache(false)
+//                .signature(StringSignature(System.currentTimeMillis().toString()))
+//                .into(holder.iv_user)
 
 
 
@@ -278,14 +295,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                 var dialog_imageview: ImageView? = null
                 dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
-                Log.i("taaag", "loading image $imgPath")
-                Glide.with(mcontext)
-                    .load(imgPath)
-                    .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
-                    .skipMemoryCache(false)
-                    .into(dialog_imageview)
-
+                dialog_imageview!!.setBackground(holder.iv_user!!.getDrawable())
                 alertadd.setView(view)
                 alertadd.show()
             }
@@ -834,8 +844,6 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                 holder.expanded_view.visibility = View.GONE
             }
         }
-
-
 
 
         private fun refreshList(fromBackend: Boolean = true) {

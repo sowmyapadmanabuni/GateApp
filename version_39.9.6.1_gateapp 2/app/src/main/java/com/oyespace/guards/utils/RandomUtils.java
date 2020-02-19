@@ -1,11 +1,14 @@
 package com.oyespace.guards.utils;
 
+import android.graphics.Bitmap;
+import android.util.Base64;
 import android.util.Log;
 
 import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.repo.VisitorLogRepo;
 import com.oyespace.guards.responce.VisitorLogExitResp;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -136,5 +139,28 @@ public class RandomUtils {
             }
         }
         return false;
+    }
+
+    public static boolean containMobileNumber(RealmList<VisitorLog> list, String mobileNumber) {
+
+        for (VisitorLog item : list) {
+
+            if (item.getVlMobile()==mobileNumber) {
+                Log.v("oyespace number",mobileNumber);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static String encodeToBase64(Bitmap image, Bitmap.CompressFormat compressFormat, int quality)
+    {
+        ByteArrayOutputStream byteArrayOS = new ByteArrayOutputStream();
+//        image.compress(compressFormat, quality, byteArrayOS);
+//        return Base64.encodeToString(byteArrayOS.toByteArray(), Base64.DEFAULT);
+        image.compress(Bitmap.CompressFormat.PNG,100,byteArrayOS);
+        byte[] byteArray = byteArrayOS.toByteArray();
+        String encoded = Base64.encodeToString(byteArray,Base64.DEFAULT);
+        return encoded;
     }
 }

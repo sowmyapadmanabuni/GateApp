@@ -3,8 +3,10 @@ package com.oyespace.guards.guest
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Environment
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +15,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.android.gms.common.util.IOUtils
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
@@ -43,6 +46,7 @@ import timber.log.Timber
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.net.URL
 import java.util.*
 
 class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
@@ -72,6 +76,23 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         when (v?.id) {
 
             R.id.buttonNext ->{
+
+
+//
+//                val base64 = Base64.getEncoder().encodeToString(intent.getByteArrayExtra(PERSON_PHOTO))
+//                Log.v("Image Path",base64)
+//
+////                val destination =  File(Environment.getExternalStorageDirectory().getPath(),
+////                    System.currentTimeMillis()+".jpg");
+//
+//                val dest= File(Environment.getExternalStorageDirectory().path+"/"+"null.jpg")
+//                val imageBytes = IOUtils.toByteArray(dest.inputStream());
+//              //  val encodedImage = Base64.getEncoder().encodeToString(imageBytes)
+//
+//                val drawable = profile_image.getDrawable() as BitmapDrawable
+//                val bitmap = drawable.getBitmap()
+//               val encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
+//
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+GUEST_REGISTRATION+" "+FLOW_TYPE.equals( GUEST_REGISTRATION,true))
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
@@ -110,8 +131,6 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+STAFF_REGISTRATION+" "+FLOW_TYPE.equals( STAFF_REGISTRATION,true))
                 val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
                 if(wrrw!=null) {
-
-
 
                     val alertadd = AlertDialog.Builder(this@GuestEntryRegistration)
                     val factory = LayoutInflater.from(this@GuestEntryRegistration)
@@ -240,6 +259,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
 
+
+
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, UNUniName,
             UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
@@ -250,15 +271,14 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             SPPrdImg2,
             SPPrdImg3,
             SPPrdImg4,
-            SPPrdImg5
-            ,
+            SPPrdImg5,
             SPPrdImg6,
             SPPrdImg7,
             SPPrdImg8,
             SPPrdImg9,
             SPPrdImg10,
-            "",
-            imageName.toString(),
+            "",intent.getStringExtra("Base64") ,
+           // imageName.toString(),
             Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","",""
         )
@@ -310,17 +330,17 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                         sendBroadcast(dd)
-                        uploadImage(imageName.toString(), mBitmap)
+                       // uploadImage(imageName.toString(), mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
 
-                        val dir =
-                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-                        if (dir.isDirectory) {
-                            val children = dir.list()
-                            for (i in children!!.indices) {
-                                File(dir, children[i]).delete()
-                            }
-                        }
+//                        val dir =
+//                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
+//                        if (dir.isDirectory) {
+//                            val children = dir.list()
+//                            for (i in children!!.indices) {
+//                                File(dir, children[i]).delete()
+//                            }
+//                        }
                         //val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
                         // startActivity(d)
                         dismissProgress()

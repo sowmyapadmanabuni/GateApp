@@ -202,7 +202,9 @@ class VisitorLogRepo {
                 return
             }
 
-            val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status)
+            val req = VisitorExitReq(0, vLogId, Prefs.getString(ConstantUtils.GATE_NO, ""), status,
+                DateTimeUtils.getCurrentTimeLocal()
+            )
             CompositeDisposable().add(
                 RetrofitClinet.instance.visitorExitCall("7470AD35-D51C-42AC-BC21-F45685805BBE", req)
                     .subscribeOn(Schedulers.io())

@@ -1,5 +1,6 @@
 package com.oyespace.guards.network;
 
+import com.oyespace.guards.PojoClasses.GetLatestRecord;
 import com.oyespace.guards.request.InvitationUpdateReq;
 import com.oyespace.guards.request.ResidentValidationRequest;
 import com.oyespace.guards.request.SendStaffImageReq;
@@ -52,6 +53,10 @@ public interface ChampApiInterface {
     @POST("oyesafe/api/v1/Unit/GetMobileNumberByResident")
     @Headers("X-OYE247-APIKey: 7470AD35-D51C-42AC-BC21-F45685805BBE")
     Call<ResidentValidationResponse>residentValidation(@Body ResidentValidationRequest residentValidationRequest);
+
+    @GET("oyesafe/api/v1/GetLatestVisitorDetailsByMobileNum/{mobilenumber}/{id}")
+    @Headers("X-OYE247-APIKey: 7470AD35-D51C-42AC-BC21-F45685805BBE")
+    Call<GetLatestRecord> getLatestRecord(@Path("mobilenumber") String mobileNumber, @Path("id") String assid);
 
 //
 //    @GET("oyesafe/api/v1/GetVisitorLogEntryListByMobileNumber/{}")

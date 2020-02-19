@@ -1,4 +1,4 @@
-package com.oyespace.guards.activity
+package com.oyespace.guards.staff
 
 import android.app.Activity
 import android.content.Context
@@ -14,6 +14,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.oyespace.guards.R
+import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.staffManaualEntry.ManualMobileNumberScreen
 import com.oyespace.guards.utils.ConstantUtils
@@ -25,7 +26,7 @@ import kotlinx.android.synthetic.main.header_with_next.*
 import java.util.*
 
 
-class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
+class StaffPurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
     private val REQUEST_CODE_SPEECH_INPUT = 100
     lateinit var txt_assn_name:TextView
     lateinit var txt_gate_name: TextView
@@ -43,7 +44,7 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                 if (Ed_Name_purp.text.length > 2) {
 
                    if (Prefs.getString(TYPE, "").equals("Create")) {
-                        val d = Intent(this@PurposeScreen, NameEntryScreen::class.java)
+                        val d = Intent(this@StaffPurposeScreen, StaffMobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
                         d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
                         d.putExtra(ConstantUtils.FLOW_TYPE, intent.getStringExtra(ConstantUtils.FLOW_TYPE))
@@ -54,13 +55,12 @@ class PurposeScreen : BaseKotlinActivity()  ,View.OnClickListener {
                         d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
                         d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
                         d.putExtra(VISITOR_PURPOSE, Ed_Name_purp.text.toString())
-                       intent.putExtra(PERSON_PHOTO,intent.getStringExtra(PERSON_PHOTO))
                         startActivity(d)
                         finish()
                     }else{
 
                         val d = Intent(
-                            this@PurposeScreen, ManualMobileNumberScreen::class.java)
+                            this@StaffPurposeScreen, ManualMobileNumberScreen::class.java)
                         d.putExtra(ConstantUtils.UNITID, intent.getStringExtra(ConstantUtils.UNITID))
                         d.putExtra(ConstantUtils.UNITNAME, intent.getStringExtra(ConstantUtils.UNITNAME))
                         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))

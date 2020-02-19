@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
@@ -20,6 +21,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,16 +35,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
-
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.signature.StringSignature;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.oyespace.guards.BackgroundSyncReceiver;
+import com.oyespace.guards.PojoClasses.GetLatestRecord;
 import com.oyespace.guards.R;
 import com.oyespace.guards.activity.BaseKotlinActivity;
 import com.oyespace.guards.activity.Biometric;
@@ -56,7 +55,6 @@ import com.oyespace.guards.responce.StaffImageRes;
 import com.oyespace.guards.responce.StaffRegistrationRespJv;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
-import com.oyespace.guards.utils.UploadImageApi;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import retrofit2.Call;
@@ -73,16 +71,17 @@ import java.util.Locale;
 import java.util.Random;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
+import static com.oyespace.guards.constants.PrefKeys.MOBILE_NUMBER;
 import static com.oyespace.guards.utils.ConstantUtils.*;
+import static com.oyespace.guards.utils.RandomUtils.encodeToBase64;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 
-public class AddCarFragment extends BaseKotlinActivity implements ResponseHandler, View.OnClickListener {
+public class AddCarFragment extends BaseKotlinActivity implements View.OnClickListener {
 
     /*sumeeth fragment*/
-    // File destination;
     File file;
-
+    String encodedImage;
     Button iv_torch;
     int clickable1 = 0;
     ChampApiInterface champApiInterface;
@@ -93,7 +92,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
     private ViewPager viewPager;
     ImageAdapter imageAdapter;
     RecyclerView rv_image;
-    ImageView iv_delete, imageView1, iv_edit;
+    ImageView iv_delete, imageView1;
     final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1034;
     Bitmap photo = null;
     Bitmap images = null;
@@ -105,15 +104,11 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
     private FragmentManager fragmentManager;
     ImageView dialog_imageview;
     static ArrayList<String> list = new ArrayList<>();
-    private TextView upload_rc_book,
-            upload_insurance, Make, model, year, variant, fuel, color, transmission, owners, insurance;
-    //    private ViewPager viewPager_Image;
     private EditText notes, Regno, kms, exp_date, exp_price, car_id;
     private ProgressDialog progressDialog;
     private ImageView insurance_file_name, rc_book_file_name;
     private ArrayList<String> listpager_Array = new ArrayList<>();
-    //    private FloatingActionButton floatButton;
-    public static final int REQUEST_CAMERA = 0, SELECT_FILE = 1, PICK_INSURANCE_REQUEST_CODE = 2, PICK_RCBOOK_REQUEST_CODE = 3;
+    public static final int REQUEST_CAMERA = 0;
     private CarImages_Adapter adapter;
     private CheckBox sell_to_dealer;
     private ProgressDialog dialog;
@@ -130,8 +125,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         setLocale(Prefs.getString(LANGUAGE, null));
         setContentView(R.layout.add_car_fragment);
         initViews();
-        //  imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" + getIntent().getStringExtra(MOBILENUMBER) + ".jpg";
-        // String imgName="PERSON"+"Association"+Prefs.getInt(ASSOCIATION_ID,0)+"STAFF" +workerResponce.data.worker.wkWorkID  + ".jpg";
+        getInviation();
         Dexter.withActivity(this)
                 .withPermissions(
                         //   Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -226,14 +220,11 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                 }
             }
         });
-        // makeArrayList = new ArrayList<>();
 
-//        viewPager_Image = (ViewPager) view.findViewById(R.id.add_car_view_pager);
-        //GridView gridview
+
         champApiInterface = ChampApiClient.getClient().create(ChampApiInterface.class);
 
         tv_name = findViewById(R.id.tv_name);
-        iv_edit = findViewById(R.id.iv_edit);
         tv_name.setText(getIntent().getStringExtra(PERSONNAME));
         txt_assn_name = findViewById(R.id.txt_assn_name);
         txt_device_name = findViewById(R.id.txt_device_name);
@@ -245,9 +236,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         buttonCapture = findViewById(R.id.buttonCapture);
         imageView1 = findViewById(R.id.imageView1);
 
-//        if(Prefs.getString("Retake",null).equals("Yes")){
-//            buttonCapture.setText("RETAKE PERSON PHOTO");
-//        }
 
 
         if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
@@ -278,18 +266,9 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
             }
         });
 
-//        if() {
-//
-//            buttonCapture.setText(getResources().getString(R.string.texttakepersonphoto));
-//        }
-//        else {
-//            buttonCapture.setText(getResources().getString(R.string.textretakepersonphoto));
-//
-//        }
 
         txt_assn_name.setText("Society: " + LocalDb.getAssociation().getAsAsnName());
         txt_gate_name.setText("Gate No: " + Prefs.getString(GATE_NO, null));
-//        txt_device_name.setText("Gate: "+Prefs.getInt(ASSOCIATION_ID,0) );
         try {
             String appVersion = "";
             PackageManager manager = getBaseContext().getPackageManager();
@@ -304,10 +283,8 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
         }
 
-//        floatButton = (FloatingActionButton) view.findViewById(R.id.fab);
         image_Gallery.setOnClickListener(this);
 
-//        floatButton.setOnClickListener(this);
         submit_button = findViewById(R.id.buttonNext);
 
 
@@ -317,40 +294,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         //iamgeLyt.removeAllViews();
         list.clear();
 
-//        Log.d("intentdata ", " AddCarFragment " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-//                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
-
-        if (getIntent().getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION)) {
-            image_Gallery.setVisibility(View.INVISIBLE);
-            rv_image.setVisibility(View.INVISIBLE);
-            ((TextView) findViewById(R.id.txt_header)).setText(getString(R.string.textpersonphotoscreen));
-        } else {
-            if (getIntent().getIntExtra(ACCOUNT_ID, 0) != 0) {
-
-
-                Picasso.with(this).load(IMAGE_BASE_URL+"Images/"+"PERSON"+getIntent().getStringExtra(MOBILENUMBER)+".jpg").into(target);
-
-                imageView1.setImageBitmap(photo);
-
-
-//                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
-//                    Glide.with(this)
-//                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
-//                            .placeholder(R.drawable.user_icon_black)
-//                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                            .skipMemoryCache(false)
-//                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-//                            .into(imageView1);
-
-                Picasso.with(this)
-                        .load(IMAGE_BASE_URL +"Images/PERSON"+getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") +".jpg")
-                        .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(imageView1);
-
-            }
-
-
-        }
-
         buttonCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -359,41 +302,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 
-            }
-        });
-
-        iv_edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ViewGroup viewGroup = findViewById(android.R.id.content);
-
-                View dialogView = LayoutInflater.from(AddCarFragment.this).inflate(R.layout.layout_editname_dailog, viewGroup, false);
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(AddCarFragment.this);
-                Ed_Name = dialogView.findViewById(R.id.Ed_Name);
-                ImageView btn_Mic = dialogView.findViewById(R.id.btn_Mic);
-
-                btn_Mic.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        speak();
-                    }
-                });
-
-                Button btn_done = dialogView.findViewById(R.id.btn_done);
-
-                builder.setView(dialogView);
-
-                //finally creating the alert dialog and displaying it
-                final AlertDialog alertDialog = builder.create();
-                btn_done.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alertDialog.dismiss();
-                    }
-                });
-                alertDialog.show();
             }
         });
 
@@ -407,14 +315,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
                 if (imageView1.getDrawable().getConstantState()!=getResources().getDrawable(R.drawable.user_icon_black).getConstantState()) {
 
-
-                    if(getIntent().getStringExtra(FLOW_TYPE).equalsIgnoreCase(STAFF_REGISTRATION)){
-                        submit_button.setEnabled(false);
-                        submit_button.setClickable(false);
-                        staffRegistration();
-                    }else{
-
-
                         byte[] byteArray=null;
                         try {
                             Log.d("Dgddfdf picas","5 2");
@@ -423,12 +323,16 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                             byteArray = bos.toByteArray();
                             int len = bos.toByteArray().length;
                             System.out.println("AFTER COMPRESSION-===>" + len);
+
                             bos.flush();
                             bos.close();
                         }catch (Exception ex){
                             Log.d("Dgddfdf picas","7");
                         }
 
+                        BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = drawable.getBitmap();
+                        encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
 
                         Intent d = new Intent(AddCarFragment.this, StaffEntryRegistration.class);
 //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
@@ -448,12 +352,9 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
                         d.putExtra(BLOCK_ID,getIntent().getStringExtra(BLOCK_ID));
                         d.putExtra(UNITOCCUPANCYSTATUS,getIntent().getStringExtra(UNITOCCUPANCYSTATUS));
                         d.putExtra(VISITOR_PURPOSE,getIntent().getStringExtra(VISITOR_PURPOSE));
+                        d.putExtra("Base64", encodedImage);
                         startActivity(d);
                         finish();
-
-
-                    }
-
 
                 }
                 else {
@@ -468,158 +369,12 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         });
     }
 
-    @Override
-    public void onFailure(Exception e, int urlId) {
 
-        showToast(this, "Staff Registration Failed");
-        Log.e("taaag", "e: " + e.getMessage());
-        e.printStackTrace();
-    }
-
-    private void staffRegistration() {
-
-        RestClient restClient = RestClient.getInstance();
-
-        StaffRegistrationReqJv loginReq = new StaffRegistrationReqJv();
-
-        loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
-        loginReq.BLBlockID = getIntent().getStringExtra(BLOCK_ID);
-        loginReq.EmailID = "";
-        loginReq.FLFloorID = 0;
-        loginReq.OYEMemberID = 0;
-        loginReq.OYEMemberRoleID = 0;
-
-        loginReq.VNVendorID = 0;
-        loginReq.WKDesgn = getIntent().getStringExtra(COMPANY_NAME);
-        loginReq.WKFName = getIntent().getStringExtra(PERSONNAME);
-        loginReq.WKIDCrdNo = "";
-        loginReq.WKDOB = getIntent().getStringExtra("DOB");
-        loginReq.WKISDCode = "";
-        //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
-        loginReq.WKLName = "";
-
-        loginReq.WKMobile = getIntent().getStringExtra(MOBILENUMBER);
-        loginReq.WKWrkType = getIntent().getStringExtra(VISITOR_TYPE);
-        //loginReq.UNUnitID=toInteger( getIntent().getStringExtra(UNITID));
-        loginReq.UNUnitID = getIntent().getStringExtra(UNITID);
-        // Toast.makeText(AddCarFragment.this,getIntent().getStringExtra(UNITID),Toast.LENGTH_LONG).show();
-        loginReq.UNUniName = getIntent().getStringExtra(UNITNAME);
-        loginReq.WKEntryImg = imgName;
-
-        Log.d("saveCheckPoints", "StaffEntry " + loginReq.ASAssnID + " " + loginReq.WKFName + " "
-                + loginReq.UNUnitID + " " + loginReq.WKMobile + " " + loginReq.UNUniName);
-
-        restClient.addHeader(OYE247KEY, OYE247TOKEN);
-        restClient.post(this, loginReq, StaffRegistrationRespJv.class, this, URLData.URL_STAFF_REGISTRATION);
-
-    }
-
-    @Override
-    public void onSuccess(String responce, Object data, int urlId, int position) {
-
-        if (urlId == URLData.URL_STAFF_REGISTRATION.getUrlId()) {
-            StaffRegistrationRespJv workerResponce = (StaffRegistrationRespJv) data;
-            if (workerResponce != null) {
-                Log.d("str3", "str3: " + urlId + " id " + position + " " + " " + " " + workerResponce.success);
-                if (workerResponce.success.equalsIgnoreCase("true")) {
-                    imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" + workerResponce.data.worker.wkWorkID + ".jpg";
-
-                    sendStaffImage(imgName, "", String.valueOf(workerResponce.data.worker.wkWorkID));
-
-                    byte[] byteArray = null;
-                    try {
-                        Log.d("Dgddfdf picas", "5 2");
-                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                        photo.compress(Bitmap.CompressFormat.JPEG, 100, bos);
-                        byteArray = bos.toByteArray();
-                        int len = bos.toByteArray().length;
-                        System.out.println("AFTER COMPRESSION-===>" + len);
-                        bos.flush();
-                        bos.close();
-                    } catch (Exception ex) {
-                        Log.d("Dgddfdf picas", "7");
-                    }
-
-                    if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
-
-                        Intent d = new Intent(AddCarFragment.this, Biometric.class);
-                        d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
-                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
-                        d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
-                        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-                        d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
-                        d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
-                        d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
-                        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-                        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-                        startActivity(d);
-                    } else if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
-                        Intent intent = new Intent(AddCarFragment.this, StaffDetails.class);
-                        intent.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
-                        intent.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
-                        intent.putExtra(UNITID, getIntent().getStringExtra(UNITID));
-                        intent.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-                        intent.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
-                        intent.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
-                        intent.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
-                        intent.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-                        intent.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-                        startActivity(intent);
-                        finish();
-                    } else {
-                        Intent d = new Intent(AddCarFragment.this, Biometric.class);
-                        d.putExtra(WORKER_ID, workerResponce.data.worker.wkWorkID);
-                        d.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
-                        d.putExtra(UNITID, getIntent().getStringExtra(UNITID));
-                        d.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
-                        d.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
-                        d.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
-                        d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
-                        d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
-                        d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
-                        startActivity(d);
-                    }
-                    //   uploadImage(imgName,personPhoto);
-
-                    Intent ddc = new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
-                    Log.d("btn_biometric", "af " + imgName);
-
-                    ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
-                    ddc.putExtra("imgName", imgName);
-                    ddc.putExtra(PERSON_PHOTO, byteArray);
-                    sendBroadcast(ddc);
-                    Intent ddc1 = new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
-                    Log.d("SYNC_STAFF_LIST", "af " + imgName);
-                    ddc1.putExtra(BSR_Action, SYNC_STAFF_LIST);
-                    sendBroadcast(ddc1);
-                    showToast(this, "Staff Registered");
-                    finish();
-                } else {
-                    showToast(this, "Staff not Registered");
-                }
-
-            } else {
-                showToast(this, "Something went wrong . please try again ");
-            }
-
-        }
-        //  showToast(this, urlId+" id "+position+" "+memId+" "+MemberType+" ");
-
-    }
-
-    @Override
-    public void onDestroy() {  // could be in onPause or onStop
-      Picasso.with(this).cancelRequest(target);
-       // Glide.clear(target);
-        super.onDestroy();
-    }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//
-//          Intent i=new Intent(AddCarFragment.this, Dashboard.class);
-//          startActivity(i);
+
         finish();
 
     }
@@ -639,9 +394,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
 
     public void showViewPager() {
         Log.e("Data", "Recicved");
-//        image_Gallery.setVisibility(View.GONE);
-//        viewPager_Image.setVisibility(View.VISIBLE);
-//        floatButton.setVisibility(View.VISIBLE);
+
     }
 
     public void onCaptureImageResult(Intent data, Context context) {
@@ -666,9 +419,6 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         String imgName = System.currentTimeMillis() + ".jpg";
 
         file = new File(Environment.getExternalStorageDirectory().getPath(), imgName);
-        // file= new File(Environment.getExternalStorageDirectory()+ "/DCIM/myCapturedImages", imgName);
-        // String fileName = imgName.substring(imgName.lastIndexOf("/")+1);
-        // List<String> myList = new ArrayList<String>(Collections.singletonList(String.valueOf(destination.getAbsoluteFile())));
         setviewPager(String.valueOf(file.getAbsoluteFile()), context);
 //
         Intent ddc = new Intent(AddCarFragment.this, BackgroundSyncReceiver.class);
@@ -730,26 +480,9 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         }
     }
 
-    public void takePhoto() {
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.CAMERA}, 1);
-            } else {
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent, REQUEST_CAMERA);
-                //   take_picture();
-            }
-        }
-//        else{
-//            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//            startActivityForResult(intent, REQUEST_CAMERA);
-//        }
-    }
 
     public void hideViewPager() {
-//        viewPager_Image.setVisibility(View.GONE);
-//        floatButton.setVisibility(View.GONE);
+
         image_Gallery.setVisibility(View.VISIBLE);
     }
 
@@ -819,132 +552,7 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         } catch (Exception e) {
         }
     }
-//    void getVisitorLogEntryListByMobileNumber(){
-//
-//        Call<TicketListingTesponse> call = champApiInterface.getTicketingListResponse(EmergencyID);
-//        call.enqueue(new Callback<TicketListingTesponse>() {
-//            @Override
-//            public void onResponse(Call<TicketListingTesponse> call, Response<TicketListingTesponse> response) {
-//
-//
-//                if (response.body().getSuccess() == true) {
-//
-//                    if(response.body().getData()!=null) {
-//
-//                        Toast.makeText(TicketingDetailsActivity.this, response.body().toString(), Toast.LENGTH_LONG).show();
-//                        System.out.println("SSSSOS" + response.body().getData().toString());
-//
-//                        tv_name.setText(response.body().getData().getTicketing().getTkRaisdBy());
-//
-//                        tv_mobileno.setText(response.body().getData().getTicketing().getTkMobile());
-//
-//                    }
-//                } else {
-//                    Toast.makeText(TicketingDetailsActivity.this, "No Data", Toast.LENGTH_LONG).show();
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<TicketListingTesponse> call, Throwable t) {
-//                call.cancel();
-//            }
-//        });
-//
-//
-//    }
-//
 
-
-//    private void staffImageUpload(String wkEntryImg, String wkEntryGPS, String wkWorkID ) {
-//
-//        RestClient restClient = RestClient.getInstance();
-//
-//        SendStaffImageReq sendStaffImageReq = new SendStaffImageReq();
-//
-//
-//
-//        sendStaffImageReq.WKEntryImg=imgName;
-//        sendStaffImageReq.WKEntryGPS=wkEntryGPS;
-//        sendStaffImageReq.WKWorkID=wkWorkID;
-//
-//
-//
-//        Log.d("saveCheckPoints","StaffEntry "+sendStaffImageReq.WKWorkID+" "+sendStaffImageReq.WKEntryImg+" "
-//                +sendStaffImageReq.WKEntryGPS);
-//
-//        restClient.addHeader(OYE247KEY, OYE247TOKEN);
-//        restClient.post(this, sendStaffImageReq, StaffImageRes.class, this, URLData.URL_SEND_STAFF_IMAGE);
-//
-//    }
-
-
-    void sendStaffImage(String WKEntryImg, String WKEntryGPS, String WKWorkID) {
-
-
-        SendStaffImageReq sendStaffImageReq = new SendStaffImageReq();
-
-        sendStaffImageReq.WKEntryImg = WKEntryImg;
-        sendStaffImageReq.WKEntryGPS = WKEntryGPS;
-        sendStaffImageReq.WKWorkID = WKWorkID;
-
-        Log.v("IMAGE NAME....", WKEntryImg);
-        //  Toast.makeText(AddCarFragment.this,WKEntryImg,Toast.LENGTH_LONG).show();
-
-
-        Call<StaffImageRes> call = champApiInterface.sendStaffImage(sendStaffImageReq);
-        call.enqueue(new Callback<StaffImageRes>() {
-            @Override
-            public void onResponse(Call<StaffImageRes> call, Response<StaffImageRes> response) {
-
-                // Toast.makeText(AddCarFragment.this,"Shalinii",Toast.LENGTH_LONG).show();
-
-
-//                if (response.body().getSuccess() == true) {
-//                    DateFormat dateFormat_DMY = new SimpleDateFormat("dd-MM-yyyy");
-//                    String CurrentString = response.body().data.getSubscription().sueDate;
-//                    String[] separated = CurrentString.split("T");
-//                    subscriptionDate = separated[0];
-//
-//                    tv_subscriptiondate.setText("Valid till: " + subscriptionDate);
-//                    //  if(PrefManager.getValidityDate().length()>0) {
-//                    try {
-//                        java.util.Date dt_dwnld_date = dateFormat_DMY.parse(response.body().data.getSubscription().sueDate);
-//                        Calendar c1 = Calendar.getInstance();
-//                        c1.setTime(dt_dwnld_date);
-//
-//                        long days = (c1.getTimeInMillis() - System.currentTimeMillis()) / (24 * 60 * 60 * 1000) + 1;
-//
-//                        if (0 < days && days <= 7) {
-//                            android.app.AlertDialog.Builder alertDialog = new android.app.AlertDialog.Builder(DashBoard.this);
-//                            alertDialog.setTitle("Your Association Subscription Expires in " + days + " days");
-//                            alertDialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//                            // Showing Alert Message
-//                            if (!DashBoard.this.isFinishing()) {
-//                                alertDialog.show();
-//                            }
-//                        }
-//
-//                    } catch (Exception ex) {
-//
-//                    }
-//
-//                } else {
-//                }
-            }
-
-            @Override
-            public void onFailure(Call<StaffImageRes> call, Throwable t) {
-                Toast.makeText(AddCarFragment.this, t.toString(), Toast.LENGTH_LONG).show();
-                call.cancel();
-            }
-        });
-
-    }
 
     public void SaveImage(Bitmap showedImgae) {
 
@@ -972,6 +580,34 @@ public class AddCarFragment extends BaseKotlinActivity implements ResponseHandle
         Uri contentUri = Uri.fromFile(file);
         mediaScanIntent.setData(contentUri);
         getApplicationContext().sendBroadcast(mediaScanIntent);
+    }
+    void getInviation() {
+        Call<GetLatestRecord> call = champApiInterface.getLatestRecord(getIntent().getStringExtra(MOBILE_NUMBER), String.valueOf(LocalDb.getAssociation().getAsAssnID()));
+        call.enqueue(new Callback<GetLatestRecord>() {
+            @Override
+            public void onResponse(Call<GetLatestRecord> call, Response<GetLatestRecord> response) {
+
+                if (response.body().getData() != null) {
+                    String val = response.body().getData().getVisitorLatestRecord().getVlEntryImg();
+
+                    Toast.makeText(AddCarFragment.this, response.body().getData().toString(), Toast.LENGTH_SHORT).show();
+                    byte[] imageBytes = Base64.decode(val, Base64.DEFAULT);
+                    Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    imageView1.setImageBitmap(decodedImage);
+
+
+                } else {
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetLatestRecord> call, Throwable t) {
+                call.cancel();
+            }
+        });
+
+
     }
 
 
