@@ -409,7 +409,7 @@ var purpose:String?=null
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),
-            LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(MOBILENUMBER),
+            LocalDb.getAssociation()!!.asAsnName, 0, "","+91"+ intent.getStringExtra(MOBILENUMBER),
             purpose.toString(), "", "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), intent.getStringExtra("Base64"), Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15

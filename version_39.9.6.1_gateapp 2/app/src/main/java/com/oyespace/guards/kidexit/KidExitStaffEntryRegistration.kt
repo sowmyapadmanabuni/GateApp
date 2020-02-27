@@ -80,20 +80,7 @@ var purpose:String?=null
 
                 curTime = getCurrentTimeLocal()
 
-                if (intent.getStringExtra(VISITOR_TYPE).contains(STAFF, true)) {
 
-                    staffVisitorLog(
-                        intent.getStringExtra(UNITID),
-                        intent.getStringExtra(GUARDIANNAME),
-                        intent.getStringExtra(MOBILENUMBER),
-                        intent.getStringExtra("DESIGNATION"),
-                        intent.getStringExtra("WORKTYPE"),
-                        intent.getIntExtra("WORKERID", 0),
-                        intent.getStringExtra(UNITNAME)
-                    )
-
-
-                } else {
 
                     if (intent.getStringExtra(UNITID).contains(",")) {
 
@@ -130,7 +117,7 @@ var purpose:String?=null
                             intent.getStringExtra(UNIT_ACCOUNT_ID)
                         )
                     }
-                }
+
 
             }
 
@@ -188,21 +175,6 @@ var purpose:String?=null
         setContentView(R.layout.activity_final_registration)
 
         buttonNext.text=resources.getString(R.string.textdone)
-        //launchCamera()
-//        val service =  Intent(getBaseContext(), CapPhoto::class.java)
-//        startService(service);
-
-//         imgName = "Selfie" + "Association" + Prefs.getInt(
-//            ASSOCIATION_ID,
-//            0
-//        ) + "Gantname" + Prefs.getString(ConstantUtils.GATE_NO, "") + System.currentTimeMillis() + ".jpg"
-
-// val front_translucent =   Intent(getBaseContext(), CapPhoto::class.java)
-//                front_translucent.putExtra("Front_Request", true);
-//        front_translucent.putExtra("ImageName",imgName)
-//               // front_translucent.putExtra("Quality_Mode", camCapture.getQuality());
-//                getApplication().getApplicationContext().startService(
-//                        front_translucent);
 
         iv_torch=findViewById(R.id.iv_torch)
         iv_torch!!.setOnClickListener {
@@ -553,108 +525,6 @@ var purpose:String?=null
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
-    }
-
-    private fun staffVisitorLog(
-        unitId: String, personName: String, mobileNumb: String, desgn: String,
-        workerType: String, staffID: Int, unitName: String
-    ) {
-
-
-        var memID: Int = 410
-        if (BASE_URL.contains("dev", true)) {
-            memID = 64
-        } else if (BASE_URL.contains("uat", true)) {
-            memID = 64
-        }
-//        var memID:Int=64;
-//        if(!BASE_URL.contains("dev",true)){
-//            memID=410;
-//        }
-        var SPPrdImg1 = ""
-        var SPPrdImg2 = ""
-        var SPPrdImg3 = ""
-        var SPPrdImg4 = ""
-        var SPPrdImg5 = ""
-        var SPPrdImg6 = ""
-        var SPPrdImg7 = ""
-        var SPPrdImg8 = ""
-        var SPPrdImg9 = ""
-        var SPPrdImg10 = ""
-        val req = CreateVisitorLogReq(
-            Prefs.getInt(ASSOCIATION_ID, 0), staffID,
-            unitName, unitId, desgn,
-            personName, "", 0, "+", mobileNumb,
-            "", "", "", "",
-            1, workerType, SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            ,
-            SPPrdImg6,
-            SPPrdImg7,
-            SPPrdImg8,
-            SPPrdImg9,
-            SPPrdImg10,
-            "",
-            intent.getStringExtra("Image"),
-            Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal(),
-            "", "", "", "", "", "", "", "", "", "",intent.getStringExtra(KIDNAME)
-        )
-        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-        CompositeDisposable().add(
-            RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
-                    override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
-                        if (globalApiObject.success == true) {
-
-                            val id = globalApiObject.data.visitorLog.vlVisLgID
-                            updateFirebaseColor(id, "#f0f0f0")
-
-                            val ddc = Intent(this@KidExitStaffEntryRegistration, BackgroundSyncReceiver::class.java)
-                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                            ddc.putExtra("msg", personName + " " + desgn + " is coming to your home")
-                            ddc.putExtra("mobNum", mobileNumb)
-                            ddc.putExtra("name", personName)
-                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            ddc.putExtra("unitname", unitName)
-                            ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME, desgn)
-                            this@KidExitStaffEntryRegistration.sendBroadcast(ddc)
-
-                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
-                        } else {
-                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.toString())
-
-                            Utils.showToast(this@KidExitStaffEntryRegistration, "Entry not Saved" + globalApiObject.toString())
-                        }
-                        finish()
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        Log.d("onErrorResponse", "StaffEntry " + e.toString())
-                        buttonNext.isEnabled = true
-                        buttonNext.isClickable = true
-                        Utils.showToast(this@KidExitStaffEntryRegistration, "Something went wrong")
-//                    dismissProgress()
-                    }
-
-                    override fun noNetowork() {
-                        buttonNext.isEnabled = true
-                        buttonNext.isClickable = true
-                        Utils.showToast(this@KidExitStaffEntryRegistration, resources.getString(R.string.no_internet))
-                    }
-
-                    override fun onShowProgress() {
-//                    showProgress()
-                    }
-
-                    override fun onDismissProgress() {
-//                    dismissProgress()
-                    }
-                })
-        )
     }
 
 }

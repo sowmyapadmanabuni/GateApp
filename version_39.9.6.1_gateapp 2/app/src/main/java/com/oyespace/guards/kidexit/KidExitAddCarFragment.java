@@ -534,10 +534,10 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
 
         loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
         loginReq.BLBlockID = getIntent().getStringExtra(BLOCK_ID);
-        loginReq.EmailID = "";
-        loginReq.FLFloorID = 0;
-        loginReq.OYEMemberID = 0;
-        loginReq.OYEMemberRoleID = 0;
+//        loginReq.EmailID = "";
+//        loginReq.FLFloorID = 0;
+//        loginReq.OYEMemberID = 0;
+//        loginReq.OYEMemberRoleID = 0;
 
         loginReq.VNVendorID = 0;
         loginReq.WKDesgn = getIntent().getStringExtra(COMPANY_NAME);

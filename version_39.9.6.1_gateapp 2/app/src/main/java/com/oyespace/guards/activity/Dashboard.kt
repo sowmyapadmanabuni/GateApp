@@ -882,6 +882,7 @@ var iv_torch:Button?=null
             return
         }
 
+
         showProgress("loading exit data...")
         VisitorLogRepo.get_OUT_VisitorLog(pullFromBackend, object : VisitorLogRepo.ExitVisitorLogFetchListener {
             override fun onFetch(visitorLog: ArrayList<ExitVisitorLog>?, errorMessage: String?) {
@@ -1106,10 +1107,10 @@ var iv_torch:Button?=null
         super.onDestroy()
 
 //        try {
-//            trimCache(this)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
+////            trimCache(this)
+////        } catch (e: Exception) {
+////            e.printStackTrace()
+////        }
     }
 
     fun setLocale(lang: String?) {

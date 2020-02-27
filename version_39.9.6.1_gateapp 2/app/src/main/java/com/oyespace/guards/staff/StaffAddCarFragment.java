@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -107,6 +108,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_PURPOSE;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
+import static com.oyespace.guards.utils.RandomUtils.encodeToBase64;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 
@@ -115,7 +117,7 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
     /*sumeeth fragment*/
     // File destination;
     File file;
-
+    String encodedImage;
     Button iv_torch;
     int clickable1 = 0;
     ChampApiInterface champApiInterface;
@@ -511,16 +513,20 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
 
     private void staffRegistration() {
 
+        BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+        Bitmap bitmap = drawable.getBitmap();
+        encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
+
         RestClient restClient = RestClient.getInstance();
 
         StaffRegistrationReqJv loginReq = new StaffRegistrationReqJv();
 
         loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
         loginReq.BLBlockID = getIntent().getStringExtra(BLOCK_ID);
-        loginReq.EmailID = "";
-        loginReq.FLFloorID = 0;
-        loginReq.OYEMemberID = 0;
-        loginReq.OYEMemberRoleID = 0;
+//        loginReq.EmailID = "";
+//        loginReq.FLFloorID = 0;
+//        loginReq.OYEMemberID = 0;
+//        loginReq.OYEMemberRoleID = 0;
 
         loginReq.VNVendorID = 0;
         loginReq.WKDesgn = getIntent().getStringExtra(COMPANY_NAME);
@@ -537,7 +543,7 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
         loginReq.UNUnitID = getIntent().getStringExtra(UNITID);
         // Toast.makeText(AddCarFragment.this,getIntent().getStringExtra(UNITID),Toast.LENGTH_LONG).show();
         loginReq.UNUniName = getIntent().getStringExtra(UNITNAME);
-        loginReq.WKEntryImg = imgName;
+        loginReq.WKEntryImg = encodedImage;
 
         Log.d("saveCheckPoints", "StaffEntry " + loginReq.ASAssnID + " " + loginReq.WKFName + " "
                 + loginReq.UNUnitID + " " + loginReq.WKMobile + " " + loginReq.UNUniName);
@@ -557,7 +563,7 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                 if (workerResponce.success.equalsIgnoreCase("true")) {
                     imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" + workerResponce.data.worker.wkWorkID + ".jpg";
 
-                    sendStaffImage(imgName, "", String.valueOf(workerResponce.data.worker.wkWorkID));
+                 //   sendStaffImage(imgName, "", String.valueOf(workerResponce.data.worker.wkWorkID));
 
                     byte[] byteArray = null;
                     try {
@@ -614,13 +620,13 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                     }
                     //   uploadImage(imgName,personPhoto);
 
-                    Intent ddc = new Intent(StaffAddCarFragment.this, BackgroundSyncReceiver.class);
-                    Log.d("btn_biometric", "af " + imgName);
-
-                    ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
-                    ddc.putExtra("imgName", imgName);
-                    ddc.putExtra(PERSON_PHOTO, byteArray);
-                    sendBroadcast(ddc);
+//                    Intent ddc = new Intent(StaffAddCarFragment.this, BackgroundSyncReceiver.class);
+//                    Log.d("btn_biometric", "af " + imgName);
+//
+//                    ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO);
+//                    ddc.putExtra("imgName", imgName);
+//                    ddc.putExtra(PERSON_PHOTO, byteArray);
+//                    sendBroadcast(ddc);
                     Intent ddc1 = new Intent(StaffAddCarFragment.this, BackgroundSyncReceiver.class);
                     Log.d("SYNC_STAFF_LIST", "af " + imgName);
                     ddc1.putExtra(BSR_Action, SYNC_STAFF_LIST);

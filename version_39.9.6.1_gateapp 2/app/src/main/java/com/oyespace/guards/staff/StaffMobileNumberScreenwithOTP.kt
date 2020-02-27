@@ -682,7 +682,7 @@ class StaffMobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
 
                             progressBar?.visibility = View.GONE
-                            val d = Intent(this@StaffMobileNumberScreenwithOTP, AddCarFragment::class.java)
+                            val d = Intent(this@StaffMobileNumberScreenwithOTP, StaffAddCarFragment::class.java)
                             d.putExtra(UNITID, intent.getStringExtra(UNITID))
                             d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))

@@ -300,15 +300,16 @@ class VisitorLogRepo {
                             if (response.success) {
                                 val visitorlog = response.data.visitorLog
                                 if (visitorlog == null) {
-                                    VisitorExitLogRealm.deleteVisitorLogs()
+                                   // VisitorExitLogRealm.deleteVisitorLogs()
                                     listener?.onFetch(null, "no entries found")
                                 } else {
                                     if (listener == null) {
                                         VisitorExitLogRealm.updateVisitorLogs(visitorlog, null)
-                                    } else {
+                                  }
+                                    else {
                                         VisitorExitLogRealm.updateVisitorLogs(visitorlog, object : VisitorExitLogRealm.ExitLogUpdateListener {
                                             override fun onUpdateFinish(exitLogs: java.util.ArrayList<ExitVisitorLog>?) {
-                                                listener.onFetch(exitLogs)
+                                                listener?.onFetch(exitLogs)
                                             }
 
                                         })

@@ -46,11 +46,10 @@ import com.oyespace.guards.network.ChampApiClient
 import com.oyespace.guards.network.ChampApiInterface
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
-import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.RandomUtils
+import com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO
+import com.oyespace.guards.utils.RandomUtils.getBitmapFromURL
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -222,8 +221,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
         }
         image_Gallery!!.setOnClickListener(this)
         submit_button = findViewById(R.id.buttonNext)
-        val mLayoutManager: RecyclerView.LayoutManager =
-            GridLayoutManager(applicationContext, 4)
+        val mLayoutManager: RecyclerView.LayoutManager = GridLayoutManager(applicationContext, 4)
         rv_image!!.setLayoutManager(mLayoutManager)
         //iamgeLyt.removeAllViews();
         list.clear()
@@ -250,8 +248,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                 }
                 val drawable = imageView1!!.getDrawable() as BitmapDrawable
                 val bitmap = drawable.bitmap
-                encodedImage =
-                    RandomUtils.encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
+                encodedImage = RandomUtils.encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
                 val d = Intent(this@DeliveryPersonPhotoActivity, StaffEntryRegistration::class.java)
                 //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
                 //                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -512,14 +509,26 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
 
                     try {
-                        val imageBytes =
-                            Base64.decode(
-                                getdata.data.visitorLatestRecord.vlEntryImg,
-                                Base64.DEFAULT
-                            )
-                        val decodedImage =
-                            BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                        imageView1!!.setImageBitmap(decodedImage)
+                        if(getdata.data.visitorLatestRecord.vlEntryImg.contains("PERSON")){
+
+                            val url = ConstantUtils.IMAGE_BASE_URL + "Images/" + getdata.data.visitorLatestRecord.vlEntryImg
+
+                            GetImageFromUrl(imageView1!!).execute(url);
+
+//                           val image= getBitmapFromURL(ConstantUtils.IMAGE_BASE_URL + "Images/" + getdata.data.visitorLatestRecord.vlEntryImg)
+//
+//                            encodedImage = RandomUtils.encodeToBase64(image, Bitmap.CompressFormat.JPEG, 100)
+//                            val imageBytes = Base64.decode(encodedImage, Base64.DEFAULT)
+//                            val decodedImage =
+//                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//                            imageView1!!.setImageBitmap(decodedImage)
+                        }
+                        else {
+                            val imageBytes = Base64.decode(getdata.data.visitorLatestRecord.vlEntryImg, Base64.DEFAULT)
+                            val decodedImage =
+                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                            imageView1!!.setImageBitmap(decodedImage)
+                        }
                     }catch (e:IllegalStateException){
 
                     }

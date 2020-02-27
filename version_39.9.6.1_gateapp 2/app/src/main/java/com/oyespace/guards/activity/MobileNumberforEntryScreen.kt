@@ -285,9 +285,14 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                 // textview.text = number.replace("+91", "")
                                 textview.text = number
 
-                                ccd = number.substring(0, 3)
+                                try {
 
-                                mobileNumber = number.substring(3, 13)
+                                    ccd = number.substring(0, 3)
+
+                                    mobileNumber = number.substring(3, 13)
+                                }catch (e:StringIndexOutOfBoundsException){
+
+                                }
 
                                 // GetWorkersListByMobileNumberAndAssocID(ccd.toString()+mobileNumber.toString(),Prefs.getInt(ASSOCIATION_ID, 0))
                             }

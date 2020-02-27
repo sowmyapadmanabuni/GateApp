@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.*
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import android.os.Bundle
@@ -12,11 +13,11 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.telephony.PhoneStateListener
 import android.telephony.TelephonyManager
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import com.bumptech.glide.load.engine.Resource
 import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.listeners.PermissionCallback
@@ -29,10 +30,8 @@ import com.oyespace.guards.pojo.SendStaffImageRes
 import com.oyespace.guards.pojo.StaffEditRequest
 import com.oyespace.guards.pojo.StaffEditResponse
 import com.oyespace.guards.repo.StaffRepo
-import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.LocalDb
-import com.oyespace.guards.utils.Prefs
 import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
@@ -51,7 +50,7 @@ import java.util.*
 
 class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListener {
 
-
+    var encodedImage: String? = null
     var s_dob: String? = null
     var date: String? = null
     var inputt: SimpleDateFormat? = null
@@ -299,12 +298,30 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 
 
         token = Math.random()
-        Picasso.with(this@EditStaffActivity)
-            .load(
-                IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE")
-            )
-            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
-            .into(iv_personphoto)
+
+        val imageAsBytes = android.util.Base64.decode(intent.getStringExtra("IMAGE"),android.util.Base64.DEFAULT);
+        val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+        iv_personphoto!!.setImageBitmap(decodedImage)
+
+        if(intent.getStringExtra("IMAGE").contains("PERSON")) {
+            val url = IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE")
+
+            GetImageFromUrl(iv_personphoto!!).execute(url);
+        }else if(intent.getStringExtra("IMAGE").equals("")){
+            iv_personphoto!!.setBackgroundResource(R.drawable.user_icon_black);
+        }
+        else{
+            val imageBytes = Base64.decode(intent.getStringExtra("IMAGE"), Base64.DEFAULT)
+            val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            iv_personphoto!!.setImageBitmap(decodedImage)
+        }
+
+//        Picasso.with(this@EditStaffActivity)
+//            .load(
+//                IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE")
+//            )
+//            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
+//            .into(iv_personphoto)
 
         btn_update!!.setOnClickListener {
 
@@ -322,11 +339,15 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                 // if(tv_mobilenumber!!.length()==0){
                 showProgress()
 
+                val drawable = iv_personphoto!!.getDrawable() as BitmapDrawable
+                val bitmap = drawable.bitmap
+                encodedImage = RandomUtils.encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
+
                 if (imgName != null) {
-                    editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), imgName!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
+                    editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), encodedImage!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
 
                 } else {
-                    editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), intent.getStringExtra("IMAGE"), "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
+                    editStaff(tv_name!!.text.toString(), tv_mobilenumber!!.text.toString(), encodedImage!!, "Staff", tv_designation!!.text.toString(), "", s_dob.toString(), true, intent.getIntExtra(ConstantUtils.WORKER_ID, 0))
 
                 }
 
@@ -421,14 +442,14 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                                 } catch (ex: Exception) {
                                     Log.d("Dgddfdf picas", "7")
                                 }
-                                uploadImage(imgName.toString(), personPhoto)
+                             //   uploadImage(imgName.toString(), personPhoto)
                             } else {
 
                                 var drawable: BitmapDrawable =
                                     iv_personphoto!!.drawable as BitmapDrawable
                                 personPhoto = drawable.bitmap
 
-                                uploadImage(intent.getStringExtra("IMAGE"), personPhoto)
+                             //   uploadImage(intent.getStringExtra("IMAGE"), personPhoto)
 
                             }
                         }
@@ -453,160 +474,154 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         )
     }
 
-    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage", localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
+//    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
+//        Log.d("uploadImage", localImgName)
+//        var byteArrayProfile: ByteArray?
+//        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
+//        val imageFile = File(mPath)
+//
+//        try {
+//            val outputStream = FileOutputStream(imageFile)
+//            val quality = 50
+//            if (incidentPhoto != null) {
+//                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
+//            }
+//            outputStream.flush()
+//            outputStream.close()
+//
+//            val bosProfile = ByteArrayOutputStream()
+//            if (incidentPhoto != null) {
+//                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
+//            }
+//            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
+//            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
+//            byteArrayProfile = bosProfile.toByteArray()
+//            val len = bosProfile.toByteArray().size
+//            println("AFTER COMPRESSION-===>$len")
+//            bosProfile.flush()
+//            bosProfile.close()
+//            if (incidentPhoto != null) {
+//                //    incidentPhoto.recycle()
+//            }
+//            Timber.e("uploadImage  bf", "sfas")
+//        } catch (ex: Exception) {
+//            byteArrayProfile = null
+//            Log.d("uploadImage ererer bf", ex.toString())
+//        }
+//
+//        val uriTarget = this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
+//
+//        val imageFileOS: OutputStream?
+//        try {
+//            imageFileOS = this.contentResolver.openOutputStream(uriTarget!!)
+//            imageFileOS!!.write(byteArrayProfile!!)
+//            imageFileOS.flush()
+//            imageFileOS.close()
+//
+//            Log.d("uploadImage Path bf", uriTarget.toString())
+//        } catch (e: FileNotFoundException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        } catch (e: IOException) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace()
+//        }
+//
+//        val file = File(imageFile.toString())
+//        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
+//        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
+//        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
+//        val call = apiService.updateImageProfile(body)
+//
+//        call.enqueue(object : Callback<Any> {
+//            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
+//                try {
+//                    Log.d("uploadImage", "response:" + response.body()!!)
+//
+//                    if (imgName != null) {
+//
+//                        updateStaffImage(imgName.toString(), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("FIRSTNAME"))
+//
+//                    } else {
+//                        updateStaffImage(intent.getStringExtra("IMAGE"), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("FIRSTNAME"))
+//
+//                    }
+//                    file.delete()
+//                    //  Toast.makeText(mcontext,"Uploaded Successfully", Toast.LENGTH_SHORT).show();
+//
+//                } catch (ex: Exception) {
+//                    Log.d("uploadImage", "errr:" + ex.toString())
+//
+//                    Toast.makeText(this@EditStaffActivity, "Image Not Uploaded", Toast.LENGTH_SHORT)
+//                        .show()
+//                }
+//
+//            }
+//
+//            override fun onFailure(call: Call<Any>, t: Throwable) {
+//                dismissProgress()
+//                // Log error here since request failed
+//                Log.d("uploadImage", t.toString())
+//                Toast.makeText(this@EditStaffActivity, "Not Uploaded", Toast.LENGTH_SHORT).show()
+//
+//            }
+//        })
+//
+//    }
 
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-                //    incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-        val uriTarget = this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-
-        val imageFileOS: OutputStream?
-        try {
-            imageFileOS = this.contentResolver.openOutputStream(uriTarget!!)
-            imageFileOS!!.write(byteArrayProfile!!)
-            imageFileOS.flush()
-            imageFileOS.close()
-
-            Log.d("uploadImage Path bf", uriTarget.toString())
-        } catch (e: FileNotFoundException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        } catch (e: IOException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-
-                    if (imgName != null) {
-
-                        updateStaffImage(imgName.toString(), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("FIRSTNAME"))
-
-                    } else {
-                        updateStaffImage(intent.getStringExtra("IMAGE"), "", intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra("FIRSTNAME"))
-
-                    }
-                    file.delete()
-                    //  Toast.makeText(mcontext,"Uploaded Successfully", Toast.LENGTH_SHORT).show();
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                    Toast.makeText(this@EditStaffActivity, "Image Not Uploaded", Toast.LENGTH_SHORT)
-                        .show()
-                }
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                dismissProgress()
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-                Toast.makeText(this@EditStaffActivity, "Not Uploaded", Toast.LENGTH_SHORT).show()
-
-            }
-        })
-
-    }
-
-    private fun updateStaffImage(
-        WKEntryImg: String,
-        WKEntryGPS: String,
-        WKWorkID: Int,
-        WKFName: String
-    ) {
-
-
-        val req = SendStaffImageReq(WKEntryImg, WKEntryGPS, WKWorkID)
-
-        compositeDisposable.add(
-            RetrofitClinet.instance.sendStaffImageUpdate(ConstantUtils.OYE247TOKEN, req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<SendStaffImageRes>() {
-                    override fun onSuccessResponse(globalApiObject: SendStaffImageRes) {
-                        if (globalApiObject.success == true) {
-
-                            dismissProgress()
-
-
-                            val intent = Intent(this@EditStaffActivity, EditBiometric::class.java)
-                            intent.putExtra(WORKER_ID, WKWorkID)
-                            intent.putExtra(PERSONNAME, WKFName)
-                            intent.putExtra(UNITID, getIntent().getStringExtra(UNITID))
-                            intent.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME))
-                            intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
-                            intent.putExtra(VISITOR_TYPE, "STAFF")
-                            intent.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME))
-                            intent.putExtra(COUNTRYCODE, "")
-                            intent.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
-                            startActivity(intent)
-                            finish()
-
-
-                        } else {
-
-
-                        }
-                    }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        dismissProgress()
-//                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
-                        Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
-                    }
-
-                    override fun noNetowork() {
-//                    Utils.showToast(applicationContext, getString(R.string.no_internet))
-                    }
-
-                    override fun onShowProgress() {
-                    }
-
-                    override fun onDismissProgress() {
-                    }
-                })
-        )
-    }
+//    private fun updateStaffImage(WKEntryImg: String, WKEntryGPS: String, WKWorkID: Int, WKFName: String) {
+//
+//        val req = SendStaffImageReq(WKEntryImg, WKEntryGPS, WKWorkID)
+//
+//        compositeDisposable.add(
+//            RetrofitClinet.instance.sendStaffImageUpdate(ConstantUtils.OYE247TOKEN, req)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(object : CommonDisposable<SendStaffImageRes>() {
+//                    override fun onSuccessResponse(globalApiObject: SendStaffImageRes) {
+//                        if (globalApiObject.success == true) {
+//
+//                            dismissProgress()
+//
+//
+//                            val intent = Intent(this@EditStaffActivity, EditBiometric::class.java)
+//                            intent.putExtra(WORKER_ID, WKWorkID)
+//                            intent.putExtra(PERSONNAME, WKFName)
+//                            intent.putExtra(UNITID, getIntent().getStringExtra(UNITID))
+//                            intent.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME))
+//                            intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+//                            intent.putExtra(VISITOR_TYPE, "STAFF")
+//                            intent.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME))
+//                            intent.putExtra(COUNTRYCODE, "")
+//                            intent.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
+//                            startActivity(intent)
+//                            finish()
+//
+//
+//                        } else {
+//
+//
+//                        }
+//                    }
+//
+//                    override fun onErrorResponse(e: Throwable) {
+//                        dismissProgress()
+////                    Utils.showToast(applicationContext, getString(R.string.some_wrng))
+//                        Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
+//                    }
+//
+//                    override fun noNetowork() {
+////                    Utils.showToast(applicationContext, getString(R.string.no_internet))
+//                    }
+//
+//                    override fun onShowProgress() {
+//                    }
+//
+//                    override fun onDismissProgress() {
+//                    }
+//                })
+//        )
+//    }
 
     override fun onPause() {
 

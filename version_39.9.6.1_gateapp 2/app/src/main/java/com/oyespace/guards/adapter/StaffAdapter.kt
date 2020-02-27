@@ -4,8 +4,9 @@ import android.app.Activity
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.graphics.BitmapFactory
 import android.os.Handler
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,11 +24,8 @@ import com.oyespace.guards.activity.MobileNumberforEntryScreen
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.repo.StaffRepo
-import com.oyespace.guards.utils.ConstantUtils
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.TaptoCallApi
-import com.squareup.picasso.Picasso
 import java.util.*
 
 
@@ -36,6 +34,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
 
     private var searchList: ArrayList<Worker>? = null
     var searchString: String = ""
+    var encodedImage: String? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): StaffViewHolder {
         return StaffViewHolder(LayoutInflater.from(mcontext).inflate(R.layout.layout_staff_adapter_row, parent, false))
@@ -75,9 +74,11 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             var dialog_imageview: ImageView? = null
             dialog_imageview = view.findViewById(R.id.dialog_imageview)
 
-            Picasso.with(mcontext)
-                .load(IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg)
-                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(dialog_imageview)
+            dialog_imageview.setBackground(holder.iv_staff!!.getDrawable())
+
+//            Picasso.with(mcontext)
+//                .load(IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg)
+//                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(dialog_imageview)
 
             alertadd.setView(view)
             alertadd.show()
@@ -85,10 +86,72 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
         }
 
 
-        Picasso.with(mcontext)
-            .load(IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg)
-            .placeholder(R.drawable.placeholder_dark_potrait)
-            .error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
+
+
+//    try {
+        if(staffdata.wkEntryImg.contains("PERSON")) {
+            val url = IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg
+
+            GetImageFromUrl(holder.iv_staff).execute(url);
+        }else if(staffdata.wkEntryImg.equals("")){
+            holder.iv_staff.setBackgroundResource(R.drawable.user_icon_black);
+        }
+        else{
+            val imageBytes = Base64.decode(staffdata.wkEntryImg, Base64.DEFAULT)
+            val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            holder.iv_staff!!.setImageBitmap(decodedImage)
+        }
+//            Thread(Runnable {
+//                // performing some dummy time taking operation
+//                var i=0;
+//                while(i<Int.MAX_VALUE){
+//                    i++
+//                }
+//
+//
+//                val image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//
+//                encodedImage = RandomUtils.encodeToBase64(image, Bitmap.CompressFormat.JPEG, 100)
+//                val imageBytes = Base64.decode(encodedImage, Base64.DEFAULT)
+//                val decodedImage =
+//                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//                holder.iv_staff!!.setImageBitmap(decodedImage)
+//            }).start()
+//
+//
+//
+//
+//        }
+//
+////            Thread({
+////
+////
+////                val image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+////
+////                encodedImage = RandomUtils.encodeToBase64(image, Bitmap.CompressFormat.JPEG, 100)
+////                val imageBytes = Base64.decode(encodedImage, Base64.DEFAULT)
+////                val decodedImage =
+////                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+////                holder.iv_staff!!.setImageBitmap(decodedImage)
+////            }).start()
+//
+//      //  }
+//        else {
+//            val imageBytes = Base64.decode(staffdata.wkEntryImg, Base64.DEFAULT)
+//            val decodedImage =
+//                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+//            holder.iv_staff!!.setImageBitmap(decodedImage)
+//        }
+//    }catch (e:IllegalStateException){
+//
+//    }
+
+
+
+//        Picasso.with(mcontext)
+//            .load(IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg)
+//            .placeholder(R.drawable.placeholder_dark_potrait)
+//            .error(R.drawable.placeholder_dark_potrait).into(holder.iv_staff)
 
         holder.btn_makeentry.setOnClickListener {
 
@@ -242,6 +305,5 @@ if(staffdata.isValid){
         notifyDataSetChanged()
 
     }
-
 }
 
