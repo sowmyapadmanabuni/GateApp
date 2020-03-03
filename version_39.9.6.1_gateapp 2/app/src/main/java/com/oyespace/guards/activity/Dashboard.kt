@@ -1914,7 +1914,7 @@ var iv_torch:Button?=null
         Executors.newSingleThreadExecutor().execute({
 
             Log.e("PHONE_ZEOTEL",""+phone);
-            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+phone+"&ri=60&rc=3&user_vars=&tl=&df=json")
+            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+"9447679600"+"&ri=60&rc=3&user_vars=&tl=&df=json")
 
             with(url.openConnection() as HttpURLConnection) {
                 requestMethod = "GET"  // optional default is GET
