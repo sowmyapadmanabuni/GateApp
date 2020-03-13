@@ -856,7 +856,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
     }
 
     fun getLatestRecordData(mobileNumber:String,accountId:String,isdCode: String) {
-        RetrofitClinet.instance.getLatestRecord(OYE247TOKEN,mobileNumber, LocalDb.getAssociation()!!.asAssnID.toString())
+        RetrofitClinet.instance.getLatestRecord(OYE247TOKEN,mobileNumber)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<GetLatestRecord>() {

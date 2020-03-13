@@ -210,8 +210,8 @@ interface WebApi {
     @POST("oyesafe/api/v1/UpdateApprovalStatus")
     fun updateApprovalStatus(@Header(OYE247KEY) token: String, @Body updateApprovalStatus: UpdateApprovalStatus): Single<Any>
 
-    @GET("oyesafe/api/v1/GetLatestVisitorDetailsByMobileNum/{mobilenumber}/{id}")
-    fun getLatestRecord(@Header("X-OYE247-APIKey") token: String,@Path("mobilenumber") mobileNumber: String,@Path("id") assid: String):Single<GetLatestRecord>
+    @GET("oyesafe/api/v1/GetLatestVisitorDetailsByMobileNum/{mobilenumber}/")
+    fun getLatestRecord(@Header("X-OYE247-APIKey") token: String,@Path("mobilenumber") mobileNumber: String):Single<GetLatestRecord>
 
 
     @POST("oyesafe/api/v1/IVRCallID/Create")

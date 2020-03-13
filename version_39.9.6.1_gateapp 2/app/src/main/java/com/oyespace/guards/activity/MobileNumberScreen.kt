@@ -363,7 +363,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                             Prefs.putString("Retake", "Yes")
 
-                            getLatestRecordData(MobNumber.substring(3),globalApiObject.data.accountByMobile[0].acAccntID.toString())
+                            getLatestRecordData(MobNumber.substring(3),globalApiObject.data.accountByMobile[0].acAccntID.toString(),isdCode)
 
 
                             }else{
@@ -475,25 +475,39 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
         finish()
     }
 
-    fun getLatestRecordData(mobileNumber:String,accountId:String) {
-        RetrofitClinet.instance.getLatestRecord(OYE247TOKEN,mobileNumber, LocalDb.getAssociation()!!.asAssnID.toString())
+    fun getLatestRecordData(mobileNumber:String,accountId:String,isdCode: String) {
+        RetrofitClinet.instance.getLatestRecord(OYE247TOKEN,mobileNumber)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<GetLatestRecord>() {
 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
-
-                    val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
-                    d.putExtra(FLOW_TYPE, DELIVERY)
-                    d.putExtra(VISITOR_TYPE, DELIVERY)
-                    d.putExtra(MOBILENUMBER, getdata.data.visitorLatestRecord.vlMobile.substring(3,13))
-                    d.putExtra(COUNTRYCODE, "+91")
-                    d.putExtra(PERSONNAME,  getdata.data.visitorLatestRecord.vlfName + " " +  getdata.data.visitorLatestRecord.vllName)
-                    d.putExtra(ACCOUNT_ID, accountId)
-                   // d.putExtra(PERSON_PHOTO, getdata.data.visitorLatestRecord.vlEntryImg)
-                    d.putExtra(COMPANY_NAME,getdata.data.visitorLatestRecord.vlComName)
-                    startActivity(d)
-                    finish()
+                    if(getdata.data!=null) {
+                        val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
+                        d.putExtra(FLOW_TYPE, DELIVERY)
+                        d.putExtra(VISITOR_TYPE, DELIVERY)
+                        d.putExtra(
+                            MOBILENUMBER,
+                            getdata.data.visitorLatestRecord.vlMobile.substring(3, 13)
+                        )
+                        d.putExtra(COUNTRYCODE, "+91")
+                        d.putExtra(
+                            PERSONNAME,
+                            getdata.data.visitorLatestRecord.vlfName + " " + getdata.data.visitorLatestRecord.vllName
+                        )
+                        d.putExtra(ACCOUNT_ID, accountId)
+                        d.putExtra(COMPANY_NAME, getdata.data.visitorLatestRecord.vlComName)
+                        startActivity(d)
+                        finish()
+                    }  else{
+                        val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
+                        d.putExtra(FLOW_TYPE, DELIVERY)
+                        d.putExtra(VISITOR_TYPE, DELIVERY)
+                        d.putExtra(MOBILENUMBER, mobileNumber)
+                        d.putExtra(COUNTRYCODE, isdCode)
+                        startActivity(d)
+                        finish()
+                    }
 
                 }
 

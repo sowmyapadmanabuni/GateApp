@@ -27,7 +27,7 @@
                 android:id="@+id/iv_staff"
                 android:layout_width="@dimen/_60sdp"
                 android:layout_height="@dimen/_60sdp"
-                android:src="@mipmap/oyespace_cropped"/>
+                />
     </LinearLayout>
 
     <LinearLayout android:layout_width="0dp"

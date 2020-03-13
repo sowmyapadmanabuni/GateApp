@@ -120,13 +120,13 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
     @Override
     public void handleResult(Result rawResult) {
-//        Toast.makeText(this, "Contents = " + rawResult.getText() +
-//                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Contents = " + rawResult.getText() +
+                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
         Log.d("Contents resident", rawResult.getText());
 
         JSONObject json_Guest = null;
         try {
-            json_Guest = new JSONObject(rawResult.getText());
+            json_Guest = new JSONObject(String.valueOf(rawResult.getText()));
             String sName = json_Guest.getString("infName");
             String sMobile = json_Guest.getString("inMobile");
             String sinInvtID=json_Guest.getString("inInvtID");
@@ -622,6 +622,11 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             }
         });
 
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mScannerView.stopCamera();
     }
 
 }

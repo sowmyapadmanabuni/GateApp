@@ -75,10 +75,11 @@ class VistorOutListAdapter(
             return
         }
 
-        if (!visitor.isValid) {
-            return
-        }
+//        if (!visitor.isValid) {
+//            return
+//        }
 
+        Log.e("VISITOR_OUT",""+visitor);
         holder.iv_call.visibility = if (visitor.vlMobile.length > 5) View.VISIBLE else View.INVISIBLE
         holder.iv_call.setOnClickListener {
 

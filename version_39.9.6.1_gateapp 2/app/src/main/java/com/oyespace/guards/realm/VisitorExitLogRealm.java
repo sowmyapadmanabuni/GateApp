@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.oyespace.guards.models.ExitVisitorLog;
+import com.oyespace.guards.models.VisitorLog;
 import com.oyespace.guards.utils.DateTimeUtils;
 
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import io.realm.Realm;
 import io.realm.RealmList;
 
 public class VisitorExitLogRealm {
+
 
     public static void updateVisitorLogs(RealmList<ExitVisitorLog> visitorsList, ExitLogUpdateListener listener) {
         new AsyncTask<Void, Void, Void>() {

@@ -1,6 +1,7 @@
 package com.oyespace.guards.utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.Log;
 
@@ -9,6 +10,11 @@ import com.oyespace.guards.repo.VisitorLogRepo;
 import com.oyespace.guards.responce.VisitorLogExitResp;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -162,5 +168,20 @@ public class RandomUtils {
         byte[] byteArray = byteArrayOS.toByteArray();
         String encoded = Base64.encodeToString(byteArray,Base64.DEFAULT);
         return encoded;
+    }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
     }
 }

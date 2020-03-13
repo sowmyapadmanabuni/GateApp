@@ -882,6 +882,7 @@ var iv_torch:Button?=null
             return
         }
 
+
         showProgress("loading exit data...")
         VisitorLogRepo.get_OUT_VisitorLog(pullFromBackend, object : VisitorLogRepo.ExitVisitorLogFetchListener {
             override fun onFetch(visitorLog: ArrayList<ExitVisitorLog>?, errorMessage: String?) {
@@ -1106,10 +1107,10 @@ var iv_torch:Button?=null
         super.onDestroy()
 
 //        try {
-//            trimCache(this)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
+////            trimCache(this)
+////        } catch (e: Exception) {
+////            e.printStackTrace()
+////        }
     }
 
     fun setLocale(lang: String?) {
@@ -1845,7 +1846,7 @@ var iv_torch:Button?=null
                 d.putExtra(UNIT_ACCOUNT_ID, parsedVisitor.getString(UNIT_ACCOUNT_ID))
                 d.putExtra("VLVisLgID", parsedVisitor.getInt("VLVisLgID"))
                 d.putExtra(VISITOR_TYPE, parsedVisitor.getString(VISITOR_TYPE))
-                d.putExtra(UNITOCCUPANCYSTATUS, parsedVisitor.getString(UNITOCCUPANCYSTATUS))
+                //d.putExtra(UNITOCCUPANCYSTATUS, parsedVisitor.getString(UNITOCCUPANCYSTATUS))
                 sendBroadcast(d)
            // }
 
@@ -1881,7 +1882,7 @@ var iv_torch:Button?=null
                                 if (mob.contains("+91")) {
                                     mob = mob.replace("+91", "");
                                 }
-                                //if(mob.contains("700")) {
+                                //if(mob.contains("8072262742")) {
                                 sendIVRCall(mob, visitorLogId, type);//mob
                                 //}
                             }
@@ -1910,11 +1911,15 @@ var iv_torch:Button?=null
 
 
     fun sendIVRCall(phone:String, visitorLogId:String, type:String) {
+        var mob = phone;
+        if (mob.contains("+91")) {
+            mob = mob.replace("+91", "");
+        }
 
         Executors.newSingleThreadExecutor().execute({
 
-            Log.e("PHONE_ZEOTEL",""+phone);
-            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+"9447679600"+"&ri=60&rc=3&user_vars=&tl=&df=json")
+            Log.e("PHONE_ZEOTEL",""+mob);
+            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+mob+"&ri=60&rc=3&df=json")
 
             with(url.openConnection() as HttpURLConnection) {
                 requestMethod = "GET"  // optional default is GET
@@ -1923,7 +1928,7 @@ var iv_torch:Button?=null
 
                 inputStream.bufferedReader().use {
                     it.lines().forEach { line ->
-                        Log.e("REDING_ZEOTEL",""+line)
+                        Log.e("REDING_ZEOTEL",""+line+" - "+mob)
                         //{status:0, status_str:'OK', callid:'7JZnfKAgVYHrpNpVjxZpHA'}
                         val response = ""+line;
                         val jsonStr = response.replace("'","\"")
