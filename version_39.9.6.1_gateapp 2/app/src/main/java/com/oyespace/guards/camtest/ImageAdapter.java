@@ -14,11 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.oyespace.guards.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
 
-private List<String> imageList;
+private ArrayList<String> imageList;
 Context context;
 String visibility;
 
@@ -35,7 +36,7 @@ CardView lyt_card;
 }
 
 
-    public ImageAdapter(List<String> imageList, Context context,String visibility) {
+    public  ImageAdapter(ArrayList<String> imageList, Context context,String visibility) {
         this.imageList = imageList;
         this.context=context;
         this.visibility=visibility;
@@ -67,6 +68,7 @@ CardView lyt_card;
                 int pos = (holder.getLayoutPosition());
                 Intent intent=new Intent(context,ViewFullImageActivity.class);
                 intent.putExtra("pos",pos);
+                intent.putStringArrayListExtra("ImageList",imageList);
                 context.startActivity(intent);
 
             }

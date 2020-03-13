@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -31,7 +32,6 @@ import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.DateTimeUtils.getCurrentTimeLocal
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateFirebaseColor
 import com.oyespace.guards.utils.FirebaseDBUtils.Companion.updateVisitorLog
-import com.squareup.picasso.Picasso
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -235,11 +235,11 @@ var purpose:String?=null
 
         tv_changefrom.setOnClickListener {
 
-
-            val d = Intent(this@StaffEntryRegistration, ServiceProviderListActivity::class.java)
+            Prefs.putString("CLASS","StaffEntryRegistration")
+            val d = Intent(this@StaffEntryRegistration, ChangeServiceProviderListActivity::class.java)
             d.putExtra(UNITID, intent.getStringExtra(UNITID))
             d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-             d.putExtra(ACCOUNT_ID, intent.getStringArrayExtra(ACCOUNT_ID))
+             d.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID,0))
             d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
             d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
             d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
@@ -248,6 +248,8 @@ var purpose:String?=null
             d.putExtra("RESIDENT_NUMBER", intent.getStringExtra("RESIDENT_NUMBER"))
             d.putExtra(UNITOCCUPANCYSTATUS, intent.getStringExtra(UNITOCCUPANCYSTATUS))
             d.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
+            d.putExtra("Base64",intent.getStringExtra("Base64"))
+            d.putExtra(ITEMS_PHOTO_LIST,intent.getStringArrayListExtra(ITEMS_PHOTO_LIST))
             startActivity(d)
             finish()
         }
@@ -362,26 +364,26 @@ var purpose:String?=null
 
             when (i) {
 
-                0 -> SPPrdImg1 = list[i]
-                1 -> SPPrdImg2 = list[i]
-                2 -> SPPrdImg3 = list[i]
-                3 -> SPPrdImg4 = list[i]
-                4 -> SPPrdImg5 = list[i]
-                5 -> SPPrdImg6 = list[i]
-                6 -> SPPrdImg7 = list[i]
-                7 -> SPPrdImg8 = list[i]
-                8 -> SPPrdImg9 = list[i]
-                9 -> SPPrdImg10 = list[i]
-                10 -> SPPrdImg11 = list[i]
-                11 -> SPPrdImg12 = list[i]
-                12 -> SPPrdImg13 = list[i]
-                13 -> SPPrdImg14 = list[i]
-                14 -> SPPrdImg15 = list[i]
-                15 -> SPPrdImg16 = list[i]
-                16 -> SPPrdImg17 = list[i]
-                17 -> SPPrdImg18 = list[i]
-                18 -> SPPrdImg19 = list[i]
-                19 -> SPPrdImg20 = list[i]
+                0 -> SPPrdImg1 =convertToBase64(list[i])
+                1 -> SPPrdImg2 = convertToBase64(list[i])
+                2 -> SPPrdImg3 = convertToBase64(list[i])
+                3 -> SPPrdImg4 = convertToBase64(list[i])
+                4 -> SPPrdImg5 = convertToBase64(list[i])
+                5 -> SPPrdImg6 = convertToBase64(list[i])
+                6 -> SPPrdImg7 = convertToBase64(list[i])
+                7 -> SPPrdImg8 = convertToBase64(list[i])
+                8 -> SPPrdImg9 = convertToBase64(list[i])
+                9 -> SPPrdImg10 = convertToBase64(list[i])
+                10 -> SPPrdImg11 = convertToBase64(list[i])
+                11 -> SPPrdImg12 = convertToBase64(list[i])
+                12 -> SPPrdImg13 = convertToBase64(list[i])
+                13 -> SPPrdImg14 = convertToBase64(list[i])
+                14 -> SPPrdImg15 = convertToBase64(list[i])
+                15 -> SPPrdImg16 = convertToBase64(list[i])
+                16 -> SPPrdImg17 = convertToBase64(list[i])
+                17 -> SPPrdImg18 = convertToBase64(list[i])
+                18 -> SPPrdImg19 = convertToBase64(list[i])
+                19 -> SPPrdImg20 = convertToBase64(list[i])
 
                 else -> { // Note the block
                     print("x is neither 1 nor 2")
@@ -389,7 +391,7 @@ var purpose:String?=null
 
                 }
             }
-            println(list[i])
+            println("List Image..."+list[i])
         }
 
         val mLayoutManager = GridLayoutManager(applicationContext, 2)
@@ -630,6 +632,7 @@ var purpose:String?=null
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
+
 
     private fun staffVisitorLog(
         unitId: String, personName: String, mobileNumb: String, desgn: String,
@@ -878,6 +881,14 @@ var purpose:String?=null
         })
 
 
+    }
+
+    fun convertToBase64(imagePath: String): String {
+        val bm = BitmapFactory.decodeFile(imagePath)
+        val baos = ByteArrayOutputStream()
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val byteArrayImage = baos.toByteArray()
+        return Base64.encodeToString(byteArrayImage, Base64.DEFAULT)
     }
 
 }

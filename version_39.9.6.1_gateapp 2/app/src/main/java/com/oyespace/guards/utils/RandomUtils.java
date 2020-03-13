@@ -141,6 +141,7 @@ public class RandomUtils {
 
         for (VisitorLog item : list) {
             if (item.getReRgVisID()==id) {
+                Log.v("ns nsd d f",item.getReRgVisID()+"..."+id);
                 return true;
             }
         }
@@ -184,4 +185,6 @@ public class RandomUtils {
             return null;
         }
     }
+
+
 }

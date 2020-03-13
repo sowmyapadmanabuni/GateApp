@@ -8,17 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
-import com.oyespace.guards.activity.BlockSelectionActivity
+import com.oyespace.guards.pojo.WorkerType
 import com.oyespace.guards.staff.StaffBlockSelectionActivity
 import com.oyespace.guards.staffManaualEntry.ManulBlockSelectionActivity
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
 
 
-class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context, val flowType: String) :
+class WorkersTypeListAdapter(val items: ArrayList<WorkerType>, val mcontext: Context, val flowType: String) :
     androidx.recyclerview.widget.RecyclerView.Adapter<WorkersTypeListAdapter.WorkerViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, p1: Int): WorkerViewHolder {
@@ -27,7 +26,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
 
     override fun onBindViewHolder(holder: WorkerViewHolder, position: Int) {
 
-        holder.tv_worktype.text=items[position]
+        holder.tv_worktype.text=items[position].wtDesgn
 
         if (Prefs.getString(TYPE, "").equals("Create")) {
             holder.lv_staff.setOnClickListener {
@@ -35,7 +34,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
                 val intent = Intent(mcontext, StaffBlockSelectionActivity::class.java)
                 intent.putExtra(FLOW_TYPE, flowType)
                 intent.putExtra(VISITOR_TYPE, "STAFF")
-                intent.putExtra(COMPANY_NAME, items[position])
+                intent.putExtra(COMPANY_NAME, items[position].wtDesgn)
                 mcontext.startActivity(intent)
                 (mcontext as Activity).finish()
             }
@@ -58,7 +57,7 @@ class WorkersTypeListAdapter(val items: ArrayList<String>, val mcontext: Context
                 d.putExtra("BIRTHDAY", mcontext.intent.getStringExtra("BIRTHDAY"))
                 d.putExtra(FLOW_TYPE, flowType)
                 d.putExtra(VISITOR_TYPE, "STAFF")
-                d.putExtra(COMPANY_NAME, items[position])
+                d.putExtra(COMPANY_NAME, items[position].wtDesgn)
                 d.putExtras(mcontext.intent)
                 mcontext.startActivity(d)
                 mcontext.finish()

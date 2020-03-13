@@ -5,13 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.util.Base64
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.*
@@ -19,10 +19,9 @@ import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.pojo.VendorType
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
-import com.squareup.picasso.Picasso
 
-class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorType>, private val unitId:String, private val unitNames:String, private val flowType:String, private val visitorType:String, private val mobileNumber:String, private val countryCode:String, private val unitAccountId:String) :
-    RecyclerView.Adapter<CompanyItemRVAdapter.ItemViewHolder>() {
+class ChangeCompanyItemRVAdapter(private val mcontext: Context, private val arrayList: ArrayList<VendorType>, private val unitId:String, private val unitNames:String, private val accountId: Int, private val mobileNumber:String, private val countryCode:String, private val flowType:String, private val visitorType:String, private val unitAccountId:String, private val personName:String, private val image:String, private val photoList: java.util.ArrayList<String>) :
+    RecyclerView.Adapter<ChangeCompanyItemRVAdapter.ItemViewHolder>() {
 
     var vendorName:String?=null
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -35,10 +34,9 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
 
          if (Prefs.getString(PrefKeys.LANGUAGE, null).equals("en")) {
-             vendorName=arrayList[position].vTypeEng
+             Toast.makeText(mcontext,arrayList[position].vTypeEng,Toast.LENGTH_LONG).show()
              holder.itemLabel.text = arrayList[position].vTypeEng
          }else{
-             vendorName=arrayList[position].vTypeHin
              holder.itemLabel.text = arrayList[position].vTypeHin
          }
 
@@ -47,6 +45,12 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
         holder.img_logo!!.setImageBitmap(decodedImage)
 
         holder.lv_itemrecyclerview.setOnClickListener {
+
+            if (Prefs.getString(PrefKeys.LANGUAGE, null).equals("en")) {
+                vendorName=arrayList[position].vTypeEng
+            }else{
+                vendorName=arrayList[position].vTypeHin
+            }
 
             if(vendorName.equals("Others")){
 
@@ -77,18 +81,23 @@ class CompanyItemRVAdapter(private val mcontext: Context, private val arrayList:
                 (mcontext as Activity).finish()
 
             }else{
-                val intent = Intent(mcontext, NameEntryScreen::class.java)
+                val intent = Intent(mcontext, StaffEntryRegistration::class.java)
                 intent.putExtra(UNITID, unitId)
                 intent.putExtra(UNITNAME, unitNames)
-                intent.putExtra(FLOW_TYPE, flowType)
-                intent.putExtra(VISITOR_TYPE, visitorType)
+                intent.putExtra(ACCOUNT_ID,accountId)
                 intent.putExtra(MOBILENUMBER, mobileNumber)
                 intent.putExtra(COUNTRYCODE, countryCode)
-                intent.putExtra(COMPANY_NAME, vendorName)
+                intent.putExtra(FLOW_TYPE, flowType)
+                intent.putExtra(VISITOR_TYPE, visitorType)
                 intent.putExtra(UNIT_ACCOUNT_ID,unitAccountId)
+                intent.putExtra(PERSONNAME, personName)
+                intent.putExtra("Base64",image)
+                intent.putExtra(ITEMS_PHOTO_LIST,photoList)
+                intent.putExtra(COMPANY_NAME, vendorName)
                 mcontext.startActivity(intent)
                 (mcontext as Activity).finish()
             }
+
 
 
 

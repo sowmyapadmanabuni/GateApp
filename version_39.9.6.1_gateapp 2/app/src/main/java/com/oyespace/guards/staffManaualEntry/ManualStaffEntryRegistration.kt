@@ -76,20 +76,22 @@ class ManualStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener 
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
 
-              //  getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra(UNITID), intent.getStringExtra(PERSONNAME),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(COMPANY_NAME),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra(UNITNAME))
+                getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID,0),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra(UNITID), intent.getStringExtra(PERSONNAME),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(COMPANY_NAME),intent.getIntExtra(ConstantUtils.WORKER_ID,0),intent.getStringExtra(UNITNAME))
 
-                if (LocalDb.getVisitorEnteredLog() != null) {
-                    if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
-                        Utils.showToast(
-                            this@ManualStaffEntryRegistration,
-                            "Duplicate Entry not allowed"
-                        )
-                    }
-                }else {
-
-                        visitorLog(intent.getStringExtra(UNITNAME), intent.getStringExtra(UNITID), intent.getStringExtra(UNIT_ACCOUNT_ID))
-
-                    }
+//                if (LocalDb.getVisitorEnteredLog() != null) {
+//
+//                    if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
+//                        Toast.makeText(this@ManualStaffEntryRegistration,"..222",Toast.LENGTH_LONG).show()
+//                        Utils.showToast(
+//                            this@ManualStaffEntryRegistration,
+//                            "Duplicate Entry not allowed"
+//                        )
+//                    }
+//                }else {
+//
+//                        visitorLog(intent.getStringExtra(UNITNAME), intent.getStringExtra(UNITID), intent.getStringExtra(UNIT_ACCOUNT_ID))
+//
+//                    }
 
                     //  visitorLog(intent.getStringExtra(UNITNAME),intent.getStringExtra(UNITID),intent.getStringExtra(UNIT_ACCOUNT_ID));
 

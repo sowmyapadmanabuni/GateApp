@@ -92,7 +92,7 @@ class ResidentOptionActivity : AppCompatActivity(), View.OnClickListener {
 
             }
             R.id.bt_missedcall->{
-                val i_staff = Intent(this@ResidentOptionActivity, ResidentMobileNumberScreenwithOTP::class.java)
+                val i_staff = Intent(this@ResidentOptionActivity, ResidentIdCardMobileNumberActivity::class.java)
                 startActivity(i_staff)
             }
             R.id.iv_torch->{

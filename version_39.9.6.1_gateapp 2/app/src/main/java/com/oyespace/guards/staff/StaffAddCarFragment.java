@@ -107,6 +107,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_PURPOSE;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
+import static com.oyespace.guards.utils.ConstantUtils.VisitorEntryFCM;
 import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
 import static com.oyespace.guards.utils.RandomUtils.encodeToBase64;
 import static com.oyespace.guards.utils.Utils.showToast;
@@ -516,34 +517,27 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
         BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
         Bitmap bitmap = drawable.getBitmap();
         encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
-
         RestClient restClient = RestClient.getInstance();
-
         StaffRegistrationReqJv loginReq = new StaffRegistrationReqJv();
-
         loginReq.ASAssnID = Prefs.getInt(ASSOCIATION_ID, 0);
         loginReq.BLBlockID = getIntent().getStringExtra(BLOCK_ID);
-//        loginReq.EmailID = "";
-//        loginReq.FLFloorID = 0;
-//        loginReq.OYEMemberID = 0;
-//        loginReq.OYEMemberRoleID = 0;
-
         loginReq.VNVendorID = 0;
         loginReq.WKDesgn = getIntent().getStringExtra(COMPANY_NAME);
         loginReq.WKFName = getIntent().getStringExtra(PERSONNAME);
         loginReq.WKIDCrdNo = "";
         loginReq.WKDOB = getIntent().getStringExtra("DOB");
         loginReq.WKISDCode = "";
-        //loginReq.WKISDCode = "+"+ getIntent().getStringExtra(COUNTRYCODE);
         loginReq.WKLName = "";
-
         loginReq.WKMobile = getIntent().getStringExtra(MOBILENUMBER);
         loginReq.WKWrkType = getIntent().getStringExtra(VISITOR_TYPE);
-        //loginReq.UNUnitID=toInteger( getIntent().getStringExtra(UNITID));
         loginReq.UNUnitID = getIntent().getStringExtra(UNITID);
-        // Toast.makeText(AddCarFragment.this,getIntent().getStringExtra(UNITID),Toast.LENGTH_LONG).show();
         loginReq.UNUniName = getIntent().getStringExtra(UNITNAME);
         loginReq.WKEntryImg = encodedImage;
+        loginReq.IDPrfType=getIntent().getStringExtra("DocumentType");
+        loginReq.IDPrfImg=getIntent().getStringExtra("DocumentImage");
+        loginReq.WKExpiry=getIntent().getStringExtra("DocumentExpiry");
+        loginReq.WKStatus=getIntent().getStringExtra("Status");
+        loginReq.WKExpDate=getIntent().getStringExtra("DocumentExpiryDate");
 
         Log.d("saveCheckPoints", "StaffEntry " + loginReq.ASAssnID + " " + loginReq.WKFName + " "
                 + loginReq.UNUnitID + " " + loginReq.WKMobile + " " + loginReq.UNUniName);
@@ -564,6 +558,22 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                     imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID, 0) + "STAFF" + workerResponce.data.worker.wkWorkID + ".jpg";
 
                  //   sendStaffImage(imgName, "", String.valueOf(workerResponce.data.worker.wkWorkID));
+
+                    Intent intent_ =new Intent(StaffAddCarFragment.this, BackgroundSyncReceiver.class);
+                    intent_.putExtra(BSR_Action, VisitorEntryFCM);
+                    intent_.putExtra("msg", getIntent().getStringExtra(PERSONNAME) + " from " + getIntent().getStringExtra(COMPANY_NAME) + " is coming to your home" + "(" + getIntent().getStringExtra(UNITNAME) + ")");
+                    intent_.putExtra("mobNum", getIntent().getStringExtra(MOBILENUMBER));
+                    intent_.putExtra("name", getIntent().getStringExtra(PERSONNAME));
+                    intent_.putExtra("nr_id", String.valueOf(workerResponce.data.worker.wkWorkID));
+                    intent_.putExtra("unitname", getIntent().getStringExtra(UNITNAME));
+                    intent_.putExtra("memType", "Owner");
+                    intent_.putExtra(UNITID, getIntent().getStringExtra(UNITID));
+                    intent_.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
+                    intent_.putExtra(UNIT_ACCOUNT_ID, "");
+                    intent_.putExtra("VLVisLgID",workerResponce.data.worker.wkWorkID);
+                    intent_.putExtra(VISITOR_TYPE, "Staff");
+                    intent_.putExtra(UNITOCCUPANCYSTATUS,"");
+                    sendBroadcast(intent_);
 
                     byte[] byteArray = null;
                     try {

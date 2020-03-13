@@ -138,7 +138,7 @@
                 android:layout_toRightOf="@+id/tv_from"
                 android:textColor="#0000FF"
                 android:layout_centerHorizontal="true"
-                android:visibility="gone"
+                android:visibility="visible"
                 android:textStyle="bold"
                 android:layout_marginLeft="20dp"
                 android:text="@string/tv_change"

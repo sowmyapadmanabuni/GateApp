@@ -9,8 +9,11 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.oyespace.guards.R;
 
+import java.util.ArrayList;
+
 public class ViewFullImageActivity extends AppCompatActivity {
 
+    ViewPagerAdapter viewPagerAdapter;
     ImageView iv_full;
     int pos;
     @Override
@@ -22,7 +25,12 @@ public class ViewFullImageActivity extends AppCompatActivity {
         Log.i("List", "Passed Array List :: " + pos);
 
         ViewPager viewPager = findViewById(R.id.viewpager);
-       viewPager.setAdapter(new ViewPagerAdapter(this));
+        ArrayList<String> ar1=getIntent().getExtras().getStringArrayList("ImageList");
+
+        Log.v("IMAGESDATA",ar1.get(0));
+
+        viewPagerAdapter=new ViewPagerAdapter(this,ar1);
+        viewPager.setAdapter(viewPagerAdapter);
        viewPager.setCurrentItem(pos);
 
     }

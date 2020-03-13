@@ -175,8 +175,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                 }
             }
         })
-        champApiInterface =
-            ChampApiClient.getClient().create(ChampApiInterface::class.java)
+        champApiInterface = ChampApiClient.getClient().create(ChampApiInterface::class.java)
         tv_name = findViewById(R.id.tv_name)
         tv_name!!.setText(intent.getStringExtra(ConstantUtils.PERSONNAME))
         txt_assn_name = findViewById(R.id.txt_assn_name)
@@ -499,8 +498,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
     fun getLatestRecordData(mobileNumber:String,accountId:String) {
         RetrofitClinet.instance.getLatestRecord(
             ConstantUtils.OYE247TOKEN,
-            mobileNumber,
-            LocalDb.getAssociation()!!.asAssnID.toString()
+            mobileNumber
         )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())

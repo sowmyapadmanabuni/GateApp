@@ -354,7 +354,6 @@ class BlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
 
                 }else {
-
                     val d = Intent(this@BlockSelectionActivity, ServiceProviderListActivity::class.java)
                     d.putExtra(UNITID, unitId)
                     d.putExtra(UNITNAME, unitNames)

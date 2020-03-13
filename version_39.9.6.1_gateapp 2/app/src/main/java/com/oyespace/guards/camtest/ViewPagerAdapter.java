@@ -21,11 +21,10 @@ public class ViewPagerAdapter extends PagerAdapter {
     ArrayList<String>imagesList;
 
 
-    public ViewPagerAdapter(Context context) {
+    public ViewPagerAdapter(Context context, ArrayList<String> ar1) {
 
         mContext = context;
-        imagesList=new ArrayList<>();
-        imagesList=AddCarFragment.list;
+        imagesList=ar1;
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 

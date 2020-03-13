@@ -129,26 +129,26 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                             Toast.makeText(this, "Duplicate Entry not allowed", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
-                         //   getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITNAME), intent.getStringExtra("Image"))
-                            if (LocalDb.getVisitorEnteredLog() != null) {
-                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
-                                    Utils.showToast(
-                                        this@MobileNumberforEntryScreen,
-                                        "Duplicate Entry not allowed"
-                                    )
-                                }
-                            }else {
-
-                                    visitorLog(
-                                        intent.getStringExtra(UNITID),
-                                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
-                                        intent.getStringExtra(MOBILENUMBER),
-                                        intent.getStringExtra("DESIGNATION"),
-                                        intent.getStringExtra("WORKTYPE"),
-                                        intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
-                                        intent.getStringExtra(UNITNAME)
-                                    )
-                                }
+                           getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID), intent.getStringExtra("FIRSTNAME"), intent.getStringExtra(MOBILENUMBER), intent.getStringExtra("DESIGNATION"), intent.getStringExtra("WORKTYPE"), intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITNAME), intent.getStringExtra("Image"))
+//                            if (LocalDb.getVisitorEnteredLog() != null) {
+//                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
+//                                    Utils.showToast(
+//                                        this@MobileNumberforEntryScreen,
+//                                        "Duplicate Entry not allowed"
+//                                    )
+//                                }
+//                            }else {
+//
+//                                    visitorLog(
+//                                        intent.getStringExtra(UNITID),
+//                                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+//                                        intent.getStringExtra(MOBILENUMBER),
+//                                        intent.getStringExtra("DESIGNATION"),
+//                                        intent.getStringExtra("WORKTYPE"),
+//                                        intent.getIntExtra(ConstantUtils.WORKER_ID, 0),
+//                                        intent.getStringExtra(UNITNAME)
+//                                    )
+//                                }
 
 
 

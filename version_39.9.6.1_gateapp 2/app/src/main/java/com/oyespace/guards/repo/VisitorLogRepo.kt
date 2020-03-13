@@ -220,6 +220,10 @@ class VisitorLogRepo {
                                 s += "$vLogId,"
                                 Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
+                                if (!visitor.vlVisType.contains(STAFF)) {
+
+
+
 //                                val intentAction1 = Intent(context, BackgroundSyncReceiver::class.java)
 //                                intentAction1.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
 //                                context.sendBroadcast(intentAction1)
@@ -227,10 +231,6 @@ class VisitorLogRepo {
                                 val gateName = Prefs.getString(GATE_NO, null)
                                 try {
                                     var message = "${visitor.vlfName} from ${visitor.vlComName} has exited ${assName} from $gateName"
-                                    if (visitor.vlVisType.contains(STAFF)) {
-                                        message = "${visitor.vlfName} has exited ${assName} from $gateName"
-                                    }
-
                                 if (status == ConstantUtils.EXITED) {
                                     try {
                                         if (visitor.isValid) {
@@ -257,7 +257,7 @@ class VisitorLogRepo {
                                 }catch (e:IllegalStateException){
 
                                 }
-
+                                }
 
                             }
                         }

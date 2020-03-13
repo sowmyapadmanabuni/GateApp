@@ -1063,34 +1063,14 @@ data class GetVerifyOTPResponse(
 
 data class Data(
     val accessToken: String,
-    val account: Account1,
+    val account: OTPAccount,
     val member: List<Member>
 )
 
-data class Member(
+data class OTPAccount(
     val acAccntID: Int,
-    val acMobile: String,
-    val asAssnID: Int,
-    val meIsActive: Boolean,
-    val meMemID: Int,
-    val mePhName: String,
-    val meVisATyp: String,
-    val medCreated: String,
-    val medUpdated: String,
-    val medndStat: Boolean,
-    val medndStop: String,
-    val medndStrt: String,
-    val melvaGrd: Boolean,
-    val melvagSrt: String,
-    val melvagStp: String,
-    val meosDate: String,
-    val meuMemShp: Boolean,
-    val mrmRoleID: Int,
-    val unUnitID: String
-)
-
-data class Account1(
-    val acAccntID: Int,
+    val acCrtyCode: String,
+    val acCrtyCode1: String,
     val acE1Vfied: Boolean,
     val acE2Vfied: Boolean,
     val acE3Vfied: Boolean,
@@ -1100,6 +1080,7 @@ data class Account1(
     val acEmail2: String,
     val acEmail3: String,
     val acEmail4: String,
+    val acImgName: String,
     val acIsActive: Boolean,
     val acM1Vfied: Boolean,
     val acM2Vfied: Boolean,
@@ -1122,6 +1103,101 @@ data class Account1(
     val aclName: String,
     val acmVfied: Boolean
 )
+
+data class Member(
+    val acAccntID: Int,
+    val acMobile: String,
+    val asAsnName: String,
+    val asAssnID: Int,
+    val association: Any,
+    val meIsActive: Boolean,
+    val meJoinStat: String,
+    val meMemID: Int,
+    val mePhName: String,
+    val meReason: String,
+    val meVisATyp: String,
+    val medCreated: String,
+    val medUpdated: String,
+    val medndStat: Boolean,
+    val medndStop: String,
+    val medndStrt: String,
+    val melvaGrd: Boolean,
+    val melvagSrt: String,
+    val melvagStp: String,
+    val meosDate: String,
+    val meuMemShp: Boolean,
+    val mrmRoleID: Int,
+    val unUniName: String,
+    val unUnitID: Int,
+    val unit: Any
+)
+//data class GetVerifyOTPResponse(
+//    val apiVersion: String,
+//    val `data`: Data,
+//    val success: Boolean
+//)
+//
+//data class Data(
+//    val accessToken: String,
+//    val account: Account1,
+//    val member: List<Member>
+//)
+//
+//data class Member(
+//    val acAccntID: Int,
+//    val acMobile: String,
+//    val asAssnID: Int,
+//    val meIsActive: Boolean,
+//    val meMemID: Int,
+//    val mePhName: String,
+//    val meVisATyp: String,
+//    val medCreated: String,
+//    val medUpdated: String,
+//    val medndStat: Boolean,
+//    val medndStop: String,
+//    val medndStrt: String,
+//    val melvaGrd: Boolean,
+//    val melvagSrt: String,
+//    val melvagStp: String,
+//    val meosDate: String,
+//    val meuMemShp: Boolean,
+//    val mrmRoleID: Int,
+//    val unUnitID: String
+//)
+//
+//data class Account1(
+//    val acAccntID: Int,
+//    val acE1Vfied: Boolean,
+//    val acE2Vfied: Boolean,
+//    val acE3Vfied: Boolean,
+//    val acE4Vfied: Boolean,
+//    val acEmail: String,
+//    val acEmail1: String,
+//    val acEmail2: String,
+//    val acEmail3: String,
+//    val acEmail4: String,
+//    val acIsActive: Boolean,
+//    val acM1Vfied: Boolean,
+//    val acM2Vfied: Boolean,
+//    val acM3Vfied: Boolean,
+//    val acM4Vfied: Boolean,
+//    val acMobile: String,
+//    val acMobile1: String,
+//    val acMobile2: String,
+//    val acMobile3: String,
+//    val acMobile4: String,
+//    val acdCreated: String,
+//    val acdUpdated: String,
+//    val aceVfied: Boolean,
+//    val acfName: String,
+//    val acisdCode: String,
+//    val acisdCode1: String,
+//    val acisdCode2: String,
+//    val acisdCode3: String,
+//    val acisdCode4: String,
+//    val aclName: String,
+//    val acmVfied: Boolean
+//)
 
 // FCM request body
 data class VisitorEntryFCMReq(
@@ -1529,13 +1605,13 @@ data class SendStaffImageRes(
 data class StaffEditRequest(
     val WKFName: String,
     val WKMobile: String,
-    val WKImgName: String,
     val WKWrkType: String,
     val WKDesgn: String,
     val WKIDCrdNo: String,
     val WKDOB: String,
     val WKIsActive: Boolean,
-    val WKWorkID: Int
+    val WKWorkID: Int,
+    val WKEntryImg: String
 )
 
 
@@ -2011,84 +2087,6 @@ data class UpdateApprovalStatus(
     val VLExAprdBy: String
 )
 
-//get latest record
-//data class GetLatestRecord(
-//    val apiVersion: String,
-//    val `data`: VisitorLatestRecord,
-//    val success: Boolean
-//)
-//
-//data class VisitorLatestRecord(
-//
-//    val acAccntID: String,
-//    val asAssnID: Int,
-//    val endDate: String,
-//    val fmid: Int,
-//    val meMemID: Int,
-//    val reRgVisID: Int,
-//    val spPrdImg1: String,
-//    val spPrdImg10: String,
-//    val spPrdImg11: String,
-//    val spPrdImg12: String,
-//    val spPrdImg13: String,
-//    val spPrdImg14: String,
-//    val spPrdImg15: String,
-//    val spPrdImg16: String,
-//    val spPrdImg17: String,
-//    val spPrdImg18: String,
-//    val spPrdImg19: String,
-//    val spPrdImg2: String,
-//    val spPrdImg20: String,
-//    val spPrdImg3: String,
-//    val spPrdImg4: String,
-//    val spPrdImg5: String,
-//    val spPrdImg6: String,
-//    val spPrdImg7: String,
-//    val spPrdImg8: String,
-//    val spPrdImg9: String,
-//    val startDate: String,
-//    val unUniName: String,
-//    val unUnitID: String,
-//    val vlApprStat: String,
-//    val vlApprdBy: String,
-//    val vlCmntImg: String,
-//    val vlCmnts: String,
-//    val vlComName: String,
-//    val vlEntryGPS: String,
-//    val vlEntryImg: String,
-//    val vlEntryT: String,
-//    val vlEntyWID: Int,
-//    val vlExitGPS: String,
-//    val vlExitImg: String,
-//    val vlExitT: String,
-//    val vlExitWID: Int,
-//    val vlGtName: String,
-//    val vlIsActive: Boolean,
-//    val vlItmCnt: Int,
-//    val vlMobile: String,
-//    val vlPrmBy: String,
-//    val vlPrmStat: String,
-//    val vlSelfImg: String,
-//    val vlVehNum: String,
-//    val vlVehType: String,
-//    val vlVenImg: String,
-//    val vlVenName: String,
-//    val vlVerStat: String,
-//    val vlVisCnt: Int,
-//    val vlVisLgID: Int,
-//    val vlVisType: String,
-//    val vlVoiceNote: String,
-//    val vldCreated: String,
-//    val vldUpdated: String,
-//    val vlengName: String,
-//    val vlexgName: String,
-//    val vlfName: String,
-//    val vllName: String,
-//    val vlpOfVis: String,
-//    val vlsActTm: String
-//)
-
-
 data class IVRBody(
     val CallID: String,
     val VLVisLgID: String,
@@ -2096,6 +2094,37 @@ data class IVRBody(
     val TypeOfVisit:String
 )
 
+//getVendorTypes
+data class VendorTypes<T>(
+    val apiVersion: String,
+    val `data`: VendorData,
+    val success: Boolean
+)
 
+data class VendorData(
+    val vendorTypes: ArrayList<VendorType>
+)
 
+data class VendorType(
+    val vTypeEng: String,
+    val vTypeHin: String,
+    val vtImg: String,
+    val vtid: Int
+)
+//getWorkerTypes
+data class WorkerTypes<T>(
+    val apiVersion: String,
+    val `data`: WorkerTypeData,
+    val success: Boolean
+)
+
+data class WorkerTypeData(
+    val workerTypes: ArrayList<WorkerType>
+)
+
+data class WorkerType(
+    val wtDesgn: String,
+    val wtIsActive: Boolean,
+    val wtid: Int
+)
 

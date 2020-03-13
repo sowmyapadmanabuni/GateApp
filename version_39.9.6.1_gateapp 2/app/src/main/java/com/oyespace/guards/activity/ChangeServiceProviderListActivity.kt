@@ -9,7 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
-import com.oyespace.guards.adapter.CompanyItemRVAdapter
 import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.pojo.VendorPojo
 import com.oyespace.guards.utils.ConstantUtils
@@ -21,6 +20,7 @@ import android.os.Build
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import com.oyespace.guards.adapter.ChangeCompanyItemRVAdapter
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.VendorType
@@ -32,7 +32,7 @@ import kotlinx.android.synthetic.main.activity_service_provider_list.*
 import kotlinx.android.synthetic.main.header_with_next.*
 
 
-class ServiceProviderListActivity : BaseKotlinActivity() {
+class ChangeServiceProviderListActivity : BaseKotlinActivity() {
 
     var iv_torch: Button?=null
     var clickable1 = 0
@@ -157,7 +157,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
         //  getServiceProviderList()
         val rv_serviceProvider = findViewById<RecyclerView>(R.id.rv_serviceProvider)
         rv_serviceProvider.setHasFixedSize(true)
-        val gridLayoutManager = GridLayoutManager(this@ServiceProviderListActivity, 3)
+        val gridLayoutManager = GridLayoutManager(this@ChangeServiceProviderListActivity, 3)
         rv_serviceProvider.layoutManager = gridLayoutManager
 
 //        val data: ArrayList<VendorPojo> = prepareData()
@@ -219,7 +219,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
                 override fun onSuccessResponse(getdata: VendorTypes<ArrayList<VendorType>>) {
 
-                    val adapter = CompanyItemRVAdapter( this@ServiceProviderListActivity,getdata.data.vendorTypes,intent.getStringExtra(UNITID),intent.getStringExtra(UNITNAME),intent.getStringExtra(FLOW_TYPE),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(MOBILENUMBER),"+91",intent.getStringExtra(UNIT_ACCOUNT_ID))
+                    val adapter = ChangeCompanyItemRVAdapter( this@ChangeServiceProviderListActivity,getdata.data.vendorTypes,intent.getStringExtra(UNITID),intent.getStringExtra(UNITNAME),intent.getIntExtra(ACCOUNT_ID,0),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(FLOW_TYPE),intent.getStringExtra(VISITOR_TYPE),intent.getStringExtra(UNIT_ACCOUNT_ID),intent.getStringExtra(PERSONNAME),intent.getStringExtra("Base64"),intent.getStringArrayListExtra(ITEMS_PHOTO_LIST))
                     rv_serviceProvider.adapter = adapter
 
                 }
@@ -229,7 +229,7 @@ class ServiceProviderListActivity : BaseKotlinActivity() {
 
                 override fun noNetowork() {
                     Toast.makeText(
-                        this@ServiceProviderListActivity,
+                        this@ChangeServiceProviderListActivity,
                         "No network call ",
                         Toast.LENGTH_LONG
                     ).show()

@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.CountDownTimer
 import android.os.Handler
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -293,9 +294,33 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
 //                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 //                holder.iv_user.setImageBitmap(decodedImage)
 
-            val imageAsBytes = android.util.Base64.decode(visitor.vlEntryImg,android.util.Base64.DEFAULT);
-            val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
-            holder.iv_user.setImageBitmap(decodedImage)
+
+            if(visitor.vlEntryImg.contains("PERSON")) {
+                val url = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
+
+                GetImageFromUrl(holder.iv_user).execute(url);
+
+            }else
+                if((visitor.vlEntryImg.equals("")) ) {
+                    //|| (!staffdata.wkEntryImg.contains("PERSON"))
+                    holder.iv_user.setBackgroundResource(R.drawable.user_icon_black);
+                } else if(visitor.vlEntryImg.contains(".")){
+                    val v = visitor.vlEntryImg.substring(0,visitor.vlEntryImg.indexOf("."))
+                    if(!v.contains("PERSON"))
+                    {
+                        holder.iv_user.setBackgroundResource(R.drawable.user_icon_black);
+                    }
+                }
+
+                else{
+                    val imageBytes = Base64.decode(visitor.vlEntryImg, Base64.DEFAULT)
+                    val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                    holder.iv_user!!.setImageBitmap(decodedImage)
+                }
+
+//            val imageAsBytes = android.util.Base64.decode(visitor.vlEntryImg,android.util.Base64.DEFAULT);
+//            val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+//            holder.iv_user.setImageBitmap(decodedImage)
 
             Log.i("taaag", "loading image $imgPath")
 //            Glide.with(mcontext)

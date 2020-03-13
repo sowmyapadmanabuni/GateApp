@@ -20,13 +20,11 @@ import com.oyespace.guards.R
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.models.ExitVisitorLog
 import com.oyespace.guards.repo.VisitorLogRepo
-import com.oyespace.guards.utils.AppUtils
+import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
-import com.oyespace.guards.utils.DateTimeUtils
 import com.oyespace.guards.utils.DateTimeUtils.*
-import com.oyespace.guards.utils.Prefs
-import com.oyespace.guards.utils.TaptoCallApi
 import com.squareup.picasso.Picasso
+import android.util.Base64
 import java.util.*
 
 class VistorOutListAdapter(
@@ -213,22 +211,31 @@ class VistorOutListAdapter(
 
         var imgPath = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
 
-//        if (visitor.vlVisType.contains("STAFF", true)) {
-//
-//            if (visitor.vlEntryImg.isEmpty()) {
-//                imgPath = IMAGE_BASE_URL + "Images/PERSON" + "STAFF" + visitor.reRgVisID + ".jpg"
-//            }
-//
-//        }
-//
-//        if (refreshImages) {
-//            Picasso.with(mcontext).invalidate(imgPath)
-//        }
+
+        if(visitor.vlEntryImg.contains("PERSON")) {
+            val url = IMAGE_BASE_URL + "Images/" + visitor.vlEntryImg
+
+            GetImageFromUrl(holder.iv_user).execute(url);
+
+        }else
+            if((visitor.vlEntryImg.equals("")) ) {
+                //|| (!staffdata.wkEntryImg.contains("PERSON"))
+                holder.iv_user.setBackgroundResource(R.drawable.user_icon_black);
+            } else if(visitor.vlEntryImg.contains(".")){
+                val v = visitor.vlEntryImg.substring(0,visitor.vlEntryImg.indexOf("."))
+                if(!v.contains("PERSON"))
+                {
+                    holder.iv_user.setBackgroundResource(R.drawable.user_icon_black);
+                }
+            }
+
+            else{
+                val imageBytes = Base64.decode(visitor.vlEntryImg, Base64.DEFAULT)
+                val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                holder.iv_user!!.setImageBitmap(decodedImage)
+            }
 
 
-        val imageAsBytes = android.util.Base64.decode(visitor.vlEntryImg,android.util.Base64.DEFAULT);
-        val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
-        holder.iv_user.setImageBitmap(decodedImage)
 
         holder.iv_user.setOnClickListener {
             try {

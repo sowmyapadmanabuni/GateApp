@@ -11,10 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
@@ -89,65 +86,29 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
 
 
 //    try {
+
         if(staffdata.wkEntryImg.contains("PERSON")) {
             val url = IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg
 
-            GetImageFromUrl(holder.iv_staff).execute(url);
-        }else if(staffdata.wkEntryImg.equals("")){
+         GetImageFromUrl(holder.iv_staff).execute(url);
+
+        }else
+            if((staffdata.wkEntryImg.equals("")) ) {
+                //|| (!staffdata.wkEntryImg.contains("PERSON"))
             holder.iv_staff.setBackgroundResource(R.drawable.user_icon_black);
+        } else if(staffdata.wkEntryImg.contains(".")){
+            val v = staffdata.wkEntryImg.substring(0,staffdata.wkEntryImg.indexOf("."))
+                if(!v.contains("PERSON"))
+                {
+                    holder.iv_staff.setBackgroundResource(R.drawable.user_icon_black);
+                }
         }
+
         else{
             val imageBytes = Base64.decode(staffdata.wkEntryImg, Base64.DEFAULT)
             val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
             holder.iv_staff!!.setImageBitmap(decodedImage)
         }
-//            Thread(Runnable {
-//                // performing some dummy time taking operation
-//                var i=0;
-//                while(i<Int.MAX_VALUE){
-//                    i++
-//                }
-//
-//
-//                val image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-//
-//                encodedImage = RandomUtils.encodeToBase64(image, Bitmap.CompressFormat.JPEG, 100)
-//                val imageBytes = Base64.decode(encodedImage, Base64.DEFAULT)
-//                val decodedImage =
-//                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-//                holder.iv_staff!!.setImageBitmap(decodedImage)
-//            }).start()
-//
-//
-//
-//
-//        }
-//
-////            Thread({
-////
-////
-////                val image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-////
-////                encodedImage = RandomUtils.encodeToBase64(image, Bitmap.CompressFormat.JPEG, 100)
-////                val imageBytes = Base64.decode(encodedImage, Base64.DEFAULT)
-////                val decodedImage =
-////                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-////                holder.iv_staff!!.setImageBitmap(decodedImage)
-////            }).start()
-//
-//      //  }
-//        else {
-//            val imageBytes = Base64.decode(staffdata.wkEntryImg, Base64.DEFAULT)
-//            val decodedImage =
-//                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-//            holder.iv_staff!!.setImageBitmap(decodedImage)
-//        }
-//    }catch (e:IllegalStateException){
-//
-//    }
-
-
-
 //        Picasso.with(mcontext)
 //            .load(IMAGE_BASE_URL + "Images/" + staffdata.wkEntryImg)
 //            .placeholder(R.drawable.placeholder_dark_potrait)
@@ -179,7 +140,6 @@ if(staffdata.isValid){
         }
 
         holder.iv_edit.setOnClickListener {
-            if(staffdata.isValid) {
 
                 val intent = Intent(mcontext, EditStaffActivity::class.java)
 
@@ -197,7 +157,7 @@ if(staffdata.isValid){
                 // (mcontext as Activity).startActivityForResult(intent, 2)
                 mcontext.startActivity(intent)
                 (mcontext as Activity).finish()
-            }
+
         }
 
         holder.iv_call.setOnClickListener {
@@ -228,17 +188,19 @@ if(staffdata.isValid){
                 val pdCanceller = Handler()
                 pdCanceller.postDelayed(progressRunnable, 3000)
 
-                val d = Intent(mcontext, Biometric::class.java)
-                d.putExtra(WORKER_ID, staffdata.wkWorkID)
-                d.putExtra(PERSONNAME, staffdata.wkfName + " " + staffdata.wklName)
-                d.putExtra(UNITID, staffdata.unUnitID)
-                d.putExtra(UNITNAME, staffdata.unUniName)
-                d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
-                d.putExtra(VISITOR_TYPE, "STAFF")
-                d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
-                d.putExtra(COUNTRYCODE, "")
-                d.putExtra(MOBILENUMBER, staffdata.wkMobile)
-                mcontext.startActivity(d)
+                if(staffdata.isValid) {
+                    val d = Intent(mcontext, Biometric::class.java)
+                    d.putExtra(WORKER_ID, staffdata.wkWorkID)
+                    d.putExtra(PERSONNAME, staffdata.wkfName + " " + staffdata.wklName)
+                    d.putExtra(UNITID, staffdata.unUnitID)
+                    d.putExtra(UNITNAME, staffdata.unUniName)
+                    d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+                    d.putExtra(VISITOR_TYPE, "STAFF")
+                    d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
+                    d.putExtra(COUNTRYCODE, "")
+                    d.putExtra(MOBILENUMBER, staffdata.wkMobile)
+                    mcontext.startActivity(d)
+                }
 
             }
 

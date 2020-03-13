@@ -310,6 +310,13 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         }else if(intent.getStringExtra("IMAGE").equals("")){
             iv_personphoto!!.setBackgroundResource(R.drawable.user_icon_black);
         }
+        else if(intent.getStringExtra("IMAGE").contains(".")){
+            val v = intent.getStringExtra("IMAGE").substring(0,intent.getStringExtra("IMAGE").indexOf("."))
+            if(!v.contains("PERSON"))
+            {
+                iv_personphoto!!.setBackgroundResource(R.drawable.user_icon_black);
+            }
+        }
         else{
             val imageBytes = Base64.decode(intent.getStringExtra("IMAGE"), Base64.DEFAULT)
             val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
@@ -318,7 +325,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
 
 //        Picasso.with(this@EditStaffActivity)
 //            .load(
-//                IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE")
+//                IMAGE_BASE_URL + "Images/" + intent.getStringExtra("IMAGE\")
 //            )
 //            .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black)
 //            .into(iv_personphoto)
@@ -414,7 +421,7 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
         }
 
         val req = StaffEditRequest(
-            WKFName, mobile, WKImgName, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID
+            WKFName, mobile, WKWrkType, WKDesgn, WKIDCrdNo, WKDOB, WKIsActive, WKWorkID, WKImgName
 
         )
 
@@ -427,6 +434,19 @@ class EditStaffActivity : BaseKotlinActivity(), AdapterView.OnItemSelectedListen
                         if (globalApiObject.success == true) {
 
                             dismissProgress()
+
+                            val intent = Intent(this@EditStaffActivity, EditBiometric::class.java)
+                            intent.putExtra(WORKER_ID, WKWorkID)
+                            intent.putExtra(PERSONNAME, WKFName)
+                            intent.putExtra(UNITID, getIntent().getStringExtra(UNITID))
+                            intent.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME))
+                            intent.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+                            intent.putExtra(VISITOR_TYPE, "STAFF")
+                            intent.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME))
+                            intent.putExtra(COUNTRYCODE, "")
+                            intent.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER))
+                            startActivity(intent)
+                            finish()
                             if (imgName != null) {
 
                                 var byteArray: ByteArray? = null

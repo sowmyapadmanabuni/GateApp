@@ -204,7 +204,11 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                                 ccd = number.substring(0, 3)
 
-                                mobileNumber = number.substring(3, 13)
+                                try {
+                                    mobileNumber = number.substring(3, 13)
+                                }catch (e:StringIndexOutOfBoundsException){
+
+                                }
                                 // endCall(this@MobileNumberScreen)
 
                             }
@@ -370,7 +374,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                             val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
                             d.putExtra(FLOW_TYPE, DELIVERY)
                             d.putExtra(VISITOR_TYPE, DELIVERY)
-                            d.putExtra(MOBILENUMBER, MobNumber)
+                            d.putExtra(MOBILENUMBER, MobNumber.substring(3))
                             d.putExtra(COUNTRYCODE, isdCode)
                             startActivity(d)
                             finish()
@@ -476,7 +480,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
     }
 
     fun getLatestRecordData(mobileNumber:String,accountId:String,isdCode: String) {
-        RetrofitClinet.instance.getLatestRecord(OYE247TOKEN,mobileNumber, LocalDb.getAssociation()!!.asAssnID.toString())
+        RetrofitClinet.instance.getLatestRecord(OYE247TOKEN,mobileNumber)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<GetLatestRecord>() {

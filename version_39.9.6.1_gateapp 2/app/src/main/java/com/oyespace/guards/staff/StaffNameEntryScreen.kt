@@ -63,7 +63,7 @@ class StaffNameEntryScreen : BaseKotlinActivity() , View.OnClickListener {
                         Toast.makeText(this, "Select DOB", Toast.LENGTH_SHORT).show()
                     }
                     else{
-                        val d = Intent(this@StaffNameEntryScreen, StaffAddCarFragment::class.java)
+                        val d = Intent(this@StaffNameEntryScreen, StaffDocumentsUploadActivity::class.java)
                         d.putExtra(UNITID,intent.getStringExtra(UNITID) )
                         d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
                         d.putExtra(FLOW_TYPE,intent.getStringExtra(FLOW_TYPE))

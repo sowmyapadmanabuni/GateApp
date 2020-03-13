@@ -16,4 +16,11 @@ public class StaffRegistrationReqJv {
     public int ASAssnID;
     public String UNUnitID;
     public String UNUniName ;
+    public String IDPrfType;
+    public String IDPrfImg;
+    public String WKExpiry;
+    public String WKStatus;
+    public String WKExpDate;
 }
+
+

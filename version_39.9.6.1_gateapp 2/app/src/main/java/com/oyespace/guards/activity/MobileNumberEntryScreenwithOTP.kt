@@ -585,39 +585,35 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                             // getAccountDetails(countryCode.toString(), phone.toString());
 
-                            if (LocalDb.getVisitorEnteredLog() != null) {
-                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
-                                    Utils.showToast(
-                                        this@MobileNumberEntryScreenwithOTP,
-                                        "Duplicate Entry not allowed"
-                                    )
-                                }
-                            }else {
+                            getVisitorByWorkerId(Prefs.getInt(ASSOCIATION_ID, 0),intent.getIntExtra(ConstantUtils.WORKER_ID, 0), intent.getStringExtra(UNITID),  intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),intent.getStringExtra(MOBILENUMBER),intent.getStringExtra("DESIGNATION"),intent.getStringExtra("WORKTYPE"),intent.getIntExtra(WORKER_ID, 0),intent.getStringExtra(UNITNAME), intent.getStringExtra("Image"))
 
-
-                                    visitorLog(
-                                        intent.getStringExtra(UNITID),
-                                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
-                                        intent.getStringExtra(MOBILENUMBER),
-                                        intent.getStringExtra("DESIGNATION"),
-                                        intent.getStringExtra("WORKTYPE"),
-                                        intent.getIntExtra(WORKER_ID, 0),
-                                        intent.getStringExtra(UNITNAME)
-                                    )
-
-                                    buttonNext.isEnabled = false
-                                    buttonNext.isClickable = false
-
-                                }
-
-
-                        }else {
-
-
-                            //Utils.showToast(applicationContext, globalApiObject.apiVersion)
-
-
-                        }
+//                            if (LocalDb.getVisitorEnteredLog() != null) {
+//                                if (RandomUtils.contain(LocalDb.getVisitorEnteredLog(), intent.getIntExtra(ConstantUtils.WORKER_ID, 0))) {
+//                                    Utils.showToast(
+//                                        this@MobileNumberEntryScreenwithOTP,
+//                                        "Duplicate Entry not allowed"
+//                                    )
+//                                }
+//                            }else {
+//
+//
+//                                    visitorLog(
+//                                        intent.getStringExtra(UNITID),
+//                                        intent.getStringExtra("FIRSTNAME") + " " + intent.getStringExtra("LASTNAME"),
+//                                        intent.getStringExtra(MOBILENUMBER),
+//                                        intent.getStringExtra("DESIGNATION"),
+//                                        intent.getStringExtra("WORKTYPE"),
+//                                        intent.getIntExtra(WORKER_ID, 0),
+//                                        intent.getStringExtra(UNITNAME)
+//                                    )
+//
+//                                    buttonNext.isEnabled = false
+//                                    buttonNext.isClickable = false
+//
+//                                }
+//
+//
+                       }
                     }
 
                     override fun onErrorResponse(e: Throwable) {
