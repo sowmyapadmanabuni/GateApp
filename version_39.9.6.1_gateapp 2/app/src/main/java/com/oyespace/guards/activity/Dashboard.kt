@@ -1843,7 +1843,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 d.putExtra(UNIT_ACCOUNT_ID, parsedVisitor.getString(UNIT_ACCOUNT_ID))
                 d.putExtra("VLVisLgID", parsedVisitor.getInt("VLVisLgID"))
                 d.putExtra(VISITOR_TYPE, parsedVisitor.getString(VISITOR_TYPE))
-                d.putExtra(UNITOCCUPANCYSTATUS, parsedVisitor.getString(UNITOCCUPANCYSTATUS))
+                //d.putExtra(UNITOCCUPANCYSTATUS, parsedVisitor.getString(UNITOCCUPANCYSTATUS))
                 sendBroadcast(d)
            // }
 
@@ -1879,7 +1879,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                 if (mob.contains("+91")) {
                                     mob = mob.replace("+91", "");
                                 }
-                                //if(mob.contains("700")) {
+                                //if(mob.contains("8072262742")) {
                                 sendIVRCall(mob, visitorLogId, type);//mob
                                 //}
                             }
@@ -1908,11 +1908,15 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
 
     fun sendIVRCall(phone:String, visitorLogId:String, type:String) {
+        var mob = phone;
+        if (mob.contains("+91")) {
+            mob = mob.replace("+91", "");
+        }
 
         Executors.newSingleThreadExecutor().execute({
 
-            Log.e("PHONE_ZEOTEL",""+phone);
-            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+phone+"&ri=60&rc=3&user_vars=&tl=&df=json")
+            Log.e("PHONE_ZEOTEL",""+mob);
+            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+mob+"&ri=60&rc=3&df=json")
 
             with(url.openConnection() as HttpURLConnection) {
                 requestMethod = "GET"  // optional default is GET
@@ -1921,7 +1925,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
                 inputStream.bufferedReader().use {
                     it.lines().forEach { line ->
-                        Log.e("REDING_ZEOTEL",""+line)
+                        Log.e("REDING_ZEOTEL",""+line+" - "+mob)
                         //{status:0, status_str:'OK', callid:'7JZnfKAgVYHrpNpVjxZpHA'}
                         val response = ""+line;
                         val jsonStr = response.replace("'","\"")
