@@ -9,7 +9,7 @@
                     android:id="@+id/rl_block_header"
                     android:layout_gravity="center_vertical"
                     android:gravity="center_vertical"
-                    android:background="@color/orange">
+                    android:background="@color/end_gradient">
 
         <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/header_subtitle"

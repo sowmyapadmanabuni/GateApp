@@ -5,7 +5,6 @@ public class StaffRegistrationReqJv {
     public String WKLName;
     public String WKMobile;
     public String WKISDCode;
-    public String WKEntryImg;
     public String  WKEntryGPS;
     public String WKWrkType;
     public String WKDesgn;
@@ -17,10 +16,12 @@ public class StaffRegistrationReqJv {
     public String UNUnitID;
     public String UNUniName ;
     public String IDPrfType;
-    public String IDPrfImg;
     public String WKExpiry;
     public String WKStatus;
     public String WKExpDate;
+    public String WKVehNo;
+    public String WKEntryImg;
+    //public String IDPrfImg;
 }
 
 

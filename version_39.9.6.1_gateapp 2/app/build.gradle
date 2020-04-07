@@ -37,7 +37,7 @@ android {
         minSdkVersion 26
         targetSdkVersion 28
         versionCode 65
-        versionName "10.19D"
+        versionName "10.19V"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 

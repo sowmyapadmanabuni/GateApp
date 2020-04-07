@@ -34,6 +34,7 @@
                 android:id="@+id/r1"
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
+                android:visibility="gone"
                 android:layout_below="@+id/rl_header"
                 android:background="@color/orange" />
         <!-- HEADER END -->
@@ -85,7 +86,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:text="Resident Details"
-                        android:textColor="@color/orangedark" />
+                        android:textColor="@color/end_gradient" />
 
                 <TextView
                         android:id="@+id/sos_username"
@@ -127,7 +128,7 @@
                     android:layout_height="wrap_content"
                     android:text="Emergency Contacts"
                     android:textAlignment="center"
-                    android:textColor="@color/orangedark"
+                    android:textColor="@color/end_gradient"
                     android:textSize="18sp" />
 
 

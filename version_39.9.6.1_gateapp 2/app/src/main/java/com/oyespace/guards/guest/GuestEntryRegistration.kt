@@ -1,11 +1,13 @@
 package com.oyespace.guards.guest
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Environment
+import android.speech.RecognizerIntent
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -13,6 +15,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.gms.common.util.IOUtils
@@ -26,6 +29,7 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.AppUtils.Companion.intToString
@@ -50,8 +54,9 @@ import java.net.URL
 import java.util.*
 
 class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
-
+    private val REQUEST_CODE_SPEECH_INPUT = 100
     var iv_torch: Button?=null
+    var imageData:String?=null
     var clickable1 = 0
     var imageName: String? = null
     internal var list = ArrayList<String>()
@@ -70,29 +75,19 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
     var SPPrdImg8=""
     var SPPrdImg9=""
     var SPPrdImg10=""
-
+    var vehicleNumber:String?=null
     override fun onClick(v: View?) {
 
         when (v?.id) {
 
             R.id.buttonNext ->{
 
+                if(intent.getStringExtra("Base64")!=null){
+                    imageData=intent.getStringExtra("Base64")
+                }else{
+                    imageData=""
+                }
 
-//
-//                val base64 = Base64.getEncoder().encodeToString(intent.getByteArrayExtra(PERSON_PHOTO))
-//                Log.v("Image Path",base64)
-//
-////                val destination =  File(Environment.getExternalStorageDirectory().getPath(),
-////                    System.currentTimeMillis()+".jpg");
-//
-//                val dest= File(Environment.getExternalStorageDirectory().path+"/"+"null.jpg")
-//                val imageBytes = IOUtils.toByteArray(dest.inputStream());
-//              //  val encodedImage = Base64.getEncoder().encodeToString(imageBytes)
-//
-//                val drawable = profile_image.getDrawable() as BitmapDrawable
-//                val bitmap = drawable.getBitmap()
-//               val encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
-//
                 Log.d("button_done ","StaffEntry "+FLOW_TYPE+" "+GUEST_REGISTRATION+" "+FLOW_TYPE.equals( GUEST_REGISTRATION,true))
                 buttonNext.isEnabled = false
                 buttonNext.isClickable = false
@@ -123,7 +118,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         intent.getStringExtra(UNIT_ACCOUNT_ID)
                     ); }
 
-               // visitorLog();
+
 
             }
             R.id.profile_image ->{
@@ -205,21 +200,19 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         tv_mobilenumber.text = intent.getStringExtra(COUNTRYCODE) + " " + number
-       // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": +"+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
-       // tv_for.setText(resources.getString(R.string.textto)+intent.getStringExtra(UNITNAME))
         tv_for.text =
             resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
 
         tv_totalperson.text = resources.getString(R.string.textperson)
         tv_from.text = intent.getStringExtra(COMPANY_NAME)
-
+        menuCount.text ="" + minteger
         menuAdd.setOnClickListener {
             minteger++
             menuCount.text = "" + minteger
         }
 
         menuRemove.setOnClickListener {
-            if (minteger>1) {
+            if (minteger>=1) {
                 minteger--
                 menuCount.text = "" + minteger
 
@@ -227,8 +220,15 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
             }
         }
-
-
+        if(intent.getStringExtra(VEHICLE_NUMBER)!=null) {
+            tv_vehiclenumber?.text = (intent.getStringExtra(VEHICLE_NUMBER))
+        }
+        if(!tv_vehiclenumber.text.equals("")){
+            vehicleNumber=tv_vehiclenumber.text.toString()
+        }
+        else{
+            vehicleNumber=""
+        }
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
 
                 singUp(intent.getStringExtra(PERSONNAME),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(MOBILENUMBER))
@@ -255,6 +255,29 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         imageAdapter = ImageAdapter(list, this@GuestEntryRegistration,"Off")
         rv_image.adapter = imageAdapter
 
+        iv_mike.setOnClickListener{
+            Speak()
+        }
+        iv_scanner.setOnClickListener{
+            val i_vehicle = Intent(this@GuestEntryRegistration, GuestCaptureImageOcr::class.java)
+            i_vehicle.putExtra(UNITID, intent.getStringExtra(UNITID))
+            i_vehicle.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+            i_vehicle.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID,0))
+            i_vehicle.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+            i_vehicle.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
+            i_vehicle.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+            i_vehicle.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+            i_vehicle.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+            i_vehicle.putExtra("RESIDENT_NUMBER", intent.getStringExtra("RESIDENT_NUMBER"))
+            i_vehicle.putExtra(UNITOCCUPANCYSTATUS, intent.getStringExtra(UNITOCCUPANCYSTATUS))
+            i_vehicle.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
+            i_vehicle.putExtra("Base64",intent.getStringExtra("Base64"))
+            i_vehicle.putExtra(ITEMS_PHOTO_LIST,intent.getStringArrayListExtra(ITEMS_PHOTO_LIST))
+            i_vehicle.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
+            startActivity(i_vehicle)
+            finish()
+        }
+
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
@@ -264,7 +287,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         val req = CreateVisitorLogReq(Prefs.getInt(ASSOCIATION_ID,0), 0, UNUniName,
             UNUnitID,intent.getStringExtra(COMPANY_NAME) ,intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName,0,"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),
-            intToString(minteger),"","","",
+            intToString(minteger),vehicleNumber!!,"","",
             minteger,
             ConstantUtils.GUEST,
             SPPrdImg1,
@@ -277,7 +300,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
             SPPrdImg8,
             SPPrdImg9,
             SPPrdImg10,
-            "",intent.getStringExtra("Base64") ,
+            "",imageData!!,
            // imageName.toString(),
             Prefs.getString(ConstantUtils.GATE_NO, ""),
             DateTimeUtils.getCurrentTimeLocal(),"","","","","","","","","","",""
@@ -287,7 +310,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
         compositeDisposable.add(RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN,req)
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
+                .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
                         // Utils.showToast(applicationContext, intToString(globalApiObject.data.visitorLog.vlVisLgID))
@@ -299,7 +322,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                             "",
                             "",
                             "",
-                            imageName.toString(),
+                            imageData!!,
                             getCurrentTimeLocal(),
                             getCurrentTimeLocal(),
                             "",
@@ -326,28 +349,13 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                         dd.putExtra(UNIT_ACCOUNT_ID,Unit_ACCOUNT_ID)
                         dd.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
                         dd.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
+                        dd.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
                         sendBroadcast(dd)
-                       // uploadImage(imageName.toString(), mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
-
-//                        val dir =
-//                            File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
-//                        if (dir.isDirectory) {
-//                            val children = dir.list()
-//                            for (i in children!!.indices) {
-//                                File(dir, children[i]).delete()
-//                            }
-//                        }
-                        //val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
-                        // startActivity(d)
                         dismissProgress()
                         finish()
 
-//                        val d = Intent(this@GuestEntryRegistration, DashBoard::class.java)
-//                        startActivity(d)
+
                     } else {
                         Utils.showToast(applicationContext, globalApiObject.apiVersion)
                     }
@@ -383,7 +391,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
         val req = SignUpReq("", "", "", "", "",
             name ,isdCode, "","","","",
-            "",mobNum,"","", "","","")
+            "",mobNum,"","", "","",intent.getStringExtra("Base64"))
         //  Log.d("singUp","StaffEntry "+req.toString(),imgName.toString())
 
         compositeDisposable.add(RetrofitClinet.instance.signUpCall(CHAMPTOKEN,req)
@@ -393,7 +401,6 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                     if (globalApiObject.success == true) {
                          var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                        uploadAccountImage(imageName.toString(), mBitmap)
                         Log.d("CreateVisitorLogResp","StaffEntry "+globalApiObject.data.toString())
                     } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
@@ -439,73 +446,7 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
     override fun onBackPressed() {
         super.onBackPressed()
-//        val d = Intent(this@GuestEntryRegistration, Dashboard::class.java)
-//        startActivity(d)
         finish()
-    }
-    fun uploadAccountImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-                //    incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-
-            }
-        })
-
-
     }
 
     private fun getInvitationCreate(
@@ -565,6 +506,29 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 }
             })
     }
+    fun Speak() {
 
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
 
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
+    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_CODE_SPEECH_INPUT ->{
+                if (resultCode == Activity.RESULT_OK  && null!= data){
+                    val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    tv_vehiclenumber.setText(result[0].replace(" ", "").trim())
+
+                }
+            }
+        }
+    }
 }

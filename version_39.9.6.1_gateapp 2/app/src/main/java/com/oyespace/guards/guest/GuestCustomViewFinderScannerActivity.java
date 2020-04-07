@@ -64,6 +64,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLENUMBER;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_GUESTWITHQRCODE;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
+import static com.oyespace.guards.utils.DateTimeUtils.beforeDate;
 import static com.oyespace.guards.utils.DateTimeUtils.compareDate;
 import static com.oyespace.guards.utils.RandomUtils.entryExists;
 
@@ -86,7 +87,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             @Override
             public void onClick(View v) {
 //                Toast.makeText(GuestCustomViewFinderScannerActivity.this,"NO QR Code ",Toast.LENGTH_LONG).show();
-                Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, GuestBlockSelectionActivity.class);
+                Intent in = new Intent(GuestCustomViewFinderScannerActivity.this, GuestBlockTabsActivity.class);
                 startActivity(in);
                 finish();
 
@@ -120,8 +121,8 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
     @Override
     public void handleResult(Result rawResult) {
-        Toast.makeText(this, "Contents = " + rawResult.getText() +
-                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "Contents = " + rawResult.getText() +
+//                ", Format = " + rawResult.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
         Log.d("Contents resident", rawResult.getText());
 
         JSONObject json_Guest = null;
@@ -137,7 +138,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
             String sasAssnID=json_Guest.getString("asAssnID");
             String sinIsActive=json_Guest.getString("inIsActive");
 
-
+            Log.d("1111",sasAssnID);
 
       //  {"infName":"Satan","inMobile":"+918072262742","inInvtID":4248,"unUnitID":40907,"insDate":"2020-01-29T17:29","ineDate":"2020-01-30","inVisCnt":5,"asAssnID":14948,"inIsActive":true}
 
@@ -152,9 +153,41 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
            //     System.out.println("Guest Data 2 " + guestdataList[6] + " "+ guestdataList[7]  + " " + guestdataList[8] + " " + guestdataList[9] + " " + guestdataList[10] + " " + guestdataList[11]);
 
                 if(sasAssnID.equalsIgnoreCase( Prefs.getInt(ASSOCIATION_ID,0)+"")) {
+                    Log.d("2222", rawResult.getText());
                     if(!compareDate(sinsDate,sineDate)){
                         Toast.makeText(GuestCustomViewFinderScannerActivity.this, "You are/were Invited from "+sinsDate+" to "+sineDate, Toast.LENGTH_LONG).show();
-                    }else  if(entryExists(sMobile.replace("+91",""),"+91")) {
+                    }else if(beforeDate(sinsDate)){
+                        ViewGroup viewGroup = findViewById(android.R.id.content);
+
+                        View dialogView = LayoutInflater.from(GuestCustomViewFinderScannerActivity.this).inflate(R.layout.layout_qrcodedailog, viewGroup, false);
+
+
+                        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(GuestCustomViewFinderScannerActivity.this);
+
+                        ImageView dialog_imageview = dialogView.findViewById(R.id.dialog_imageview);
+                        Drawable drawable = getResources().getDrawable(R.drawable.invalid_invi);
+                        dialog_imageview.setImageDrawable(drawable);
+                        TextView tv_msg = dialogView.findViewById(R.id.tv_msg);
+                        tv_msg.setText("Invalid date");
+                        Button btn_ok = dialogView.findViewById(R.id.btn_ok);
+                        btn_ok.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                alertDialog.dismiss();
+//
+                                finish();
+
+                            }
+                        });
+
+                        builder.setView(dialogView);
+
+                        //finally creating the alert dialog and displaying it
+                        alertDialog = builder.create();
+
+                        alertDialog.show();
+                    }
+                    else  if(entryExists(sMobile.replace("+91",""),"+91")) {
 
 
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
@@ -172,8 +205,8 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                     } else if ((sinIsActive.equalsIgnoreCase("false"))) {
 
                       //  (  final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId
-
-                      //  getInviation(Integer.parseInt(sinInvtID), sName, "+91", sMobile.replace("+91",""), sunUnitID, guestdataList[5], guestdataList[6], guestdataList[7], guestdataList[8], guestdataList[9], guestdataList[10], guestdataList[11]);
+//final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID,final String fromDate, final String numberofPersons, final String toDate, final String associationId
+                        getInviation(Integer.parseInt(sinInvtID), sName, "+91", sMobile.replace("+91",""), sunUnitID,sinsDate,sinVisCnt,sineDate,sasAssnID );
                     } else {
                         //Toast.makeText(GuestCustomViewFinderScannerActivity.this, "Valid Invitation", Toast.LENGTH_LONG).show();
 
@@ -443,7 +476,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 //        alertDialog.show();
 //    }
 
-    void getInviation(final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID, final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId) {
+    void getInviation(final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID,final String fromDate, final String numberofPersons, final String toDate, final String associationId) {
 
 
         Call<InvitationRequestResponse> call = champApiInterface.getInvitationResponse(invitationId);
@@ -486,10 +519,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                                 intent.putExtra(MOBILENUMBER, mobileNumber);
                                 intent.putExtra(INVITATIONID, invitationId);
                                 intent.putExtra(UNITID, unitID);
-                                intent.putExtra(UNITNAME, unitName);
                                 intent.putExtra(FROMDATE, fromDate);
-                                intent.putExtra(FROMTIME, fromTime);
-                                intent.putExtra(VEHICLENUMBER, vehicleNumber);
                                 intent.putExtra(NUMBEROFPERSONS, numberofPersons);
                                 intent.putExtra(TODATE, toDate);
                                 intent.putExtra("Association Id", associationId);

@@ -393,7 +393,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
             ) as ImageView
             list.add(selectedImagePath)
             ImageHelper.loadImage(context, selectedImagePath, imageView)
-            imageAdapter = ImageAdapter(list, this@DeliveryPersonPhotoActivity, "On")
+            imageAdapter = ImageAdapter(list, this@DeliveryPersonPhotoActivity, "On",image_Gallery)
             rv_image!!.adapter = imageAdapter
         } catch (e: Exception) {
             e.printStackTrace()
@@ -506,12 +506,15 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
 
-                    try {
-                        if(getdata.data.visitorLatestRecord.vlEntryImg.contains("PERSON")){
+                    if (!getdata.data.visitorLatestRecord.vlEntryImg.contains("")){
 
-                            val url = ConstantUtils.IMAGE_BASE_URL + "Images/" + getdata.data.visitorLatestRecord.vlEntryImg
+                        try {
+                            if (getdata.data.visitorLatestRecord.vlEntryImg.contains("PERSON")) {
 
-                            GetImageFromUrl(imageView1!!).execute(url);
+                                val url =
+                                    ConstantUtils.IMAGE_BASE_URL + "Images/" + getdata.data.visitorLatestRecord.vlEntryImg
+
+                                GetImageFromUrl(imageView1!!).execute(url);
 
 //                           val image= getBitmapFromURL(ConstantUtils.IMAGE_BASE_URL + "Images/" + getdata.data.visitorLatestRecord.vlEntryImg)
 //
@@ -520,15 +523,21 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
 //                            val decodedImage =
 //                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 //                            imageView1!!.setImageBitmap(decodedImage)
-                        }
-                        else {
-                            val imageBytes = Base64.decode(getdata.data.visitorLatestRecord.vlEntryImg, Base64.DEFAULT)
-                            val decodedImage =
-                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-                            imageView1!!.setImageBitmap(decodedImage)
-                        }
-                    }catch (e:IllegalStateException){
+                            } else {
+                                val imageBytes = Base64.decode(
+                                    getdata.data.visitorLatestRecord.vlEntryImg,
+                                    Base64.DEFAULT
+                                )
+                                val decodedImage =
+                                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                imageView1!!.setImageBitmap(decodedImage)
+                            }
+                        } catch (e: IllegalStateException) {
 
+                        }
+                }
+                    else{
+                        imageView1!!.setBackgroundResource(R.drawable.user_icon_black)
                     }
 
                 }

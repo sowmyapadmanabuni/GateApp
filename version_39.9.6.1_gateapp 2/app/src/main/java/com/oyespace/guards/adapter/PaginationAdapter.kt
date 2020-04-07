@@ -21,7 +21,7 @@ class PaginationAdapter(private val mcontext: Context, private val arrayList: Ar
         p0.mPageNumber.text = arrayList[p1].pageNumber
         if(arrayList[p1].isActive){
             activePage = p1
-            p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.orange))
+            p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.end_gradient))
             p0.mPageNumber.setTextColor(mcontext.resources.getColor(R.color.white))
         }else{
             p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.white))

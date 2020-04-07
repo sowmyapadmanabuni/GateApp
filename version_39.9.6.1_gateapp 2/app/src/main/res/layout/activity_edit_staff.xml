@@ -116,7 +116,7 @@
             android:text="@string/textstaffedit"
             android:textStyle="bold"
             android:layout_below="@+id/lyt"
-            android:textColor="#ff8c00"
+            android:textColor="@color/end_gradient"
             android:textSize="18sp"
             android:layout_marginTop="10dp"/>
     <de.hdodenhof.circleimageview.CircleImageView
@@ -149,7 +149,7 @@
             android:layout_centerInParent="true"
             android:layout_below="@+id/iv_personphoto"
             android:textStyle="bold"
-            android:textColor="#ff8c00"
+            android:textColor="@color/end_gradient"
             android:textSize="14dp"
             android:layout_marginTop="14dp"/>
 
@@ -232,7 +232,7 @@
                   android:layout_marginRight="8dp"
                   style="@style/EditTextCustomHolo"
                   android:editable="false"
-                  android:drawableRight="@drawable/calnder_small"
+                  android:drawableRight="@drawable/calendar"
                   android:id="@+id/ed_dob"
                   android:layout_marginTop="@dimen/dob_layout_marginTop"
         />

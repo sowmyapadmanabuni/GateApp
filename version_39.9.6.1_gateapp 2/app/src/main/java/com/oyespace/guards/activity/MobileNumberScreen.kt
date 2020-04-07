@@ -371,7 +371,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
 
                             }else{
-                            val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
+                            val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
                             d.putExtra(FLOW_TYPE, DELIVERY)
                             d.putExtra(VISITOR_TYPE, DELIVERY)
                             d.putExtra(MOBILENUMBER, MobNumber.substring(3))
@@ -401,7 +401,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
     }
 
     fun deliveryFlow_launchNameEntryScreen() {
-        val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
+        val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
         d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
         d.putExtra(MOBILENUMBER, mobileNumber)
@@ -487,24 +487,18 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
                     if(getdata.data!=null) {
-                        val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
+                        val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
                         d.putExtra(FLOW_TYPE, DELIVERY)
                         d.putExtra(VISITOR_TYPE, DELIVERY)
-                        d.putExtra(
-                            MOBILENUMBER,
-                            getdata.data.visitorLatestRecord.vlMobile.substring(3, 13)
-                        )
+                        d.putExtra(MOBILENUMBER, getdata.data.visitorLatestRecord.vlMobile.substring(3, 13))
                         d.putExtra(COUNTRYCODE, "+91")
-                        d.putExtra(
-                            PERSONNAME,
-                            getdata.data.visitorLatestRecord.vlfName + " " + getdata.data.visitorLatestRecord.vllName
-                        )
+                        d.putExtra(PERSONNAME, getdata.data.visitorLatestRecord.vlfName + " " + getdata.data.visitorLatestRecord.vllName)
                         d.putExtra(ACCOUNT_ID, accountId)
                         d.putExtra(COMPANY_NAME, getdata.data.visitorLatestRecord.vlComName)
                         startActivity(d)
                         finish()
                     }  else{
-                        val d = Intent(this@MobileNumberScreen, BlockSelectionActivity::class.java)
+                        val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
                         d.putExtra(FLOW_TYPE, DELIVERY)
                         d.putExtra(VISITOR_TYPE, DELIVERY)
                         d.putExtra(MOBILENUMBER, mobileNumber)

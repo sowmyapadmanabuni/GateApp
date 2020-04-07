@@ -23,6 +23,7 @@ open class Worker:RealmObject(){
     var asAssnID:Long = 0
     var wkIsActive:Boolean = false
     var unUniName:String = ""
+    var acAccntID:Int=0
 
 }
 data class GetWorkersResponse<T>(

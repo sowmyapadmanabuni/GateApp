@@ -256,6 +256,7 @@ class VehicleGuestQRRegistration : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra(UNIT_ACCOUNT_ID,accountId)
                         d.putExtra("VLVisLgID",globalApiObject.data.visitorLog.vlVisLgID)
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
                         sendBroadcast(d)
 
 

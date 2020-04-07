@@ -18,7 +18,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
                 android:textSize="@dimen/_16sdp"
-                android:textColor="@color/orange"
+                android:textColor="@color/end_gradient"
                 android:text="Unit"
         />
 

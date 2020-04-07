@@ -4,7 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        app:cardBackgroundColor="@color/orange"
+        app:cardBackgroundColor="@color/end_gradient"
         app:contentPadding="1dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -12,9 +12,7 @@
 
     <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:orientation="vertical"
-            >
+                  android:orientation="vertical">
         <LinearLayout android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
@@ -24,24 +22,25 @@
             <LinearLayout android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:layout_weight="2.5">
-                <ImageView
+                    android:layout_weight="2">
+                <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/iv_user"
-                        android:layout_width="@dimen/_80sdp"
-                        android:layout_height="@dimen/_120sdp"
+                        android:layout_width="@dimen/_60sdp"
+                        android:layout_height="@dimen/_60sdp"
                         android:src="@drawable/user_icon_black"
-                        android:adjustViewBounds="true"
                         android:layout_gravity="center_horizontal"
-                        android:padding="2dp"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        android:padding="1dp"
                         />
-                <!--<TextView-->
-                <!--android:id="@+id/tv_entrytime"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:textSize="14sp"-->
-                <!--android:text="Entry Time"-->
-                <!--android:layout_gravity="center_horizontal"-->
-                <!--/>-->
+                <TextView
+                android:id="@+id/tv_vehiclenumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:padding="2dp"
+                android:text=""
+                android:layout_gravity="center_horizontal"
+                />
                 <!--<TextView-->
                 <!--android:id="@+id/tv_exittime"-->
                 <!--android:layout_width="wrap_content"-->
@@ -110,7 +109,7 @@
                 <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/orange" />
+                        android:background="@color/end_gradient" />
                 <LinearLayout android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         >
@@ -212,7 +211,7 @@
                         android:textSize="12sp"
                         android:layout_marginRight="4dp"
                         android:background="@drawable/square"
-                        android:visibility="invisible"
+                        android:visibility="visible"
                         android:text="@string/textexit"/>
 
                 <TextView

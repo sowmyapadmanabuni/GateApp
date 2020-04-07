@@ -42,6 +42,9 @@ import com.oyespace.guards.network.ResponseHandler
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.repo.VisitorLogRepo
+import com.oyespace.guards.staffManaualEntry.ManualBlockTabsActivity
+import com.oyespace.guards.staffManaualEntry.ManualMobileNumberScreen
+import com.oyespace.guards.staffManaualEntry.ManualNameEntryScreen
 import com.oyespace.guards.staffManaualEntry.ManulBlockSelectionActivity
 import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
@@ -238,21 +241,92 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
 
 
             Prefs.putString(TYPE, "Entry")
-            val d = Intent(this@MobileNumberforEntryScreen, ManulBlockSelectionActivity::class.java)
-            d.putExtra(UNITID, intent.getStringExtra(UNITID))
-            d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
-            d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
-            d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
-            d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
-            d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
-            d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
-            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
-            d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
-            d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
-            d.putExtra(VISITOR_TYPE, "STAFF")
-            d.putExtras(intent)
-            startActivity(d)
-            finish()
+//            val d = Intent(this@MobileNumberforEntryScreen, ManualBlockTabsActivity::class.java)
+////            d.putExtra(UNITID, intent.getStringExtra(UNITID))
+////            d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+////            d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+////            d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+////            d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+////            d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+////            d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+////            d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+////            d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+////            d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+////            d.putExtra(VISITOR_TYPE, "STAFF")
+////            d.putExtras(intent)
+////            startActivity(d)
+////            finish()
+            if (intent.getStringExtra(COMPANY_NAME) != null && intent.getStringExtra(
+                    COMPANY_NAME
+                ).equals("Others")
+            ) {
+                val d = Intent(this@MobileNumberforEntryScreen, PurposeScreen::class.java)
+//                            Log.d( "intentdata MobileNumber", "buttonNext " + intent.getStringExtra(UNITNAME) +
+// " " + intent.getStringExtra(UNITID) + " " + Ed_phoneNum.text + " " + countryCode );
+                d.putExtra(UNITID, intent.getStringExtra(UNITID))
+                d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+                d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                startActivity(d)
+                finish()
+            } else {
+                if( intent.getStringExtra(MOBILENUMBER).isEmpty()){
+                    val d = Intent(this@MobileNumberforEntryScreen, ManualNameEntryScreen::class.java)
+
+                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                    d.putExtra(UNITID,intent.getStringExtra(UNITID))
+                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                    d.putExtra(MOBILENUMBER, "")
+                    d.putExtra(COUNTRYCODE, "")
+                    d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+                    d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                    d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                    d.putExtra(MOBILENUMBER, "")
+                    d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                    d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                    d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                    d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                    //  d.putExtras(intent)
+                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                    startActivity(d)
+                    finish()                    }
+                else {
+
+                    val d = Intent(this@MobileNumberforEntryScreen, ManualMobileNumberScreen::class.java)
+                    d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+                    d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                    d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
+                    d.putExtra(UNITID,intent.getStringExtra(UNITID))
+                    d.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+                    d.putExtra(MOBILENUMBER, "")
+                    d.putExtra(COUNTRYCODE, "")
+                    d.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+                    d.putExtra("FIRSTNAME", intent.getStringExtra("FIRSTNAME"))
+                    d.putExtra("LASTNAME", intent.getStringExtra("LASTNAME"))
+                    d.putExtra(MOBILENUMBER, "")
+                    d.putExtra("DESIGNATION", intent.getStringExtra("DESIGNATION"))
+                    d.putExtra("WORKTYPE", intent.getStringExtra("WORKTYPE"))
+                    d.putExtra(WORKER_ID, intent.getIntExtra(WORKER_ID, 0))
+                    d.putExtra("BIRTHDAY", intent.getStringExtra("BIRTHDAY"))
+                    d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+                    //  d.putExtras(intent)
+                    d.putExtra(BLOCK_ID, intent.getStringExtra(BLOCK_ID))
+                    startActivity(d)
+                    finish()
+                }
+            }
 
         }
 
@@ -816,6 +890,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                             globalApiObject.data.visitorLog.vlVisLgID
                                         )
                                         ddc.putExtra(VISITOR_TYPE, desgn)
+                                        ddc.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
@@ -850,6 +925,7 @@ class MobileNumberforEntryScreen : BaseKotlinActivity(), View.OnClickListener, R
                                 //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
                                 ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
                                 ddc.putExtra(VISITOR_TYPE, "Staff")
+                                ddc.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")

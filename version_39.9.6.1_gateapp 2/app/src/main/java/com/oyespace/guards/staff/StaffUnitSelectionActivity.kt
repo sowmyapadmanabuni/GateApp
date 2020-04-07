@@ -2,13 +2,11 @@ package com.oyespace.guards.staff
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -26,7 +24,6 @@ import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.FamilMembersAdapter
 import com.oyespace.guards.adapter.PaginationAdapter
 import com.oyespace.guards.constants.PrefKeys
-import com.oyespace.guards.guest.GuestUnitSelectionActivity
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.pojo.*

@@ -207,7 +207,7 @@
                   android:layout_height="match_parent"
                   android:layout_weight="1"
                   android:hint="DOB"
-                  android:drawableRight="@drawable/calnder_small"
+                  android:drawableRight="@drawable/calendar"
                   android:id="@+id/ed_dob"
         />
 

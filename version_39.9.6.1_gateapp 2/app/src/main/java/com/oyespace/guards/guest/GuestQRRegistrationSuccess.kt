@@ -142,26 +142,19 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         if (intent.getStringExtra(FLOW_TYPE).equals(VEHICLE_GUESTWITHQRCODE, true)) {
             profile_image.visibility = View.GONE
         }
-//        Log.d(
-//            "intentdata StaffEntry", "" + intent.getStringExtra(UNITNAME) + " " + intent.getStringExtra(UNITID)
-//                    + " " + intent.getStringExtra(MOBILENUMBER) + " " + intent.getStringExtra(COUNTRYCODE) + " "
-//                    + intent.getStringExtra(PERSONNAME) + " "
-//                    + " " + intent.getStringExtra(FLOW_TYPE) + " "
-//                    + intent.getStringExtra(VISITOR_TYPE) + " " + intent.getStringExtra(COMPANY_NAME)
-//        )
+
 
         tv_name.text = intent.getStringExtra(PERSONNAME)
 
         val input =intent.getStringExtra(MOBILENUMBER)
-        //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
 
         val number = input.replaceFirst("(\\d{2})(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3 $4")
         tv_mobilenumber.text = number
-//        tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": " + intent.getStringExtra(COUNTRYCODE)
-//                + "" + intent.getStringExtra(MOBILENUMBER))
+
         tv_for.text = resources.getString(R.string.textto) + intent.getStringExtra(UNITNAME)
         tv_totalperson.text = resources.getString(R.string.textperson)
         tv_from.text = resources.getString(R.string.textfrom) + intent.getStringExtra(COMPANY_NAME)
+        menuCount.text ="" + minteger
 
         menuAdd.setOnClickListener {
             minteger++
@@ -170,7 +163,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         }
 
         menuRemove.setOnClickListener {
-            if (minteger > 1) {
+            if (minteger >= 1) {
                 minteger--
                 menuCount.text = "" + minteger
 
@@ -201,7 +194,6 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             profile_image.setImageBitmap(mBitmap)
 
         }else{
-            //  profile_image.visibility=View.GONE
             imageName=""
         }
 
@@ -209,10 +201,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
     }
 
     private fun visitorLog() {
-        var memID: Int = 64
-        if(!BASE_URL.contains("dev",true)){
-            memID = 410
-        }
+
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0),
             0,
@@ -231,10 +220,6 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
             .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
                 override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
                     if (globalApiObject.success == true) {
-
-                        //  getInvitationCreate(intent.getStringExtra(UNITID).toInt(),intent.getStringExtra(PERSONNAME),"",intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER),"","","","",getCurrentTimeLocal(),getCurrentTimeLocal(),"",true,Prefs.getInt(ASSOCIATION_ID,0),true)
-
-                      //  visitorEntryLog(globalApiObject.data.visitorLog.vlVisLgID)
                         var imgName = "PERSON" + "Association" + Prefs.getInt(ASSOCIATION_ID,0) + "NONREGULAR" + globalApiObject.data.visitorLog.vlVisLgID + ".jpg"
 
                         val d  =  Intent(this@GuestQRRegistrationSuccess, BackgroundSyncReceiver::class.java)
@@ -248,14 +233,11 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
                         d.putExtra("memType", "Owner")
                         d.putExtra(UNITID,intent.getStringExtra(UNITID))
                         d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                        d.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
 
-//                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
-//                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
-//                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")
                         sendBroadcast(d)
 
-//                        val intentdata = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
-//                        startActivity(intentdata)
+
 
                         finish()
 
@@ -305,8 +287,7 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
                 override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                     if (globalApiObject.success == true) {
                         var imgName = "PERSON" + globalApiObject.data.account.acAccntID + ".jpg"
-                        //uploadAccountImage(imgName, mBitmap)
-                        Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
+                      Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
                     } else {
 //                        Utils.showToast(applicationContext, globalApiObject.apiVersion)
                         Log.d("CreateVisitorLogResp", "globalApiObject  " + globalApiObject.data.toString())
@@ -332,92 +313,6 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
         )
     }
 
-    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage", localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.JPEG, 50, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-                incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-
-        val imageFileOS: OutputStream?
-        try {
-            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-            imageFileOS!!.write(byteArrayProfile!!)
-            imageFileOS.flush()
-            imageFileOS.close()
-
-            Log.d("uploadImage Path bf", uriTarget.toString())
-        } catch (e: FileNotFoundException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        } catch (e: IOException) {
-            // TODO Auto-generated catch block
-            e.printStackTrace()
-        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-                    file.delete()
-                    Toast.makeText(getApplicationContext(), "Uploaded Successfully", Toast.LENGTH_SHORT).show();
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                    Toast.makeText(applicationContext, "Image Not Uploaded", Toast.LENGTH_SHORT).show()
-                }
-
-                finish()
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-                Toast.makeText(applicationContext, "Not Uploaded", Toast.LENGTH_SHORT).show()
-//                finish()
-            }
-        })
-
-
-    }
 
     fun setLocale(lang: String?) {
         var lang = lang
@@ -434,68 +329,11 @@ class GuestQRRegistrationSuccess : BaseKotlinActivity(), View.OnClickListener {
     }
     override fun onBackPressed() {
         super.onBackPressed()
-//        val d = Intent(this@GuestQRRegistrationSuccess, Dashboard::class.java)
-//        startActivity(d)
+
         finish()
     }
 
-    private fun getInvitationCreate(
-        unUnitID: String,
-        INFName: String,
-        INLName: String,
-        INMobile: String,
-        INEmail: String,
-        INVchlNo: String,
-        INVisCnt: String,
-        INPhoto: String,
-        INSDate: String,
-        INEDate: String,
-        INPOfInv: String,
-        INMultiEy: Boolean,
-        ASAssnID: Int,
-        INQRCode: Boolean
-    ) {
 
-
-        val dataReq = InviteCreateReq(
-            unUnitID,
-            INFName,
-            INLName,
-            INMobile,
-            INEmail,
-            INVchlNo,
-            INVisCnt,
-            INPhoto,
-            INSDate,
-            INEDate,
-            INPOfInv,
-            INMultiEy,
-            ASAssnID,
-            INQRCode
-        )
-
-
-        RetrofitClinet.instance
-            .sendInviteRequest(OYE247TOKEN, dataReq)
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(object : CommonDisposable<InviteCreateRes>() {
-
-                override fun onSuccessResponse(inviteCreateRes: InviteCreateRes) {
-
-
-                }
-
-
-                override fun onErrorResponse(e: Throwable) {
-                    Log.d("Error WorkerList", e.toString())
-                }
-
-                override fun noNetowork() {
-
-                }
-            })
-    }
 
 
 

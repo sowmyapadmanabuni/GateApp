@@ -5,12 +5,18 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.location.Location
+import android.net.wifi.WifiInfo
+import android.net.wifi.WifiManager
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.util.Log
 import android.view.Gravity
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import com.oyespace.guards.Dashboard
 import com.oyespace.guards.Myapp
 import com.oyespace.guards.R
@@ -41,6 +47,7 @@ class SplashActivity : BaseLocationActivity() {
 
     var app: Myapp? = null
     var Mobile_IMEI_NO: String? = null
+    var imeiNumber:String?=null
     var getSimNumber: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,15 +118,19 @@ class SplashActivity : BaseLocationActivity() {
     private fun launchMainActivity() {
         // val mainIntent = Intent(this@SplashActivity, DashboardActivity::class.java)
 
-        Thread {
-            VisitorLogRepo.get_OUT_VisitorLog(true)
-            VisitorLogRepo.exitYesterdaysINEntries()
-        }.start()
+//        Thread {
+//            VisitorLogRepo.get_OUT_VisitorLog(true)
+//            VisitorLogRepo.exitYesterdaysINEntries()
+//        }.start()
 
 
         val tm = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        Mobile_IMEI_NO = tm.deviceId
-        //   Mobile_IMEI_NO=""
+        imeiNumber = tm.deviceId
+       if(imeiNumber!=null){
+           Mobile_IMEI_NO= imeiNumber
+       }else{
+           Mobile_IMEI_NO= android.os.Build.SERIAL
+       }
         getSimNumber = tm.line1Number
         val modelno = android.os.Build.MODEL
         Prefs.putString(PrefKeys.MODEL_NUMBER, modelno)
@@ -128,8 +139,6 @@ class SplashActivity : BaseLocationActivity() {
 
 
             if (Prefs.getString(PrefKeys.MOBILE_NUMBER, null) == null) {
-
-
                 val mainIntent = Intent(this@SplashActivity, LoginActivity::class.java)
                 startActivity(mainIntent)
                 finish()
@@ -371,4 +380,34 @@ class SplashActivity : BaseLocationActivity() {
     }
 
 
+    fun getUniqueIMEIId(context: Context): String? {
+        try {
+            val telephonyManager =
+                context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+            if (ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_PHONE_STATE
+                ) !== PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return ""
+            }
+            val imei = telephonyManager.deviceId
+            Log.e("imei", "=$imei")
+            return if (imei != null && !imei.isEmpty()) {
+                imei
+            } else {
+                Build.SERIAL
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return "not_found"
+    }
 }

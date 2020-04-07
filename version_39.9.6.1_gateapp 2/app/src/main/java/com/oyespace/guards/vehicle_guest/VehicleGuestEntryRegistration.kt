@@ -329,6 +329,7 @@ class VehicleGuestEntryRegistration : BaseKotlinActivity(), View.OnClickListener
                             d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
                             d.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
                             d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                            d.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
                             sendBroadcast(d)
                             uploadImage(imageName.toString(), mBitmap)
                             Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())

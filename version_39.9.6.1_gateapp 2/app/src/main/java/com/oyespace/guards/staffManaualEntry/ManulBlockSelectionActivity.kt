@@ -300,34 +300,6 @@ class ManulBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 blockID += selected.get(j).blBlockID
 
 
-//                if (selected.get(j).tenant.size != 0) {
-//                    try {
-//                        unitNumber1 += selected.get(j).tenant[0].utMobile
-//                        unitNumber2 += selected.get(j).tenant[0].utMobile1
-//                        //0  Toast.makeText(this@UnitListActivity, unitNumber1, Toast.LENGTH_LONG).show()
-//                    } catch (e: IndexOutOfBoundsException) {
-//
-//                    }
-//                } else {
-//                    if (selected.get(j).owner.size != 0) {
-//
-//                        try {
-//                            unitNumber1 += selected.get(j).owner[0].uoMobile
-//                            unitNumber2 += selected.get(j).owner[0].uoMobile1
-//                            unitNumber3 += selected.get(j).owner[0].uoMobile2
-//                            unitNumber4 += selected.get(j).owner[0].uoMobile3
-//                            unitNumber5 += selected.get(j).owner[0].uoMobile4
-//
-//                            //   Toast.makeText(this@UnitListActivity,unitNumber1,Toast.LENGTH_LONG).show()
-//                        } catch (e: IndexOutOfBoundsException) {
-//
-//                        }
-//
-//                    }
-//
-//                }
-
-
             }
 
             if (unitNames.length > 0) {

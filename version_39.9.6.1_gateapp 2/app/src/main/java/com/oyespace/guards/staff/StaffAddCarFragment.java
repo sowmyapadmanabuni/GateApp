@@ -66,6 +66,7 @@ import com.oyespace.guards.responce.StaffImageRes;
 import com.oyespace.guards.responce.StaffRegistrationRespJv;
 import com.oyespace.guards.utils.LocalDb;
 import com.oyespace.guards.utils.Prefs;
+import com.oyespace.guards.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -439,7 +440,12 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                 submit_button.setEnabled(false);
                 submit_button.setClickable(false);
 
-
+                if (!Utils.isConnectedToInternet()) {
+                    submit_button.setEnabled(true);
+                    submit_button.setEnabled(true);
+                    Utils.showToast(StaffAddCarFragment.this, getString(R.string.no_internet));
+                    return;
+                }
 
                 if (imageView1.getDrawable().getConstantState()!=getResources().getDrawable(R.drawable.user_icon_black).getConstantState()) {
 
@@ -465,7 +471,9 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                             Log.d("Dgddfdf picas","7");
                         }
 
-
+                        BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = drawable.getBitmap();
+                        encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
                         Intent d = new Intent(StaffAddCarFragment.this, StaffEntryRegistration.class);
 //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -484,6 +492,7 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                         d.putExtra(BLOCK_ID,getIntent().getStringExtra(BLOCK_ID));
                         d.putExtra(UNITOCCUPANCYSTATUS,getIntent().getStringExtra(UNITOCCUPANCYSTATUS));
                         d.putExtra(VISITOR_PURPOSE,getIntent().getStringExtra(VISITOR_PURPOSE));
+                        d.putExtra("Base64", encodedImage);
                         startActivity(d);
                         finish();
 
@@ -532,12 +541,12 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
         loginReq.WKWrkType = getIntent().getStringExtra(VISITOR_TYPE);
         loginReq.UNUnitID = getIntent().getStringExtra(UNITID);
         loginReq.UNUniName = getIntent().getStringExtra(UNITNAME);
-        loginReq.WKEntryImg = encodedImage;
         loginReq.IDPrfType=getIntent().getStringExtra("DocumentType");
-        loginReq.IDPrfImg=getIntent().getStringExtra("DocumentImage");
         loginReq.WKExpiry=getIntent().getStringExtra("DocumentExpiry");
         loginReq.WKStatus=getIntent().getStringExtra("Status");
         loginReq.WKExpDate=getIntent().getStringExtra("DocumentExpiryDate");
+        loginReq.WKEntryImg = encodedImage;
+       // loginReq.IDPrfImg=getIntent().getStringExtra("DocumentImage");
 
         Log.d("saveCheckPoints", "StaffEntry " + loginReq.ASAssnID + " " + loginReq.WKFName + " "
                 + loginReq.UNUnitID + " " + loginReq.WKMobile + " " + loginReq.UNUniName);
@@ -589,6 +598,9 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                         Log.d("Dgddfdf picas", "7");
                     }
 
+                    BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+                    Bitmap bitmap = drawable.getBitmap();
+                    encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
                     if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 2.1")) {
 
                         Intent d = new Intent(StaffAddCarFragment.this, Biometric.class);
@@ -601,6 +613,7 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                         d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
                         d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                        d.putExtra("Base64",encodedImage);
                         startActivity(d);
                     } else if (Prefs.getString(PrefKeys.MODEL_NUMBER, null).equals("Nokia 1")) {
                         Intent intent = new Intent(StaffAddCarFragment.this, StaffDetails.class);
@@ -626,6 +639,7 @@ public class StaffAddCarFragment extends BaseKotlinActivity implements ResponseH
                         d.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
                         d.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
                         d.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                        d.putExtra("Base64",encodedImage);
                         startActivity(d);
                     }
                     //   uploadImage(imgName,personPhoto);

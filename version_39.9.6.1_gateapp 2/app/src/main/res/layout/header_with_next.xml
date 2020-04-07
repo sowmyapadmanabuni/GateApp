@@ -32,17 +32,19 @@
                 />
 
         <Button
-                android:id="@+id/buttonNext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:padding="@dimen/_2sdp"
-                android:onClick="onClick"
-                android:text="@string/textnext"
-                android:textColor="@android:color/white"
-                android:background="@drawable/square"
-                android:textSize="@dimen/_10sdp" android:layout_marginTop="@dimen/_2sdp"
-                android:layout_marginEnd="@dimen/_2sdp" android:layout_marginBottom="@dimen/_2sdp"/>
+            android:id="@+id/buttonNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:padding="@dimen/_2sdp"
+            android:onClick="onClick"
+            android:text="@string/textnext"
+            android:textColor="@android:color/white"
+            android:background="@drawable/square"
+            android:textSize="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_2sdp"
+            android:layout_marginEnd="@dimen/_2sdp"
+            android:layout_marginBottom="@dimen/_2sdp" />
 
 
 
@@ -64,7 +66,7 @@
 
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/orange" />
+                    android:background="@drawable/background_color" />
     <LinearLayout android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="3"
@@ -109,7 +111,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
                 android:layout_below="@+id/lyt"
-                android:background="@color/orange">
+                android:background="@drawable/background_color">
 
         </RelativeLayout>
 

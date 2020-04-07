@@ -55,6 +55,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     var unAccountID: Int? = 0
     var unitid:Int?=0
     lateinit var mcontext: Context
+    var time:String?=null
 
     override fun onReceive(context: Context, intent: Intent) {
         // This method is called when the BroadcastReceiver is receiving
@@ -77,6 +78,11 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 //                unitOccupancyStatues=intent.getStringExtra(UNITOCCUPANCYSTATUS).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
                 if (unitid_dataList.size > 0) {
                     for (i in 0 until unitid_dataList.size) {
+                        if(intent.getStringExtra("EntryTime")!=""){
+                            time=intent.getStringExtra("EntryTime")
+                        }else{
+                            time=DateTimeUtils.getCurrentTimeLocal()
+                        }
 
                         try {
                             val unitid = unitid_dataList.get(i).replace(" ", "").toInt();
@@ -91,7 +97,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 intent.getIntExtra("VLVisLgID", 0),
                                 intent.getStringExtra("msg"),
                                 intent.getStringExtra("nr_id"),
-                                sendNotification,""+Prefs.getInt(ASSOCIATION_ID, 0).toString()+ NOTIF_STAFF_ENTRY+unitid
+                                sendNotification,""+Prefs.getInt(ASSOCIATION_ID, 0).toString()+ NOTIF_STAFF_ENTRY+unitid,
+                                time!!
                             )
                         } catch (e: Exception) {
 
@@ -99,10 +106,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                     }
                 }
             } else {
+                if(intent.getStringExtra("EntryTime")!=""){
+                    time=intent.getStringExtra("EntryTime")
+                }else{
+                    time=DateTimeUtils.getCurrentTimeLocal()
+                }
 
                 try {
                     val unitid = intent.getStringExtra(UNITID).toInt()
-                    getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), intent.getStringExtra(VISITOR_TYPE), 0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0), intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification, ""+Prefs.getInt(ASSOCIATION_ID, 0).toString()+NOTIF_STAFF_ENTRY+unitid)
+                    getUnitLog(intent.getStringExtra(UNITID).toInt(), intent.getStringExtra("name"), "", intent.getStringExtra(VISITOR_TYPE), intent.getStringExtra(VISITOR_TYPE), 0, intent.getStringExtra("name"), intent.getIntExtra("VLVisLgID", 0), intent.getStringExtra("msg"), intent.getStringExtra("nr_id"), sendNotification, ""+Prefs.getInt(ASSOCIATION_ID, 0).toString()+NOTIF_STAFF_ENTRY+unitid,time!!)
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
@@ -935,7 +947,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
     private fun getUnitLog(unitId: Int, personName: String, mobileNumb: String, desgn: String,
-                           workerType: String, staffID: Int, unitName: String, vlVisLgID: Int, msg: String, nrId: String, sendNotification: Boolean,topicName: String) {
+                           workerType: String, staffID: Int, unitName: String, vlVisLgID: Int, msg: String, nrId: String, sendNotification: Boolean,topicName: String,entryTime:String) {
 
         Log.e("getUnitLog_SAV",""+unitId+" - "+personName);
         RetrofitClinet.instance
@@ -957,7 +969,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification,topicName
+                                            sendNotification,topicName,entryTime
                                         )
                                   //  }
                                 } catch (e: IndexOutOfBoundsException) {
@@ -977,7 +989,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification,topicName
+                                            sendNotification,topicName,entryTime
                                         )
 
                                   //  }
@@ -1000,7 +1012,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         getFamilyMemberData(
                                             unitId.toString(), Prefs.getInt(ASSOCIATION_ID, 0),
                                             unAccountID!!.toInt(), desgn, msg, vlVisLgID,
-                                            sendNotification,topicName
+                                            sendNotification,topicName,entryTime
                                         )
 
                                   //  }
@@ -1104,7 +1116,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
     }
 
 
-    fun getFamilyMemberData(unitId: String, assnID: Int, accountId: Int, desgn: String, msg: String, vlVisLgID: Int, sendNotification: Boolean, topicName:String) {
+    fun getFamilyMemberData(unitId: String, assnID: Int, accountId: Int, desgn: String, msg: String, vlVisLgID: Int, sendNotification: Boolean, topicName:String,entryTime:String) {
         RetrofitClinet.instance.getFamilyMemberList(OYE247TOKEN, unitId, assnID.toString(), accountId.toString())
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -1132,7 +1144,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                             LocalDb.getAssociation()!!.asAsnName,
                                             "gate_app",
                                             DateTimeUtils.getCurrentTimeLocal(),
-                                            DateTimeUtils.getCurrentTimeLocal(),
+                                            entryTime,
                                             vlVisLgID.toString()
                                         )
                                     } catch (e: KotlinNullPointerException) {

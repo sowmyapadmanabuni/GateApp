@@ -1160,6 +1160,7 @@ class Biometric : BaseKotlinActivity(), ResponseHandler, View.OnClickListener, R
             d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
             d.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
             d.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
+            d.putExtra("Base64",intent.getStringExtra("Base64"))
             startActivity(d)
             finish()
         }

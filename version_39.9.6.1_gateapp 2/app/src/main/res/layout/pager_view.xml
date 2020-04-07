@@ -28,7 +28,7 @@
                 android:visibility="invisible"
                 android:onClick="onClick"
                 android:scaleType="fitCenter"
-                android:src="@drawable/prev_page"/>
+                android:src="@drawable/next_inactive"/>
 
 
         <androidx.recyclerview.widget.RecyclerView

@@ -27,7 +27,7 @@
         <RelativeLayout android:layout_width="match_parent"
                         android:layout_below="@+id/rl_header"
                         android:layout_height="2dp"
-                        android:background="@color/orange">
+                        android:background="@color/end_gradient">
 
         </RelativeLayout>
 
@@ -76,7 +76,7 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_below="@+id/lyt"
-            android:background="@color/orange">
+            android:background="@color/end_gradient">
 
     </RelativeLayout>
 

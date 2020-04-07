@@ -89,14 +89,15 @@
                   android:layout_weight="1.5">
         <Button
                 android:id="@+id/btn_biometric"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@drawable/square"
                 android:textStyle="bold"
                 android:textColor="@color/white"
                 android:gravity="center"
                 android:textSize="10dp"
                 android:visibility="gone"
+                android:layout_gravity="center_vertical"
                 android:textAllCaps="false"
                 android:text="@string/textbiometric"/>
     </LinearLayout>
@@ -107,12 +108,13 @@
 
         <Button
                 android:id="@+id/btn_makeentry"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="@drawable/square"
                 android:textColor="@color/white"
                 android:textStyle="bold"
                 android:gravity="center"
+                android:layout_gravity="center_vertical"
                 android:padding="10dp"
                 android:textSize="10dp"
                 android:textAllCaps="false"

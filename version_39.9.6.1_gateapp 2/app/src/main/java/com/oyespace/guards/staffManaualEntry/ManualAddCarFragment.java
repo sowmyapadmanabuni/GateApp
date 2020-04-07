@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -109,11 +110,12 @@ import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
+import static com.oyespace.guards.utils.RandomUtils.encodeToBase64;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 
 public class ManualAddCarFragment extends Activity implements ResponseHandler, View.OnClickListener {
-
+    String encodedImage;
     Button iv_torch;
     int clickable1 = 0;
     public final static int REQUEST_CODE = 65635;
@@ -499,7 +501,9 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
                         Log.d("Dgddfdf picas", "7");
                     }
 
-
+                    BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+                    Bitmap bitmap = drawable.getBitmap();
+                    encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
                     Intent d = new Intent(ManualAddCarFragment.this, ManualStaffEntryRegistration.class);
 //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
 //                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
@@ -517,6 +521,7 @@ public class ManualAddCarFragment extends Activity implements ResponseHandler, V
                     d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                     d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
                     d.putExtra(WORKER_ID, getIntent().getIntExtra(WORKER_ID, 0));
+                    d.putExtra("Base64", encodedImage);
                     startActivity(d);
                     finish();
 

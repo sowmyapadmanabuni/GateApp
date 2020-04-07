@@ -218,7 +218,12 @@ class MyRoleScreen : BaseKotlinActivity() {
                         Prefs.putInt(ASSOCIATION_ID,globalApiObject.data.association.asAssnID)
 
 
-                        getStaffList(AssnID)
+                       // getStaffList(AssnID)
+                        val mainIntent = Intent(this@MyRoleScreen, Dashboard::class.java)
+                        mainIntent.putExtra("STAFF","Available")
+                        startActivity(mainIntent)
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out)
+                        finish()
 
                     } else {
                         //rv_staff.setEmptyAdapter("No items to show!", false, 0)

@@ -85,6 +85,7 @@
 
         <RelativeLayout android:layout_width="match_parent"
                         android:layout_height="2dp"
+                        android:visibility="gone"
                         android:background="@color/orange">
 
         </RelativeLayout>
@@ -440,7 +441,7 @@
                     android:layout_toLeftOf="@+id/buttonNext"
                     android:layout_toStartOf="@+id/buttonNext"
                     android:text="Click on Next To Select Finger. Click on Save to Register Finger Biometric"
-                    android:textColor="@color/orange"
+                    android:textColor="@color/end_gradient"
                     android:textSize="@dimen/_10sdp" />
 
                 <Button

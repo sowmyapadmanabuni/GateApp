@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Environment
+import android.speech.RecognizerIntent
 import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,6 +25,7 @@ import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.ImageApiClient
 import com.oyespace.guards.network.ImageApiInterface
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
@@ -52,6 +54,7 @@ import kotlin.collections.ArrayList
 
 class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     internal var TAKE_PHOTO_REQUEST = 1034
+    private val REQUEST_CODE_SPEECH_INPUT = 100
     var destination: File? = null
     var imgName: String? = null
     internal var list = ArrayList<String>()
@@ -60,6 +63,7 @@ class StaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
+    var vehicleNumber:String?=null
 var purpose:String?=null
     var count = 0
 
@@ -79,23 +83,13 @@ var purpose:String?=null
                     Utils.showToast(applicationContext, getString(R.string.no_internet))
                     return
                 }
-
+                if(tv_vehiclenumber.text.toString().length==0){
+                    vehicleNumber=""
+                }
+                else{
+                    vehicleNumber=tv_vehiclenumber.text.toString()
+                }
                 curTime = getCurrentTimeLocal()
-
-                if (intent.getStringExtra(VISITOR_TYPE).contains(STAFF, true)) {
-
-                    staffVisitorLog(
-                        intent.getStringExtra(UNITID),
-                        intent.getStringExtra(PERSONNAME),
-                        intent.getStringExtra(MOBILENUMBER),
-                        intent.getStringExtra("DESIGNATION"),
-                        intent.getStringExtra("WORKTYPE"),
-                        intent.getIntExtra("WORKERID", 0),
-                        intent.getStringExtra(UNITNAME)
-                    )
-
-
-                } else {
 
                     if (intent.getStringExtra(UNITID).contains(",")) {
 
@@ -114,6 +108,8 @@ var purpose:String?=null
 
                             for (i in 0 until unitname_dataList.size) {
 
+
+
                                 visitorLog(
                                     unitname_dataList.get(i).replace(" ", ""),
                                     unitid_dataList.get(i).replace(" ", ""),
@@ -125,14 +121,13 @@ var purpose:String?=null
 
                         }
                     } else {
-
                         visitorLog(
                             intent.getStringExtra(UNITNAME),
                             intent.getStringExtra(UNITID),
                             intent.getStringExtra(UNIT_ACCOUNT_ID)
                         )
                     }
-                }
+
 
             }
 
@@ -146,29 +141,12 @@ var purpose:String?=null
                     val view = factory.inflate(R.layout.dialog_big_image, null)
                     var dialog_imageview: ImageView? = null
                     dialog_imageview = view.findViewById(R.id.dialog_imageview)
-                    mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                    dialog_imageview.setImageBitmap(mBitmap)
-                  //  dialog_imageview.background = profile_image.getDrawable()
+                    dialog_imageview!!.setBackground(profile_image!!.getDrawable())
 
                     alertadd.setView(view)
                     alertadd.show()
                 }
-//                else {
-//                    val alertadd = AlertDialog.Builder(this@StaffEntryRegistration)
-//                    val factory = LayoutInflater.from(this@StaffEntryRegistration)
-//                    val view = factory.inflate(R.layout.dialog_big_image, null)
-//                    var dialog_imageview: ImageView? = null
-//                    dialog_imageview = view.findViewById(R.id.dialog_imageview)
-//                    Glide.with(this)
-//                        .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
-//                        .placeholder(R.drawable.user_icon_black)
-//                        .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                        .skipMemoryCache(false)
-//                        .signature(StringSignature(System.currentTimeMillis().toString()))
-//                        .into(dialog_imageview)
-//                    alertadd.setView(view)
-//                    alertadd.show()
-//                }
+
             }
 
         }
@@ -202,35 +180,50 @@ var purpose:String?=null
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_final_registration)
-        //launchCamera()
-//        val service =  Intent(getBaseContext(), CapPhoto::class.java)
-//        startService(service);
 
-//         imgName = "Selfie" + "Association" + Prefs.getInt(
-//            ASSOCIATION_ID,
-//            0
-//        ) + "Gantname" + Prefs.getString(ConstantUtils.GATE_NO, "") + System.currentTimeMillis() + ".jpg"
-
-// val front_translucent =   Intent(getBaseContext(), CapPhoto::class.java)
-//                front_translucent.putExtra("Front_Request", true);
-//        front_translucent.putExtra("ImageName",imgName)
-//               // front_translucent.putExtra("Quality_Mode", camCapture.getQuality());
-//                getApplication().getApplicationContext().startService(
-//                        front_translucent);
 
         purpose=intent.getStringExtra(VISITOR_PURPOSE)
         buttonNext.text=resources.getString(R.string.textdone)
 
+        if(intent.getStringExtra(VEHICLE_NUMBER)!=null) {
+            tv_vehiclenumber?.text = (intent.getStringExtra(VEHICLE_NUMBER))
+
+      }
+
+
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION, true)) {
 
-            //  tv_from.setText(resources.getString(R.string.textfrom) +intent.getStringExtra(COMPANY_NAME))
             txt_header.text = LocalDb.getAssociation()!!.asAsnName
             tv_from.text = intent.getStringExtra(FLOW_TYPE)
 
         } else {
+            tv_changefrom.visibility=View.VISIBLE
             txt_header.text = LocalDb.getAssociation()!!.asAsnName
             tv_from.text =
                 intent.getStringExtra(COMPANY_NAME)
+        }
+
+        iv_mike.setOnClickListener{
+            Speak()
+        }
+        iv_scanner.setOnClickListener{
+            val i_vehicle = Intent(this@StaffEntryRegistration, CaptureImageOcr::class.java)
+            i_vehicle.putExtra(UNITID, intent.getStringExtra(UNITID))
+            i_vehicle.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+            i_vehicle.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID,0))
+            i_vehicle.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+            i_vehicle.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
+            i_vehicle.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+            i_vehicle.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+            i_vehicle.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+            i_vehicle.putExtra("RESIDENT_NUMBER", intent.getStringExtra("RESIDENT_NUMBER"))
+            i_vehicle.putExtra(UNITOCCUPANCYSTATUS, intent.getStringExtra(UNITOCCUPANCYSTATUS))
+            i_vehicle.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
+            i_vehicle.putExtra("Base64",intent.getStringExtra("Base64"))
+            i_vehicle.putExtra(ITEMS_PHOTO_LIST,intent.getStringArrayListExtra(ITEMS_PHOTO_LIST))
+            i_vehicle.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
+            startActivity(i_vehicle)
+            finish()
         }
 
         tv_changefrom.setOnClickListener {
@@ -273,17 +266,15 @@ var purpose:String?=null
 
         }
 
-        // tv_name.setText(resources.getString(R.string.textname)+": "+intent.getStringExtra(PERSONNAME))
         tv_name.text = intent.getStringExtra(PERSONNAME)
-        // tv_mobilenumber.setText(resources.getString(R.string.textmobile)+": + "+intent.getStringExtra(COUNTRYCODE)+""+intent.getStringExtra(MOBILENUMBER))
 
         val input = intent.getStringExtra(COUNTRYCODE)+intent.getStringExtra(MOBILENUMBER)
-        //  val countrycode = Prefs.getString(PrefKeys.COUNTRY_CODE,"")
         val number = input.replaceFirst("(\\d{4})(\\d{3})(\\d+)".toRegex(), "$1 $2 $3")
         tv_mobilenumber.text = number
 
 
         tv_for.text = resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
+        menuCount.text ="" + minteger
 
         menuAdd.setOnClickListener {
             minteger++
@@ -291,7 +282,7 @@ var purpose:String?=null
 
         }
         menuRemove.setOnClickListener {
-            if (minteger > 1) {
+            if (minteger >= 1) {
                 minteger--
                 menuCount.text = "" + minteger
 
@@ -304,59 +295,15 @@ var purpose:String?=null
             itemLyt.visibility = View.GONE
         } else {
             if (intent.getIntExtra(ACCOUNT_ID, 0) == 0) {
-                // Toast.makeText(this@StaffEntryRegistration,intent.getIntExtra(ACCOUNT_ID, 0).toString(),Toast.LENGTH_LONG).show()
-                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER).substring(3))
+                singUp(intent.getStringExtra(PERSONNAME), intent.getStringExtra(COUNTRYCODE), intent.getStringExtra(MOBILENUMBER))
 
             }
         }
-
-       // val url=intent.getStringExtra(PERSON_PHOTO)
-
 
         val imageAsBytes = android.util.Base64.decode(intent.getStringExtra("Base64"),android.util.Base64.DEFAULT);
         val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
         profile_image.setImageBitmap(decodedImage)
 
-
-//       val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-//       if (wrrw != null) {
-////            //   imageView1.setImageBitmap(photo);
-////
-//           mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-//           profile_image.setImageBitmap(mBitmap)
-//
-//           intent.getStringExtra("Base64")
-////
-//       }intent.getStringExtra("Base64")
-//        else{
-//           //                    Log.v("IIIIII","Images/" + "PERSONNONREGULAR" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg");
-////                    Glide.with(this)
-////                            .load(Uri.parse(IMAGE_BASE_URL + "Images/" + "PERSON" + getIntent().getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg"))
-////                            .placeholder(R.drawable.user_icon_black)
-////                            .diskCacheStrategy(DiskCacheStrategy.NONE)
-////                            .skipMemoryCache(false)
-////                            .signature(new StringSignature(String.valueOf(System.currentTimeMillis())))
-////                            .into(imageView1);
-//           Picasso.with(this)
-//               .load(IMAGE_BASE_URL + "Images/PERSON" + intent.getStringExtra(MOBILENUMBER).replace("+91", "") + ".jpg")
-//               .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
-//       }
-       //else {
-//               //imageView1.setImageBitmap(photo);
-//            Toast.makeText(applicationContext, "222 ", Toast.LENGTH_SHORT).show()
-//
-//            val image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg"
-////            Picasso.with(this)
-////                .load(image)
-////                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
-//            Glide.with(this)
-//                .load(Uri.parse(IMAGE_BASE_URL + "Images/" + url))
-//                .placeholder(R.drawable.user_icon_black)
-//                .diskCacheStrategy(DiskCacheStrategy.NONE)
-//                .skipMemoryCache(false)
-//                .signature(StringSignature(System.currentTimeMillis().toString()))
-//                .into(profile_image)
-//        }
 
         list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
 
@@ -402,17 +349,12 @@ var purpose:String?=null
     }
 
     private fun visitorLog(UNUniName: String, UNUnitID: String, Unit_ACCOUNT_ID: String) {
-      //  val imgName = "PERSON" + "NONREGULAR" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
-        val imgName = "PERSON" + intent.getStringExtra(MOBILENUMBER).substring(3) + ".jpg"
-
-        Log.i("taaag", "cutTIme: $curTime")
-        Log.e("VISITOR_LOG","::"+Unit_ACCOUNT_ID+" - "+UNUniName)
 
         val req = CreateVisitorLogReq(
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(PERSONNAME),
             LocalDb.getAssociation()!!.asAsnName, 0, "","+91"+ intent.getStringExtra(MOBILENUMBER),
-            purpose.toString(), "", "", "",
+            purpose.toString(), vehicleNumber!!, "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
             , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), intent.getStringExtra("Base64"), Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20,""
@@ -449,17 +391,6 @@ var purpose:String?=null
                                 deleteDir(dir.absolutePath)
 
 
-                               //   uploadImage(imgName,personPhoto);
-//                                val ddc = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
-//                                Log.d("btn_biometric", "af $imgName")
-//
-//                                ddc.putExtra(BSR_Action, UPLOAD_STAFF_PHOTO)
-//                                ddc.putExtra("imgName", imgName)
-//                                ddc.putExtra(PERSON_PHOTO,  intent.getByteArrayExtra(PERSON_PHOTO))
-//                                sendBroadcast(ddc)
-
-
-                              //  uploadImage(imgName, mBitmap)
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
@@ -504,6 +435,7 @@ var purpose:String?=null
                                                     d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                                                     d.putExtra(UNITOCCUPANCYSTATUS,intent.getStringExtra(UNITOCCUPANCYSTATUS))
+                                                    d.putExtra("EntryTime",visitor.vlsActTm)
                                                     sendBroadcast(d)
 
                                                     Log.v("DELIVERY",visitor.vlVisLgID.toString()+intent.getStringExtra(VISITOR_TYPE))
@@ -532,16 +464,13 @@ var purpose:String?=null
                     override fun onErrorResponse(e: Throwable) {
                         Toast.makeText(this@StaffEntryRegistration, "222", Toast.LENGTH_SHORT).show()
                         dismissProgress()
-                       // buttonNext.isEnabled = true
-                       // buttonNext.isClickable = true
                         Utils.showToast(applicationContext, getString(R.string.some_wrng) + e.toString())
                         Log.d("CreateVisitorLogResp", "onErrorResponse  " + e.toString())
                     }
 
                     override fun noNetowork() {
                         dismissProgress()
-                       // buttonNext.isEnabled = true
-                       // buttonNext.isClickable = true
+
                         Utils.showToast(applicationContext, getString(R.string.no_internet))
                     }
 
@@ -561,7 +490,7 @@ var purpose:String?=null
         val req = SignUpReq(
             "", "", "", "", "",
             name, isdCode, "", "", "", "",
-            "", mobNum, "", "", "", "", imgName.toString()
+            "", mobNum, "", "", "", "", intent.getStringExtra("Base64")
         )
         Log.d("singUp", "StaffEntry " + req.toString())
 
@@ -572,8 +501,6 @@ var purpose:String?=null
                 .subscribeWith(object : CommonDisposable<SignUpResp<Account>>() {
                     override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                         if (globalApiObject.success == true) {
-                            // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                            uploadAccountImage(imgName.toString(), mBitmap)
                             Log.d(
                                 "CreateVisitorLogResp",
                                 "StaffEntry " + globalApiObject.data.toString()
@@ -620,268 +547,19 @@ var purpose:String?=null
         res.updateConfiguration(conf, dm)
     }
 
-    override fun onActivityResult(
-        requestCode: Int, resultCode: Int,
-        data: Intent?
-    ) {
-        if (resultCode == Activity.RESULT_OK
-            && requestCode == TAKE_PHOTO_REQUEST
-        ) {
-            // processCapturedPhoto()
-        } else {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
             super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
+            when(requestCode){
+                REQUEST_CODE_SPEECH_INPUT ->{
+                    if (resultCode == Activity.RESULT_OK  && null!= data){
+                        val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                        tv_vehiclenumber.setText(result[0].replace(" ", "").trim())
 
-
-    private fun staffVisitorLog(
-        unitId: String, personName: String, mobileNumb: String, desgn: String,
-        workerType: String, staffID: Int, unitName: String
-    ) {
-
-
-        var memID: Int = 410
-        if (BASE_URL.contains("dev", true)) {
-            memID = 64
-        } else if (BASE_URL.contains("uat", true)) {
-            memID = 64
-        }
-//        var memID:Int=64;
-//        if(!BASE_URL.contains("dev",true)){
-//            memID=410;
-//        }
-        var SPPrdImg1 = ""
-        var SPPrdImg2 = ""
-        var SPPrdImg3 = ""
-        var SPPrdImg4 = ""
-        var SPPrdImg5 = ""
-        var SPPrdImg6 = ""
-        var SPPrdImg7 = ""
-        var SPPrdImg8 = ""
-        var SPPrdImg9 = ""
-        var SPPrdImg10 = ""
-        val req = CreateVisitorLogReq(
-            Prefs.getInt(ASSOCIATION_ID, 0), staffID,
-            unitName, unitId, desgn,
-            personName, "", 0, "+", mobileNumb,
-            "", "", "", "",
-            1, workerType, SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            ,
-            SPPrdImg6,
-            SPPrdImg7,
-            SPPrdImg8,
-            SPPrdImg9,
-            SPPrdImg10,
-            "",
-            intent.getStringExtra("Image"),
-            Prefs.getString(ConstantUtils.GATE_NO, ""),
-            DateTimeUtils.getCurrentTimeLocal(),
-            "", "", "", "", "", "", "", "", "", "",""
-        )
-        Log.d("CreateVisitorLogResp", "StaffEntry " + req.toString())
-
-        CompositeDisposable().add(
-            RetrofitClinet.instance.createVisitorLogCall(OYE247TOKEN, req)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(object : CommonDisposable<CreateVisitorLogResp<VLRData>>() {
-                    override fun onSuccessResponse(globalApiObject: CreateVisitorLogResp<VLRData>) {
-                        if (globalApiObject.success == true) {
-
-                            val id = globalApiObject.data.visitorLog.vlVisLgID
-                            updateFirebaseColor(id, "#f0f0f0")
-
-                            val ddc = Intent(this@StaffEntryRegistration, BackgroundSyncReceiver::class.java)
-                            ddc.putExtra(ConstantUtils.BSR_Action, ConstantUtils.SENDFCM_toSYNC_VISITORENTRY)
-                            ddc.putExtra("msg", personName + " " + desgn + " is coming to your home")
-                            ddc.putExtra("mobNum", mobileNumb)
-                            ddc.putExtra("name", personName)
-                            ddc.putExtra("nr_id", AppUtils.intToString(globalApiObject.data.visitorLog.vlVisLgID))
-                            ddc.putExtra("unitname", unitName)
-                            ddc.putExtra("memType", "Owner")
-                            ddc.putExtra(COMPANY_NAME, desgn)
-                            this@StaffEntryRegistration.sendBroadcast(ddc)
-
-                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.data.toString())
-                        } else {
-                            Log.d("CreateVisitorLogResp", "StaffEntry " + globalApiObject.toString())
-
-                            Utils.showToast(this@StaffEntryRegistration, "Entry not Saved" + globalApiObject.toString())
-                        }
-                        finish()
                     }
-
-                    override fun onErrorResponse(e: Throwable) {
-                        Log.d("onErrorResponse", "StaffEntry " + e.toString())
-                        buttonNext.isEnabled = true
-                        buttonNext.isClickable = true
-                        Utils.showToast(this@StaffEntryRegistration, "Something went wrong")
-//                    dismissProgress()
-                    }
-
-                    override fun noNetowork() {
-                        buttonNext.isEnabled = true
-                        buttonNext.isClickable = true
-                        Utils.showToast(this@StaffEntryRegistration, resources.getString(R.string.no_internet))
-                    }
-
-                    override fun onShowProgress() {
-//                    showProgress()
-                    }
-
-                    override fun onDismissProgress() {
-//                    dismissProgress()
-                    }
-                })
-        )
-    }
-
-    fun uploadImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-
-
-        val imageFile = File(mPath)
-
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 50
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.PNG, 50, bosProfile)
-            }
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage111", "response:" + response.body()!!)
-                    file.delete()
-                    // Toast.makeText(getApplicationContext(),"Uploaded Successfully",Toast.LENGTH_SHORT).show();
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage222", "errr:" + ex.toString())
-
                 }
-
             }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-
-            }
-        })
-
-
     }
 
-    fun uploadAccountImage(localImgName: String, incidentPhoto: Bitmap?) {
-        Log.d("uploadImage",localImgName)
-        var byteArrayProfile: ByteArray?
-        val mPath = Environment.getExternalStorageDirectory().toString() + "/" + localImgName + ".jpg"
-        val imageFile = File(mPath)
-
-        try {
-            val outputStream = FileOutputStream(imageFile)
-            val quality = 75
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
-            }
-            outputStream.flush()
-            outputStream.close()
-
-            val bosProfile = ByteArrayOutputStream()
-            if (incidentPhoto != null) {
-                incidentPhoto.compress(Bitmap.CompressFormat.PNG, 75, bosProfile)
-            }
-            // bmp1.compress(Bitmap.CompressFormat.JPEG, 50, bos);
-            //InputStream in = new ByteArrayInputStream(bos.toByteArray());
-            byteArrayProfile = bosProfile.toByteArray()
-            val len = bosProfile.toByteArray().size
-            println("AFTER COMPRESSION-===>$len")
-            bosProfile.flush()
-            bosProfile.close()
-            if (incidentPhoto != null) {
-                //    incidentPhoto.recycle()
-            }
-            Timber.e("uploadImage  bf", "sfas")
-        } catch (ex: Exception) {
-            byteArrayProfile = null
-            Log.d("uploadImage ererer bf", ex.toString())
-        }
-
-//        val uriTarget = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, ContentValues())
-//
-//        val imageFileOS: OutputStream?
-//        try {
-//            imageFileOS = contentResolver.openOutputStream(uriTarget!!)
-//            imageFileOS!!.write(byteArrayProfile!!)
-//            imageFileOS.flush()
-//            imageFileOS.close()
-//
-//            Log.d("uploadImage Path bf", uriTarget.toString())
-//        } catch (e: FileNotFoundException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        } catch (e: IOException) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace()
-//        }
-
-        val file = File(imageFile.toString())
-        val requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file)
-        val body = MultipartBody.Part.createFormData("Test", localImgName, requestFile)
-        val apiService = ImageApiClient.getImageClient().create(ImageApiInterface::class.java)
-        val call = apiService.updateImageProfile(body)
-
-        call.enqueue(object : Callback<Any> {
-            override fun onResponse(call: Call<Any>, response: retrofit2.Response<Any>) {
-                try {
-                    Log.d("uploadImage", "response:" + response.body()!!)
-
-                } catch (ex: Exception) {
-                    Log.d("uploadImage", "errr:" + ex.toString())
-
-                }
-
-            }
-
-            override fun onFailure(call: Call<Any>, t: Throwable) {
-                // Log error here since request failed
-                Log.d("uploadImage", t.toString())
-
-            }
-        })
-
-
-    }
 
     fun convertToBase64(imagePath: String): String {
         val bm = BitmapFactory.decodeFile(imagePath)
@@ -890,5 +568,19 @@ var purpose:String?=null
         val byteArrayImage = baos.toByteArray()
         return Base64.encodeToString(byteArrayImage, Base64.DEFAULT)
     }
+    fun Speak() {
+
+            val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+            intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
+
+            try {
+                startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+            } catch (e: Exception) {
+                Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
 }

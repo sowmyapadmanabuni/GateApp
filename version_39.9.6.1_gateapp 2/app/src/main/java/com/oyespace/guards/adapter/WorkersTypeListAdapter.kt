@@ -11,7 +11,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.oyespace.guards.R
 import com.oyespace.guards.pojo.WorkerType
-import com.oyespace.guards.staff.StaffBlockSelectionActivity
+import com.oyespace.guards.staff.StaffBlockTabsActivity
 import com.oyespace.guards.staffManaualEntry.ManulBlockSelectionActivity
 import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.Prefs
@@ -31,7 +31,7 @@ class WorkersTypeListAdapter(val items: ArrayList<WorkerType>, val mcontext: Con
         if (Prefs.getString(TYPE, "").equals("Create")) {
             holder.lv_staff.setOnClickListener {
 
-                val intent = Intent(mcontext, StaffBlockSelectionActivity::class.java)
+                val intent = Intent(mcontext, StaffBlockTabsActivity::class.java)
                 intent.putExtra(FLOW_TYPE, flowType)
                 intent.putExtra(VISITOR_TYPE, "STAFF")
                 intent.putExtra(COMPANY_NAME, items[position].wtDesgn)
@@ -47,10 +47,7 @@ class WorkersTypeListAdapter(val items: ArrayList<WorkerType>, val mcontext: Con
                 d.putExtra("FIRSTNAME", mcontext.intent.getStringExtra("FIRSTNAME"))
                 d.putExtra("LASTNAME", mcontext.intent.getStringExtra("LASTNAME"))
                 d.putExtra(MOBILENUMBER, mcontext.intent.getStringExtra(MOBILENUMBER))
-                d.putExtra(
-                    "DESIGNATION",
-                    mcontext.intent.getStringExtra("DESIGNATION")
-                )
+                d.putExtra("DESIGNATION", mcontext.intent.getStringExtra("DESIGNATION"))
                 d.putExtra("WORKTYPE", mcontext.intent.getStringExtra("WORKTYPE"))
                 d.putExtra(WORKER_ID, mcontext.intent.getIntExtra(WORKER_ID, 0))
                 d.putExtra("UNITNAME", mcontext.intent.getStringExtra("UNITNAME"))

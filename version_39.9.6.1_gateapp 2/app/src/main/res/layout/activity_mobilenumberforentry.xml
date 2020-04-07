@@ -131,7 +131,7 @@
             android:textSize="18sp"
             android:paddingLeft="15dp"
             android:textStyle="bold"
-            android:textColor="@color/orange"
+            android:textColor="@color/end_gradient"
             android:layout_height="wrap_content"/>
     <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -332,7 +332,7 @@
             android:layout_below="@+id/lytt"
             android:paddingLeft="15dp"
             android:textStyle="bold"
-            android:textColor="@color/orange"
+            android:textColor="@color/end_gradient"
     />
 
     <TextView

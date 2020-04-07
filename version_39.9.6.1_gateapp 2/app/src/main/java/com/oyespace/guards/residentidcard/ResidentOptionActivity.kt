@@ -81,7 +81,7 @@ class ResidentOptionActivity : AppCompatActivity(), View.OnClickListener {
 
             R.id.bt_vehicleScanner->{
 
-                val i_staff = Intent(this@ResidentOptionActivity, CaptureImageOcr::class.java)
+                val i_staff = Intent(this@ResidentOptionActivity, ResidentCaptureImageOcr::class.java)
                 startActivity(i_staff)
             }
 

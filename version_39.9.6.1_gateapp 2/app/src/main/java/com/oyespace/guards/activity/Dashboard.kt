@@ -32,6 +32,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.*
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -56,7 +57,7 @@ import com.oyespace.guards.com.oyespace.guards.fcm.FRTDBService
 import com.oyespace.guards.constants.PrefKeys
 import com.oyespace.guards.constants.PrefKeys.*
 import com.oyespace.guards.guest.GuestCustomViewFinderScannerActivity
-import com.oyespace.guards.kidexit.KidExitBlockSelectionActivity
+import com.oyespace.guards.kidexit.KidEdxitBlockTabsActivity
 import com.oyespace.guards.models.*
 import com.oyespace.guards.models.FingerPrint
 import com.oyespace.guards.models.Worker
@@ -351,10 +352,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         } else {
             Prefs.putString(LANGUAGE, "en")
         }
-//        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
-//            startService(Intent(this@Dashboard, BGService::class.java))
-//
-//        }
+
+        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
+            startService(Intent(this@Dashboard, BGService::class.java))
+        }
+
 //        getLatestSubscription()
         println("Shalini" + getCurrentTimeLocalYMD())
         Dexter.withActivity(this)
@@ -1409,7 +1411,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             }
             R.id.re_kidexit->{
 
-                val i_kidexit = Intent(this@Dashboard, KidExitBlockSelectionActivity::class.java)
+                val i_kidexit = Intent(this@Dashboard, KidEdxitBlockTabsActivity::class.java)
                 startActivity(i_kidexit)
             }
             R.id.iv_torch-> {
@@ -1478,7 +1480,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         btn_mic = findViewById(R.id.btn_mic)
         btn_in = findViewById(R.id.btn_in)
         btn_out = findViewById(R.id.btn_out)
-        btn_in.setBackgroundColor(resources.getColor(R.color.orange))
+        btn_in.setBackgroundDrawable(ContextCompat.getDrawable(this@Dashboard, R.drawable.background_color) );
         btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
         walk1 = findViewById(R.id.walky)
@@ -1636,7 +1638,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             showingOutLog = false
             clearSearchText()
             Prefs.putString("BUTTON", "IN")
-            btn_in.setBackgroundColor(resources.getColor(R.color.orange))
+            btn_in.setBackgroundDrawable(ContextCompat.getDrawable(this@Dashboard, R.drawable.background_color) );
             btn_out.setBackgroundColor(resources.getColor(R.color.grey))
 
             val visitorLog = VisitorLogRepo.get_IN_VisitorLog()
@@ -1659,7 +1661,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                     visitorEntryListAdapter?.setVisitorLog(newAl)
                 }
                 rv_dashboard?.adapter = visitorEntryListAdapter
-                btn_in.setBackgroundColor(resources.getColor(R.color.orange))
+                btn_in.setBackgroundDrawable(ContextCompat.getDrawable(this@Dashboard, R.drawable.background_color) );
                 btn_out.setBackgroundColor(resources.getColor(R.color.grey))
                 dismissProgress()
 
@@ -1679,16 +1681,12 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
             clearSearchText()
             Prefs.putString("BUTTON", "OUT")
             btn_in.setBackgroundColor(resources.getColor(R.color.grey))
-            btn_out.setBackgroundColor(resources.getColor(R.color.orange))
+            btn_out.setBackgroundDrawable(ContextCompat.getDrawable(this@Dashboard, R.drawable.background_color) );
             loadExitVisitorLog(true)
         }
-
-
-
-
-//        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
-//            startService(Intent(this@Dashboard, BGService::class.java))
-//        }
+        if (!Prefs.getBoolean(BG_NOTIFICATION_ON, false)) {
+            startService(Intent(this@Dashboard, BGService::class.java))
+        }
 
 
         if (Prefs.getInt(PATROLLING_ID, 0) != 0) {
@@ -2618,78 +2616,80 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                             updateFirebaseColor(visitorLogID, "#f0f0f0")
                             loadEntryVisitorLog()
 
-//                            if (unitId.contains(",")) {
-//
-//                                var unitname_dataList: Array<String>
-//                                var unitid_dataList: Array<String>
-//
-//                                unitname_dataList =
-//                                    unitName.split(",".toRegex())
-//                                        .dropLastWhile({ it.isEmpty() })
-//                                        .toTypedArray()
-//                                unitid_dataList =
-//                                    unitId.split(",".toRegex())
-//                                        .dropLastWhile({ it.isEmpty() })
-//                                        .toTypedArray()
-//                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
-//                                if (unitid_dataList.isNotEmpty()) {
-//                                    for (i in 0 until unitid_dataList.size) {
-//
-//                                        val ddc = Intent(
-//                                            this@Dashboard,
-//                                            BackgroundSyncReceiver::class.java
-//                                        )
-//                                        ddc.putExtra(
-//                                            ConstantUtils.BSR_Action,
-//                                            ConstantUtils.VisitorEntryFCM
-//                                        )
-//                                        ddc.putExtra(
-//                                            "msg",
-//                                            "$personName $desgn " + " is coming to your home" + "(" + unitname_dataList.get(
-//                                                i
-//                                            ).replace(" ", "") + ")"
-//                                        )
-//                                        ddc.putExtra("mobNum", mobileNumb)
-//                                        ddc.putExtra("name", personName)
-//                                        ddc.putExtra("nr_id", visitorLogID.toString())
-//                                        ddc.putExtra(
-//                                            "unitname",
-//                                            unitname_dataList.get(i).replace(" ", "")
-//                                        )
-//                                        ddc.putExtra("memType", "Owner")
-//                                        ddc.putExtra(
-//                                            UNITID,
-//                                            unitid_dataList.get(i).replace(" ", "")
-//                                        )
-//                                        ddc.putExtra(COMPANY_NAME, "Staff")
-//                                        ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
-//                                        ddc.putExtra("VLVisLgID", visitorLogID)
-//                                        ddc.putExtra(VISITOR_TYPE, desgn)
-//                                        sendBroadcast(ddc)
-//                                    }
-//                                }
-//                            } else {
-//                                val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
-//                                ddc.putExtra(
-//                                    ConstantUtils.BSR_Action,
-//                                    ConstantUtils.VisitorEntryFCM
-//                                )
-//                                ddc.putExtra(
-//                                    "msg",
-//                                    "$personName" + " is coming to your home" + "(" + unitName + ")"
-//                                )
-//                                ddc.putExtra("mobNum", mobileNumb)
-//                                ddc.putExtra("name", personName)
-//                                ddc.putExtra("nr_id", visitorLogID.toString())
-//                                ddc.putExtra("unitname", unitName)
-//                                ddc.putExtra("memType", "Owner")
-//                                ddc.putExtra(UNITID, unitId)
-//                                ddc.putExtra(COMPANY_NAME, "Staff")
-//                                ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
-//                                ddc.putExtra("VLVisLgID", visitorLogID)
-//                                ddc.putExtra(VISITOR_TYPE, desgn)
-//                                sendBroadcast(ddc)
-//                            }
+                            if (unitId.contains(",")) {
+
+                                var unitname_dataList: Array<String>
+                                var unitid_dataList: Array<String>
+
+                                unitname_dataList =
+                                    unitName.split(",".toRegex())
+                                        .dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
+                                unitid_dataList =
+                                    unitId.split(",".toRegex())
+                                        .dropLastWhile({ it.isEmpty() })
+                                        .toTypedArray()
+                                // unitAccountId_dataList=intent.getStringExtra(UNIT_ACCOUNT_ID).split(",".toRegex()).dropLastWhile({ it.isEmpty() }).toTypedArray()
+                                if (unitid_dataList.isNotEmpty()) {
+                                    for (i in 0 until unitid_dataList.size) {
+
+                                        val ddc = Intent(
+                                            this@Dashboard,
+                                            BackgroundSyncReceiver::class.java
+                                        )
+                                        ddc.putExtra(
+                                            ConstantUtils.BSR_Action,
+                                            ConstantUtils.VisitorEntryFCM
+                                        )
+                                        ddc.putExtra(
+                                            "msg",
+                                            "$personName $desgn " + " is coming to your home" + "(" + unitname_dataList.get(
+                                                i
+                                            ).replace(" ", "") + ")"
+                                        )
+                                        ddc.putExtra("mobNum", mobileNumb)
+                                        ddc.putExtra("name", personName)
+                                        ddc.putExtra("nr_id", visitorLogID.toString())
+                                        ddc.putExtra(
+                                            "unitname",
+                                            unitname_dataList.get(i).replace(" ", "")
+                                        )
+                                        ddc.putExtra("memType", "Owner")
+                                        ddc.putExtra(
+                                            UNITID,
+                                            unitid_dataList.get(i).replace(" ", "")
+                                        )
+                                        ddc.putExtra(COMPANY_NAME, "Staff")
+                                        ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                                        ddc.putExtra("VLVisLgID", visitorLogID)
+                                        ddc.putExtra(VISITOR_TYPE, desgn)
+                                        ddc.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
+                                        sendBroadcast(ddc)
+                                    }
+                                }
+                            } else {
+                                val ddc = Intent(this@Dashboard, BackgroundSyncReceiver::class.java)
+                                ddc.putExtra(
+                                    ConstantUtils.BSR_Action,
+                                    ConstantUtils.VisitorEntryFCM
+                                )
+                                ddc.putExtra(
+                                    "msg",
+                                    "$personName" + " is coming to your home" + "(" + unitName + ")"
+                                )
+                                ddc.putExtra("mobNum", mobileNumb)
+                                ddc.putExtra("name", personName)
+                                ddc.putExtra("nr_id", visitorLogID.toString())
+                                ddc.putExtra("unitname", unitName)
+                                ddc.putExtra("memType", "Owner")
+                                ddc.putExtra(UNITID, unitId)
+                                ddc.putExtra(COMPANY_NAME, "Staff")
+                                ddc.putExtra(UNIT_ACCOUNT_ID, unAccountID)
+                                ddc.putExtra("VLVisLgID", visitorLogID)
+                                ddc.putExtra(VISITOR_TYPE, desgn)
+                                ddc.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
+                                sendBroadcast(ddc)
+                            }
 
                             val intentAction1 =
                                 Intent(applicationContext, BackgroundSyncReceiver::class.java)

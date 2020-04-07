@@ -33,7 +33,7 @@ class BlockSelectionAdapter(private val mcontext: Context, private val arrayList
         p0.mPageNumber.text = block
         //p0.itemView.requestLayout();
         if(!arrayList[p1].isSelected){
-            p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.orange))
+            p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.end_gradient))
             p0.mPageNumber.setTextColor(mcontext.resources.getColor(R.color.white))
         }else{
             p0.mPageCard.setCardBackgroundColor(mcontext.resources.getColor(R.color.dark_grey))

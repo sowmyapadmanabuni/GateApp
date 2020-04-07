@@ -110,7 +110,7 @@ public class BGService extends Service  {
                    t1.speak("Attention Security", TextToSpeech.QUEUE_FLUSH, null);
 
                 try {
-                    Thread.sleep((long) 2000);
+                    Thread.sleep((long) 3000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -132,7 +132,7 @@ public class BGService extends Service  {
         }
 
         if(Prefs.getBoolean(BG_NOTIFICATION_ON,true)) {
-            handler.postDelayed(r, 2000);
+            handler.postDelayed(r, 100000);
 
         }else {
             Prefs.putBoolean(BG_NOTIFICATION_ON,false);

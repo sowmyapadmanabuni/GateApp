@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -37,6 +38,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 import com.oyespace.guards.R;
+import com.oyespace.guards.activity.StaffEntryRegistration;
 import com.oyespace.guards.camtest.ImageHelper;
 import com.oyespace.guards.constants.PrefKeys;
 import com.oyespace.guards.network.ChampApiInterface;
@@ -61,9 +63,21 @@ import java.util.Map;
 import java.util.PriorityQueue;
 
 import static com.oyespace.guards.constants.PrefKeys.LANGUAGE;
+import static com.oyespace.guards.utils.ConstantUtils.ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.ASSOCIATION_ID;
+import static com.oyespace.guards.utils.ConstantUtils.COMPANY_NAME;
+import static com.oyespace.guards.utils.ConstantUtils.COUNTRYCODE;
+import static com.oyespace.guards.utils.ConstantUtils.FLOW_TYPE;
 import static com.oyespace.guards.utils.ConstantUtils.GATE_NO;
+import static com.oyespace.guards.utils.ConstantUtils.ITEMS_PHOTO_LIST;
+import static com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.PERSONNAME;
+import static com.oyespace.guards.utils.ConstantUtils.UNITID;
+import static com.oyespace.guards.utils.ConstantUtils.UNITNAME;
+import static com.oyespace.guards.utils.ConstantUtils.UNITOCCUPANCYSTATUS;
+import static com.oyespace.guards.utils.ConstantUtils.UNIT_ACCOUNT_ID;
 import static com.oyespace.guards.utils.ConstantUtils.VEHICLE_NUMBER;
+import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 public class  CaptureImageOcr extends Activity implements View.OnClickListener,ResponseHandler  {
@@ -222,7 +236,7 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener,R
 
                     Log.d("data in text ", text.getText());
 
-                    vehicalnumber.setText(text.getText().replaceAll("[-+^]*", " "));
+                    vehicalnumber.setText(text.getText().replaceAll("[-+^]*", ""));
                     vehicalNumberData = vehicalnumber.getText().toString().trim();
 
                 }
@@ -260,9 +274,26 @@ public class  CaptureImageOcr extends Activity implements View.OnClickListener,R
             case R.id.buttonNext:
 
                 if(!vehicalnumber.getText().toString().matches("")){
-                    checkValidateUserVehical(vehicalnumber.getText().toString());
+                   // checkValidateUserVehical(vehicalnumber.getText().toString());
 
-
+                    Intent i_vehicle = new Intent(CaptureImageOcr.this, StaffEntryRegistration.class);
+                    i_vehicle.putExtra(UNITID, getIntent().getStringExtra(UNITID));
+                    i_vehicle.putExtra(UNITNAME, getIntent().getStringExtra(UNITNAME));
+                    i_vehicle.putExtra(ACCOUNT_ID, getIntent().getIntExtra(ACCOUNT_ID,0));
+                    i_vehicle.putExtra(MOBILENUMBER, getIntent().getStringExtra(MOBILENUMBER));
+                    i_vehicle.putExtra(COUNTRYCODE, getIntent().getStringExtra(COUNTRYCODE));
+                    i_vehicle.putExtra(FLOW_TYPE, getIntent().getStringExtra(FLOW_TYPE));
+                    i_vehicle.putExtra(VISITOR_TYPE, getIntent().getStringExtra(VISITOR_TYPE));
+                    i_vehicle.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
+                    i_vehicle.putExtra("RESIDENT_NUMBER", getIntent().getStringExtra("RESIDENT_NUMBER"));
+                    i_vehicle.putExtra(UNITOCCUPANCYSTATUS, getIntent().getStringExtra(UNITOCCUPANCYSTATUS));
+                    i_vehicle.putExtra(PERSONNAME, getIntent().getStringExtra(PERSONNAME));
+                    i_vehicle.putExtra("Base64",getIntent().getStringExtra("Base64"));
+                    i_vehicle.putExtra(ITEMS_PHOTO_LIST,getIntent().getStringArrayListExtra(ITEMS_PHOTO_LIST));
+                    i_vehicle.putExtra(VEHICLE_NUMBER,vehicalnumber.getText().toString());
+                    i_vehicle.putExtra(COMPANY_NAME, getIntent().getStringExtra(COMPANY_NAME));
+                    startActivity(i_vehicle);
+                    finish();
                 } else {
                     showToast(CaptureImageOcr.this,"Enter Vehicle number");
                 }

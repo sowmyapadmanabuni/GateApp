@@ -71,7 +71,7 @@
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_below="@+id/rl_header"
                     android:layout_height="1dp"
-                    android:background="@color/orange">
+                    android:background="@drawable/background_color">
 
     </RelativeLayout>
     <LinearLayout
@@ -118,7 +118,7 @@
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:id="@+id/view2"
-                    android:background="@color/orange"
+                    android:background="@drawable/background_color"
     android:layout_below="@+id/lyt">
 
     </RelativeLayout>

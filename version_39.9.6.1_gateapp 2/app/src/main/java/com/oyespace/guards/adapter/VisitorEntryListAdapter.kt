@@ -132,7 +132,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
             holder.apartmentNamee.text = if (debug) "${unitName} ($vlLogId) ($phone)" else unitName
             holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
             holder.entrydate.text = formatDateDMY(visitor.vldCreated)
-
+            holder.tv_vehiclenumber.text= visitor.vLVehNum
 
 
             if (visitor.vlExitT.equals("0001-01-01T00:00:00", true)) {
@@ -183,10 +183,10 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                         }
 
                         type.contains(DELIVERY, true) -> {
-                            if (status_!!.contains("EntryApproved")) {
-
-
-                            }
+//                            if (status_!!.contains("EntryApproved")||status_!!.contains("Entry Approved")) {
+//
+//
+//                            }
                             if (holder.btn_makeexit.text == "Request Exit") {
                                 try {
 
@@ -228,6 +228,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                     d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                     d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
                                     d.putExtra(ConstantUtils.SEND_NOTIFICATION, true)
+                                    d.putExtra("EntryTime", visitor.vlsActTm)
                                     mcontext.sendBroadcast(d)
                                 }catch (e:java.lang.Exception){
                                     e.printStackTrace()
@@ -535,6 +536,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
 
         var isAnimating: Boolean = false
          var timer: CountDownTimer? = null
+        var tv_vehiclenumber:TextView
 
 
         init {
@@ -564,6 +566,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
             iv_play = view.findViewById(R.id.iv_play)
             tv_comments = view.findViewById(R.id.tv_comments)
             iv_attachment = view.findViewById(R.id.iv_attachment)
+            tv_vehiclenumber=view.findViewById(R.id.tv_vehiclenumber)
 
 
         }
@@ -647,7 +650,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                             "#00ff00",
                             ACCEPTED_COLOR -> {
 
-                                if(status_!!.contains("EntryApproved")) {
+                                if(status_!!.contains("EntryApproved")||status_!!.contains("Entry Approved")) {
                                     // accepted by resident, start timer for 7 mins to overstay
 
                                     holder.tv.text="Entry Approved"
@@ -661,10 +664,14 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                     VisitorLogRepo.updateVisitorStatus(mcontext, visitor, ENTRYAPPROVED, true)
 
                                     if (msLeft < 0) {// time is up
-                                        holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
-                                        holder.isAnimating = true
-                                        holder.ll_card.startAnimation(animBlink)
-                                        holder.btn_makeexit.visibility = View.VISIBLE
+                                        if(visitor?.vlVisType.equals(DELIVERY) && deliveryTimeUp(visitor?.vlsActTm,getCurrentTimeLocal(),1)) {
+
+                                            holder.ll_card.setBackgroundColor(Color.parseColor(TIMEUP_COLOR))
+                                            holder.isAnimating = true
+                                            holder.ll_card.startAnimation(animBlink)
+                                            holder.btn_makeexit.visibility = View.VISIBLE
+                                        }
+
 
                                        // val overstayValue=Prefs.getBoolean(PrefKeys.BG_NOTIFICATION_ON, false)
 
@@ -672,10 +679,12 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                            // Let it continue running until it is stopped.
 
 
-                                        Handler().postDelayed({
-                                            var serviceIntent = Intent(mcontext, BGService::class.java);
-                                            mcontext.startService(serviceIntent);
-                                        }, 1000*1*60)
+
+
+//                                        Handler().postDelayed({
+//                                            var serviceIntent = Intent(mcontext, BGService::class.java);
+//                                            mcontext.startService(serviceIntent);
+//                                        }, 1000*1*60)
 
 
 
@@ -692,7 +701,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                         }
                                     }
                                 }
-                                else if(status_!!.contains("ExitApproved")){
+                                else if(status_!!.contains("ExitApproved")||status_!!.contains("Exit Approved")){
 
                                     holder.tv.text=status_
                                     holder.btn_makeexit.visibility = View.VISIBLE
@@ -720,7 +729,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                             }
                             else -> {// pending, start timer for 30mins to remove, hide exit button
 
-                                if(status_!!.contains("EntryPending")) {
+                                if(status_!!.contains("EntryPending")||status_!!.contains("Entry Pending")) {
 
                                     holder.tv.text="Entry Pending"
                                     holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
@@ -732,7 +741,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                         updateVisitorStatus(visitor, holder.adapterPosition, ENTRYEXPIRED, false)
                                     }
                                 }
-                                else if(status_!!.contains("ExitPending")){
+                                else if(status_!!.contains("ExitPending")||status_!!.contains("Exit Pending")){
 
                                     holder.btn_makeexit.visibility = View.VISIBLE
                                     holder.btn_makeexit.text="Waiting for Approval"
@@ -806,7 +815,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                             "#00ff00",
                             ACCEPTED_COLOR -> {
 
-                                if(status_!!.contains("ExitApproved")) {
+                                if(status_!!.contains("ExitApproved")||status_!!.contains("Exit Approved")) {
                                  // accepted by resident, start timer for 7 mins to overstay
                                     holder.tv.text="Exit Approved"
                                     holder.btn_makeexit.visibility = View.VISIBLE
@@ -835,7 +844,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                             }
                             else -> {// pending, start timer for 30mins to remove, hide exit button
 
-                                if(status_!!.contains("ExitPending")) {
+                                if(status_!!.contains("ExitPending")||status_!!.contains("Exit Pending")) {
                                     holder.tv.text=status_
                                     holder.btn_makeexit.visibility = if (debug) View.VISIBLE else View.INVISIBLE
                                   //  updateVisitorStatus(visitor, holder.adapterPosition, EXITPENDING, false)

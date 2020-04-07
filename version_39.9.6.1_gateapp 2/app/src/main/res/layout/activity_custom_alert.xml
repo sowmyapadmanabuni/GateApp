@@ -15,7 +15,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="@dimen/_28sdp"
                 android:text="SOS passed"
-                android:textColor="@color/orange"
+                android:textColor="@color/end_gradient"
                 android:textSize="@dimen/_18sdp" />
 
         <Button
@@ -25,7 +25,7 @@
                 android:layout_below="@id/p1"
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="33dp"
-                android:background="@color/orange"
+                android:background="@drawable/background_color"
                 android:text="Ok"
                 android:textColor="@color/white" />
 

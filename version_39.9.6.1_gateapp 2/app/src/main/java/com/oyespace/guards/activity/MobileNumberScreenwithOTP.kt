@@ -531,7 +531,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                             getLatestRecordData(MobNumber,globalApiObject.data.accountByMobile.get(0).acAccntID.toString(),isdCode)
 
                             }else {
-                            val d = Intent(this@MobileNumberScreenwithOTP, BlockSelectionActivity::class.java)
+                            val d = Intent(this@MobileNumberScreenwithOTP, BlockTabsActivity::class.java)
                             d.putExtra(FLOW_TYPE, DELIVERY)
                             d.putExtra(VISITOR_TYPE, DELIVERY)
                             d.putExtra(MOBILENUMBER, MobNumber)
@@ -866,7 +866,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
                     if (getdata.data != null) {
                         val d = Intent(
                             this@MobileNumberScreenwithOTP,
-                            BlockSelectionActivity::class.java
+                            BlockTabsActivity::class.java
                         )
                         d.putExtra(FLOW_TYPE, DELIVERY)
                         d.putExtra(VISITOR_TYPE, DELIVERY)
@@ -884,7 +884,7 @@ class MobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListener, Co
 
                     } else {
 
-                            val d = Intent(this@MobileNumberScreenwithOTP, BlockSelectionActivity::class.java)
+                            val d = Intent(this@MobileNumberScreenwithOTP, BlockTabsActivity::class.java)
                             d.putExtra(FLOW_TYPE, DELIVERY)
                             d.putExtra(VISITOR_TYPE, DELIVERY)
                             d.putExtra(MOBILENUMBER, mobileNumber)

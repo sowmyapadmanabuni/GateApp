@@ -2,13 +2,11 @@ package com.oyespace.guards.guest
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -16,7 +14,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -417,7 +414,7 @@ class GuestUnitSelectionActivity : BaseKotlinActivity() , View.OnClickListener  
 
     private fun managePageNavButtons(){
         if(PAGE_NUMBER == 0){
-            btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.prev_page))
+            btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.next_inactive))
         }else{
             btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.prev_active))
         }

@@ -248,6 +248,7 @@ class VisitorLogRepo {
                                             d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                             d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
                                             d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
+                                            d.putExtra("EntryTime", visitor.vlsActTm)
                                             context.sendBroadcast(d)
                                         }
                                     } catch (e: Exception) {

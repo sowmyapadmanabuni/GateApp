@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AlertDialog;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.MyViewHolder> {
-
+    Button image_Gallery;
 private ArrayList<String> imageList;
 Context context;
 String visibility;
@@ -36,12 +37,17 @@ CardView lyt_card;
 }
 
 
+    public  ImageAdapter(ArrayList<String> imageList, Context context,String visibility,Button image_Gallery) {
+        this.imageList = imageList;
+        this.context=context;this.image_Gallery=image_Gallery;
+        this.visibility=visibility;
+        this.image_Gallery=image_Gallery;
+    }
     public  ImageAdapter(ArrayList<String> imageList, Context context,String visibility) {
         this.imageList = imageList;
         this.context=context;
         this.visibility=visibility;
     }
-
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_custom_row_layout_camtest, parent, false);
@@ -88,7 +94,7 @@ CardView lyt_card;
                         notifyDataSetChanged();
 
                         if (imageList.size() == 19) {
-                            AddCarFragment.image_Gallery.setVisibility(View.VISIBLE);
+                            image_Gallery.setVisibility(View.VISIBLE);
                         }
 
 

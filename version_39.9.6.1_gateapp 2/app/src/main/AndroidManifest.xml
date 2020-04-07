@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.oyespace.guards">
+    package="com.oyespace.guards" >
     <!-- NETWORK & WIFI -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -44,8 +44,12 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
-        tools:replace="android:allowBackup">
-        <activity android:name=".staff.StaffDocumentsUploadActivity"></activity>
+        tools:replace="android:allowBackup" >
+
+        <activity android:name=".staff.StaffBlockTabsActivity" />
+        <activity android:name=".kidexit.KidEdxitBlockTabsActivity" />
+        <activity android:name=".residentidcard.ResidentCaptureImageOcr" />
+        <activity android:name=".staff.StaffDocumentsUploadActivity" />
         <activity android:name=".activity.DeliveryPersonPhotoActivity" />
         <activity android:name=".residentidcard.ResidentOptionActivity" />
         <activity android:name=".activity.PatrollingAlert" />
@@ -54,6 +58,9 @@
             android:theme="@style/noActionBar" /> <!-- <activity -->
         <!-- android:name=".residentidcard.ResidentIdActivity" -->
         <!-- android:theme="@style/noActionBar"></activity> -->
+        <activity android:name=".staffManaualEntry.ManualBlockTabsActivity" />
+        <activity android:name=".guest.GuestBlockTabsActivity" />
+        <activity android:name=".activity.BlockTabsActivity" />
         <activity
             android:name=".staff.StaffBlockSelectionActivity"
             android:screenOrientation="portrait"
@@ -185,7 +192,7 @@
             android:name=".activity.SplashActivity"
             android:noHistory="true"
             android:screenOrientation="portrait"
-            android:theme="@style/splashScreen">
+            android:theme="@style/splashScreen" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -247,6 +254,7 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".staff.StaffListActivity"
+            android:parentActivityName=".Dashboard"
             android:screenOrientation="portrait"
             android:theme="@style/noActionBar"
             android:windowSoftInputMode="adjustPan" />
@@ -313,6 +321,18 @@
             android:enabled="true"
             android:exported="true" />
 
+        <activity
+            android:name=".staff.StaffCaptureImageOcr"
+            android:screenOrientation="portrait"
+            android:theme="@style/noActionBar" />
+        <activity
+            android:name=".kidexit.KidExitCaptureImageOcr"
+            android:screenOrientation="portrait"
+            android:theme="@style/noActionBar" />
+        <activity
+            android:name=".guest.GuestCaptureImageOcr"
+            android:screenOrientation="portrait"
+            android:theme="@style/noActionBar" />
         <activity
             android:name=".ocr.CaptureImageOcr"
             android:screenOrientation="portrait"
@@ -437,7 +457,7 @@
 
         <receiver
             android:name=".broadcastreceiver.NetworkChangeReceiver"
-            android:label="NetworkChangeReceiver">
+            android:label="NetworkChangeReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
@@ -447,7 +467,7 @@
         <service
             android:name=".fcm.FCMMessagingService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -455,7 +475,7 @@
         <service
             android:name=".fcm.FCMInstantIDService"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true" >
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

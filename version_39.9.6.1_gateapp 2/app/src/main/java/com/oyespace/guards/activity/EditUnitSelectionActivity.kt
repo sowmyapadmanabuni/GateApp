@@ -384,7 +384,7 @@ class EditUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
     private fun managePageNavButtons() {
         if (PAGE_NUMBER == 0) {
-            btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.prev_page))
+            btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.next_inactive))
         } else {
             btn_page_prev.setImageDrawable(this.resources.getDrawable(R.drawable.prev_active))
         }

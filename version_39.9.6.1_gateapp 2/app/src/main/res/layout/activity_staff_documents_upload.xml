@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:text="Staff Registartion"
         android:layout_gravity="center_horizontal"
-        android:textColor="@color/orange"
+        android:textColor="@color/end_gradient"
 
         />
 
@@ -34,38 +34,44 @@
         android:textColor="@color/black"
         android:gravity="end"
         android:padding="@dimen/padding_medium"
-        android:layout_margin="@dimen/padding_small" />
+       />
 
     <RadioGroup
         android:id="@+id/radiogroup"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/text"
         android:layout_alignLeft="@+id/text"
-        android:orientation="horizontal" >
+        android:weightSum="4"
+        android:orientation="vertical" >
         <RadioButton
             android:id="@+id/rb_adhar"
             android:text="Adhar"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+
             />
         <RadioButton
             android:id="@+id/rbpan"
             android:text="PAN"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="0dp" />
 
         <RadioButton
             android:id="@+id/rbvoterid"
             android:text="Voter ID"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="0dp" />
 
         <RadioButton
             android:id="@+id/rbdl"
             android:text="Driving Licence"
+            android:layout_weight="1"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="0dp" />
     </RadioGroup>
 
     <EditText
@@ -90,9 +96,9 @@
 
     <ImageView
         android:id="@+id/iv_document"
-        android:layout_width="wrap_content"
-        android:visibility="invisible"
-        android:layout_height="wrap_content"
+        android:layout_width="40dp"
+        android:visibility="gone"
+        android:layout_height="40dp"
         android:layout_centerHorizontal="true"
         android:layout_below="@+id/ed_idproof"
         android:background="@drawable/round_outline"
@@ -163,7 +169,7 @@
                 android:visibility="gone"
                 android:hint="Date of Expiry"
                 android:inputType="textCapWords"
-                android:drawableRight="@drawable/calnder_small"
+                android:drawableRight="@drawable/calendar"
                 android:maxLength="40"
                 android:editable="false"
                 android:layout_marginBottom="12dp"

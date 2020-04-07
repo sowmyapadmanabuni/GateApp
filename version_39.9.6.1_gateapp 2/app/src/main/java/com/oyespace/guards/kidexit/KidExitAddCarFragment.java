@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
@@ -109,6 +110,7 @@ import static com.oyespace.guards.utils.ConstantUtils.UPLOAD_STAFF_PHOTO;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_PURPOSE;
 import static com.oyespace.guards.utils.ConstantUtils.VISITOR_TYPE;
 import static com.oyespace.guards.utils.ConstantUtils.WORKER_ID;
+import static com.oyespace.guards.utils.RandomUtils.encodeToBase64;
 import static com.oyespace.guards.utils.Utils.showToast;
 
 
@@ -120,7 +122,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
     Button iv_torch;
     int clickable1 = 0;
     ChampApiInterface champApiInterface;
-
+    String encodedImage;
     private final int REQUEST_CODE_SPEECH_INPUT = 100;
     EditText Ed_Name;
     public static Button image_Gallery, submit_button, buttonCapture;
@@ -477,7 +479,9 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
                         } catch (Exception ex) {
                             Log.d("Dgddfdf picas", "7");
                         }
-
+                        BitmapDrawable drawable = (BitmapDrawable) imageView1.getDrawable();
+                        Bitmap bitmap = drawable.getBitmap();
+                        encodedImage = encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100);
 
                         Intent d = new Intent(KidExitAddCarFragment.this, KidExitStaffEntryRegistration.class);
 //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
@@ -497,6 +501,7 @@ public class KidExitAddCarFragment extends BaseKotlinActivity implements Respons
                         d.putExtra(UNIT_ACCOUNT_ID, getIntent().getStringExtra(UNIT_ACCOUNT_ID));
                         d.putExtra(BLOCK_ID, getIntent().getStringExtra(BLOCK_ID));
                         d.putExtra(VISITOR_PURPOSE,getIntent().getStringExtra(VISITOR_PURPOSE));
+                        d.putExtra("Base64", encodedImage);
                         d.putExtras(getIntent());
                         startActivity(d);
                         finish();

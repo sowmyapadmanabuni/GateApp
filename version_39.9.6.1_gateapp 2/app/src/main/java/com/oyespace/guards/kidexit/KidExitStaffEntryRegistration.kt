@@ -10,6 +10,7 @@ import android.hardware.camera2.CameraManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.speech.RecognizerIntent
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,7 @@ import com.oyespace.guards.constants.PrefKeys.LANGUAGE
 import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
+import com.oyespace.guards.ocr.CaptureImageOcr
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.*
@@ -47,6 +49,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class KidExitStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener {
+    private val REQUEST_CODE_SPEECH_INPUT = 100
     var iv_torch: Button?=null
     var clickable1 = 0
     internal var TAKE_PHOTO_REQUEST = 1034
@@ -60,7 +63,7 @@ class KidExitStaffEntryRegistration : BaseKotlinActivity(), View.OnClickListener
     lateinit var txt_device_name: TextView
 var purpose:String?=null
     var count = 0
-
+    var vehicleNumber:String?=null
     lateinit var curTime: String
 
     override fun onClick(v: View?) {
@@ -131,8 +134,7 @@ var purpose:String?=null
                     val view = factory.inflate(R.layout.dialog_big_image, null)
                     var dialog_imageview: ImageView? = null
                     dialog_imageview = view.findViewById(R.id.dialog_imageview)
-                    mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-                    dialog_imageview.setImageBitmap(mBitmap)
+                    dialog_imageview!!.setBackground(profile_image!!.getDrawable())
 
                     alertadd.setView(view)
                     alertadd.show()
@@ -177,6 +179,16 @@ var purpose:String?=null
         buttonNext.text=resources.getString(R.string.textdone)
 
         iv_torch=findViewById(R.id.iv_torch)
+        if(intent.getStringExtra(VEHICLE_NUMBER)!=null) {
+            tv_vehiclenumber?.text = (intent.getStringExtra(VEHICLE_NUMBER))
+        }
+
+        if(!tv_vehiclenumber.text.equals("")){
+            vehicleNumber=tv_vehiclenumber.text.toString()
+        }
+        else{
+            vehicleNumber=""
+        }
         iv_torch!!.setOnClickListener {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -205,7 +217,29 @@ var purpose:String?=null
             }
 
         }
-
+        iv_mike.setOnClickListener{
+            Speak()
+        }
+        iv_scanner.setOnClickListener{
+            val i_vehicle = Intent(this@KidExitStaffEntryRegistration, KidExitCaptureImageOcr::class.java)
+            i_vehicle.putExtra(UNITID, intent.getStringExtra(UNITID))
+            i_vehicle.putExtra(UNITNAME, intent.getStringExtra(UNITNAME))
+            i_vehicle.putExtra(ACCOUNT_ID, intent.getIntExtra(ACCOUNT_ID,0))
+            i_vehicle.putExtra(MOBILENUMBER, intent.getStringExtra(MOBILENUMBER))
+            i_vehicle.putExtra(COUNTRYCODE, intent.getStringExtra(COUNTRYCODE))
+            i_vehicle.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
+            i_vehicle.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+            i_vehicle.putExtra(UNIT_ACCOUNT_ID, intent.getStringExtra(UNIT_ACCOUNT_ID))
+            i_vehicle.putExtra("RESIDENT_NUMBER", intent.getStringExtra("RESIDENT_NUMBER"))
+            i_vehicle.putExtra(UNITOCCUPANCYSTATUS, intent.getStringExtra(UNITOCCUPANCYSTATUS))
+            i_vehicle.putExtra(PERSONNAME, intent.getStringExtra(PERSONNAME))
+            i_vehicle.putExtra("Base64",intent.getStringExtra("Base64"))
+            i_vehicle.putExtra(ITEMS_PHOTO_LIST,intent.getStringArrayListExtra(ITEMS_PHOTO_LIST))
+            i_vehicle.putExtra(ConstantUtils.COMPANY_NAME, intent.getStringExtra(ConstantUtils.COMPANY_NAME))
+            i_vehicle.putExtra(GUARDIANNAME,intent.getStringExtra(GUARDIANNAME))
+            startActivity(i_vehicle)
+            finish()
+        }
         purpose=intent.getStringExtra(VISITOR_PURPOSE)
 
         if (intent.getStringExtra(FLOW_TYPE).equals(STAFF_REGISTRATION, true)) {
@@ -251,6 +285,7 @@ var purpose:String?=null
 
 
         tv_for.text = resources.getString(R.string.textvisiting) + ":  " + intent.getStringExtra(UNITNAME)
+        menuCount.text ="" + minteger
 
         menuAdd.setOnClickListener {
             minteger++
@@ -258,7 +293,7 @@ var purpose:String?=null
 
         }
         menuRemove.setOnClickListener {
-            if (minteger > 1) {
+            if (minteger >= 1) {
                 minteger--
                 menuCount.text = "" + minteger
 
@@ -277,18 +312,10 @@ var purpose:String?=null
             }
         }
 
-        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-        if (wrrw != null) {
+        val imageAsBytes = android.util.Base64.decode(intent.getStringExtra("Base64"),android.util.Base64.DEFAULT);
+        val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+        profile_image.setImageBitmap(decodedImage)
 
-            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-            profile_image.setImageBitmap(mBitmap)
-
-        } else {
-            val image = IMAGE_BASE_URL + "Images/" + "PERSONNONREGULAR" + intent.getStringExtra(MOBILENUMBER).replace("+", "") + ".jpg"
-            Picasso.with(this)
-                .load(image)
-                .placeholder(R.drawable.user_icon_black).error(R.drawable.user_icon_black).into(profile_image)
-        }
 
         list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
 
@@ -342,9 +369,9 @@ var purpose:String?=null
             Prefs.getInt(ASSOCIATION_ID, 0), 0, UNUniName,
             UNUnitID, intent.getStringExtra(COMPANY_NAME), intent.getStringExtra(GUARDIANNAME),
             LocalDb.getAssociation()!!.asAsnName, 0, "", intent.getStringExtra(MOBILENUMBER),
-            purpose.toString(), "", "", "",
+            purpose.toString(), vehicleNumber!!, "", "",
             minteger, intent.getStringExtra(VISITOR_TYPE), SPPrdImg1, SPPrdImg2, SPPrdImg3, SPPrdImg4, SPPrdImg5
-            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), imgName, Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
+            , SPPrdImg6, SPPrdImg7, SPPrdImg8, SPPrdImg9, SPPrdImg10, imgName.toString(), intent.getStringExtra("Base64"), Prefs.getString(ConstantUtils.GATE_NO, ""), curTime, SPPrdImg11, SPPrdImg12, SPPrdImg13, SPPrdImg14, SPPrdImg15
             , SPPrdImg16, SPPrdImg17, SPPrdImg18, SPPrdImg19, SPPrdImg20,intent.getStringExtra(KIDNAME)
         )
 
@@ -377,7 +404,7 @@ var purpose:String?=null
                                 val dir = File(Environment.getExternalStorageDirectory().toString() + "/DCIM/myCapturedImages")
                                 deleteDir(dir.absolutePath)
 
-                                uploadImage(imgName, mBitmap)
+
 
                                 VisitorLogRepo.get_IN_VisitorLog(true, object : VisitorLogRepo.VisitorLogFetchListener {
                                     override fun onFetch(visitorLog: ArrayList<VisitorLog>?, error: String?) {
@@ -403,6 +430,7 @@ var purpose:String?=null
                                                 d.putExtra(UNIT_ACCOUNT_ID, Unit_ACCOUNT_ID)
                                                 d.putExtra("VLVisLgID", vlid)
                                                 d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
+                                                d.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
                                                 sendBroadcast(d)
 
                                                 Log.v("DELIVERY",vlid.toString())
@@ -455,7 +483,7 @@ var purpose:String?=null
         val req = SignUpReq(
             "", "", "", "", "",
             name, isdCode, "", "", "", "",
-            "", mobNum, "", "", "", "", imgName.toString()
+            "", mobNum, "", "", "", "", intent.getStringExtra("Base64")
         )
         Log.d("singUp", "StaffEntry " + req.toString())
 
@@ -467,7 +495,6 @@ var purpose:String?=null
                     override fun onSuccessResponse(globalApiObject: SignUpResp<Account>) {
                         if (globalApiObject.success == true) {
                             // var imgName="PERSON" +globalApiObject.data.account.acAccntID  + ".jpg"
-                            uploadImage(imgName.toString(), mBitmap)
                             Log.d(
                                 "CreateVisitorLogResp",
                                 "StaffEntry " + globalApiObject.data.toString()
@@ -514,17 +541,30 @@ var purpose:String?=null
         res.updateConfiguration(conf, dm)
     }
 
-    override fun onActivityResult(
-        requestCode: Int, resultCode: Int,
-        data: Intent?
-    ) {
-        if (resultCode == Activity.RESULT_OK
-            && requestCode == TAKE_PHOTO_REQUEST
-        ) {
-            // processCapturedPhoto()
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
+
+    fun Speak() {
+
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, Locale.getDefault())
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "say something")
+
+        try {
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT)
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
         }
     }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode){
+            REQUEST_CODE_SPEECH_INPUT ->{
+                if (resultCode == Activity.RESULT_OK  && null!= data){
+                    val result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                    tv_vehiclenumber.setText(result[0].replace(" ", "").trim())
 
+                }
+            }
+        }
+    }
 }

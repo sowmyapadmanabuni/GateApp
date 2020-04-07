@@ -26,7 +26,7 @@
                 android:gravity="center"
                 android:padding="@dimen/dp_5"
                 android:text="-"
-                android:textColor="@color/orange"
+                android:textColor="@color/end_gradient"
                 android:textSize="16sp">
 
             <RadioButton
@@ -55,7 +55,7 @@
                 android:gravity="center"
                 android:padding="@dimen/dp_5"
                 android:text="1"
-                android:textColor="@color/orange"
+                android:textColor="@color/end_gradient"
                 android:textSize="16sp">
 
             <TextView
@@ -74,7 +74,7 @@
                 android:gravity="center"
                 android:padding="@dimen/dp_5"
                 android:text="+"
-                android:textColor="@color/orange"
+                android:textColor="@color/end_gradient"
                 android:textSize="16sp">
 
             <ImageView

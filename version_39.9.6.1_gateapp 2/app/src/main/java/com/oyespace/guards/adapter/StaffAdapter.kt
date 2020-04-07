@@ -119,7 +119,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             holder.btn_makeentry.isEnabled = false
             holder.btn_makeentry.isClickable = false
 
-if(staffdata.isValid){
+            if(staffdata.isValid){
             val d = Intent(mcontext, MobileNumberforEntryScreen::class.java)
             d.putExtra(UNITID, staffdata.unUnitID)
             d.putExtra("FIRSTNAME", staffdata.wkfName)
@@ -132,6 +132,9 @@ if(staffdata.isValid){
             d.putExtra("Image", staffdata.wkEntryImg)
             d.putExtra(COMPANY_NAME, staffdata.wkDesgn)
             d.putExtra("BIRTHDAY", staffdata.wkdob)
+            d.putExtra(BLOCK_ID,staffdata.blBlockID)
+            d.putExtra(UNIT_ACCOUNT_ID,staffdata.acAccntID)
+
 
             mcontext.startActivity(d)
             (mcontext as Activity).finish()

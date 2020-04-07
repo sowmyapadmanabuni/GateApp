@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.StaffAdapter
@@ -36,6 +37,8 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
     lateinit var tv_nodata: TextView
     private lateinit var tv: EditText
     private val REQUEST_CODE_SPEECH_INPUT = 100
+    private val TIME_INTERVAL = 2000
+    private var mBackPressed: Long = 0
 
     override fun onClick(v: View?) {
 
@@ -244,5 +247,20 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         return dir!!.delete()
     }
 
-
+    override fun onBackPressed() {
+        if (mBackPressed + TIME_INTERVAL > System.currentTimeMillis()) {
+            super.onBackPressed()
+            finish()
+        } else {
+            finish()
+//           val i=Intent(this@StaffListActivity,Dashboard::class.java)
+//            startActivity(i)
+//            Toast.makeText(
+//                baseContext,
+//                "Click two times to close an activity",
+//                Toast.LENGTH_SHORT
+//            ).show()
+        }
+        mBackPressed = System.currentTimeMillis()
+    }
 }

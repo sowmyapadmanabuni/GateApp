@@ -2,13 +2,11 @@ package com.oyespace.guards.staffManaualEntry
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.hardware.camera2.CameraAccessException
 import android.hardware.camera2.CameraManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -137,7 +135,7 @@ class ManualUnitSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 
         try {
             blockId = intent.getIntExtra(ConstantUtils.SELECTED_BLOCK, -1)
-            blockName = "" + intent.getStringExtra(ConstantUtils.SELECTED_BLOCK_NAME)
+         blockName = "" + intent.getStringExtra(ConstantUtils.SELECTED_BLOCK_NAME)
             header_subtitle.text = blockName
             var json: String = (intent.getStringExtra(SELECTED_UNITS))
             var selArray: Array<UnitPojo> = Gson().fromJson(json, Array<UnitPojo>::class.java)

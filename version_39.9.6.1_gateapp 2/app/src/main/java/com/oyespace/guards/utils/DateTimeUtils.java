@@ -168,15 +168,65 @@ public class DateTimeUtils {
 
     }
 
-    public static boolean deliveryTimeUp(String downloaded_date, String curr_date_YMD_hms, int maxMins) {
+//    public static boolean deliveryTimeUp(String downloaded_date, String curr_date_YMD_hms, int maxMins) {
+//
+//        try {
+//            java.util.Date dt_dwnld_date, dt_curr_date;
+//            // DateFormat dateFormatGMT =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",  Locale.getDefault());
+//            // DateFormat dateFormatHMS =new SimpleDateFormat("HH:mm:ss",  Locale.getDefault());
+//            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+//
+//            Log.i("taagtime", "1");
+//
+//            //  dateFormatGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
+//            dt_dwnld_date = DATE_FORMAT_YMDHMS.parse(downloaded_date);
+//            Calendar c1 = Calendar.getInstance();
+//            //Change to Calendar Date
+//            c1.setTime(dt_dwnld_date);
+//
+//            dt_curr_date = DATE_FORMAT_YMDHMS.parse(curr_date_YMD_hms);
+//
+//            Calendar c2 = Calendar.getInstance();
+//            //Change to Calendar Date
+//            c2.setTime(DATE_FORMAT_YMDHMS.parse(DATE_FORMAT_YMDHMS.format(dt_curr_date)));
+//          //  c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)));
+//            //get Time in milli seconds
+//            long ms1 = c1.getTimeInMillis();
+//            long ms2 = c2.getTimeInMillis();
+//            Log.i("taagtime", "2");
+//            //get difference in milli seconds
+//            long diff_sec = ms2 - ms1;
+//            int day_diff = (int) diff_sec / (60 * 1000);
+//            int allottedTime = maxMins;
+//            Log.i("taagtime", "3");
+//            Log.v("Gateapp", String.valueOf(allottedTime)+".."+String.valueOf(day_diff));
+//
+//            //int allottedTime=8+itemCount*7;
+//
+//            if (day_diff >= 120) {
+////                return day_diff;
+//                return true;
+//            }
+//            return day_diff >= allottedTime;
+////            return day_diff;
+//        } catch (java.text.ParseException e) {
+//
+//            e.printStackTrace();
+//            return true;
+////            return 7;
+//        }
+//
+//    }
 
-        try {
-            java.util.Date dt_dwnld_date, dt_curr_date;
-            // DateFormat dateFormatGMT =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",  Locale.getDefault());
-            // DateFormat dateFormatHMS =new SimpleDateFormat("HH:mm:ss",  Locale.getDefault());
-            DateFormat dateFormatLocal = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+    public static boolean deliveryTimeUp(String downloaded_date,String curr_date_YMD_hms,int itemCount){
+        Log.d("stfdh1 0",downloaded_date+" "+curr_date_YMD_hms);
 
-            Log.i("taagtime", "1");
+        try
+        {
+            java.util.Date  dt_dwnld_date, dt_curr_date;
+            DateFormat dateFormatGMT =new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss",  Locale.getDefault());
+            DateFormat dateFormatHMS =new SimpleDateFormat("HH:mm:ss",  Locale.getDefault());
+            DateFormat dateFormatLocal =new SimpleDateFormat("HH:mm:ss",  Locale.getDefault());
 
             //  dateFormatGMT.setTimeZone(TimeZone.getTimeZone("GMT"));
             dt_dwnld_date = DATE_FORMAT_YMDHMS.parse(downloaded_date);
@@ -189,36 +239,36 @@ public class DateTimeUtils {
             Calendar c2 = Calendar.getInstance();
             //Change to Calendar Date
             c2.setTime(DATE_FORMAT_YMDHMS.parse(DATE_FORMAT_YMDHMS.format(dt_curr_date)));
-          //  c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T" + dateFormatLocal.format(dt_curr_date)));
+            c2.setTime(DATE_FORMAT_YMDHMS.parse("1900-01-01T"+dateFormatLocal.format(dt_curr_date)));
+            Log.d("stfdh1 1",dateFormatLocal.format(dt_curr_date)+" "+dateFormatLocal.format(dt_dwnld_date)+" "+ dt_dwnld_date.toLocaleString()+" "+dt_curr_date.toLocaleString());
+            Log.d("stfdh1 2",c1.getTimeInMillis()+" "+c2.getTimeInMillis());
             //get Time in milli seconds
             long ms1 = c1.getTimeInMillis();
             long ms2 = c2.getTimeInMillis();
-            Log.i("taagtime", "2");
+
             //get difference in milli seconds
             long diff_sec = ms2 - ms1;
-            int day_diff = (int) diff_sec / (60 * 1000);
-            int allottedTime = maxMins;
-            Log.i("taagtime", "3");
-            Log.v("Gateapp", String.valueOf(allottedTime)+".."+String.valueOf(day_diff));
+            int day_diff =(int) diff_sec / ( 60 * 1000);
+            int allottedTime=0+itemCount*7;
 
             //int allottedTime=8+itemCount*7;
-
-            if (day_diff >= 120) {
+            Log.d("stfdh1 time",day_diff+" "+c2.getTimeInMillis()+" "+diff_sec+" "+allottedTime);
+            if(day_diff>=120){
 //                return day_diff;
                 return true;
             }
-            return day_diff >= allottedTime;
+            return day_diff >= allottedTime ;
 //            return day_diff;
-        } catch (java.text.ParseException e) {
-
+        }
+        catch (java.text.ParseException e)
+        {
+            Log.d("stfdh1 time"," "+e.toString());
             e.printStackTrace();
             return true;
 //            return 7;
         }
 
     }
-
-
     public static String formatDateDMY(String date) {
         try {
             java.util.Date dt_dwnld_date;
@@ -260,7 +310,24 @@ public class DateTimeUtils {
 
     }
 
+    public static boolean beforeDate(String startSH) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date strDate = null, strDate1 = null, nowDate = null;
+            strDate = sdf.parse(startSH);
+            nowDate = sdf.parse(sdf.format(new Date()));
 
+
+            if (strDate.before(nowDate)) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (java.text.ParseException e) {
+            return false;
+        }
+
+    }
     public static String formatTimeHM(String date) {
         try {
             java.util.Date dt_dwnld_date;

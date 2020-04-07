@@ -767,6 +767,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                                             "VLVisLgID",
                                             globalApiObject.data.visitorLog.vlVisLgID
                                         )
+                                        ddc.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
                                         ddc.putExtra(VISITOR_TYPE, "Staff")
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
@@ -802,6 +803,7 @@ class MobileNumberEntryScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
                                 //     ddc.putExtra(UNIT_ACCOUNT_ID,UnitList.data.unit.acAccntID.toString())
                                 ddc.putExtra("VLVisLgID", globalApiObject.data.visitorLog.vlVisLgID)
                                 ddc.putExtra(VISITOR_TYPE, desgn)
+                                ddc.putExtra("EntryTime",globalApiObject.data.visitorLog.vlsActTm)
 //                        intent.getStringExtra("msg"),intent.getStringExtra("mobNum"),
 //                        intent.getStringExtra("name"),intent.getStringExtra("nr_id"),
 //                        intent.getStringExtra("unitname"),intent.getStringExtra("memType")

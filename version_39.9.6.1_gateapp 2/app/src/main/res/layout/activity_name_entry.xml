@@ -196,7 +196,7 @@
                   android:layout_gravity="center"
                   android:hint="@string/textselectdob"
                   android:inputType="textCapWords"
-                  android:drawableRight="@drawable/calnder_small"
+                  android:drawableRight="@drawable/calendar"
                   android:maxLength="40"
                   android:editable="false"
                   android:focusable="false"

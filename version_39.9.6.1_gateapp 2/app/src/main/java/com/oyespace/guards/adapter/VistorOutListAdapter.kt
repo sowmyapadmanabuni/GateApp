@@ -96,7 +96,7 @@ class VistorOutListAdapter(
             holder.tv_purposeofvisit.visibility=View.GONE
         }
 
-
+        holder.tv_vehiclenumber.text= visitor.vLVehNum
         holder.apartmentNamee.text = "${visitor.unUniName} " + if (debug) "(${visitor.vlApprStat})" else ""
         holder.entryTime.text = formatDateHM(visitor.vlEntryT) + " "
         holder.entrydate.text = formatDateDMY(visitor.vldCreated)
@@ -325,6 +325,7 @@ class VistorOutListAdapter(
         val iv_play: ImageView
         val tv_purposeofvisit: TextView
         val tv:TextView
+        var tv_vehiclenumber:TextView
 
         init {
             entryTime = view.findViewById(R.id.tv_entrytime)
@@ -352,7 +353,7 @@ class VistorOutListAdapter(
             tv_comments = view.findViewById(R.id.tv_comments)
             iv_play = view.findViewById(R.id.iv_play)
             tv=view.findViewById(R.id.tv)
-
+            tv_vehiclenumber=view.findViewById(R.id.tv_vehiclenumber)
         }
 
     }

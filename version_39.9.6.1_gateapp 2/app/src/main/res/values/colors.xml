@@ -85,4 +85,6 @@
     <color name="main_color">#ff9a00</color>
     <color name="secondary_color">#BDBDBD</color>
     <color name="dark_grey">#696969</color>
+    <color name="start_gradient">#581113</color>
+    <color name="end_gradient">#971510</color>
 </resources>

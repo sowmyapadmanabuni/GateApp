@@ -15,10 +15,7 @@ class FirebaseDBUtils {
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.e("taaag_firebase", "push to firebase: $visitorId")
             val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status,"","","",false)
-            FirebaseDatabase.getInstance()
-                .getReference("NotificationSync")
-                .child(childName)
-                .child(visitorId.toString()).setValue(notificationSyncModel)
+            FirebaseDatabase.getInstance().getReference("NotificationSync").child(childName).child(visitorId.toString()).setValue(notificationSyncModel)
 
         }
 
@@ -27,10 +24,7 @@ class FirebaseDBUtils {
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.e("taaag_firebase", "push to firebase: $visitorId")
             val notificationSyncModel = NotificationSyncModel(visitorId, buttonColor,status,visitorLog.unUnitID,accountId,visitorJSON,false)
-            FirebaseDatabase.getInstance()
-                .getReference("NotificationSync")
-                .child(childName)
-                .child(visitorId.toString()).setValue(notificationSyncModel)
+            FirebaseDatabase.getInstance().getReference("NotificationSync").child(childName).child(visitorId.toString()).setValue(notificationSyncModel)
 
         }
 

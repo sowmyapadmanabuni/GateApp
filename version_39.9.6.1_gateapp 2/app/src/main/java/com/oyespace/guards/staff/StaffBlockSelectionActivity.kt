@@ -247,6 +247,7 @@ class StaffBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
         if (selected.size > 0) {
             for (j in selected.indices) {
                 if ((unitNames.length != 0) || (unitNumber1.length != 0)) {
+                    blockID += ", "
                     unitNames += ", "
                     unitId += ", "
                     acAccntID += ", "
@@ -261,6 +262,7 @@ class StaffBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                 unitNames += selected.get(j).unUniName
                 unitId += selected.get(j).unUnitID
                 unitOccupancyStatus+=selected.get(j).unOcStat
+                blockID += selected.get(j).blBlockID
 
 //               if(selected.get(j).unOcStat.contains("Sold Owner Occupied Unit")){
 //                   acAccntID += selected.get(j).owner[0].acAccntID
@@ -288,15 +290,13 @@ class StaffBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
 //                            Log.d( "intentdata MobileNumber", "buttonNext " + intent.getStringExtra(UNITNAME) +
 // " " + intent.getStringExtra(UNITID) + " " + Ed_phoneNum.text + " " + countryCode );
                     d.putExtra(UNITID, unitId)
+                    d.putExtra(BLOCK_ID,blockID)
                     d.putExtra(UNITNAME, unitNames)
                     d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))
                     d.putExtra(COMPANY_NAME, intent.getStringExtra(COMPANY_NAME))
                     d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
-                    d.putExtra(
-                        "RESIDENT_NUMBER",
-                        unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5
-                    )
+                    d.putExtra("RESIDENT_NUMBER", unitNumber1 + ", " + unitNumber2 + ", " + unitNumber3 + ", " + unitNumber4 + ", " + unitNumber5)
                     d.putExtra(UNITOCCUPANCYSTATUS,unitOccupancyStatus)
                     startActivity(d)
                     finish()
@@ -311,6 +311,7 @@ class StaffBlockSelectionActivity : BaseKotlinActivity(), View.OnClickListener {
                                 + intent.getStringExtra(COUNTRYCODE) + " "
                     )
                     d.putExtra(UNITID, unitId)
+                    d.putExtra(BLOCK_ID,blockID)
                     d.putExtra(UNITNAME, unitNames)
                     d.putExtra(FLOW_TYPE, intent.getStringExtra(FLOW_TYPE))
                     d.putExtra(VISITOR_TYPE, intent.getStringExtra(VISITOR_TYPE))

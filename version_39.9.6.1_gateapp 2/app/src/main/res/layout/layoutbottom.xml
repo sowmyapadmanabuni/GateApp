@@ -9,7 +9,7 @@
     <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="2dp"
-            android:background="@color/orange"></RelativeLayout>
+            android:background="@drawable/background_color"></RelativeLayout>
 
     <LinearLayout
             android:id="@+id/main_bottom"
