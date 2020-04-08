@@ -1151,7 +1151,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                     }
                                 }
-                                sendCloudFunctionNotification(
+                              sendCloudFunctionNotification(
                                     Prefs.getInt(ASSOCIATION_ID, 0),
                                     LocalDb.getAssociation()!!.asAsnName,
                                     msg,

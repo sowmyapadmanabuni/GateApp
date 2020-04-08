@@ -146,15 +146,15 @@ public static final String BASE_URL = "https://apiuat.oyespace.com/";
 
     public static final String SP_DEL_FB_IDs = "delete_fb_entry_ids";
 
-    public static final String ENTRYEXPIRED = "EntryExpired";
-    public static final String EXITEXPIRED = "ExitExpired";
-    public static final String ENTRYREJECTED = "EntryRejected";
-    public static final String EXITREJECTED = "ExitRejected";
-    public static final String ENTRYAPPROVED = "EntryApproved";
-    public static final String EXITAPPROVED = "ExitApproved";
+    public static final String ENTRYEXPIRED = "Entry Expired";
+    public static final String EXITEXPIRED = "Exit Expired";
+    public static final String ENTRYREJECTED = "Entry Rejected";
+    public static final String EXITREJECTED = "Exit Rejected";
+    public static final String ENTRYAPPROVED = "Entry Approved";
+    public static final String EXITAPPROVED = "Exit Approved";
     public static final String EXITED = "Exited";
-    public static final String ENTRYPENDING = "EntryPending";
-    public static final String EXITPENDING = "ExitPending";
+    public static final String ENTRYPENDING = "Entry Pending";
+    public static final String EXITPENDING = "Exit Pending";
 
     public static final String SEND_NOTIFICATION = "send_notification";
 

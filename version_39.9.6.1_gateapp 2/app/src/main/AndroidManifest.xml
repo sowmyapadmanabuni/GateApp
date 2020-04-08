@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.oyespace.guards" >
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.oyespace.guards">
     <!-- NETWORK & WIFI -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -44,8 +44,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
-        tools:replace="android:allowBackup" >
-
+        tools:replace="android:allowBackup">
+        <activity android:name=".activity.StaffAddCarFragment"></activity>
         <activity android:name=".staff.StaffBlockTabsActivity" />
         <activity android:name=".kidexit.KidEdxitBlockTabsActivity" />
         <activity android:name=".residentidcard.ResidentCaptureImageOcr" />
@@ -192,7 +192,7 @@
             android:name=".activity.SplashActivity"
             android:noHistory="true"
             android:screenOrientation="portrait"
-            android:theme="@style/splashScreen" >
+            android:theme="@style/splashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -457,7 +457,7 @@
 
         <receiver
             android:name=".broadcastreceiver.NetworkChangeReceiver"
-            android:label="NetworkChangeReceiver" >
+            android:label="NetworkChangeReceiver">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGED" />
@@ -467,7 +467,7 @@
         <service
             android:name=".fcm.FCMMessagingService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
@@ -475,7 +475,7 @@
         <service
             android:name=".fcm.FCMInstantIDService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
             </intent-filter>

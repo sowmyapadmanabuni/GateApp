@@ -207,11 +207,11 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                     visitorJsonObj.put(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
                                     visitorJsonObj.put(ConstantUtils.SEND_NOTIFICATION, true)
 
-                                    updateFirebaseColorforExit(vlLogId.toInt(), visitor, visitorJsonObj.toString(), "#ffb81a", "ExitPending")
+                                    updateFirebaseColorforExit(vlLogId.toInt(), visitor, visitorJsonObj.toString(), "#ffb81a", EXITPENDING)
 
 
                                     VisitorLogRepo.updateVisitorStatus(mcontext, visitor, EXITPENDING, true)
-                                    updateApprovalStatus("ExitPending", visitor.vlVisLgID, visitor.vlApprdBy, "")
+                                    updateApprovalStatus("Exit Pending", visitor.vlVisLgID, visitor.vlApprdBy, "")
 
 
                                     val d = Intent(mcontext, BackgroundSyncReceiver::class.java)
