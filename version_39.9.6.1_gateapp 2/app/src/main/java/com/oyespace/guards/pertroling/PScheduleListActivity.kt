@@ -412,6 +412,23 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
 
                         loadFromRealm()
 
+                    }else{
+                        try {
+                            Log.e("Error_Sched", "No")
+                            if (!realm.isInTransaction) {
+                                Log.e("Error_Sched", "Notintras")
+                                realm.beginTransaction()
+                                realm.delete<CheckPointsOfSchedule>()
+                                realm.delete<PatrolShiftRealm>()
+                            }
+                            if (realm.isInTransaction()) {
+                                Log.e("Error_Sched", "Commit")
+                                realm.commitTransaction()
+                            }
+                            loadFromRealm()
+                        }catch (e:Exception){
+                            e.printStackTrace()
+                        }
                     }
                 }
 

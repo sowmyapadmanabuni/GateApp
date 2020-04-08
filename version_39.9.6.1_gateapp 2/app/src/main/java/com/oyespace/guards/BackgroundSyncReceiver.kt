@@ -414,9 +414,9 @@ BackgroundSyncReceiver : BroadcastReceiver() {
             .subscribeWith(object : CommonDisposable<ShiftsListResponse<ArrayList<PatrolShift>>>() {
 
                 override fun onSuccessResponse(PatrolList: ShiftsListResponse<ArrayList<PatrolShift>>) {
-
+                    var realm:Realm = Realm.getDefaultInstance()
                     if (PatrolList.success == true) {
-                        var realm:Realm = Realm.getDefaultInstance()
+
                         var mTempShifts = PatrolList.data.patrollingShifts;
                         try {
                             if(!realm.isInTransaction) {
@@ -477,6 +477,23 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                         Log.e("ALARM_PATR", "" + PatrolList.data.patrollingShifts)
 
                         processPatrollingAlarm()
+
+                    }else{
+                        try {
+                            Log.e("Error_Sched", "No")
+                            if (!realm.isInTransaction) {
+                                Log.e("Error_Sched", "Notintras")
+                                realm.beginTransaction()
+                                realm.delete<CheckPointsOfSchedule>()
+                                realm.delete<PatrolShiftRealm>()
+                            }
+                            if (realm.isInTransaction()) {
+                                Log.e("Error_Sched", "Commit")
+                                realm.commitTransaction()
+                            }
+                        }catch (e:java.lang.Exception){
+                            e.printStackTrace()
+                        }
 
                     }
                 }
