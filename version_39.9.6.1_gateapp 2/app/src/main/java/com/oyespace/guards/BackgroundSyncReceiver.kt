@@ -989,8 +989,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                             sendNotification,topicName,entryTime
                                         )
                                   //  }
-                                } catch (e: IndexOutOfBoundsException) {
-
+                                } catch (e: java.lang.Exception) {
+                                    e.printStackTrace()
                                 }
                             } else {
                                 unAccountID = 0
@@ -1010,8 +1010,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         )
 
                                   //  }
-                                } catch (e: IndexOutOfBoundsException) {
-
+                                } catch (e: java.lang.Exception) {
+                                    e.printStackTrace()
                                 }
                             } else {
                                 unAccountID = 0
@@ -1033,8 +1033,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                         )
 
                                   //  }
-                                } catch (e: IndexOutOfBoundsException) {
-
+                                } catch (e: java.lang.Exception) {
+                                    e.printStackTrace()
                                 }
 
                             } else {
@@ -1081,8 +1081,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 unitName, "Owner"
                             )
 
-                        } catch (e: KotlinNullPointerException) {
-
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
                         }
 
                         try {
@@ -1094,8 +1094,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                     vlVisLgID.toString()
                                 )
                             }
-                        } catch (e: KotlinNullPointerException) {
-
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
                         }
 //                        sendCloudFunctionNotification(Prefs.getInt(ASSOCIATION_ID,0),LocalDb.getAssociation()!!.asAsnName,msg,desgn,"gate_app",
 //                            unitId.toString()+"admin",Prefs.getInt(DEVICE_ID,0),unAccountID.toString())
@@ -1111,11 +1111,12 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 unAccountID!!.toInt(),
                                 unAccountID.toString(),topicName
                             )
-                        } catch (e: KotlinNullPointerException) {
-
+                        } catch (e: java.lang.Exception) {
+                            e.printStackTrace()
                         }
 
                     } else {
+                        Log.e("UNITLOG","UNSUCCESS")
                     }
                 }
 

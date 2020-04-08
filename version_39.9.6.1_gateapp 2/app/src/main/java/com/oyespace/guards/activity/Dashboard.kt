@@ -1752,7 +1752,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                     if (it.hasChild("status")) {
                         val status = it.child("status").getValue(String::class.java)!!
                         Log.e("hasChild",""+status)
-                        if(status.equals("EntryPending") || status.equals("ExitPending")){
+                        if(status.equals("Entry Pending") || status.equals("Exit Pending")){
                             Log.e("status_match",""+status)
                             //Check if entry if still pending
                             if (it.hasChild("gate_mobile")) {

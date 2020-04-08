@@ -189,7 +189,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
 //                            }
                             if (holder.btn_makeexit.text == "Request Exit") {
                                 try {
-
+                                    Toast.makeText(mcontext,"Request Exit",Toast.LENGTH_LONG).show()
                                     val assName = LocalDb.getAssociation()!!.asAsnName
                                     val gateName = Prefs.getString(GATE_NO, null)
                                     var visitorJsonObj = JSONObject();
@@ -232,6 +232,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                     mcontext.sendBroadcast(d)
                                 }catch (e:java.lang.Exception){
                                     e.printStackTrace()
+                                    Toast.makeText(mcontext,"Something wrong...",Toast.LENGTH_LONG).show()
                                 }
                             }
                             else if(holder.btn_makeexit.text == "Exit"){
@@ -392,7 +393,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
             .subscribeWith(object : CommonDisposable<Any>() {
 
                 override fun onSuccessResponse(any: Any) {
-
+                    Log.e("UpdateApprivl",""+any);
 
                 }
 
