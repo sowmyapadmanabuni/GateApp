@@ -1,6 +1,8 @@
 package com.oyespace.guards.adapter
 
 import android.content.Context
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,9 +64,13 @@ class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Arra
 //        }
 //        if(arrayList[position].image_url>0) {
 
-        Picasso.with(mcontext)
-            .load("http://mediaupload.oyespace.com/" + arrayList[position])
-            .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)
+//        Picasso.with(mcontext)
+//            .load("http://mediaupload.oyespace.com/" + arrayList[position])
+//            .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)
+
+        val imageBytes = Base64.decode(arrayList[position], Base64.DEFAULT)
+        val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        holder.image!!.setImageBitmap(decodedImage)
 
         holder.image.setOnClickListener {
             imageList?.scrollToPosition(position)
@@ -107,9 +113,13 @@ class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Arra
 
         fun setImage(img: String) {
             val imgv = itemView.findViewById<ImageView>(R.id.image)
-            Picasso.with(mcontext)
-                .load("http://mediaupload.oyespace.com/" + img)
-                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(imgv)
+//            Picasso.with(mcontext)
+//                .load("http://mediaupload.oyespace.com/" + img)
+//                .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(imgv)
+
+            val imageBytes = Base64.decode(img, Base64.DEFAULT)
+            val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+            imgv!!.setImageBitmap(decodedImage)
         }
 
     }

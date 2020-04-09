@@ -205,7 +205,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                     visitorJsonObj.put(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                     visitorJsonObj.put("VLVisLgID", visitor.vlVisLgID)
                                     visitorJsonObj.put(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
-                                    visitorJsonObj.put(ConstantUtils.SEND_NOTIFICATION, true)
+                                    visitorJsonObj.put(ConstantUtils.SEND_NOTIFICATION, false)
 
                                     updateFirebaseColorforExit(vlLogId.toInt(), visitor, visitorJsonObj.toString(), "#ffb81a", EXITPENDING)
 
@@ -227,7 +227,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                                     d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
                                     d.putExtra("VLVisLgID", visitor.vlVisLgID)
                                     d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
-                                    d.putExtra(ConstantUtils.SEND_NOTIFICATION, true)
+                                    d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
                                     d.putExtra("EntryTime", visitor.vlsActTm)
                                     mcontext.sendBroadcast(d)
                                 }catch (e:java.lang.Exception){

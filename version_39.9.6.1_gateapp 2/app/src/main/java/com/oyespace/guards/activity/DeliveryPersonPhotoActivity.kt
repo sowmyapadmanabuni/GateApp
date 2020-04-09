@@ -506,7 +506,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
                     if(getdata.data!=null) {
-                        if (!getdata.data.visitorLatestRecord.vlEntryImg.contains("")) {
+                        if (getdata.data.visitorLatestRecord.vlEntryImg!=null) {
 
                             try {
                                 if (getdata.data.visitorLatestRecord.vlEntryImg.contains("PERSON")) {
@@ -524,16 +524,8 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
 //                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 //                            imageView1!!.setImageBitmap(decodedImage)
                                 } else {
-                                    val imageBytes = Base64.decode(
-                                        getdata.data.visitorLatestRecord.vlEntryImg,
-                                        Base64.DEFAULT
-                                    )
-                                    val decodedImage =
-                                        BitmapFactory.decodeByteArray(
-                                            imageBytes,
-                                            0,
-                                            imageBytes.size
-                                        )
+                                    val imageBytes = Base64.decode(getdata.data.visitorLatestRecord.vlEntryImg, Base64.DEFAULT)
+                                    val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
                                     imageView1!!.setImageBitmap(decodedImage)
                                 }
                             } catch (e: IllegalStateException) {
