@@ -360,6 +360,7 @@ class PScheduleListActivity: BaseKotlinActivity(), PictureCapturingListener, Act
                             if(!realm.isInTransaction) {
                                 realm.beginTransaction()
                                 realm.delete<CheckPointsOfSchedule>()
+                                realm.delete<PatrolShiftRealm>()
                             }
                             for (shift: PatrolShift in mTempShifts) {
                                 var schedule:PatrolShiftRealm;

@@ -4,13 +4,15 @@ import android.util.Log
 import com.google.firebase.database.FirebaseDatabase
 import com.oyespace.guards.models.NotificationSyncModel
 import com.oyespace.guards.models.VisitorLog
+import com.oyespace.guards.utils.ConstantUtils.ENTRYPENDING
+import com.oyespace.guards.utils.ConstantUtils.EXITPENDING
 
 class FirebaseDBUtils {
 
     companion object {
 
 
-        fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a",status:String="EntryPending") {
+        fun updateFirebaseColor(visitorId: Int, buttonColor: String = "#ffb81a",status:String=ENTRYPENDING) {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.e("taaag_firebase", "push to firebase: $visitorId")
@@ -19,7 +21,7 @@ class FirebaseDBUtils {
 
         }
 
-        fun updateVisitorLog(visitorId: Int, visitorLog: VisitorLog, accountId:String,visitorJSON:String, buttonColor: String = "#ffb81a",status:String="EntryPending") {
+        fun updateVisitorLog(visitorId: Int, visitorLog: VisitorLog, accountId:String,visitorJSON:String, buttonColor: String = "#ffb81a",status:String=ENTRYPENDING) {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.e("taaag_firebase", "push to firebase: $visitorId")
@@ -58,7 +60,7 @@ class FirebaseDBUtils {
                 .child("f")
                 .removeValue()
         }
-        fun updateFirebaseColorforExit(visitorId: Int,visitorLog: VisitorLog,visitorJSON:String, buttonColor: String = "#ffb81a",status:String="ExitPending") {
+        fun updateFirebaseColorforExit(visitorId: Int,visitorLog: VisitorLog,visitorJSON:String, buttonColor: String = "#ffb81a",status:String=EXITPENDING) {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.d("taaag", "push to firebase: $visitorId")
@@ -70,7 +72,7 @@ class FirebaseDBUtils {
 
         }
 
-        fun updateKidExitFirebaseColor(visitorId: Int, unitId:String,visitorJSON: String, buttonColor: String = "#ffb81a",status:String="ExitPending") {
+        fun updateKidExitFirebaseColor(visitorId: Int, unitId:String,visitorJSON: String, buttonColor: String = "#ffb81a",status:String=EXITPENDING) {
 
             val childName = "A_${Prefs.getInt(ConstantUtils.ASSOCIATION_ID, 0)}"
             Log.d("taaag", "push to firebase: $visitorId")

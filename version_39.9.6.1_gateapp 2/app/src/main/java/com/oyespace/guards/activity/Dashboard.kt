@@ -1752,7 +1752,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                     if (it.hasChild("status")) {
                         val status = it.child("status").getValue(String::class.java)!!
                         Log.e("hasChild",""+status)
-                        if(status.equals("Entry Pending") || status.equals("Exit Pending")){
+                        if(status.equals(ENTRYPENDING) || status.equals(EXITPENDING)){
                             Log.e("status_match",""+status)
                             //Check if entry if still pending
                             if (it.hasChild("gate_mobile")) {
@@ -1822,7 +1822,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                 val parsedVisitor = JSONObject(visitorJSON)
 
                 var msg = parsedVisitor.getString("msg");
-                if(status.equals("ExitPending")){
+                if(status.equals(EXITPENDING)){
                     val gateName = Prefs.getString(GATE_NO, null)
                     msg = parsedVisitor.getString("name")+" from "+parsedVisitor.getString(COMPANY_NAME)+" has requested for exit from "+gateName
                 }
@@ -1950,7 +1950,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
     fun updateIVRCallStatus(visitorLogId:String, callId:String, status:String){
         val assnId = Prefs.getInt(ASSOCIATION_ID, 0)
         var type = "Exit"
-        if(status.equals("EntryPending")){
+        if(status.equals(ENTRYPENDING)){
             type = "Entry"
         }
         val ivrBody = IVRBody(callId,visitorLogId,""+assnId,type)

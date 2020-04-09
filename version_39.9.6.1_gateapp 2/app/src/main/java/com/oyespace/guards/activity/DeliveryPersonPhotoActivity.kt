@@ -505,8 +505,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
             .subscribeWith(object : CommonDisposable<GetLatestRecord>() {
 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
-
-                    try {
+                    if(getdata.data!=null) {
                         if (!getdata.data.visitorLatestRecord.vlEntryImg.contains("")) {
 
                             try {
@@ -543,10 +542,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                         } else {
                             imageView1!!.setBackgroundResource(R.drawable.user_icon_black)
                         }
-                    }catch (e:java.lang.Exception){
-                        e.printStackTrace()
                     }
-
                 }
 
                 override fun onErrorResponse(e: Throwable) {

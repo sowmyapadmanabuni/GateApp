@@ -422,6 +422,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                             if(!realm.isInTransaction) {
                                 realm.beginTransaction()
                                 realm.delete<CheckPointsOfSchedule>()
+                                realm.delete<PatrolShiftRealm>()
                             }
                             for (shift: PatrolShift in mTempShifts) {
                                 var schedule: PatrolShiftRealm;
@@ -1169,7 +1170,7 @@ BackgroundSyncReceiver : BroadcastReceiver() {
 
                                     }
                                 }
-                                sendCloudFunctionNotification(
+                              sendCloudFunctionNotification(
                                     Prefs.getInt(ASSOCIATION_ID, 0),
                                     LocalDb.getAssociation()!!.asAsnName,
                                     msg,
