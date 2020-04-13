@@ -37,6 +37,7 @@ class StaffRepo {
 
 
                             if (workerListResponse.data.worker != null) {
+                                Log.d("WorkerList", workerListResponse.data.worker.toString())
                                 val realm = Realm.getDefaultInstance()
                                 val arrayList = workerListResponse.data.worker
 

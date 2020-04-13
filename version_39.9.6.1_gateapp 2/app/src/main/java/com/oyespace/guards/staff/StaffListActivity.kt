@@ -13,14 +13,18 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.oyespace.guards.Dashboard
 import com.oyespace.guards.R
 import com.oyespace.guards.activity.BaseKotlinActivity
 import com.oyespace.guards.adapter.StaffAdapter
+import com.oyespace.guards.adapter.VisitorEntryListAdapter
 import com.oyespace.guards.constants.PrefKeys
+import com.oyespace.guards.models.VisitorLog
 import com.oyespace.guards.models.Worker
 import com.oyespace.guards.pojo.WorkerDetails
 import com.oyespace.guards.repo.StaffRepo
+import com.oyespace.guards.repo.VisitorLogRepo
 import com.oyespace.guards.utils.ConstantUtils
 import com.oyespace.guards.utils.LocalDb
 import com.oyespace.guards.utils.Prefs
@@ -30,7 +34,7 @@ import java.util.*
 
 
 class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
-
+    private var swipeContainer: SwipeRefreshLayout? = null
     lateinit var txt_assn_name: TextView
     lateinit var txt_gate_name: TextView
     lateinit var txt_device_name: TextView
@@ -39,7 +43,8 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
     private val REQUEST_CODE_SPEECH_INPUT = 100
     private val TIME_INTERVAL = 2000
     private var mBackPressed: Long = 0
-
+    internal var newAl: ArrayList<Worker>? = ArrayList()
+    var workerAdapter: StaffAdapter? = null
     override fun onClick(v: View?) {
 
         when (v?.id) {
@@ -63,12 +68,13 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
     //    private var rv_staff: RecyclerView? = null
     private var arrayList: ArrayList<WorkerDetails>? = null
     //private lateinit var WorkerAdapter: StaffAdapter
-    var WorkerAdapter: StaffAdapter? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setLocale(Prefs.getString(PrefKeys.LANGUAGE, null))
         setContentView(R.layout.activity_staff_list)
+        swipeContainer = findViewById<View>(R.id.swipeContainer) as SwipeRefreshLayout
 
         tv_nodata = findViewById(R.id.tv_nodata)
         tv = findViewById<EditText>(R.id.edt_search_text1)
@@ -93,6 +99,12 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
         }
         rv_staff?.setLayoutManager(GridLayoutManager(this@StaffListActivity, 1))
 
+        swipeContainer!!.setOnRefreshListener {
+
+            loadStaffData()
+            swipeContainer!!.isRefreshing = false
+        }
+
         tv.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(charSequence: CharSequence, i: Int, i1: Int, i2: Int) {
 
@@ -104,8 +116,8 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
 
                 try {
 
-                        if (WorkerAdapter != null) {
-                            WorkerAdapter!!.applySearch(charSequence.toString())
+                        if (workerAdapter != null) {
+                            workerAdapter!!.applySearch(charSequence.toString())
 
                         }
 
@@ -129,24 +141,25 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
     override fun onStart() {
         super.onStart()
         Log.i("taaag", "staff refresh")
-        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
-            override fun onFetch(staff: ArrayList<Worker>?) {
-
-                if (staff == null || staff.isEmpty()) {
-                    tv_nodata.visibility = View.VISIBLE
-                } else {
-                    tv_nodata.visibility = View.INVISIBLE
-                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
-                    rv_staff!!.adapter = WorkerAdapter
-
-                    val searchString = tv.text.toString()
-                    if (!searchString.isEmpty()) {
-                        WorkerAdapter!!.applySearch(searchString)
-                    }
-                }
-            }
-
-        })
+        loadStaffData()
+//        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
+//            override fun onFetch(staff: ArrayList<Worker>?) {
+//
+//                if (staff == null || staff.isEmpty()) {
+//                    tv_nodata.visibility = View.VISIBLE
+//                } else {
+//                    tv_nodata.visibility = View.INVISIBLE
+//                    WorkerAdapter = StaffAdapter(staff, this@StaffListActivity)
+//                    rv_staff!!.adapter = WorkerAdapter
+//
+//                    val searchString = tv.text.toString()
+//                    if (!searchString.isEmpty()) {
+//                        WorkerAdapter!!.applySearch(searchString)
+//                    }
+//                }
+//            }
+//
+//        })
     }
 
     fun setLocale(lang: String?) {
@@ -262,5 +275,56 @@ class StaffListActivity : BaseKotlinActivity(), View.OnClickListener {
 //            ).show()
         }
         mBackPressed = System.currentTimeMillis()
+    }
+
+    private fun loadStaffData(callback: () -> Unit = {}) {
+
+
+        if (newAl == null || newAl!!.isEmpty()) {
+            tv_nodata.text = "fetching data..."
+            tv_nodata.visibility = View.VISIBLE
+        }
+        StaffRepo.getStaffList(true, object : StaffRepo.StaffFetchListener {
+            override fun onFetch(staff: ArrayList<Worker>?) {
+
+                // reset no data text
+                rv_staff!!.visibility = View.GONE
+                tv_nodata.text = "no data"
+                tv_nodata.visibility = View.VISIBLE
+
+                if (staff != null) {
+                    newAl = staff
+
+                    if (newAl!!.isEmpty()) {
+                        rv_staff!!.visibility = View.GONE
+                        tv_nodata.visibility = View.VISIBLE
+
+                    } else {
+                        rv_staff!!.visibility = View.VISIBLE
+                        tv_nodata.visibility = View.GONE
+                    }
+
+
+                        workerAdapter = StaffAdapter(newAl!!, this@StaffListActivity)
+                        rv_staff?.adapter = workerAdapter
+
+
+                    rv_staff?.smoothScrollToPosition(0)
+
+                    val searchString = tv.text.toString()
+                    if (!searchString.isEmpty()) {
+                        workerAdapter!!.applySearch(searchString)
+                    }
+
+                    callback()
+
+                } else {
+                  //  Toast.makeText(this@StaffListActivity, errorMessage, Toast.LENGTH_SHORT).show()
+                }
+
+            }
+
+        })
+
     }
 }

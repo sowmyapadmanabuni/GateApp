@@ -29,11 +29,13 @@ class RetrofitClinet {
 //                .build()
 
                         val okHttpClient = OkHttpClient.Builder()
-                .connectTimeout(30, TimeUnit.SECONDS)
-                .writeTimeout(30, TimeUnit.SECONDS) // write timeout
-                .readTimeout(30, TimeUnit.SECONDS) // read timeout
-                .addInterceptor( httpLoggingInterceptor)
+                            .connectTimeout(1, TimeUnit.MINUTES)
+                            .readTimeout(30, TimeUnit.SECONDS)
+                            .writeTimeout(15, TimeUnit.SECONDS)
+               // .addInterceptor( httpLoggingInterceptor)
                 .build()
+
+
 
             val gson = GsonBuilder()
                     .setDateFormat("yyyy-MM-dd HH:mm:ss")

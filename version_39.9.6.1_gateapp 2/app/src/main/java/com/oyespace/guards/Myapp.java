@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 

@@ -5,6 +5,7 @@ import com.oyespace.guards.PojoClasses.GetLatestRecord
 import com.oyespace.guards.models.*
 import com.oyespace.guards.pojo.*
 import com.oyespace.guards.request.FingerPrintCreateReq
+import com.oyespace.guards.request.StaffRegistrationReqJv
 import com.oyespace.guards.responce.FingerPrintCreateResp
 import com.oyespace.guards.utils.ConstantUtils.CHAMPKEY
 import com.oyespace.guards.utils.ConstantUtils.OYE247KEY
@@ -222,4 +223,8 @@ interface WebApi {
 
     @GET("oye247/api/v1/WorkerTypes/GetWorkerTypes")
     fun getWorkerTypes(@Header("X-OYE247-APIKey") token: String):Single<WorkerTypes<ArrayList<WorkerType>>>
+
+    @POST("oye247/api/v1/Worker/Create")
+    fun staffregistration(@Header(OYE247KEY)token: String, @Body staffRegistrationReqJv: StaffRegistrationReqJv):Single<Any>
 }
+

@@ -21,7 +21,7 @@ public class StaffRegistrationReqJv {
     public String WKExpDate;
     public String WKVehNo;
     public String WKEntryImg;
-    //public String IDPrfImg;
+    public String IDPrfImg;
 }
 
 

@@ -47,8 +47,7 @@ import com.oyespace.guards.network.ChampApiInterface
 import com.oyespace.guards.network.CommonDisposable
 import com.oyespace.guards.network.RetrofitClinet
 import com.oyespace.guards.utils.*
-import com.oyespace.guards.utils.ConstantUtils.MOBILENUMBER
-import com.oyespace.guards.utils.ConstantUtils.PERSON_PHOTO
+import com.oyespace.guards.utils.ConstantUtils.*
 import com.oyespace.guards.utils.RandomUtils.getBitmapFromURL
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
@@ -63,7 +62,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.util.*
 
-class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
+class DeliveryPersonPhotoActivity : BaseKotlinActivity() , View.OnClickListener {
 
     var file: File? = null
     var encodedImage: String? = null
@@ -103,11 +102,15 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                 Manifest.permission.CAMERA
             )
             .withListener(object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport) { // check if all permissions are granted
-                    if (report.areAllPermissionsGranted()) { // do you work now
+                override fun onPermissionsChecked(report: MultiplePermissionsReport) {
+                    // check if all permissions are granted
+                    if (report.areAllPermissionsGranted()) {
+                        // do you work now
                     }
+
                     // check for permanent denial of any permission
-                    if (report.isAnyPermissionPermanentlyDenied) { // permission is denied permenantly, navigate user to app settings
+                    if (report.isAnyPermissionPermanentlyDenied) {
+                        // permission is denied permenantly, navigate user to app settings
                         finish()
                     }
                 }
@@ -186,10 +189,16 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
         rv_image = findViewById(R.id.rv_image)
         buttonCapture = findViewById(R.id.buttonCapture)
         imageView1 = findViewById(R.id.imageView1)
+
         if (Prefs.getString(PrefKeys.MODEL_NUMBER, null) == "Nokia 1") {
             txt_assn_name!!.setTextSize(5 * resources.displayMetrics.density)
         }
-        getLatestRecordData(intent.getStringExtra(MOBILENUMBER),intent.getIntExtra(ConstantUtils.ACCOUNT_ID, 0).toString())
+      if(Prefs.getString("PHOTO","").equals("DONTCAPTURE")){
+          getLatestRecordData(intent.getStringExtra(MOBILENUMBER),intent.getIntExtra(ConstantUtils.ACCOUNT_ID, 0).toString())
+
+      }
+
+
         imageView1!!.setOnClickListener(View.OnClickListener {
             val viewGroup = findViewById<ViewGroup>(android.R.id.content)
             val dialogView = LayoutInflater.from(this@DeliveryPersonPhotoActivity)
@@ -231,6 +240,8 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
         submit_button!!.setOnClickListener {
            submit_button!!.isEnabled = false
             submit_button!!.isClickable = false
+
+
             if (imageView1!!.getDrawable().constantState !== resources.getDrawable(R.drawable.user_icon_black).constantState) {
                 var byteArray: ByteArray? = null
                 try {
@@ -245,70 +256,78 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                 } catch (ex: Exception) {
                     Log.d("Dgddfdf picas", "7")
                 }
-                val drawable = imageView1!!.getDrawable() as BitmapDrawable
-                val bitmap = drawable.bitmap
-                encodedImage = RandomUtils.encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
-                val d = Intent(this@DeliveryPersonPhotoActivity, StaffEntryRegistration::class.java)
-                //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
-                //                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
-                d.putExtra(
-                    ConstantUtils.UNITID,
-                    intent.getStringExtra(ConstantUtils.UNITID)
-                )
-                d.putExtra(
-                    ConstantUtils.UNITNAME,
-                    intent.getStringExtra(ConstantUtils.UNITNAME)
-                )
-                d.putExtra(
-                    ConstantUtils.FLOW_TYPE,
-                    intent.getStringExtra(ConstantUtils.FLOW_TYPE)
-                )
-                d.putExtra(
-                    ConstantUtils.VISITOR_TYPE,
-                    intent.getStringExtra(ConstantUtils.VISITOR_TYPE)
-                )
-                d.putExtra(
-                    ConstantUtils.COMPANY_NAME,
-                    intent.getStringExtra(ConstantUtils.COMPANY_NAME)
-                )
-                d.putExtra(
-                    ConstantUtils.MOBILENUMBER,
-                    intent.getStringExtra(ConstantUtils.MOBILENUMBER)
-                )
-                d.putExtra(
-                    ConstantUtils.COUNTRYCODE,
-                    intent.getStringExtra(ConstantUtils.COUNTRYCODE)
-                )
-                d.putExtra(
-                    ConstantUtils.PERSONNAME,
-                    intent.getStringExtra(ConstantUtils.PERSONNAME)
-                )
-                d.putExtra(ConstantUtils.PERSON_PHOTO, byteArray)
-                d.putExtra(ConstantUtils.ITEMS_PHOTO_LIST,list)
-                d.putExtra(
-                    ConstantUtils.ACCOUNT_ID,
-                    intent.getIntExtra(ConstantUtils.ACCOUNT_ID, 0)
-                )
-                d.putExtra(
-                    ConstantUtils.UNIT_ACCOUNT_ID,
-                    intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
-                )
-                d.putExtra(
-                    ConstantUtils.BLOCK_ID,
-                    intent.getStringExtra(ConstantUtils.BLOCK_ID)
-                )
-                d.putExtra(
-                    ConstantUtils.UNITOCCUPANCYSTATUS,
-                    intent.getStringExtra(ConstantUtils.UNITOCCUPANCYSTATUS)
-                )
-                d.putExtra(
-                    ConstantUtils.VISITOR_PURPOSE,
-                    intent.getStringExtra(ConstantUtils.VISITOR_PURPOSE)
-                )
-                d.putExtra("Base64", encodedImage)
-                startActivity(d)
-                finish()
-            } else {
+
+                    val drawable = imageView1!!.getDrawable() as BitmapDrawable
+                    val bitmap = drawable.bitmap
+                    encodedImage =
+                        RandomUtils.encodeToBase64(bitmap, Bitmap.CompressFormat.JPEG, 100)
+
+
+                    val d =
+                        Intent(this@DeliveryPersonPhotoActivity, StaffEntryRegistration::class.java)
+                    //                        Log.d("intentdata personPhoto", "buttonNext " + getIntent().getStringExtra(UNITNAME) + " " + getIntent().getStringExtra(UNITID)
+                    //                                + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " " + getIntent().getStringExtra(PERSONNAME));
+                    d.putExtra(
+                        ConstantUtils.UNITID,
+                        intent.getStringExtra(ConstantUtils.UNITID)
+                    )
+                    d.putExtra(
+                        ConstantUtils.UNITNAME,
+                        intent.getStringExtra(ConstantUtils.UNITNAME)
+                    )
+                    d.putExtra(
+                        ConstantUtils.FLOW_TYPE,
+                        intent.getStringExtra(ConstantUtils.FLOW_TYPE)
+                    )
+                    d.putExtra(
+                        ConstantUtils.VISITOR_TYPE,
+                        intent.getStringExtra(ConstantUtils.VISITOR_TYPE)
+                    )
+                    d.putExtra(
+                        ConstantUtils.COMPANY_NAME,
+                        intent.getStringExtra(ConstantUtils.COMPANY_NAME)
+                    )
+                    d.putExtra(
+                        ConstantUtils.MOBILENUMBER,
+                        intent.getStringExtra(ConstantUtils.MOBILENUMBER)
+                    )
+                    d.putExtra(
+                        ConstantUtils.COUNTRYCODE,
+                        intent.getStringExtra(ConstantUtils.COUNTRYCODE)
+                    )
+                    d.putExtra(
+                        ConstantUtils.PERSONNAME,
+                        intent.getStringExtra(ConstantUtils.PERSONNAME)
+                    )
+                    d.putExtra(ConstantUtils.PERSON_PHOTO, byteArray)
+                    d.putExtra(ConstantUtils.ITEMS_PHOTO_LIST, list)
+                    d.putExtra(
+                        ConstantUtils.ACCOUNT_ID,
+                        intent.getIntExtra(ConstantUtils.ACCOUNT_ID, 0)
+                    )
+                    d.putExtra(
+                        ConstantUtils.UNIT_ACCOUNT_ID,
+                        intent.getStringExtra(ConstantUtils.UNIT_ACCOUNT_ID)
+                    )
+                    d.putExtra(
+                        ConstantUtils.BLOCK_ID,
+                        intent.getStringExtra(ConstantUtils.BLOCK_ID)
+                    )
+                    d.putExtra(
+                        ConstantUtils.UNITOCCUPANCYSTATUS,
+                        intent.getStringExtra(ConstantUtils.UNITOCCUPANCYSTATUS)
+                    )
+                    d.putExtra(
+                        ConstantUtils.VISITOR_PURPOSE,
+                        intent.getStringExtra(ConstantUtils.VISITOR_PURPOSE)
+                    )
+                    d.putExtra("Base64", encodedImage)
+                    startActivity(d)
+                    finish()
+
+
+            }
+            else {
                 Toast.makeText(applicationContext, "Capture Photo ", Toast.LENGTH_SHORT)
                     .show()
                submit_button!!.isEnabled = true
@@ -400,17 +419,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String?>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            1 -> if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { // takePhoto();
-            }
-        }
-    }
+
 
 
     fun hideViewPager() {
@@ -507,7 +516,11 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
                     if(getdata.data!=null) {
                         if (getdata.data.visitorLatestRecord.vlEntryImg!=null) {
-
+                            Toast.makeText(
+                                this@DeliveryPersonPhotoActivity,
+                                getdata.data.visitorLatestRecord.vlEntryImg,
+                                Toast.LENGTH_LONG
+                            ).show()
                             try {
                                 if (getdata.data.visitorLatestRecord.vlEntryImg.contains("PERSON")) {
 
@@ -534,6 +547,7 @@ class DeliveryPersonPhotoActivity : AppCompatActivity() , View.OnClickListener {
                         } else {
                             imageView1!!.setBackgroundResource(R.drawable.user_icon_black)
                         }
+
                     }
                 }
 

@@ -45,7 +45,7 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup">
-        <activity android:name=".activity.StaffAddCarFragment"></activity>
+        <activity android:name=".staff.StaffAddCarFragment"></activity>
         <activity android:name=".staff.StaffBlockTabsActivity" />
         <activity android:name=".kidexit.KidEdxitBlockTabsActivity" />
         <activity android:name=".residentidcard.ResidentCaptureImageOcr" />
@@ -71,10 +71,6 @@
             android:theme="@style/noActionBar" />
         <activity
             android:name=".staff.StaffMobileNumberScreenwithOTP"
-            android:screenOrientation="portrait"
-            android:theme="@style/noActionBar" />
-        <activity
-            android:name=".staff.StaffAddCarFragment"
             android:screenOrientation="portrait"
             android:theme="@style/noActionBar" />
         <activity
@@ -531,23 +527,13 @@
             android:name=".vehicle_others.Vehicle_OthersUnitSelectionActivity"
             android:screenOrientation="portrait"
             android:theme="@style/noActionBar" />
-        <activity
-            android:name=".resident.ResidentIdActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/noActionBar" />
-        <activity
-            android:name=".resident.ResidentMissedCallActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/noActionBar" />
+
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/gate_channel" />
 
-        <activity
-            android:name=".resident.ResidentMobileNumberScreenwithOTP"
-            android:screenOrientation="portrait"
-            android:theme="@style/noActionBar" />
+
         <activity
             android:name=".kidexit.KidExitBlockSelectionActivity"
             android:screenOrientation="portrait"

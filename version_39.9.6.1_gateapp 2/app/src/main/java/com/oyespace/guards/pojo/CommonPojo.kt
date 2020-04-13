@@ -1629,11 +1629,12 @@ data class GetWorkersListByMobileNumberReq(
 )
 
 data class GetWorkersListByMobileNumberResp(
-    val `data`: WorkersData,
+    val `data`: WorkersData_,
     val apiVersion: String,
     val success: Boolean
 )
-data class WorkersData(
+
+data class WorkersData_(
     val workers:WorkerMobileData,
     val message:String
 )
@@ -2127,4 +2128,65 @@ data class WorkerType(
     val wtIsActive: Boolean,
     val wtid: Int
 )
+//data class StaffRegistrationReqJv (
+//    val WKFName: String,
+//    val WKLName: String,
+//    val WKMobile: String,
+//    val WKISDCode: String,
+//    val WKEntryGPS: String,
+//    val WKWrkType: String,
+//    val WKDesgn: String,
+//    val WKIDCrdNo: String,
+//    val WKDOB: String,
+//    val VNVendorID: Int ,
+//    val BLBlockID: String,
+//    val ASAssnID : Int,
+//    val UNUnitID: String,
+//    val UNUniName: String,
+//    val IDPrfType: String,
+//    val WKExpiry: String,
+//    val WKStatus: String,
+//    val WKExpDate: String,
+//    val WKVehNo: String,
+//    val WKEntryImg: String,
+//    val IDPrfImg: String
+//)
+//data class StaffRegistrationReqJv(
+//    val WKFName: String,
+//    val WKLName: String,
+//    val WKMobile: String,
+//    val WKISDCode: String,
+//    //val WKEntryGPS: String,
+//    val WKWrkType: String,
+//    val WKDesgn: String,
+//    val WKIDCrdNo: String,
+//    val WKDOB: String,
+//    val VNVendorID: Int,
+//    val BLBlockID: String,
+//    val ASAssnID: Int,
+//    val UNUnitID: String,
+//    val UNUniName: String,
+//    val IDPrfType: String,
+//    val WKExpiry: String,
+//    val WKStatus: String,
+//    val WKExpDate: String,
+//    //val WKVehNo: String,
+//    val WKEntryImg: String,
+//    val IDPrfImg: String
+//)
+
+data class  StaffRegistrationRespJv (
+    var apiVersion: String,
+    var data: Workersdata,
+    var success: String
+)
+
+data class Workersdata (
+        var worker: Worker_
+    )
+
+data class Worker_ (
+        var wkWorkID:Int
+    )
+
 

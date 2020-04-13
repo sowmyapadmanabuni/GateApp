@@ -23,7 +23,40 @@ open class Worker:RealmObject(){
     var asAssnID:Long = 0
     var wkIsActive:Boolean = false
     var unUniName:String = ""
-    var acAccntID:Int=0
+    var acAccntID:String=""
+
+//    var acAccntID: String= ""
+//    var asAssnID: Long = 0
+//    var blBlockID: String= ""
+//    var fromDate: String= ""
+//    var idPrfImg: String= ""
+//    var idPrfType: String= ""
+//    var toDate: String= ""
+//    var unUniName: String= ""
+//    var unUnitID: String= ""
+//    var vnVendorID:Long = 0
+//    var wkDesgn: String= ""
+//    var wkEntryGPS: String= ""
+//    var wkEntryImg: String= ""
+//    var wkExitGPS: String= ""
+//    var wkExitImg: String= ""
+//    var wkExpDate: String= ""
+//    var wkExpiry: String= ""
+//    var wkIsActive: Boolean=false
+//    var wkMobile: String= ""
+//    var wkSelfImg: String= ""
+//    var wkStatus: String= ""
+//    var wkVehNo: String= ""
+//    var wkWorkID: Int=0
+//    var wkWrkType: String= ""
+//    var wkdCreated: String= ""
+//    var wkdUpdated: String= ""
+//    var wkdob: String= ""
+//    var wkfName: String= ""
+//    var wkidCrdNo: String= ""
+//    var wkisdCode: String= ""
+//    var wklName: String= ""
+//    var workerstatuses: String= ""
 
 }
 data class GetWorkersResponse<T>(
@@ -44,3 +77,5 @@ data class GetGuardsListResponse<T>(
 data class GuardsList(
     val workers: RealmList<Worker>
 )
+
+
