@@ -39,7 +39,7 @@ public class StaffRealm {
 
         try (Realm realmInstance = Realm.getDefaultInstance()) {
             if(realmInstance.isInTransaction()){
-             //   realmInstance.delete(Worker.class);
+                realmInstance.delete(Worker.class);
                 realmInstance.copyToRealmOrUpdate(arrayList);
             }else {
                 realmInstance.executeTransaction((realm) -> {

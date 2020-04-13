@@ -135,6 +135,7 @@ class UnitsFragment : Fragment() {
         override fun onBindViewHolder(holder: MenuHolder, position: Int) {
             val orderData = listVistor.get(position)
             val vistordate = orderData.asAssnID
+
             holder.apartmentNamee.text = orderData.unUniName
             if (listVistor.get(position).isSelected) {
                 holder.cb_unit.isChecked = true

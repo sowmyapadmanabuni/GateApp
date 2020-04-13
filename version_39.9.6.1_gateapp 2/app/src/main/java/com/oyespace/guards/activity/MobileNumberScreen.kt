@@ -371,6 +371,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
 
                             }else{
+                            Prefs.putString("PHOTO","CAPTURE")
                             val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
                             d.putExtra(FLOW_TYPE, DELIVERY)
                             d.putExtra(VISITOR_TYPE, DELIVERY)
@@ -487,7 +488,15 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
                     if(getdata.data!=null) {
+
+                        if(getdata.data.visitorLatestRecord.vlEntryImg==""){
+                            Prefs.putString("PHOTO","CAPTURE")
+                        }else{
+                            Prefs.putString("PHOTO","DONTCAPTURE")
+                        }
+
                         val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
+
                         d.putExtra(FLOW_TYPE, DELIVERY)
                         d.putExtra(VISITOR_TYPE, DELIVERY)
                         d.putExtra(MOBILENUMBER, getdata.data.visitorLatestRecord.vlMobile.substring(3, 13))
@@ -498,6 +507,7 @@ class MobileNumberScreen : BaseKotlinActivity(), View.OnClickListener,
                         startActivity(d)
                         finish()
                     }  else{
+                        Prefs.putString("PHOTO","CAPTURE")
                         val d = Intent(this@MobileNumberScreen, BlockTabsActivity::class.java)
                         d.putExtra(FLOW_TYPE, DELIVERY)
                         d.putExtra(VISITOR_TYPE, DELIVERY)
