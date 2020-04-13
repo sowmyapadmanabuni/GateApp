@@ -1166,8 +1166,8 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                             entryTime,
                                             vlVisLgID.toString()
                                         )
-                                    } catch (e: KotlinNullPointerException) {
-
+                                    } catch (e: java.lang.Exception) {
+                                            e.printStackTrace()
                                     }
                                 }
                               sendCloudFunctionNotification(
@@ -1182,14 +1182,15 @@ BackgroundSyncReceiver : BroadcastReceiver() {
                                 )
 
                             }
-                        } catch (e: IndexOutOfBoundsException) {
-
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }
 
                 }
 
                 override fun onErrorResponse(e: Throwable) {
+                    e.printStackTrace()
                     // visitorLog(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
                     //  visitorLogBiometric(unitId, personName, mobileNumb, desgn, workerType, staffID, unitName,wkEntryImg)
 
