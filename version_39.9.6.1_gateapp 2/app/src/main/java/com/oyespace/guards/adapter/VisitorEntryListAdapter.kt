@@ -168,7 +168,7 @@ class VisitorEntryListAdapter(private var visitorList: ArrayList<VisitorLog>, pr
                     holder.btn_makeexit.visibility = View.VISIBLE
                 }
                 holder.btn_makeexit.setOnClickListener {
-                    val type = visitor.vlVisType
+                  //  val type = visitor.vlVisType
                     when {
                         type.contains(GUEST,true)->{
                             holder.btn_makeexit.visibility = View.GONE

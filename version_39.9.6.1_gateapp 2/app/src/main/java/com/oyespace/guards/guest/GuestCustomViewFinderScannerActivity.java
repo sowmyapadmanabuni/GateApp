@@ -187,7 +187,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
                         alertDialog.show();
                     }
-                    else  if(entryExists(sMobile.replace("+91",""),"+91")) {
+                    else  if(entryExists("+91",sMobile)) {
 
 
 //                        Toast.makeText(this,"Mobile Number already used for Visitor Entry", Toast.LENGTH_SHORT).show()
@@ -206,7 +206,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
 
                       //  (  final String unitName, final String fromDate, final String fromTime, final String vehicleNumber, final String numberofPersons, final String toDate, final String associationId
 //final int invitationId, final String personname, final String countryCode, final String mobileNumber, final String unitID,final String fromDate, final String numberofPersons, final String toDate, final String associationId
-                        getInviation(Integer.parseInt(sinInvtID), sName, "+91", sMobile.replace("+91",""), sunUnitID,sinsDate,sinVisCnt,sineDate,sasAssnID );
+                        getInviation(Integer.parseInt(sinInvtID), sName, "+91", sMobile, sunUnitID,sinsDate,sinVisCnt,sineDate,sasAssnID );
                     } else {
                         //Toast.makeText(GuestCustomViewFinderScannerActivity.this, "Valid Invitation", Toast.LENGTH_LONG).show();
 
@@ -229,7 +229,7 @@ public class GuestCustomViewFinderScannerActivity extends BaseScannerActivity im
                                 alertDialog.dismiss();
                                 Intent intent = new Intent(GuestCustomViewFinderScannerActivity.this, VehicleGuestQRRegistration.class);
                                 intent.putExtra(FLOW_TYPE, VEHICLE_GUESTWITHQRCODE);
-                                intent.putExtra(VISITOR_TYPE, GUEST);
+                                intent.putExtra(VISITOR_TYPE, "Guest with Invitation");
                                 intent.putExtra(COMPANY_NAME, GUEST);
                                 intent.putExtra(PERSONNAME, sName);
                                 intent.putExtra(COUNTRYCODE, "+91");

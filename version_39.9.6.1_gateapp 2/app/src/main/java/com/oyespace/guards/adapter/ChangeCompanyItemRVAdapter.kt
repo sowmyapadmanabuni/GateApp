@@ -34,7 +34,6 @@ class ChangeCompanyItemRVAdapter(private val mcontext: Context, private val arra
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
 
          if (Prefs.getString(PrefKeys.LANGUAGE, null).equals("en")) {
-             Toast.makeText(mcontext,arrayList[position].vTypeEng,Toast.LENGTH_LONG).show()
              holder.itemLabel.text = arrayList[position].vTypeEng
          }else{
              holder.itemLabel.text = arrayList[position].vTypeHin
