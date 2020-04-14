@@ -196,7 +196,13 @@ class VisitorLogRepo {
         fun updateVisitorStatus(context: Context, visitor: VisitorLog, status: String, onlyLocalUpdate: Boolean = false) {
 
             val vLogId = visitor.vlVisLgID
-
+            val vMobileNumber=visitor.vlMobile
+            val vName=visitor.vlfName
+            val vUnitName=visitor.unUniName
+            val vUnitId=visitor.unUnitID
+            val vColumnName=visitor.vlComName
+            val vVisType=visitor.vlVisType
+            val vActTime=visitor.vlsActTm
             if (onlyLocalUpdate) {
                 VisitorEntryLogRealm.updateVisitorStatus(visitor, status)
                 return
@@ -220,7 +226,7 @@ class VisitorLogRepo {
                                 s += "$vLogId,"
                                 Prefs.putString(ConstantUtils.SP_DEL_FB_IDs, s)
 
-                                if (!visitor.vlVisType.contains(STAFF)) {
+                                if (!vVisType.contains(STAFF)) {
 
 
 
@@ -230,25 +236,25 @@ class VisitorLogRepo {
                                 val assName = LocalDb.getAssociation()!!.asAsnName
                                 val gateName = Prefs.getString(GATE_NO, null)
                                 try {
-                                    var message = "${visitor.vlfName} from ${visitor.vlComName} has exited ${assName} from $gateName"
+                                    var message = "${vName} from ${vColumnName} has exited ${assName} from $gateName"
                                 if (status == ConstantUtils.EXITED) {
                                     try {
                                         if (visitor.isValid) {
                                             val d = Intent(context, BackgroundSyncReceiver::class.java)
                                             d.putExtra(ConstantUtils.BSR_Action, ConstantUtils.VisitorEntryFCM)
                                             d.putExtra("msg", message)
-                                            d.putExtra("mobNum", visitor.vlMobile)
-                                            d.putExtra("name", visitor.vlfName)
-                                            d.putExtra("nr_id", visitor.vlVisLgID.toString())
-                                            d.putExtra("unitname", visitor.unUniName)
+                                            d.putExtra("mobNum", vMobileNumber)
+                                            d.putExtra("name", vName)
+                                            d.putExtra("nr_id", vLogId.toString())
+                                            d.putExtra("unitname", vUnitName)
                                             d.putExtra("memType", "Owner")
-                                            d.putExtra(ConstantUtils.UNITID, visitor.unUnitID)
-                                            d.putExtra(ConstantUtils.COMPANY_NAME, visitor.vlComName)
-                                            d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID, visitor.unUnitID)
-                                            d.putExtra("VLVisLgID", visitor.vlVisLgID)
-                                            d.putExtra(ConstantUtils.VISITOR_TYPE, visitor.vlVisType)
+                                            d.putExtra(ConstantUtils.UNITID, vUnitId)
+                                            d.putExtra(ConstantUtils.COMPANY_NAME,vColumnName)
+                                            d.putExtra(ConstantUtils.UNIT_ACCOUNT_ID,vUnitId)
+                                            d.putExtra("VLVisLgID", vLogId)
+                                            d.putExtra(ConstantUtils.VISITOR_TYPE, vVisType)
                                             d.putExtra(ConstantUtils.SEND_NOTIFICATION, false)
-                                            d.putExtra("EntryTime", visitor.vlsActTm)
+                                            d.putExtra("EntryTime", vActTime)
                                             context.sendBroadcast(d)
                                         }
                                     } catch (e: Exception) {

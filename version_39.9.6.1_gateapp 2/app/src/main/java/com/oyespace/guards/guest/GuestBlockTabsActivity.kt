@@ -257,7 +257,7 @@ class GuestBlockTabsActivity : BaseKotlinActivity(), OnDataPass {
                 d.putExtra(UNITID, unitId)
                 d.putExtra(UNITNAME, unitNames)
                 d.putExtra(FLOW_TYPE, GUEST_REGISTRATION)
-                d.putExtra(VISITOR_TYPE, GUEST)
+                d.putExtra(VISITOR_TYPE, "Guest without Invitation")
                 d.putExtra(COMPANY_NAME, GUEST)
                 d.putExtra(UNIT_ACCOUNT_ID,acAccntID)
                 d.putExtra(BLOCK_ID, blockID)

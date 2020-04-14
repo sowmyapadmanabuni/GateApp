@@ -134,8 +134,8 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
             d.putExtra("BIRTHDAY", staffdata.wkdob)
             d.putExtra(BLOCK_ID,staffdata.blBlockID)
             d.putExtra(UNIT_ACCOUNT_ID,staffdata.acAccntID)
-
-
+                d.putExtra(FLOW_TYPE, STAFF_REGISTRATION)
+                d.putExtra(VISITOR_TYPE, "STAFF")
             mcontext.startActivity(d)
             (mcontext as Activity).finish()
 }
@@ -156,6 +156,7 @@ class StaffAdapter(val items: ArrayList<Worker>, val mcontext: Context) :
                 intent.putExtra(UNITNAME, staffdata.unUniName)
                 intent.putExtra("IMAGE", staffdata.wkEntryImg)
                 intent.putExtra("DOB", staffdata.wkdob)
+                intent.putExtra(VISITOR_TYPE, "STAFF")
 
                 // (mcontext as Activity).startActivityForResult(intent, 2)
                 mcontext.startActivity(intent)
