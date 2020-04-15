@@ -151,6 +151,11 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.bugsnag.android.API_KEY"
+            android:value="a47aaea90de4d5f5d3ca1f3eed5e9965"/>
+        <meta-data android:name="com.bugsnag.android.DETECT_ANRS"
+            android:value="true"/>
 
         <activity
             android:name=".activity.ChangeServiceProviderListActivity"

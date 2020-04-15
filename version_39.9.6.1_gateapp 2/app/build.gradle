@@ -9,7 +9,7 @@ buildscript {
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
-
+apply plugin: 'com.bugsnag.android.gradle'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -107,6 +107,7 @@ dependencies {
     implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.6.0'
 
+    implementation 'com.bugsnag:bugsnag-android:4.+'
     // implementation 'com.squareup.retrofit2:retrofit:2.3.0'
     //implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
     //implementation 'com.jakewharton.retrofit:retrofit2-rxjava2-adapter:1.0.0'
