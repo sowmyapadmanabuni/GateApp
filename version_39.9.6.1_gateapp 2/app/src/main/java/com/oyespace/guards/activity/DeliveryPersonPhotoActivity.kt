@@ -503,12 +503,11 @@ class DeliveryPersonPhotoActivity : BaseKotlinActivity() , View.OnClickListener 
         applicationContext.sendBroadcast(mediaScanIntent)
     }
 
-
     fun getLatestRecordData(mobileNumber:String,accountId:String) {
         RetrofitClinet.instance.getLatestRecord(
-            ConstantUtils.OYE247TOKEN,
-            mobileNumber
-        )
+                ConstantUtils.OYE247TOKEN,
+                mobileNumber
+            )
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeWith(object : CommonDisposable<GetLatestRecord>() {
@@ -516,11 +515,7 @@ class DeliveryPersonPhotoActivity : BaseKotlinActivity() , View.OnClickListener 
                 override fun onSuccessResponse(getdata: GetLatestRecord) {
                     if(getdata.data!=null) {
                         if (getdata.data.visitorLatestRecord.vlEntryImg!=null) {
-                            Toast.makeText(
-                                this@DeliveryPersonPhotoActivity,
-                                getdata.data.visitorLatestRecord.vlEntryImg,
-                                Toast.LENGTH_LONG
-                            ).show()
+
                             try {
                                 if (getdata.data.visitorLatestRecord.vlEntryImg.contains("PERSON")) {
 
@@ -568,6 +563,7 @@ class DeliveryPersonPhotoActivity : BaseKotlinActivity() , View.OnClickListener 
             })
 
     }
+
 }
 
 

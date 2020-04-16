@@ -148,8 +148,8 @@ public class GuestAddCarFragment extends BaseKotlinActivity implements View.OnCl
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setLocale(Prefs.getString(LANGUAGE, null));
-
         setContentView(R.layout.add_car_fragment);
+
         initViews();
         txt_assn_name.setText("Society: " + LocalDb.getAssociation().getAsAsnName());
         txt_gate_name.setText("Gate No: "+Prefs.getString(GATE_NO,""));

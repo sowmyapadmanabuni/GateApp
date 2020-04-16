@@ -71,7 +71,7 @@ android {
     dataBinding {
         enabled = true
 //        android.databinding.enableV2 = true
-      //  android.enableExperimentalFeatureDatabinding = true
+        //  android.enableExperimentalFeatureDatabinding = true
     }
 
     compileOptions {

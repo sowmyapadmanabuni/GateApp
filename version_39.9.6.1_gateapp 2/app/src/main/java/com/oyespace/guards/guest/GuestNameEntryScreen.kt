@@ -42,7 +42,7 @@ class GuestNameEntryScreen : BaseKotlinActivity(), View.OnClickListener {
                 buttonNext.isClickable = false
                 if (Ed_Name.text.length > 2) {
 //                    val d = Intent(this@NameEntryScreen, CameraActivity::class.java)
-                    val d = Intent(this@GuestNameEntryScreen, GuestAddCarFragment::class.java)
+                    val d = Intent(this@GuestNameEntryScreen, GuestPhotoScreen::class.java)
 
 //                    Log.d(
 //                        "intentdata NameEntr",

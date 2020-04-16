@@ -28,9 +28,11 @@ import com.oyespace.guards.utils.*
 import com.oyespace.guards.utils.ConstantUtils.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import io.realm.Realm
 
 
 class BlockTabsActivity : BaseKotlinActivity(), OnDataPass {
+
     var clickable1 = 0
     var iv_torch: Button?=null
     var buttonNext:Button?=null
@@ -366,11 +368,13 @@ class BlockTabsActivity : BaseKotlinActivity(), OnDataPass {
 
     override fun onDataPass(data: String) {
         Log.d("LOG","hello " + data.toString())
+
         if (data != null) {
             var selArray: Array<UnitPojo> = Gson().fromJson(data, Array<UnitPojo>::class.java)
             selectedUnits = ArrayList(selArray.asList())
 
-            Log.d("LOG", "111 " + selectedUnits.size)
-        }
+//            }
+
+              }
     }
 }

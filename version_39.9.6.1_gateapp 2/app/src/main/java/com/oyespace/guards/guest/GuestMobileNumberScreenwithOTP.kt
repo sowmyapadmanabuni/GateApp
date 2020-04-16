@@ -605,7 +605,7 @@ class GuestMobileNumberScreenwithOTP : BaseKotlinActivity(), View.OnClickListene
 
                             Log.d("getAccountDetails", globalApiObject.data.toString())
                             Log.d("getAccountDetails", globalApiObject.data.accountByMobile.toString())
-                            val d = Intent(this@GuestMobileNumberScreenwithOTP, GuestAddCarFragment::class.java)
+                            val d = Intent(this@GuestMobileNumberScreenwithOTP, GuestPhotoScreen::class.java)
 
                             Log.d(
                                 "intentdata NameEntr",
