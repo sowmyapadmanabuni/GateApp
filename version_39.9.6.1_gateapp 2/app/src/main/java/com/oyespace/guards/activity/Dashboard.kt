@@ -37,6 +37,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.bugsnag.android.Bugsnag
 import com.google.firebase.FirebaseError
 import com.google.firebase.database.*
 import com.google.firebase.messaging.FirebaseMessaging
@@ -311,7 +312,6 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         createNotificationChannel();
         setLocale(Prefs.getString(LANGUAGE, null))
         setContentView(R.layout.activity_dash_board)
-
         //   getSubscriptionData()
 
         cd = ConnectionDetector()
@@ -1793,7 +1793,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                             }else{
                                                 //IVR
                                                 //sendIVRCall()
-                                                sendReminderToFamily(status,unitId,""+visitorLgId)
+                                                sendReminderToFamily(status,unitId,""+visitorLgId,visitorJSON)
                                             }
                                         }
 
@@ -1850,7 +1850,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         }
     }
 
-    fun sendReminderToFamily(type:String, unitId:String, visitorLogId: String){
+    fun sendReminderToFamily(type:String, unitId:String, visitorLogId: String, visitorJSON:String){
 
         val assnId = Prefs.getInt(ASSOCIATION_ID, 0)
         RetrofitClinet.instance.getFamilyMemberListForIVR(OYE247TOKEN, ""+assnId,unitId)
@@ -1866,11 +1866,11 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                             val owner = getdata.data.ownerDetails;
                             val tenant = getdata.data.tenantDetails
                             if(owner.uoid != 0 && owner.uoMobile != null){
-                                sendIVRCall(owner.uoMobile, visitorLogId, type);
+                                sendIVRCall(owner.uoMobile, visitorLogId, type, visitorJSON);
                             }
 
                             if(tenant.utid != 0 && tenant.utMobile != null){
-                                sendIVRCall(tenant.utMobile, visitorLogId, type);
+                                sendIVRCall(tenant.utMobile, visitorLogId, type, visitorJSON);
                             }
                             for (member in familyMembers) {
                                 var mob = member.fmMobile;
@@ -1878,7 +1878,7 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
                                     mob = mob.replace("+91", "");
                                 }
                                 //if(mob.contains("8072262742")) {
-                                sendIVRCall(mob, visitorLogId, type);//mob
+                                sendIVRCall(mob, visitorLogId, type, visitorJSON);//mob
                                 //}
                             }
 
@@ -1905,8 +1905,22 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
 
 
 
-    fun sendIVRCall(phone:String, visitorLogId:String, type:String) {
+    fun sendIVRCall(phone:String, visitorLogId:String, type:String, visitorJSON:String) {
         var mob = phone;
+        var unitName:String = "";
+        var companyName:String = ""
+        var gateNumber:String = "Gate%20"+Prefs.getString(GATE_NO,"")
+
+        try{
+            val visitorJSONObject = JSONObject(visitorJSON);
+            unitName = visitorJSONObject.getString("unitname")
+            companyName = visitorJSONObject.getString("company_name")
+
+        }catch (e:java.lang.Exception){
+            e.printStackTrace()
+        }
+
+
         if (mob.contains("+91")) {
             mob = mob.replace("+91", "");
         }
@@ -1914,7 +1928,9 @@ class Dashboard : BaseKotlinActivity(), View.OnClickListener, ResponseHandler, S
         Executors.newSingleThreadExecutor().execute({
 
             Log.e("PHONE_ZEOTEL",""+mob);
-            val url = URL("http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+mob+"&ri=60&rc=3&df=json")
+            //http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+mob+"&ri=60&rc=3&df=json
+            var zeotelAPIString = "http://ex4.zeotel.com/c2c?key=ynXIl8oE9bN7NLulZjea1Q-1579242022&ac=4000342&ph="+mob+"&user_vars=GNAME="+companyName+",GNUMBER="+gateNumber+",APNAME="+unitName
+            val url = URL(zeotelAPIString)
 
             with(url.openConnection() as HttpURLConnection) {
                 requestMethod = "GET"  // optional default is GET

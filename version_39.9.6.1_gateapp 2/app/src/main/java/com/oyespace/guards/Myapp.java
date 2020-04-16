@@ -10,6 +10,7 @@ import androidx.multidex.BuildConfig;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
+import com.bugsnag.android.Bugsnag;
 import com.crashlytics.android.Crashlytics;
 import com.crashlytics.android.core.CrashlyticsCore;
 import com.google.android.material.snackbar.Snackbar;
@@ -80,6 +81,7 @@ public class Myapp extends MultiDexApplication implements InternetConnectivityLi
 
         super.onCreate();
 
+        Bugsnag.init(this);
 
         IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         this.registerReceiver(new NetworkChangeReceiver(), intentFilter);
