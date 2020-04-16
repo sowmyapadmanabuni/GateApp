@@ -41,8 +41,11 @@ public class SOSSirenService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mediaPlayer.stop();
-
+        try {
+            mediaPlayer.stop();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 //        Toast.makeText(this, "Service Destroyed", Toast.LENGTH_LONG).show();
     }
 }

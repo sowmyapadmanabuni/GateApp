@@ -146,6 +146,17 @@ class FRTDBService : Service() {
                                 }
                                 if (it.hasChild("sosImage")) {
                                     sosImage = it.child("sosImage").getValue(String::class.java)!!
+                                }else if (it.hasChild("emergencyImages")) {
+                                    try {
+                                        var emergencyImages: ArrayList<String> = ArrayList()
+                                        val _tp =
+                                            object : GenericTypeIndicator<ArrayList<String>>() {}
+                                        emergencyImages =
+                                            (it.child("emergencyImages").getValue(_tp))!!
+                                        sosImage = emergencyImages[0];
+                                    }catch (e:java.lang.Exception){
+                                        e.printStackTrace()
+                                    }
                                 }
                                 if (it.hasChild("userId")) {
                                     userId = it.child("userId").getValue(Int::class.java)!!

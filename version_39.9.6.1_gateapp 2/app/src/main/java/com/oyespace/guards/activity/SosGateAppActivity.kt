@@ -1,5 +1,6 @@
 package com.oyespace.guards.activity
 
+import android.app.Dialog
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
@@ -14,11 +15,15 @@ import android.os.AsyncTask
 import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
+import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.view.Window
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
+import androidx.viewpager.widget.ViewPager
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -30,6 +35,7 @@ import com.google.gson.Gson
 import com.kodmap.app.library.PopopDialogBuilder
 import com.oyespace.guards.BackgroundSyncReceiver
 import com.oyespace.guards.R
+import com.oyespace.guards.adapter.SOSImageAdapter
 import com.oyespace.guards.com.oyespace.guards.activity.EmergencyModel
 import com.oyespace.guards.com.oyespace.guards.pojo.SOSModel
 import com.oyespace.guards.constants.PrefKeys
@@ -234,10 +240,34 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
     private fun showImages() {
         val urlList = ArrayList<String>()
         urlList.addAll(emergencyImages)
-        val dialog = PopopDialogBuilder(this@SosGateAppActivity).setList(urlList).build()
-        dialog.show()
+//        val dialog = PopopDialogBuilder(this@SosGateAppActivity).setList(urlList).build()
+//        dialog.show()
+        showDialog(urlList)
     }
 
+    private fun showDialog(images: ArrayList<String>) {
+        val dialog = Dialog(this@SosGateAppActivity)
+        dialog .requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog .setCancelable(true)
+        dialog .setContentView(R.layout.sos_image_dialog)
+
+        val pager = dialog.findViewById(R.id.sos_pager) as ViewPager
+        val closebtn = dialog.findViewById(R.id.sos_close) as Button
+        val sosPagerAdapter = SOSImageAdapter(this@SosGateAppActivity,images)
+        pager.adapter = sosPagerAdapter;
+
+        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+//        val body = dialog .findViewById(R.id.body) as TextView
+//        body.text = title
+//        val yesBtn = dialog .findViewById(R.id.yesBtn) as Button
+//        val noBtn = dialog .findViewById(R.id.noBtn) as TextView
+        closebtn.setOnClickListener {
+            dialog .dismiss()
+        }
+//        noBtn.setOnClickListener { dialog .dismiss() }
+        dialog .show()
+
+    }
 
     private fun initFRTDB() {
         try {
@@ -451,10 +481,19 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                             }
                             if (emergencyImages != null && emergencyImages.size > 0) {
 
-                                Picasso.with(applicationContext)
-                                    .load(emergencyImages[0])
-                                    .placeholder(R.drawable.newicons_camera)
-                                    .error(R.drawable.newicons_camera).into(sos_image)
+//                                Picasso.with(applicationContext)
+//                                    .load(emergencyImages[0])
+//                                    .placeholder(R.drawable.newicons_camera)
+//                                    .error(R.drawable.newicons_camera).into(sos_image)
+
+
+                                try{
+                                    val imageBytes = Base64.decode(emergencyImages[0], Base64.DEFAULT)
+                                    val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                    sos_image!!.setImageBitmap(decodedImage)
+                                }catch (e:java.lang.Exception){
+                                    e.printStackTrace()
+                                }
                             } else {
                                 Picasso.with(applicationContext)
                                     .load(R.drawable.newicons_camera).into(sos_image)
@@ -702,10 +741,21 @@ open class SosGateAppActivity : BaseKotlinActivity(), OnMapReadyCallback,
                     sos_username.text = currentSOS.userName
                 }
                 if (currentSOS.sosImage != "" && currentSOS.sosImage != null) {
-                    Picasso.with(applicationContext)
-                        .load(currentSOS.sosImage)
-                        .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera)
-                        .into(sos_image)
+//                    Picasso.with(applicationContext)
+//                        .load(currentSOS.sosImage)
+//                        .placeholder(R.drawable.newicons_camera).error(R.drawable.newicons_camera)
+//                        .into(sos_image)
+                    try{
+                        val imageBytes = Base64.decode(currentSOS.sosImage, Base64.DEFAULT)
+                        val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                        sos_image!!.setImageBitmap(decodedImage)
+
+
+                    }catch (e:java.lang.Exception){
+                        e.printStackTrace()
+                    }
+
+
                 } else {
                     Picasso.with(applicationContext)
                         .load(R.drawable.newicons_camera).into(sos_image)
