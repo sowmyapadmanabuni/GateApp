@@ -548,7 +548,7 @@ class GuestMobileNumberScreen : BaseKotlinActivity(), View.OnClickListener, Coun
                         if (globalApiObject.data != null) {
                             Log.d("getAccountDetails", globalApiObject.data.toString())
                             Log.d("getAccountDetails", globalApiObject.data.accountByMobile.toString())
-                            val d = Intent(this@GuestMobileNumberScreen, GuestAddCarFragment::class.java)
+                            val d = Intent(this@GuestMobileNumberScreen, GuestPhotoScreen::class.java)
 
 //                            Log.d("intentdata NameEntr", "buttonNext " + getIntent().getStringExtra(UNITNAME)
 //                                    + " " + intent.getStringExtra(UNITID) + " " + getIntent().getStringExtra(MOBILENUMBER) + " " + getIntent().getStringExtra(COUNTRYCODE) + " "

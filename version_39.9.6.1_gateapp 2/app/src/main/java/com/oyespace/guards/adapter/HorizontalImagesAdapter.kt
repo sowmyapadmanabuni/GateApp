@@ -68,6 +68,8 @@ class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Arra
 //            .load("http://mediaupload.oyespace.com/" + arrayList[position])
 //            .placeholder(R.drawable.placeholder_dark).error(R.drawable.placeholder_dark).into(holder.image)
 
+
+
         val imageBytes = Base64.decode(arrayList[position], Base64.DEFAULT)
         val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
         holder.image!!.setImageBitmap(decodedImage)
@@ -120,6 +122,8 @@ class HorizontalImagesAdapter(private val mcontext: Context, val arrayList: Arra
             val imageBytes = Base64.decode(img, Base64.DEFAULT)
             val decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
             imgv!!.setImageBitmap(decodedImage)
+
+
         }
 
     }

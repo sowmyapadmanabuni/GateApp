@@ -67,6 +67,8 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
 
                 if(intent.getStringExtra("Base64")!=null){
                     imageData=intent.getStringExtra("Base64")
+
+
                 }else{
                     imageData=""
                 }
@@ -217,19 +219,25 @@ class GuestEntryRegistration : BaseKotlinActivity() , View.OnClickListener {
                 singUp(intent.getStringExtra(PERSONNAME),intent.getStringExtra(COUNTRYCODE),intent.getStringExtra(MOBILENUMBER))
             }
       //  }
-
-        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
-        if(wrrw!=null) {
-            imageName = "PERSON"+ intent.getStringExtra(MOBILENUMBER) + ".jpg"
-//            var mBitmap: Bitmap;
-            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
-            profile_image.setImageBitmap(mBitmap)
-
-        }else{
-          //  profile_image.visibility=View.GONE
-            imageName = ""
+        if(intent.getStringExtra("Base64")!=null){
+            val imageAsBytes = android.util.Base64.decode(intent.getStringExtra("Base64"),android.util.Base64.DEFAULT);
+            val decodedImage = BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.size);
+            profile_image.setImageBitmap(decodedImage)
 
         }
+
+        val wrrw = intent.getByteArrayExtra(PERSON_PHOTO)
+//        if(wrrw!=null) {
+//            imageName = "PERSON"+ intent.getStringExtra(MOBILENUMBER) + ".jpg"
+////            var mBitmap: Bitmap;
+//            mBitmap = BitmapFactory.decodeByteArray(wrrw, 0, wrrw.size)
+//            profile_image.setImageBitmap(mBitmap)
+//
+//        }else{
+//          //  profile_image.visibility=View.GONE
+//            imageName = ""
+//
+//        }
 
         list = intent.getStringArrayListExtra(ITEMS_PHOTO_LIST)
 

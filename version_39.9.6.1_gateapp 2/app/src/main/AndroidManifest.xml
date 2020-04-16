@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.oyespace.guards">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.oyespace.guards">
     <!-- NETWORK & WIFI -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -45,7 +45,8 @@
         android:usesCleartextTraffic="true"
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup">
-        <activity android:name=".staff.StaffAddCarFragment"></activity>
+        <activity android:name=".guest.GuestPhotoScreen"></activity>
+        <activity android:name=".staff.StaffAddCarFragment" />
         <activity android:name=".staff.StaffBlockTabsActivity" />
         <activity android:name=".kidexit.KidEdxitBlockTabsActivity" />
         <activity android:name=".residentidcard.ResidentCaptureImageOcr" />
@@ -533,11 +534,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/noActionBar" />
 
-
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/gate_channel" />
-
 
         <activity
             android:name=".kidexit.KidExitBlockSelectionActivity"
